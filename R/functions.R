@@ -1,8 +1,21 @@
 
-#'@param x
-#'@param y
-#'@param family
-#'@param pars
+
+#'@title
+#'Standardisation
+#'
+#'@description
+#'Transforming variables to mean 0 and variance 1.
+#'
+#'@inheritParams corila
+#'@param y \eqn{n_0}-dimensional response vector or \code{NULL}, only for Gaussian family 
+#'@param family character string \code{"gaussian"}, \code{NULL}
+#'@param pars list or \code{NULL}
+#'
+#'@return
+#'- standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
+#'- standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
+#'- list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
+#'- character string \code{family} indicates the model (\code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}), determined by argument \code{family} or \code{pars$family}
 #'
 forescale <- function(x,y=NULL,family=NULL,pars=NULL){
   if(is.null(family)==is.null(pars)){stop("Provide either family or pars.")}
@@ -33,9 +46,18 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
   return(list)
 }
 
-#'@param pars 
-#'@param y
-#'@param coef
+#'@title
+#'Inverse Standardisation
+#'
+#'@description
+#'Transforms response variable back to original scale or transforms coefficients for predictor variables and response variable on original scales.
+#'
+#'@inheritParams forescale
+#'@param y \eqn{n_1}-dimensional response vector
+#'@param coef \eqn{(1+p)-dimensional vector} containing the estimated intercept and the estimated slopes or \code{NULL} (default)
+#'
+#'@return
+#'Returns a list with slots \code{y_original} or \code{coef}.
 #'
 backscale <- function(pars,y=NULL,coef=NULL){
   list <- list()
@@ -57,6 +79,16 @@ backscale <- function(pars,y=NULL,coef=NULL){
 # use forescale and backscale also for multiridge
 # adapt func for binomial case
 
+#'@title
+#'Multi-Penalty Ridge Regression
+#'@description
+#'Fits multi-penalty ridge regression.
+#'
+#'@param x,y,z,family,penalties to be documented
+#'
+#'@return
+#'Returns an object of class \code{multiridge}.
+#'
 multiridge <- function(x,y,z,family,penalties=NULL){
   scale <- forescale(x=x,y=y,family=family)
   model <- ifelse(family=="gaussian","linear",ifelse(family=="binomial","logistic",NA))
@@ -92,6 +124,15 @@ multiridge <- function(x,y,z,family,penalties=NULL){
   return(object)
 }
 
+#'@title
+#'Make Predictions
+#'
+#'@description
+#'Make predictions from an object of class \code{multiridge}.
+#'
+#'@param object object of class \code{multiridge}
+#'@inheritParams predict.corila
+#'
 predict.multiridge <- function(object,newx,...){
   scale <- forescale(x=newx,pars=object$pars)
   #newx <- t((t(newx)-object$mu.x)/object$sd.x)
@@ -105,6 +146,14 @@ predict.multiridge <- function(object,newx,...){
   return(y_hat)
 }
 
+#'@title
+#'Extract Coefficients
+#'
+#'@description
+#'Extracts coefficients from a multi-penalty ridge regression model.
+#'
+#'@inheritParams predict.multiridge
+#'
 coef.multiridge <- function(object,...){
   Xblocks <- multiridge::createXblocks(datablocks=object$datablocks)
   coef <- multiridge::betasout(object,Xblocks=Xblocks,penalties=object$penalties)
@@ -159,6 +208,15 @@ if(FALSE){
 
 #----- group-lasso -----
 
+#'@title
+#'Combine variables
+#'
+#'@description
+#'Calculates the mean or the first principal component of a group of variables
+#'
+#'@inheritParams construct_matrices
+#'@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group
+#'
 combine_features <- function(x,mode="mean"){
   if(mode=="mean"){
     rowMeans(x)
@@ -167,6 +225,19 @@ combine_features <- function(x,mode="mean"){
   }
 }
 
+#'@title
+#'Construct Matrices
+#'
+#'@description
+#'Constructs matrices with (i) the original data concatenated with the inverted data, (ii) one meta-variable for each group, and (iii) one meta-variable for each group in each type.
+#'
+#'@param group \eqn{p}-dimensional vector of group labels or indices, or list with one slot for each group containing the variable labels or indices
+#'@param type \eqn{p}-dimensional vector
+#'@inheritParams corila
+#'
+#'@return
+#'See description.
+#'
 construct_matrices <- function(x,group,type,mode="mean"){
   index <- seq_len(ncol(x))
   n <- nrow(x)
@@ -208,8 +279,28 @@ if(FALSE){
   hyper <- data.frame(com=0.5,sep=0.25,ind=0.25)
 }
 
-
-
+#'@title
+#'Group lasso
+#'
+#'@description
+#'Fits an initial ridge regression to obtain weights for an adaptive lasso 
+#'regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
+#'
+#'@param x \eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables
+#'@param y \eqn{n}-dimensional response vector
+#'@param group XXX
+#'@param type \eqn{p}-dimensional vector
+#'@param family character string "gaussian", "binomial", "poisson" or "cox"
+#'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with $m$ rows containing candidate values for hyperparameters
+#'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
+#'@param cond \code{NULL}
+#'@param lambda.com, lambda.sep, lambda.ind \code{NULL}
+#'@param mode character string "mean" for arithmetic mean  or "pca" for first principal component
+#'@param init.multi logical
+#'
+#'@return
+#'Returns an object of class \code{"corila"}.
+#'
 corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,mode="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"
   
@@ -490,6 +581,18 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
   return(list)
 }
 
+#'@title
+#'predict (S3 method) 
+#'
+#'@description
+#'Makes prediction from an object of class \code{corila}.
+#'
+#'@param index integer scalar specifying the index of the mixing hyperparameter(s)
+#'@param s numeric scalar specifying the value of the regularisation hyperparameter
+#'
+#'@return
+#'Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
+#'
 predict.corila <- function(object,newx,index,s,...){
   newx_stand <- forescale(x=newx,pars=object$scale)$x
   y_hat_stand <- stats::predict(object=object$model[[index]],newx=cbind(newx_stand,-newx_stand),s=s,type=ifelse(object$scale$family=="cox","link","response"))
@@ -497,6 +600,17 @@ predict.corila <- function(object,newx,index,s,...){
   return(y_hat)
 }
 
+#'@title
+#'Sparse Group Lasso
+#'
+#'@description
+#'Optimises the parameters and the hyperparameters of the sparse group lasso.
+#'
+#'@inheritParams corila
+#'@param foldid \eqn{n}-dimensional vector containing the fold identifiers
+#'
+#'@seealso [corila()]
+#'
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
   if(is.null(type)){
     type <- rep(x=1,times=ncol(x))
@@ -601,6 +715,18 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode=
   return(list)
 }
 
+#'@title
+#'predict (S3 method)
+#'
+#'@description
+#'Makes predictions from an object of class \code{cv.corila}. 
+#'
+#'@param object object of class "cv.corila"
+#'@param newx \eqn{n_1 \times p} matrix
+#'@param s character "lambda.min" or numeric value
+#'
+#'@inherit predict.corila return
+#'
 predict.cv.corila <- function(object,newx,s="lambda.min"){
   if(s=="lambda.min"){
     s <- object$lambda.min
@@ -614,6 +740,8 @@ predict.cv.corila <- function(object,newx,s="lambda.min"){
   return(y_hat)
 }
 
+#'@inheritParams predict.cv.corila
+#'
 coef.cv.corila <- function(object,s="lambda.min"){
   if(s=="lambda.min"){
     s <- object$lambda.min
