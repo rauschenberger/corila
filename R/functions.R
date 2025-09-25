@@ -59,6 +59,22 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
 #'@return
 #'Returns a list with slots \code{y_original} or \code{coef}.
 #'
+#'@example
+#'
+#'# simulate data
+#'n <- 100; p <- 3
+#'sd <- stats::rpois(n=p,lambda=5)
+#'x <- sapply(X=sd,FUN=function(x) stats::rnorm(n=n,sd=x))
+#'beta <- stats::rnorm(n=p)
+#'y <- x %*% beta + stats::rnorm(n=n)
+#'
+#'# without standardisation
+#'lm <- stats::lm(y~x)
+#'
+#'# with standardisation
+#'forescale(x=x,y=y)
+#'
+#'
 backscale <- function(pars,y=NULL,coef=NULL){
   list <- list()
   if(!is.null(y) & pars$family=="gaussian"){
