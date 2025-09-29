@@ -1,6 +1,6 @@
 Package: corila
 Version: 0.0.1
-Title: Sparse Group Lasso
+Title: A Flexible Version of the Sparse Group Lasso
 Description: Estimates sparse regression models under grouped variables.
 Depends: R (>= 3.0.0)
 Imports: glmnet, stats, mvtnorm, pROC

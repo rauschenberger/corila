@@ -28,7 +28,7 @@
 #' @references
 #' \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger},
 #' (2025).
-#' "Sparse modelling with correlated features structured by heterogeneous, overlapping, or unobserved groups".
+#' "A flexible version of the sparse group lasso".
 #' \emph{In preparation}.
 #' 
 #' @examples
