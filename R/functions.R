@@ -239,6 +239,13 @@ if(FALSE){
 #'@inheritParams construct_matrices
 #'@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group
 #'
+#'@examples
+#'n <- 100; p <- 5
+#'x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
+#'mean <- combine_features(x=x,mode="mean")
+#'comp <- combine_features(x=x,mode="pca")
+#'plot(mean,comp)
+#'
 combine_features <- function(x,mode="mean"){
   if(mode=="mean"){
     rowMeans(x)
@@ -256,6 +263,14 @@ combine_features <- function(x,mode="mean"){
 #'@param group \eqn{p}-dimensional vector of group labels or indices, or list with one slot for each group containing the variable labels or indices
 #'@param type \eqn{p}-dimensional vector
 #'@inheritParams corila
+#'
+#'@examples
+#'n <- 5
+#'p <- 6
+#'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
+#'group <- rep(1:2,each=p/2)
+#'type <- rep(x=1,times=p)
+#'x <- construct_matrices(x=x,group=group,type=type)
 #'
 #'@return
 #'See description.
