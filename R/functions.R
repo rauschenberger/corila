@@ -3,6 +3,8 @@
 #'@title
 #'Standardisation
 #'
+#'@export
+#'
 #'@description
 #'Transforming variables to mean 0 and variance 1.
 #'
@@ -48,6 +50,8 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
 
 #'@title
 #'Inverse Standardisation
+#'
+#'@export
 #'
 #'@description
 #'Transforms response variable back to original scale or transforms coefficients for predictor variables and response variable on original scales.
@@ -123,7 +127,7 @@ multiridge <- function(x,y,z,family,penalties=NULL){
   #mu.x <- apply(X=x,MARGIN=2,FUN=base::mean)
   #sd.x <- apply(X=x,MARGIN=2,FUN=stats::sd)
   #mu.y <- mean(y)
-  #sd.y <- sd(y)
+  #sd.y <- stats::sd(y)
   #x <- t((t(x)-mu.x)/sd.x)
   X <- lapply(X=unique(z),FUN=function(i) scale$x[,z==i])
   XXblocks <- multiridge::createXXblocks(datablocks=X)
@@ -156,6 +160,9 @@ multiridge <- function(x,y,z,family,penalties=NULL){
 #'Make predictions from an object of class \code{multiridge}.
 #'
 #'@param object object of class \code{multiridge}
+#'
+#'@param ... not applicable
+#'
 #'@inheritParams predict.corila
 #'
 predict.multiridge <- function(object,newx,...){
@@ -203,7 +210,7 @@ if(FALSE){
   eta <- x %*% beta
   family <- "gaussian"
   if(family=="gaussian"){
-    y <- eta + 0.5*stats::rnorm(n=n,sd=sd(eta))
+    y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
   } else if(family=="binomial"){
     y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
   }
@@ -212,13 +219,13 @@ if(FALSE){
   y_hat <- list()
   # equality
   object <- multiridge(x=x[cond,],y=y[cond],z=z,family=family)
-  y_hat$multiridge <- predict(object,newx=x[!cond,])
+  y_hat$multiridge <- stats::predict(object,newx=x[!cond,])
   temp <- starnet:::.mean.function(coef(object)[1] + x[!cond,] %*% coef(object)[-1],family=family)
   all.equal(y_hat$multiridge,temp)
   
   # comparison
   glmnet <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=0)
-  y_hat$glmnet <- predict(object=glmnet,newx=x[!cond,],type="response")
+  y_hat$glmnet <- stats::predict(object=glmnet,newx=x[!cond,],type="response")
   
   if(family=="gaussian"){
     metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
@@ -232,6 +239,8 @@ if(FALSE){
 
 #'@title
 #'Combine variables
+#'
+#'@export
 #'
 #'@description
 #'Calculates the mean or the first principal component of a group of variables
@@ -256,6 +265,8 @@ combine_features <- function(x,mode="mean"){
 
 #'@title
 #'Construct Matrices
+#'
+#'@export
 #'
 #'@description
 #'Constructs matrices with (i) the original data concatenated with the inverted data, (ii) one meta-variable for each group, and (iii) one meta-variable for each group in each type.
@@ -331,9 +342,10 @@ if(FALSE){
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with $m$ rows containing candidate values for hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
 #'@param cond \code{NULL}
-#'@param lambda.com, lambda.sep, lambda.ind \code{NULL}
+#'@param lambda.com,lambda.sep,lambda.ind \code{NULL}
 #'@param mode character string "mean" for arithmetic mean  or "pca" for first principal component
 #'@param init.multi logical
+#'@param trial logical
 #'
 #'@return
 #'Returns an object of class \code{"corila"}.
@@ -624,8 +636,12 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
 #'@description
 #'Makes prediction from an object of class \code{corila}.
 #'
+#'@inheritParams predict.cv.corila
+#'
+#'@param object object of class \code{corila}
 #'@param index integer scalar specifying the index of the mixing hyperparameter(s)
 #'@param s numeric scalar specifying the value of the regularisation hyperparameter
+#'@param ... (not used)
 #'
 #'@return
 #'Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
@@ -724,7 +740,7 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode=
   for(i in seq_len(nfolds)){
     object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,type=type,family=family,cor=cor,hyper=hyper,mode=mode,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi,trial=trial)
     for(j in seq_len(nrow(hyper))){
-      hat[[j]][foldid==i,] <- predict(object=object.int,newx=x[foldid==i,],index=j,s=lambda[[j]])
+      hat[[j]][foldid==i,] <- stats::predict(object=object.int,newx=x[foldid==i,],index=j,s=lambda[[j]])
     }
   }
   
@@ -761,10 +777,11 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode=
 #'@param object object of class "cv.corila"
 #'@param newx \eqn{n_1 \times p} matrix
 #'@param s character "lambda.min" or numeric value
+#'@param ... (not used)
 #'
 #'@inherit predict.corila return
 #'
-predict.cv.corila <- function(object,newx,s="lambda.min"){
+predict.cv.corila <- function(object,newx,s="lambda.min",...){
   if(s=="lambda.min"){
     s <- object$lambda.min
   } else if(!is.numeric(s)||length(s)!=1){
@@ -772,11 +789,17 @@ predict.cv.corila <- function(object,newx,s="lambda.min"){
   }
   newx_stand <- forescale(x=newx,pars=object$scale)$x
   x_all <- cbind(newx_stand,-newx_stand) 
-  y_hat_stand <- predict(object=object$object[[object$id.hyper]],newx=x_all,s=s,type="response")
+  y_hat_stand <- stats::predict(object=object$object[[object$id.hyper]],newx=x_all,s=s,type="response")
   y_hat <- backscale(y=y_hat_stand,pars=object$scale)$y
   return(y_hat)
 }
 
+#'@title
+#'Extract coefficients
+#'
+#'@description
+#'Extracts coefficients from an object of class \code{cv.corila}.
+#'
 #'@inheritParams predict.cv.corila
 #'
 coef.cv.corila <- function(object,s="lambda.min"){
@@ -847,8 +870,8 @@ simulate <- function(family="gaussian",n0=100,n1=10000,n.group=20,n.type=2,size.
   #- - - target vector - - -
   eta <- scale(x %*% as.vector(beta)) # was without scale
   if(family=="gaussian"){
-    y <- eta + noise.factor*stats::rnorm(n=n,sd=sd(eta)) # decrease/increase noise?
-    if(sd(y)==0){
+    y <- eta + noise.factor*stats::rnorm(n=n,sd=stats::sd(eta)) # decrease/increase noise?
+    if(stats::sd(y)==0){
       warning("Replacing constant y by random noise.")
       y <- stats::rnorm(n=n)
     }
@@ -901,7 +924,7 @@ simulate_overlap <- function(){
   sel.group <- sample(x=seq_len(n.group),size=3)
   beta <- 1*(seq_len(p) %in% unlist(group[sel.group])) # multiply by abs(stats::rnorm(p))
   eta <- x %*% beta
-  y <- eta + 0.5*stats::rnorm(n=n,sd=sd(eta))
+  y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
   fold <- rep(x=c(0,1),times=c(n0,n1))
   x_train <- x[fold==0,]
   y_train <- y[fold==0]
@@ -969,7 +992,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       #--- ridge ---
       object <- glmnet::cv.glmnet(x=x_train,y=y_train,family=family,alpha=0,foldid=foldid)
       if(!is.null(x_test)){
-        y_hat$ridge <- predict(object=object,newx=x_test,s="lambda.min",type="response")
+        y_hat$ridge <- stats::predict(object=object,newx=x_test,s="lambda.min",type="response")
       }
       coef$ridge <- stats::coef(object=object,s="lambda.min")
     } else if(i=="multiridge"){
@@ -987,7 +1010,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       #--- lasso ---
       object <- glmnet::cv.glmnet(x=x_train,y=y_train,family=family,alpha=1,foldid=foldid)
       if(!is.null(x_test)){
-        y_hat$lasso <- predict(object=object,newx=x_test,s="lambda.min",type="response")
+        y_hat$lasso <- stats::predict(object=object,newx=x_test,s="lambda.min",type="response")
       }
       coef$lasso <- stats::coef(object=object,s="lambda.min")
     } else if(i=="gglasso"){
@@ -1068,7 +1091,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       #--- grpregOverlap (only on GitHub) ---
       func <- grpregOverlap::expandX
       body(func)[[3]] <- quote(over.mat <- Matrix(incidence.mat %*% t(incidence.mat), sparse=TRUE))
-      assignInNamespace(x="expandX",value=func,ns="grpregOverlap")
+      utils::assignInNamespace(x="expandX",value=func,ns="grpregOverlap")
       if(is.numeric(group)){
         list <- c(lapply(X=unique(group),FUN=function(z) which(group==z)),lapply(X=unique(type),FUN=function(z) which(type==z)))
       } else {
@@ -1128,7 +1151,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       cv <- MLGL::cv.MLGL(X=x_train,y=y_train_temp,loss=loss)
       object <- MLGL::MLGL(X=x_train,y=y_train_temp,loss=loss)
       if(!is.null(x_test)){
-        temp <- predict(object=object,newx=x_test,type="fit",s=cv$lambda.min)
+        temp <- stats::predict(object=object,newx=x_test,type="fit",s=cv$lambda.min)
         if(loss=="ls"){
           y_hat$MLGL <- temp
         } else {
@@ -1146,16 +1169,16 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       #--- ecpc ---
       model <- ifelse(family=="gaussian","linear",ifelse(family=="binomial","logistic",family))
       if(is.numeric(group)){
-        null <- capture.output(groupset <- ecpc::createGroupset(values=as.factor(group)))
+        null <- utils::capture.output(groupset <- ecpc::createGroupset(values=as.factor(group)))
       } else if(is.list(group)){
         base <- lapply(group,function(x) as.integer(x))
         #extra <- seq_len(p)[!seq_len(p) %in% unlist(base)] # first alternative
         extra <- list(seq_len(p)[!seq_len(p) %in% unlist(base)])# second alternative
         groupset <- c(base,extra)
       }
-      null <- capture.output(typeset <- ecpc::createGroupset(values=as.factor(type)))
+      null <- utils::capture.output(typeset <- ecpc::createGroupset(values=as.factor(type)))
       datablocks <- lapply(X=unique(type),FUN=function(x) which(type==x))
-      null <- tryCatch(capture.output(object <- ecpc::ecpc(Y=Y_temp,X=x_train,groupsets=list(groupset),X2=x_test,model=model,fold=nfolds,datablocks=NULL)),error=function(x) NULL)
+      null <- tryCatch(utils::capture.output(object <- ecpc::ecpc(Y=Y_temp,X=x_train,groupsets=list(groupset),X2=x_test,model=model,fold=nfolds,datablocks=NULL)),error=function(x) NULL)
       # Currently typeset/datablocks is ignored!
       if(!is.null(object)){
         coef$ecpc <- unlist(stats::coef(object))
@@ -1205,7 +1228,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       ratio <- c(seq(from=0.25,to=0.75,by=0.25),0.9,0.95,1) # set is from paper
       object <- list()
       for(j in seq_along(ratio)){
-        null <- capture.output(object[[j]] <- pcLasso::cv.pcLasso(x=x_train,y=y_train,family=family,groups=group_temp,ratio=ratio[j]))
+        null <- utils::capture.output(object[[j]] <- pcLasso::cv.pcLasso(x=x_train,y=y_train,family=family,groups=group_temp,ratio=ratio[j]))
       }
       id <- which.min(sapply(X=object,FUN=function(x) min(x$cvm)))
       object <- object[[id]]
@@ -1318,7 +1341,7 @@ plot_boxes <- function(x,base="corila",main="",decrease=TRUE,ylim=NULL){
   for(i in seq_along(col)){
     graphics::axis(side=1,at=seq_len(ncol(x))[col[[i]]],labels=colnames(x)[col[[i]]],las=2,col.axis=names(col)[i],tick=FALSE,line=-0.5)
   }
-  graphics::abline(h=median(x[,"mean"]),lty=2,col="grey") # temporary
+  graphics::abline(h=stats::median(x[,"mean"]),lty=2,col="grey") # temporary
   #--- vertical axis ---
   usr <- graphics::par("usr")
   mar.big <- 0.05*(usr[4]-usr[3])
