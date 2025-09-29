@@ -1,0 +1,15 @@
+citHeader("To cite corila in publications use:")
+
+bibentry(
+  bibtype  = "Article",
+  title    = "A flexible version of the sparse group lasso",
+  author   = c(person("Armin","Rauschenberger")),
+  journal  = "In preparation.",
+  year     = 2025,
+  volume   = "-",
+  pages    = "-",
+  doi      = "-",
+  textVersion = paste("Armin Rauschenberger (2025).",
+		"\"A flexible version of the sparse group lasso\".",
+		"In preparation.")
+)
