@@ -59,7 +59,7 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
 #'@return
 #'Returns a list with slots \code{y_original} or \code{coef}.
 #'
-#'@example
+#'@examples
 #'
 #'# simulate data
 #'n <- 100; p <- 3
@@ -69,11 +69,20 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
 #'y <- x %*% beta + stats::rnorm(n=n)
 #'
 #'# without standardisation
-#'lm <- stats::lm(y~x)
+#'lm1 <- stats::lm(y~x)
+#'y_hat1 <- fitted(lm1)
+#'coef1 <- coef(lm1)
 #'
 #'# with standardisation
-#'forescale(x=x,y=y)
+#'scale <- forescale(x=x,y=y,family="gaussian")
+#'lm2 <- stats::lm(scale$y~scale$x)
+#'result <- backscale(pars=scale$pars,y=fitted(lm2),coef=coef(lm2))
+#'y_hat2 <- result$y_original
+#'coef2 <- result$coef
 #'
+#'# equality
+#'all.equal(y_hat1,y_hat2)
+#'all.equal(coef1,coef2,check.attributes=FALSE)
 #'
 backscale <- function(pars,y=NULL,coef=NULL){
   list <- list()
@@ -199,8 +208,7 @@ if(FALSE){
     y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
   }
   cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
-  
-  
+
   y_hat <- list()
   # equality
   object <- multiridge(x=x[cond,],y=y[cond],z=z,family=family)
@@ -218,8 +226,6 @@ if(FALSE){
     metric <- sapply(X=y_hat,FUN=function(x) pROC::auc(response=y[!cond],predictor=as.vector(x),levels=c(0,1),direction="<"))
   }
   metric
-  
-  
 }
 
 #----- group-lasso -----
