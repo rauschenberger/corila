@@ -1,0 +1,38 @@
+url: https://rauschenberger.github.io/corila/
+template:
+  bootstrap: 5
+  math-rendering: mathjax
+  bootswatch: cerulean
+
+home:
+  sidebar:
+    structure: [links, community, citation, authors, dev]
+
+navbar:
+  title: "corila"
+  left:
+    - text: "functions"
+      href: reference/index.html
+    - text: "article"
+      href: articles/article.html
+    - text: "analysis"
+      href: articles/analysis.html
+    - text: "news"
+      href: news/index.html
+
+reference:
+- title: "R Package"
+  contents:
+  - corila-package
+- title: "Main functions"
+  contents:
+  - cv.corila
+  - coef.cv.corila
+  - predict.cv.corila
+- title: "Other functions"
+  contents:
+  - matches(".*")
+  - -cv.corila
+  - -coef.cv.corila
+  - -predict.cv.corila
+
