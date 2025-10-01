@@ -53,3 +53,7 @@ Returns an object of class \code{"corila"}.
 Fits an initial ridge regression to obtain weights for an adaptive lasso 
 regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
 }
+\examples{
+NULL
+
+}
