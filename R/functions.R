@@ -350,6 +350,9 @@ if(FALSE){
 #'@return
 #'Returns an object of class \code{"corila"}.
 #'
+#'@examples
+#'NULL
+#'
 corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,mode="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"
   
