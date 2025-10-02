@@ -35,5 +35,5 @@ and
 \href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
 }
 \seealso{
-[coef.multiridge()], [predict.multiridge()]
+Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}.
 }

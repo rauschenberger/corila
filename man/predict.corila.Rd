@@ -23,3 +23,6 @@ Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dime
 \description{
 Makes prediction from an object of class \code{corila}.
 }
+\seealso{
+\code{\link{corila}()}
+}

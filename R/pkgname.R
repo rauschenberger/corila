@@ -9,24 +9,29 @@
 #' Sparse group lasso
 #' 
 #' @description
-#' The R package `corila` implements the sparse group lasso.
+#' The R package \code{corila} implements the sparse group lasso.
 #' 
 #' @details
-#' Use function [cv.corila()] for model fitting.
-#' Type `library(corila)` and then `?cv.corila` or
-#' `help("cv.corila")` to open its help file.
+#' Use function \code{\link[=cv.corila]{cv.corila()}} for model fitting.
+#' Type \code{library(corila)} and then \code{?cv.corila} or
+#' \code{help("cv.corila")} to open its help file.
 #' 
 #' See the vignette for further examples.
-#' Type `vignette("corila")` or `browseVignettes("corila")`
+#' Type \code{vignette("corila")} or \code{browseVignettes("corila")}
 #' to open the vignette.
 #' 
+#' This package also includes the wrapper function \code{\link[=multiridge]{multiridge()}} for multi-penalty ridge regression with
+#' the R package \code{multiridge}.
+#' 
 #' @seealso
-#' First use \code{\link{cv.corila}} to fit the models,
-#' and then \code{\link[=coef.cv.corila]{coef}} to extract coefficients
-#' or \code{\link[=predict.cv.corila]{predict}} to make predictions.
+#' First use \code{\link[=cv.corila]{cv.corila()}} to fit the model,
+#' and then \code{\link[=coef.cv.corila]{coef()}} to extract coefficients
+#' or \code{\link[=predict.cv.corila]{predict()}} to make predictions.
+#' 
+#' @author \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
 #' 
 #' @references
-#' \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger},
+#' \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
 #' (2025).
 #' "A flexible version of the sparse group lasso".
 #' \emph{In preparation}.

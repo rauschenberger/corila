@@ -17,5 +17,5 @@
 Makes predictions from a multi-penalty ridge regression model.
 }
 \seealso{
-[multiridge()], [coef.multiridge()]
+\code{\link{multiridge}()}, \code{\link{coef.multiridge}()}
 }

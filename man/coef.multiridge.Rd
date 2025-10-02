@@ -15,5 +15,5 @@
 Extracts coefficients from a multi-penalty ridge regression model.
 }
 \seealso{
-[multiridge()], [predict.multiridge()]
+\code{\link{multiridge}()}, \code{\link{predict.multiridge}()}
 }

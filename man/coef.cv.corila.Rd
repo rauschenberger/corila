@@ -14,3 +14,6 @@
 \description{
 Extracts coefficients from an object of class \code{cv.corila}.
 }
+\seealso{
+\code{\link{cv.corila}()}, \code{\link{predict.cv.corila}()}
+}

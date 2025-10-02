@@ -133,7 +133,8 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'@return
 #'Returns an object of class \code{multiridge}.
 #'
-#'@seealso [coef.multiridge()], [predict.multiridge()]
+#'@seealso
+#'Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}.
 #'
 multiridge <- function(x,y,z,family,penalties=NULL){
   if(!family %in% c("gaussian","linear","binomial","logistic","cox")){
@@ -176,7 +177,7 @@ multiridge <- function(x,y,z,family,penalties=NULL){
 #'@inheritParams coef.multiridge
 #'@inheritParams predict.corila
 #'
-#'@seealso [multiridge()], [coef.multiridge()]
+#'@seealso \code{\link{multiridge}()}, \code{\link{coef.multiridge}()}
 #'
 predict.multiridge <- function(object,newx,...){
   scale <- forescale(x=newx,pars=object$pars)
@@ -200,9 +201,7 @@ predict.multiridge <- function(object,newx,...){
 #'@param object object of class \code{"multiridge"}
 #'@param ... (not used)
 #'
-#'@inheritParams predict.multiridge
-#'
-#'@seealso [multiridge()], [predict.multiridge()]
+#'@seealso \code{\link{multiridge}()}, \code{\link{predict.multiridge}()}
 #'
 coef.multiridge <- function(object,...){
   Xblocks <- multiridge::createXblocks(datablocks=object$datablocks)
@@ -672,6 +671,8 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
 #'@param s numeric scalar specifying the value of the regularisation hyperparameter
 #'@param ... (not used)
 #'
+#'@seealso \code{\link{corila}()}
+#'
 #'@return
 #'Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
 #'
@@ -691,7 +692,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'@inheritParams corila
 #'@param foldid \eqn{n}-dimensional vector containing the fold identifiers
 #'
-#'@seealso [corila()]
+#'@seealso \code{\link{corila}()}
 #'
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
   if(is.null(type)){
@@ -810,6 +811,8 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode=
 #'
 #'@inherit predict.corila return
 #'
+#'@seealso \code{\link{cv.corila}()}, \code{\link{coef.cv.corila}()}
+#'
 predict.cv.corila <- function(object,newx,s="lambda.min",...){
   if(s=="lambda.min"){
     s <- object$lambda.min
@@ -830,6 +833,8 @@ predict.cv.corila <- function(object,newx,s="lambda.min",...){
 #'Extracts coefficients from an object of class \code{cv.corila}.
 #'
 #'@inheritParams predict.cv.corila
+#'
+#'@seealso \code{\link{cv.corila}()}, \code{\link{predict.cv.corila}()}
 #'
 coef.cv.corila <- function(object,s="lambda.min"){
   if(s=="lambda.min"){

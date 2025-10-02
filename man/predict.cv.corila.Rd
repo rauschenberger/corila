@@ -21,3 +21,6 @@ Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dime
 \description{
 Makes predictions from an object of class \code{cv.corila}.
 }
+\seealso{
+\code{\link{cv.corila}()}, \code{\link{coef.cv.corila}()}
+}
