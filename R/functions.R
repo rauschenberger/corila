@@ -177,7 +177,10 @@ multiridge <- function(x,y,z,family,penalties=NULL){
 #'@inheritParams coef.multiridge
 #'@inheritParams predict.corila
 #'
-#'@seealso \code{\link{multiridge}()}, \code{\link{coef.multiridge}()}
+#'@inherit multiridge references
+#'
+#'@seealso
+#'Fit models with \code{\link{multiridge}()} and extract coefficients with \code{\link{coef.multiridge}()}.
 #'
 predict.multiridge <- function(object,newx,...){
   scale <- forescale(x=newx,pars=object$pars)
@@ -201,7 +204,10 @@ predict.multiridge <- function(object,newx,...){
 #'@param object object of class \code{"multiridge"}
 #'@param ... (not used)
 #'
-#'@seealso \code{\link{multiridge}()}, \code{\link{predict.multiridge}()}
+#'@inherit multiridge references
+#'
+#'@seealso
+#'Fit models with \code{\link{multiridge}()} and make predictions with \code{\link{predict.multiridge}()}.
 #'
 coef.multiridge <- function(object,...){
   Xblocks <- multiridge::createXblocks(datablocks=object$datablocks)
@@ -273,6 +279,9 @@ if(FALSE){
 #'@inheritParams construct_matrices
 #'@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group
 #'
+#'@seealso
+#'This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
+#'
 #'@examples
 #'n <- 100; p <- 5
 #'x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
@@ -307,6 +316,9 @@ combine_features <- function(x,mode="mean"){
 #'group <- rep(1:2,each=p/2)
 #'type <- rep(x=1,times=p)
 #'x <- construct_matrices(x=x,group=group,type=type)
+#'
+#'@seealso
+#'This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
 #'
 #'@return
 #'See description.
@@ -355,6 +367,8 @@ if(FALSE){
 #'@title
 #'Group lasso
 #'
+#'@export
+#'
 #'@description
 #'Fits an initial ridge regression to obtain weights for an adaptive lasso 
 #'regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
@@ -374,6 +388,11 @@ if(FALSE){
 #'
 #'@return
 #'Returns an object of class \code{"corila"}.
+#'
+#'@inherit corila-package references
+#'
+#'@seealso
+#'Estimate parameters and tune hyperparameters (using cross-validation) with \code{\link{cv.corila}()}. Make predictions for a range of hyperparameters with \code{\link{predict.corila}()}.
 #'
 #'@examples
 #'NULL
@@ -659,7 +678,9 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
 }
 
 #'@title
-#'predict (S3 method) 
+#'predict (S3 method)
+#'
+#'@export
 #'
 #'@description
 #'Makes prediction from an object of class \code{corila}.
@@ -671,7 +692,10 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
 #'@param s numeric scalar specifying the value of the regularisation hyperparameter
 #'@param ... (not used)
 #'
-#'@seealso \code{\link{corila}()}
+#'@inherit corila-package references
+#'
+#'@seealso
+#'Estimate parameters with \code{\link{corila}()}, or estimate parameters and tune hyperparameters with \code{\link{cv.corila}()}.
 #'
 #'@return
 #'Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
@@ -686,13 +710,18 @@ predict.corila <- function(object,newx,index,s,...){
 #'@title
 #'Sparse Group Lasso
 #'
+#'@export
+#'
 #'@description
 #'Optimises the parameters and the hyperparameters of the sparse group lasso.
 #'
 #'@inheritParams corila
 #'@param foldid \eqn{n}-dimensional vector containing the fold identifiers
 #'
-#'@seealso \code{\link{corila}()}
+#'@inherit corila-package references
+#'
+#'@seealso
+#'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 #'
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
   if(is.null(type)){
@@ -801,6 +830,8 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode=
 #'@title
 #'predict (S3 method)
 #'
+#'@export
+#'
 #'@description
 #'Makes predictions from an object of class \code{cv.corila}. 
 #'
@@ -811,7 +842,10 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode=
 #'
 #'@inherit predict.corila return
 #'
-#'@seealso \code{\link{cv.corila}()}, \code{\link{coef.cv.corila}()}
+#'@inherit corila-package references
+#'
+#'@seealso
+#'Fit models with \code{\link{cv.corila}()} and extract coefficients with \code{\link{coef.cv.corila}()}.
 #'
 predict.cv.corila <- function(object,newx,s="lambda.min",...){
   if(s=="lambda.min"){
@@ -829,12 +863,15 @@ predict.cv.corila <- function(object,newx,s="lambda.min",...){
 #'@title
 #'Extract coefficients
 #'
+#'@export
+#'
 #'@description
 #'Extracts coefficients from an object of class \code{cv.corila}.
 #'
 #'@inheritParams predict.cv.corila
 #'
-#'@seealso \code{\link{cv.corila}()}, \code{\link{predict.cv.corila}()}
+#'@seealso
+#'Fit models with \code{\link{cv.corila}()} and make predictions with \code{\link{predict.cv.corila}()}.
 #'
 coef.cv.corila <- function(object,s="lambda.min"){
   if(s=="lambda.min"){
@@ -971,6 +1008,17 @@ simulate_overlap <- function(){
 
 #----- comparison -----
 
+if(FALSE){
+  truth <- sample(x=c(-1,0,1),size=10,replace=TRUE)
+  estim <- sample(x=c(-1,0,1),size=10,replace=TRUE)
+  calc_sign_prec(truth=truth,estim=estim)
+  calc_sign_prec(truth=truth,estim=-truth)
+  calc_sign_prec(truth=truth,estim=abs(truth))
+  calc_sign_prec(truth=truth,estim=-abs(truth))
+  calc_sign_prec(truth=truth,estim=0*truth+1)
+  calc_sign_prec(truth=truth,estim=0*truth-1)
+  calc_sign_prec(truth=truth,estim=truth)
+}
 calc_sign_prec <- function(truth,estim){
   sum(estim!=0 & truth!=0 & sign(estim)==sign(truth))/sum(estim!=0)
 }

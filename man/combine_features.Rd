@@ -22,3 +22,6 @@ comp <- combine_features(x=x,mode="pca")
 plot(mean,comp)
 
 }
+\seealso{
+This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
+}

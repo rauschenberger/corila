@@ -14,6 +14,17 @@
 \description{
 Extracts coefficients from a multi-penalty ridge regression model.
 }
+\references{
+\href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
+\href{https://orcid.org/0000-0001-7715-1446}{Mirrelijn M. van Nee},
+and
+\href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
+(2021).
+"Fast cross-validation for multi-penalty high-dimensional ridge regression"
+\emph{Journal of Computational and Graphical Statistics}
+30(4):835-847.
+\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
+}
 \seealso{
-\code{\link{multiridge}()}, \code{\link{predict.multiridge}()}
+Fit models with \code{\link{multiridge}()} and make predictions with \code{\link{predict.multiridge}()}.
 }

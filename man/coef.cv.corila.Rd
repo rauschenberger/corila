@@ -15,5 +15,5 @@
 Extracts coefficients from an object of class \code{cv.corila}.
 }
 \seealso{
-\code{\link{cv.corila}()}, \code{\link{predict.cv.corila}()}
+Fit models with \code{\link{cv.corila}()} and make predictions with \code{\link{predict.cv.corila}()}.
 }

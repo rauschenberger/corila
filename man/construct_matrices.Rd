@@ -30,3 +30,6 @@ type <- rep(x=1,times=p)
 x <- construct_matrices(x=x,group=group,type=type)
 
 }
+\seealso{
+This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
+}

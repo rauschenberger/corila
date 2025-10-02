@@ -57,3 +57,12 @@ regression that allows for heterogeneous, overlapping and unknown groups of corr
 NULL
 
 }
+\references{
+\href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
+(2025).
+"A flexible version of the sparse group lasso".
+\emph{In preparation}.
+}
+\seealso{
+Estimate parameters and tune hyperparameters (using cross-validation) with \code{\link{cv.corila}()}. Make predictions for a range of hyperparameters with \code{\link{predict.corila}()}.
+}

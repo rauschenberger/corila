@@ -23,6 +23,12 @@ Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dime
 \description{
 Makes prediction from an object of class \code{corila}.
 }
+\references{
+\href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
+(2025).
+"A flexible version of the sparse group lasso".
+\emph{In preparation}.
+}
 \seealso{
-\code{\link{corila}()}
+Estimate parameters with \code{\link{corila}()}, or estimate parameters and tune hyperparameters with \code{\link{cv.corila}()}.
 }

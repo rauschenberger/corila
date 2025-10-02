@@ -41,6 +41,12 @@ cv.corila(
 \description{
 Optimises the parameters and the hyperparameters of the sparse group lasso.
 }
+\references{
+\href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
+(2025).
+"A flexible version of the sparse group lasso".
+\emph{In preparation}.
+}
 \seealso{
-\code{\link{corila}()}
+Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 }
