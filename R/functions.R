@@ -105,15 +105,19 @@ backscale <- function(pars,y=NULL,coef=NULL){
 
 #----- group-ridge -----
 
-# use forescale and backscale also for multiridge
-# adapt func for binomial case
-
 #'@title
 #'Multi-Penalty Ridge Regression
-#'@description
-#'Fits multi-penalty ridge regression.
 #'
-#'@param x,y,z,family,penalties to be documented
+#'@export
+#'
+#'@description
+#'Fits multi-penalty ridge regression (tuning regularisation parameters and estimating regression coefficients).
+#'
+#'@param x predictors: \eqn{n \times p} matrix, or list of length \eqn{q} of \eqn{n \times p_k} matrices, with \eqn{k} in \eqn{\{1,\ldots,q\}}.
+#'@param y response: \eqn{n}-dimensional vector
+#'@param z groups: \eqn{p}-dimensional vector with entries in \eqn{\{1,\ldots,q\}} (if \code{x} is a matrix), or \code{NULL} (if \code{x} is a list of matrices)
+#'@param family character \code{"linear"} (or \code{"gaussian"}), \code{"logistic"} (or \code{"binomial"}), or \code{"cox"} 
+#'@param penalties \eqn{q}-dimensional vector of penalty parameters, or \code{NULL} (cross-validation)
 #'
 #'@references
 #'\href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
@@ -121,25 +125,22 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'and
 #'\href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
 #'(2021).
-#'"Fast Cross-validation for Multi-penalty High-dimensional Ridge Regression"
+#'"Fast cross-validation for multi-penalty high-dimensional ridge regression"
 #'\emph{Journal of Computational and Graphical Statistics}
-#'30(4):835-847
+#'30(4):835-847.
 #'\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
 #'
 #'@return
 #'Returns an object of class \code{multiridge}.
 #'
+#'@seealso [coef.multiridge()], [predict.multiridge()]
+#'
 multiridge <- function(x,y,z,family,penalties=NULL){
+  if(!family %in% c("gaussian","linear","binomial","logistic","cox")){
+    stop("Argument \"family\" must equal \"gaussian\" (or \"linear\"), \"binomial\" (or \"logistic\"), or \"cox\".")
+  }
   scale <- forescale(x=x,y=y,family=family)
-  model <- ifelse(family=="gaussian","linear",ifelse(family=="binomial","logistic",NA))
-  #if(family=="binomial"){
-  #  data$y <- as.factor(data$y)
-  #}
-  #mu.x <- apply(X=x,MARGIN=2,FUN=base::mean)
-  #sd.x <- apply(X=x,MARGIN=2,FUN=stats::sd)
-  #mu.y <- mean(y)
-  #sd.y <- stats::sd(y)
-  #x <- t((t(x)-mu.x)/sd.x)
+  model <- ifelse(family=="gaussian",yes="linear",no=ifelse(family=="binomial",yes="logistic",no=family))
   X <- lapply(X=unique(z),FUN=function(i) scale$x[,z==i])
   XXblocks <- multiridge::createXXblocks(datablocks=X)
   invisible(utils::capture.output(init <- multiridge::fastCV2(XXblocks=XXblocks,Y=scale$y,model=model)))
@@ -150,15 +151,15 @@ multiridge <- function(x,y,z,family,penalties=NULL){
     penalties <- final$optpen
   }
   XXT <- multiridge::SigmaFromBlocks(XXblocks=XXblocks,penalties=penalties)
-  object <- multiridge::IWLSridge(XXT=XXT,Y=scale$y,model=model)
+  if(family=="cox"){
+    object <- multiridge::IWLSCoxridge(XXT=XXT,Y=scale$y)
+  } else {
+    object <- multiridge::IWLSridge(XXT=XXT,Y=scale$y,model=model)
+  }
   object$family <- family
   object$penalties <- penalties
   object$datablocks <- X
   object$z <- z
-  #object$sd.x <- sd.x
-  #object$sd.y <- sd.y
-  #object$mu.x <- mu.x
-  #object$mu.y <- mu.y
   object$pars <- scale$pars
   class(object) <- "multiridge"
   return(object)
@@ -167,24 +168,23 @@ multiridge <- function(x,y,z,family,penalties=NULL){
 #'@title
 #'Make Predictions
 #'
+#'@export
+#'
 #'@description
-#'Make predictions from an object of class \code{multiridge}.
+#'Makes predictions from a multi-penalty ridge regression model.
 #'
-#'@param object object of class \code{multiridge}
-#'
-#'@param ... not applicable
-#'
+#'@inheritParams coef.multiridge
 #'@inheritParams predict.corila
+#'
+#'@seealso [multiridge()], [coef.multiridge()]
 #'
 predict.multiridge <- function(object,newx,...){
   scale <- forescale(x=newx,pars=object$pars)
-  #newx <- t((t(newx)-object$mu.x)/object$sd.x)
   newX <- lapply(X=unique(object$z),FUN=function(x) scale$x[,object$z==x])
   XXblocks <- multiridge::createXXblocks(datablocks=object$datablocks,datablocksnew=newX)
   Sigmanew <- multiridge::SigmaFromBlocks(XXblocks=XXblocks,penalties=object$penalties)
   eta <- multiridge::predictIWLS(IWLSfit=object,Sigmanew=Sigmanew)
   y_hat <- starnet:::.mean.function(eta,family=object$family)
-  #y_hat <- object$mu.y+object$sd.y*starnet:::.mean.function(eta,family=object$family)
   y_hat <- backscale(pars=object$pars,y=y_hat)$y
   return(y_hat)
 }
@@ -192,17 +192,24 @@ predict.multiridge <- function(object,newx,...){
 #'@title
 #'Extract Coefficients
 #'
+#'@export
+#'
 #'@description
 #'Extracts coefficients from a multi-penalty ridge regression model.
 #'
+#'@param object object of class \code{"multiridge"}
+#'@param ... (not used)
+#'
 #'@inheritParams predict.multiridge
+#'
+#'@seealso [multiridge()], [predict.multiridge()]
 #'
 coef.multiridge <- function(object,...){
   Xblocks <- multiridge::createXblocks(datablocks=object$datablocks)
   coef <- multiridge::betasout(object,Xblocks=Xblocks,penalties=object$penalties)
-  #alpha <- object$mu.y+object$sd.y*(coef[[1]]-sum(unlist(coef)[-1]*object$mu.x/object$sd.x))
-  #beta <- unlist(coef)[-1]*object$sd.y/object$sd.x
-  #coef <- c(alpha,beta)
+  if(object$family=="cox" & is.null(coef[[1]])){
+    coef[[1]] <- 0
+  }
   coef <- backscale(pars=object$pars,coef=unlist(coef))$coef
   return(coef)
 }
@@ -211,6 +218,7 @@ if(FALSE){
   # Make multiridge work (Gaussian and binomial case)
   
   # simulate
+  set.seed(1)
   n0 <- 100
   n1 <- 10000
   n <- n0 + n1
@@ -224,6 +232,11 @@ if(FALSE){
     y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
   } else if(family=="binomial"){
     y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
+  } else if(family=="cox"){
+    time <- stats::rexp(n=n,rate=exp(eta))
+    status <- stats::rbinom(n=n,prob=0.5,size=1)
+    #y <- cbind(time=time,status=status)
+    y <- survival::Surv(time=time,event=status)
   }
   cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
 
@@ -242,6 +255,8 @@ if(FALSE){
     metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
   } else if(family=="binomial"){
     metric <- sapply(X=y_hat,FUN=function(x) pROC::auc(response=y[!cond],predictor=as.vector(x),levels=c(0,1),direction="<"))
+  } else if(family=="cox"){
+    metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
   }
   metric
 }

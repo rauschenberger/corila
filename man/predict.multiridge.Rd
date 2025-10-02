@@ -7,12 +7,15 @@
 \method{predict}{multiridge}(object, newx, ...)
 }
 \arguments{
-\item{object}{object of class \code{multiridge}}
+\item{object}{object of class \code{"multiridge"}}
 
 \item{newx}{\eqn{n_1 \times p} matrix}
 
-\item{...}{not applicable}
+\item{...}{(not used)}
 }
 \description{
-Make predictions from an object of class \code{multiridge}.
+Makes predictions from a multi-penalty ridge regression model.
+}
+\seealso{
+[multiridge()], [coef.multiridge()]
 }

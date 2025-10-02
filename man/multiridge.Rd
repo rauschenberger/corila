@@ -7,13 +7,21 @@
 multiridge(x, y, z, family, penalties = NULL)
 }
 \arguments{
-\item{x, y, z, family, penalties}{to be documented}
+\item{x}{predictors: \eqn{n \times p} matrix, or list of length \eqn{q} of \eqn{n \times p_k} matrices, with \eqn{k} in \eqn{\{1,\ldots,q\}}.}
+
+\item{y}{response: \eqn{n}-dimensional vector}
+
+\item{z}{groups: \eqn{p}-dimensional vector with entries in \eqn{\{1,\ldots,q\}} (if \code{x} is a matrix), or \code{NULL} (if \code{x} is a list of matrices)}
+
+\item{family}{character \code{"linear"} (or \code{"gaussian"}), \code{"logistic"} (or \code{"binomial"}), or \code{"cox"}}
+
+\item{penalties}{\eqn{q}-dimensional vector of penalty parameters, or \code{NULL} (cross-validation)}
 }
 \value{
 Returns an object of class \code{multiridge}.
 }
 \description{
-Fits multi-penalty ridge regression.
+Fits multi-penalty ridge regression (tuning regularisation parameters and estimating regression coefficients).
 }
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
@@ -21,8 +29,11 @@ Fits multi-penalty ridge regression.
 and
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
 (2021).
-"Fast Cross-validation for Multi-penalty High-dimensional Ridge Regression"
+"Fast cross-validation for multi-penalty high-dimensional ridge regression"
 \emph{Journal of Computational and Graphical Statistics}
-30(4):835-847
+30(4):835-847.
 \href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
+}
+\seealso{
+[coef.multiridge()], [predict.multiridge()]
 }

@@ -7,10 +7,13 @@
 \method{coef}{multiridge}(object, ...)
 }
 \arguments{
-\item{object}{object of class \code{multiridge}}
+\item{object}{object of class \code{"multiridge"}}
 
-\item{...}{not applicable}
+\item{...}{(not used)}
 }
 \description{
 Extracts coefficients from a multi-penalty ridge regression model.
+}
+\seealso{
+[multiridge()], [predict.multiridge()]
 }
