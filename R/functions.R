@@ -115,6 +115,17 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'
 #'@param x,y,z,family,penalties to be documented
 #'
+#'@references
+#'\href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
+#'\href{https://orcid.org/0000-0001-7715-1446}{Mirrelijn M. van Nee},
+#'and
+#'\href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
+#'(2021).
+#'"Fast Cross-validation for Multi-penalty High-dimensional Ridge Regression"
+#'\emph{Journal of Computational and Graphical Statistics}
+#'30(4):835-847
+#'\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
+#'
 #'@return
 #'Returns an object of class \code{multiridge}.
 #'
@@ -208,7 +219,7 @@ if(FALSE){
   x <- sapply(X=z,FUN=function(x) stats::rnorm(n=n,sd=x))
   beta <- stats::rnorm(n=sum(p),mean=1,sd=0)*stats::rbinom(n=sum(p),size=1,prob=0.2)
   eta <- x %*% beta
-  family <- "gaussian"
+  family <- "binomial"
   if(family=="gaussian"){
     y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
   } else if(family=="binomial"){
