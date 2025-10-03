@@ -7,7 +7,7 @@
 \method{predict}{corila}(object, newx, index, s, ...)
 }
 \arguments{
-\item{object}{object of class \code{corila}}
+\item{object}{object of class \code{"corila"}}
 
 \item{newx}{\eqn{n_1 \times p} matrix}
 
@@ -21,7 +21,7 @@
 Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
 }
 \description{
-Makes prediction from an object of class \code{corila}.
+Makes prediction from an object of class \code{"corila"}.
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}

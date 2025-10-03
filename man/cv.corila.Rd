@@ -26,11 +26,11 @@ cv.corila(
 
 \item{type}{\eqn{p}-dimensional vector}
 
-\item{family}{character string "gaussian", "binomial", "poisson" or "cox"}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}}
 
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 
-\item{mode}{character string "mean" for arithmetic mean  or "pca" for first principal component}
+\item{mode}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
 \item{init.multi}{logical}
 
@@ -40,6 +40,10 @@ cv.corila(
 }
 \description{
 Optimises the parameters and the hyperparameters of the sparse group lasso.
+}
+\examples{
+1+1
+
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}

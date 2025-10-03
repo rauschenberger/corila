@@ -7,19 +7,19 @@
 \method{predict}{cv.corila}(object, newx, s = "lambda.min", ...)
 }
 \arguments{
-\item{object}{object of class "cv.corila"}
+\item{object}{object of class \code{"cv.corila"}}
 
 \item{newx}{\eqn{n_1 \times p} matrix}
 
-\item{s}{character "lambda.min" or numeric value}
+\item{s}{character \code{"lambda.min"} or numeric value}
 
 \item{...}{(not used)}
 }
 \value{
-Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
+Returns an \eqn{n_1}-dimensional vector of predicted values.
 }
 \description{
-Makes predictions from an object of class \code{cv.corila}.
+Makes predictions from an object of class \code{"cv.corila"}.
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}

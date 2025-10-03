@@ -13,7 +13,7 @@ construct_matrices(x, group, type, mode = "mean")
 
 \item{type}{\eqn{p}-dimensional vector}
 
-\item{mode}{character string "mean" for arithmetic mean  or "pca" for first principal component}
+\item{mode}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 }
 \value{
 See description.

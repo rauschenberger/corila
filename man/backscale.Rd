@@ -7,7 +7,7 @@
 backscale(pars, y = NULL, coef = NULL)
 }
 \arguments{
-\item{pars}{list or \code{NULL}}
+\item{pars}{list or \code{NULL} (see section "Value")}
 
 \item{y}{\eqn{n_1}-dimensional response vector}
 
@@ -44,4 +44,7 @@ coef2 <- result$coef
 all.equal(y_hat1,y_hat2)
 all.equal(coef1,coef2,check.attributes=FALSE)
 
+}
+\seealso{
+forescale
 }

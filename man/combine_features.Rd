@@ -9,7 +9,10 @@ combine_features(x, mode = "mean")
 \arguments{
 \item{x}{\eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group}
 
-\item{mode}{character string "mean" for arithmetic mean  or "pca" for first principal component}
+\item{mode}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
+}
+\value{
+Returns an \eqn{n_0}-dimensional numeric vector.
 }
 \description{
 Calculates the mean or the first principal component of a group of variables

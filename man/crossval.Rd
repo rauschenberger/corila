@@ -22,7 +22,7 @@ crossval(
 
 \item{y}{\eqn{n}-dimensional response vector}
 
-\item{family}{character string "gaussian", "binomial", "poisson" or "cox"}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}}
 
 \item{group}{XXX}
 
@@ -38,13 +38,25 @@ crossval(
 
 \item{method}{character vector listing all methods to be compared}
 }
+\value{
+Returns a list with the following slots:
+\itemize{
+\item \code{nzero} non-zero coefficients
+\item \code{metric} metric
+}
+Both slot contain a data frame with one row for each iteration (\code{iter}) and one column for each \code{method}.
+}
 \description{
 Compares methods with cross-validation method
 }
 \details{
-This function implements repeated $k$-fold cross-validation (e.g., 5 repetitions of 10-fold cross-validation).
+This function implements repeated \eqn{k}-fold cross-validation (e.g., 5 repetitions of 10-fold cross-validation).
 }
 \examples{
-NULL
+n <- 100
+p <- 20
+x <- matrix(rnorm(n*p),nrow=n,ncol=p)
+y <- stats::rnorm(n)
+results <- crossval(x,y,family="gaussian",method=c("mean","corila"),trial=TRUE)
 
 }

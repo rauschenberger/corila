@@ -1,5 +1,4 @@
 
-
 #'@title
 #'Standardisation
 #'
@@ -11,13 +10,19 @@
 #'@inheritParams corila
 #'@param y \eqn{n_0}-dimensional response vector or \code{NULL}, only for Gaussian family 
 #'@param family character string \code{"gaussian"}, \code{NULL}
-#'@param pars list or \code{NULL}
+#'@param pars list or \code{NULL} (see section "Value")
 #'
 #'@return
-#'- standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
-#'- standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
-#'- list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
-#'- character string \code{family} indicates the model (\code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}), determined by argument \code{family} or \code{pars$family}
+#'\itemize{
+#'\item standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
+#'\item standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
+#'\item list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
+#'\item character string \code{family} indicates the model (\code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}), determined by argument \code{family} or \code{pars$family}
+#'}
+#'
+#'@seealso Use function \code{\link{backscale}} to bring coefficients and predictions back to original scale.
+#'
+#'@inherit backscale examples
 #'
 forescale <- function(x,y=NULL,family=NULL,pars=NULL){
   if(is.null(family)==is.null(pars)){stop("Provide either family or pars.")}
@@ -62,6 +67,8 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
 #'
 #'@return
 #'Returns a list with slots \code{y_original} or \code{coef}.
+#'
+#'@seealso forescale
 #'
 #'@examples
 #'
@@ -131,7 +138,7 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
 #'
 #'@return
-#'Returns an object of class \code{multiridge}.
+#'Returns an object of class \code{"multiridge"}.
 #'
 #'@seealso
 #'Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}.
@@ -219,6 +226,9 @@ multiridge <- function(x,y,z,family,penalties=NULL){
 #'
 #'@inherit multiridge references
 #'
+#'@return
+#'Returns an \eqn{n_0}-dimensional vector of fitted values or an \eqn{n_1}-dimensional vector of predicted values.
+#'
 #'@seealso
 #'Fit models with \code{\link{multiridge}()} and extract coefficients with \code{\link{coef.multiridge}()}.
 #'
@@ -246,6 +256,9 @@ predict.multiridge <- function(object,newx,...){
 #'
 #'@inherit multiridge references
 #'
+#'@return
+#'Returns an \eqn{1+p}-dimensional vector of estimated coefficients (estimated intercept and estimated slopes).
+#'
 #'@seealso
 #'Fit models with \code{\link{multiridge}()} and make predictions with \code{\link{predict.multiridge}()}.
 #'
@@ -271,6 +284,9 @@ coef.multiridge <- function(object,...){
 #'
 #'@inheritParams construct_matrices
 #'@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group
+#'
+#'@return
+#'Returns an \eqn{n_0}-dimensional numeric vector.
 #'
 #'@seealso
 #'This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
@@ -370,12 +386,12 @@ if(FALSE){
 #'@param y \eqn{n}-dimensional response vector
 #'@param group XXX
 #'@param type \eqn{p}-dimensional vector
-#'@param family character string "gaussian", "binomial", "poisson" or "cox"
-#'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with $m$ rows containing candidate values for hyperparameters
+#'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}
+#'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
 #'@param cond \code{NULL}
 #'@param lambda.com,lambda.sep,lambda.ind \code{NULL}
-#'@param mode character string "mean" for arithmetic mean  or "pca" for first principal component
+#'@param mode character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
 #'@param init.multi logical
 #'@param trial logical
 #'
@@ -676,11 +692,11 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
 #'@export
 #'
 #'@description
-#'Makes prediction from an object of class \code{corila}.
+#'Makes prediction from an object of class \code{"corila"}.
 #'
 #'@inheritParams predict.cv.corila
 #'
-#'@param object object of class \code{corila}
+#'@param object object of class \code{"corila"}
 #'@param index integer scalar specifying the index of the mixing hyperparameter(s)
 #'@param s numeric scalar specifying the value of the regularisation hyperparameter
 #'@param ... (not used)
@@ -715,6 +731,9 @@ predict.corila <- function(object,newx,index,s,...){
 #'
 #'@seealso
 #'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
+#'
+#'@examples
+#'1+1
 #'
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
   if(is.null(type)){
@@ -826,16 +845,19 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode=
 #'@export
 #'
 #'@description
-#'Makes predictions from an object of class \code{cv.corila}. 
+#'Makes predictions from an object of class \code{"cv.corila"}. 
 #'
-#'@param object object of class "cv.corila"
+#'@param object object of class \code{"cv.corila"}
 #'@param newx \eqn{n_1 \times p} matrix
-#'@param s character "lambda.min" or numeric value
+#'@param s character \code{"lambda.min"} or numeric value
 #'@param ... (not used)
 #'
 #'@inherit predict.corila return
 #'
 #'@inherit corila-package references
+#'
+#'@return
+#'Returns an \eqn{n_1}-dimensional vector of predicted values.
 #'
 #'@seealso
 #'Fit models with \code{\link{cv.corila}()} and extract coefficients with \code{\link{coef.cv.corila}()}.
@@ -859,7 +881,7 @@ predict.cv.corila <- function(object,newx,s="lambda.min",...){
 #'@export
 #'
 #'@description
-#'Extracts coefficients from an object of class \code{cv.corila}.
+#'Extracts coefficients from an object of class \code{"cv.corila"}.
 #'
 #'@inheritParams predict.cv.corila
 #'
@@ -897,7 +919,7 @@ coef.cv.corila <- function(object,s="lambda.min"){
 #'@description
 #'Simulates data with grouped predictor variables
 #'
-#'@param family character "gaussian", "binomial", "poisson" or "cox"
+#'@param family character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}
 #'@param n0 number of training observations
 #'@param n1 number of testing observations
 #'@param n.group number of variable groups
@@ -911,6 +933,19 @@ coef.cv.corila <- function(object,s="lambda.min"){
 #'@param prop.causal proportion of causal features within causal groups
 #'@param noise.factor noise factor
 #'@param plot logical
+#'
+#'@return
+#'Returns a list with the following slots:
+#'\itemize{
+#'\item \eqn{n_0 \times p} matrix \code{x_train}
+#'\item \eqn{p}-dimensional vector \code{type}
+#'\item \eqn{p}-dimensional vector \code{group}
+#'\item \eqn{n_0}-dimensional vector \code{y_train}
+#'\item \eqn{n_1 \times p} matrix \code{x_test}
+#'\item \eqn{n_1}-dimensional vector \code{y_test}
+#'\item \eqn{p}-dimensional vector \code{beta}
+#'\item data frame \code{info} with entries \eqn{n_0}, \eqn{n_1}, \eqn{p}, \code{n.type}, \code{n.group}, and \code{family}
+#'}
 #'
 #'@examples
 #'NULL
@@ -1066,6 +1101,14 @@ calc_sign_prec <- function(truth,estim){
 #'@param nfolds number of internal cross-validation folds (integer scalar)
 #'@param foldid internal cross-validation fold identifiers (\eqn{p}-dimensional integer vector)
 #'@param seed random seed (integer scalar)
+#'
+#'@return
+#'Returns a list with the following slots:
+#'\itemize{
+#'\item \eqn{n_1}-dimensional vector \code{y_hat} containing predicted values
+#'\item \eqn{p}-dimensional vector \code{coef} containing estimated coefficients
+#'\item numerical vector \code{difftime} indicating the computation time of each \code{method}
+#'}
 #'
 #'@examples
 #'NULL
@@ -1437,10 +1480,22 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
 #'@param nfolds number of cross-validation folds
 #'
 #'@details
-#'This function implements repeated $k$-fold cross-validation (e.g., 5 repetitions of 10-fold cross-validation).
+#'This function implements repeated \eqn{k}-fold cross-validation (e.g., 5 repetitions of 10-fold cross-validation).
+#'
+#'@return
+#'Returns a list with the following slots:
+#'\itemize{
+#'\item \code{nzero} non-zero coefficients
+#'\item \code{metric} metric
+#'}
+#'Both slot contain a data frame with one row for each iteration (\code{iter}) and one column for each \code{method}.
 #'
 #'@examples
-#'NULL
+#'n <- 100
+#'p <- 20
+#'x <- matrix(rnorm(n*p),nrow=n,ncol=p)
+#'y <- stats::rnorm(n)
+#'results <- crossval(x,y,family="gaussian",method=c("mean","corila"),trial=TRUE)
 #'
 crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi=FALSE,trial=FALSE,method=NULL){
   n <- nrow(x)
@@ -1487,10 +1542,13 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
 #'@export
 #'
 #'@param x data frame with names slots
-#'@param base character string naming the slot of interest (e.g., "corila")
+#'@param base character string naming the slot of interest (e.g., \code{"corila"})
 #'@param main character string used as a title
 #'@param decrease \code{TRUE} for decreasing arrow, \code{FALSE} for increasing arrow
 #'@param ylim limits for the vertical axis, or \code{NULL}
+#'
+#'@return
+#'Returns a figure.
 #'
 #'@examples
 #'x <- data.frame(mean=0,corila=rnorm(100)-1,other=rnorm(100))

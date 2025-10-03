@@ -18,7 +18,7 @@ multiridge(x, y, z, family, penalties = NULL)
 \item{penalties}{\eqn{q}-dimensional vector of penalty parameters, or \code{NULL} (cross-validation)}
 }
 \value{
-Returns an object of class \code{multiridge}.
+Returns an object of class \code{"multiridge"}.
 }
 \description{
 Fits multi-penalty ridge regression (tuning regularisation parameters and estimating regression coefficients).

@@ -22,7 +22,7 @@ simulate(
 )
 }
 \arguments{
-\item{family}{character "gaussian", "binomial", "poisson" or "cox"}
+\item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}}
 
 \item{n0}{number of training observations}
 
@@ -49,6 +49,19 @@ simulate(
 \item{noise.factor}{noise factor}
 
 \item{plot}{logical}
+}
+\value{
+Returns a list with the following slots:
+\itemize{
+\item \eqn{n_0 \times p} matrix \code{x_train}
+\item \eqn{p}-dimensional vector \code{type}
+\item \eqn{p}-dimensional vector \code{group}
+\item \eqn{n_0}-dimensional vector \code{y_train}
+\item \eqn{n_1 \times p} matrix \code{x_test}
+\item \eqn{n_1}-dimensional vector \code{y_test}
+\item \eqn{p}-dimensional vector \code{beta}
+\item data frame \code{info} with entries \eqn{n_0}, \eqn{n_1}, \eqn{p}, \code{n.type}, \code{n.group}, and \code{family}
+}
 }
 \description{
 Simulates data with grouped predictor variables

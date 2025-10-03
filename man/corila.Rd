@@ -30,9 +30,9 @@ corila(
 
 \item{type}{\eqn{p}-dimensional vector}
 
-\item{family}{character string "gaussian", "binomial", "poisson" or "cox"}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}}
 
-\item{hyper}{list of of \eqn{m}-dimensional vectors or a data frame with $m$ rows containing candidate values for hyperparameters}
+\item{hyper}{list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for hyperparameters}
 
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 
@@ -42,7 +42,7 @@ corila(
 
 \item{trial}{logical}
 
-\item{mode}{character string "mean" for arithmetic mean  or "pca" for first principal component}
+\item{mode}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
 \item{init.multi}{logical}
 }

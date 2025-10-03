@@ -29,7 +29,7 @@ holdout(
 
 \item{type}{\eqn{p}-dimensional vector}
 
-\item{family}{character string "gaussian", "binomial", "poisson" or "cox"}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}}
 
 \item{x_test}{\eqn{n_1 \times p} matrix}
 
@@ -46,6 +46,14 @@ holdout(
 \item{init.multi}{logical}
 
 \item{trial}{logical}
+}
+\value{
+Returns a list with the following slots:
+\itemize{
+\item \eqn{n_1}-dimensional vector \code{y_hat} containing predicted values
+\item \eqn{p}-dimensional vector \code{coef} containing estimated coefficients
+\item numerical vector \code{difftime} indicating the computation time of each \code{method}
+}
 }
 \description{
 Compares methods using hold-out method

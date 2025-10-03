@@ -9,13 +9,16 @@ plot_boxes(x, base = "corila", main = "", decrease = TRUE, ylim = NULL)
 \arguments{
 \item{x}{data frame with names slots}
 
-\item{base}{character string naming the slot of interest (e.g., "corila")}
+\item{base}{character string naming the slot of interest (e.g., \code{"corila"})}
 
 \item{main}{character string used as a title}
 
 \item{decrease}{\code{TRUE} for decreasing arrow, \code{FALSE} for increasing arrow}
 
 \item{ylim}{limits for the vertical axis, or \code{NULL}}
+}
+\value{
+Returns a figure.
 }
 \description{
 Creates box plots for paired/matched data, using Wilcoxon's signed-rank test to compare a group with the other groups.

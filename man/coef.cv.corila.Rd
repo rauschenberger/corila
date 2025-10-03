@@ -7,12 +7,12 @@
 \method{coef}{cv.corila}(object, s = "lambda.min")
 }
 \arguments{
-\item{object}{object of class "cv.corila"}
+\item{object}{object of class \code{"cv.corila"}}
 
-\item{s}{character "lambda.min" or numeric value}
+\item{s}{character \code{"lambda.min"} or numeric value}
 }
 \description{
-Extracts coefficients from an object of class \code{cv.corila}.
+Extracts coefficients from an object of class \code{"cv.corila"}.
 }
 \seealso{
 Fit models with \code{\link{cv.corila}()} and make predictions with \code{\link{predict.cv.corila}()}.

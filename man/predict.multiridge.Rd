@@ -13,6 +13,9 @@
 
 \item{...}{(not used)}
 }
+\value{
+Returns an \eqn{n_0}-dimensional vector of fitted values or an \eqn{n_1}-dimensional vector of predicted values.
+}
 \description{
 Makes predictions from a multi-penalty ridge regression model.
 }

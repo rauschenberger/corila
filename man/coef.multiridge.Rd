@@ -11,6 +11,9 @@
 
 \item{...}{(not used)}
 }
+\value{
+Returns an \eqn{1+p}-dimensional vector of estimated coefficients (estimated intercept and estimated slopes).
+}
 \description{
 Extracts coefficients from a multi-penalty ridge regression model.
 }
