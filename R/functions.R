@@ -219,53 +219,6 @@ coef.multiridge <- function(object,...){
   return(coef)
 }
 
-if(FALSE){
-  # Make multiridge work (Gaussian and binomial case)
-  
-  # simulate
-  set.seed(1)
-  n0 <- 100
-  n1 <- 10000
-  n <- n0 + n1
-  p <- c(100,50)
-  z <- rep(x=seq_along(p),times=p)
-  x <- sapply(X=z,FUN=function(x) stats::rnorm(n=n,sd=x))
-  beta <- stats::rnorm(n=sum(p),mean=1,sd=0)*stats::rbinom(n=sum(p),size=1,prob=0.2)
-  eta <- x %*% beta
-  family <- "binomial"
-  if(family=="gaussian"){
-    y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
-  } else if(family=="binomial"){
-    y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
-  } else if(family=="cox"){
-    time <- stats::rexp(n=n,rate=exp(eta))
-    status <- stats::rbinom(n=n,prob=0.5,size=1)
-    #y <- cbind(time=time,status=status)
-    y <- survival::Surv(time=time,event=status)
-  }
-  cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
-
-  y_hat <- list()
-  # equality
-  object <- multiridge(x=x[cond,],y=y[cond],z=z,family=family)
-  y_hat$multiridge <- stats::predict(object,newx=x[!cond,])
-  temp <- starnet:::.mean.function(coef(object)[1] + x[!cond,] %*% coef(object)[-1],family=family)
-  all.equal(y_hat$multiridge,temp)
-  
-  # comparison
-  glmnet <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=0)
-  y_hat$glmnet <- stats::predict(object=glmnet,newx=x[!cond,],type="response")
-  
-  if(family=="gaussian"){
-    metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
-  } else if(family=="binomial"){
-    metric <- sapply(X=y_hat,FUN=function(x) pROC::auc(response=y[!cond],predictor=as.vector(x),levels=c(0,1),direction="<"))
-  } else if(family=="cox"){
-    metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
-  }
-  metric
-}
-
 #----- group-lasso -----
 
 #'@title
@@ -896,6 +849,32 @@ coef.cv.corila <- function(object,s="lambda.min"){
 
 #----- simulation -----
 
+#'@title
+#'Data simulation
+#'
+#'@export
+#'
+#'@description
+#'Simulates data with grouped predictor variables
+#'
+#'@param family character "gaussian", "binomial", "poisson" or "cox"
+#'@param n0 number of training observations
+#'@param n1 number of testing observations
+#'@param n.group number of variable groups
+#'@param n.type number of variable types
+#'@param size.group size of variable groups (per variable type)
+#'@param effect.size effect sizes (per variable type)
+#'@param corfac.feature decrease of correlation if different variable
+#'@param corfac.type decrease of correlation if different type
+#'@param corfac.group decrease of correlation if different group
+#'@param n.group.causal number of causal groups
+#'@param prop.causal proportion of causal features within causal groups
+#'@param noise.factor noise factor
+#'@param plot logical
+#'
+#'@examples
+#'NULL
+#'
 simulate <- function(family="gaussian",n0=100,n1=10000,n.group=20,n.type=2,size.group=c(5,3),effect.size=c(1,1),corfac.feature=0.5,corfac.type=0.5,corfac.group=0.25,n.group.causal=2,prop.causal=0.5,noise.factor=1,plot=TRUE){
   # family="gaussian";n0=100;n1=10000;n.group=20;n.type=2;size.group=c(5,3);effect.size=c(1,1);corfac.feature=0.5;corfac.type=0.5;corfac.group=0.25;n.group.causal=2;prop.causal=0.5; noise.factor=1; plot=TRUE
   n <- n0 + n1
