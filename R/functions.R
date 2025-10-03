@@ -384,7 +384,7 @@ if(FALSE){
 #'
 #'@param x \eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables
 #'@param y \eqn{n}-dimensional response vector
-#'@param group XXX
+#'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{(th)}}} row and the \eqn{k^{\text{(th)}}} column indicates whether information should be transferred from the \eqn{j^{\text{(th)}}} to the \eqn{k^{\text{(th)}}} variable 
 #'@param type \eqn{p}-dimensional vector
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for hyperparameters
@@ -404,7 +404,14 @@ if(FALSE){
 #'Estimate parameters and tune hyperparameters (using cross-validation) with \code{\link{cv.corila}()}. Make predictions for a range of hyperparameters with \code{\link{predict.corila}()}.
 #'
 #'@examples
-#'NULL
+#'n <- 100
+#'p <- 50
+#'group <- rep(x=1:10,each=5)
+#'type <- rep(x=1,times=length(group))
+#'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
+#'y <- rnorm(n=n)
+#'hyper <- data.frame(local=0.5,global=0.5)
+#'object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 #'
 corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,mode="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"

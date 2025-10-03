@@ -26,7 +26,7 @@ corila(
 
 \item{y}{\eqn{n}-dimensional response vector}
 
-\item{group}{XXX}
+\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{(th)}}} row and the \eqn{k^{\text{(th)}}} column indicates whether information should be transferred from the \eqn{j^{\text{(th)}}} to the \eqn{k^{\text{(th)}}} variable}
 
 \item{type}{\eqn{p}-dimensional vector}
 
@@ -54,7 +54,14 @@ Fits an initial ridge regression to obtain weights for an adaptive lasso
 regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
 }
 \examples{
-NULL
+n <- 100
+p <- 50
+group <- rep(x=1:10,each=5)
+type <- rep(x=1,times=length(group))
+x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
+y <- rnorm(n=n)
+hyper <- data.frame(local=0.5,global=0.5)
+object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 
 }
 \references{

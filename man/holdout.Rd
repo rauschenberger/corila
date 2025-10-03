@@ -25,7 +25,7 @@ holdout(
 
 \item{y_train}{\eqn{n_0}-dimensional vector}
 
-\item{group}{XXX}
+\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{(th)}}} row and the \eqn{k^{\text{(th)}}} column indicates whether information should be transferred from the \eqn{j^{\text{(th)}}} to the \eqn{k^{\text{(th)}}} variable}
 
 \item{type}{\eqn{p}-dimensional vector}
 
