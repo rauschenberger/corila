@@ -147,6 +147,7 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'x <- sapply(X=z,FUN=function(x) stats::rnorm(n=n,sd=x))
 #'beta <- stats::rnorm(n=sum(p),mean=1,sd=0)*stats::rbinom(n=sum(p),size=1,prob=0.2)
 #'eta <- x %*% beta
+#'family <- "gaussian"
 #'if(family=="gaussian"){
 #'  y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
 #'} else if(family=="binomial"){
@@ -158,9 +159,9 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'}
 #'cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
 #'
+#'y_hat <- list()
 #'object <- multiridge(x=x[cond,],y=y[cond],z=z,family=family)
 #'y_hat$multiridge <- stats::predict(object,newx=x[!cond,])
-#'temp <- starnet:::.mean.function(coef(object)[1] + x[!cond,] %*% coef(object)[-1],family=family)
 #'
 #'# comparison
 #'glmnet <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=0)

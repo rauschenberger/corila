@@ -23,6 +23,47 @@ Returns an object of class \code{multiridge}.
 \description{
 Fits multi-penalty ridge regression (tuning regularisation parameters and estimating regression coefficients).
 }
+\examples{
+
+set.seed(1)
+n0 <- 100
+n1 <- 10000
+n <- n0 + n1
+p <- c(100,50)
+z <- rep(x=seq_along(p),times=p)
+x <- sapply(X=z,FUN=function(x) stats::rnorm(n=n,sd=x))
+beta <- stats::rnorm(n=sum(p),mean=1,sd=0)*stats::rbinom(n=sum(p),size=1,prob=0.2)
+eta <- x \%*\% beta
+family <- "gaussian"
+if(family=="gaussian"){
+ y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
+} else if(family=="binomial"){
+ y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
+} else if(family=="cox"){
+ time <- stats::rexp(n=n,rate=exp(eta))
+ status <- stats::rbinom(n=n,prob=0.5,size=1)
+ y <- survival::Surv(time=time,event=status)
+}
+cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
+
+y_hat <- list()
+object <- multiridge(x=x[cond,],y=y[cond],z=z,family=family)
+y_hat$multiridge <- stats::predict(object,newx=x[!cond,])
+
+# comparison
+glmnet <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=0)
+y_hat$glmnet <- stats::predict(object=glmnet,newx=x[!cond,],type="response")
+
+if(family=="gaussian"){
+ metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
+} else if(family=="binomial"){
+ metric <- sapply(X=y_hat,FUN=function(x) pROC::auc(response=y[!cond],predictor=as.vector(x),levels=c(0,1),direction="<"))
+} else if(family=="cox"){
+ metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
+}
+metric
+
+}
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
 \href{https://orcid.org/0000-0001-7715-1446}{Mirrelijn M. van Nee},
