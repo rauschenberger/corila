@@ -136,6 +136,45 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'@seealso
 #'Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}.
 #'
+#'@examples
+#'
+#'set.seed(1)
+#'n0 <- 100
+#'n1 <- 10000
+#'n <- n0 + n1
+#'p <- c(100,50)
+#'z <- rep(x=seq_along(p),times=p)
+#'x <- sapply(X=z,FUN=function(x) stats::rnorm(n=n,sd=x))
+#'beta <- stats::rnorm(n=sum(p),mean=1,sd=0)*stats::rbinom(n=sum(p),size=1,prob=0.2)
+#'eta <- x %*% beta
+#'if(family=="gaussian"){
+#'  y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
+#'} else if(family=="binomial"){
+#'  y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
+#'} else if(family=="cox"){
+#'  time <- stats::rexp(n=n,rate=exp(eta))
+#'  status <- stats::rbinom(n=n,prob=0.5,size=1)
+#'  y <- survival::Surv(time=time,event=status)
+#'}
+#'cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
+#'
+#'object <- multiridge(x=x[cond,],y=y[cond],z=z,family=family)
+#'y_hat$multiridge <- stats::predict(object,newx=x[!cond,])
+#'temp <- starnet:::.mean.function(coef(object)[1] + x[!cond,] %*% coef(object)[-1],family=family)
+#'
+#'# comparison
+#'glmnet <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=0)
+#'y_hat$glmnet <- stats::predict(object=glmnet,newx=x[!cond,],type="response")
+#'
+#'if(family=="gaussian"){
+#'  metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
+#'} else if(family=="binomial"){
+#'  metric <- sapply(X=y_hat,FUN=function(x) pROC::auc(response=y[!cond],predictor=as.vector(x),levels=c(0,1),direction="<"))
+#'} else if(family=="cox"){
+#'  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
+#'}
+#'metric
+#'
 multiridge <- function(x,y,z,family,penalties=NULL){
   if(!family %in% c("gaussian","linear","binomial","logistic","cox")){
     stop("Argument \"family\" must equal \"gaussian\" (or \"linear\"), \"binomial\" (or \"logistic\"), or \"cox\".")
@@ -213,7 +252,7 @@ coef.multiridge <- function(object,...){
   Xblocks <- multiridge::createXblocks(datablocks=object$datablocks)
   coef <- multiridge::betasout(object,Xblocks=Xblocks,penalties=object$penalties)
   if(object$family=="cox" & is.null(coef[[1]])){
-    coef[[1]] <- 0
+    coef[[1]] <- NA # was 0
   }
   coef <- backscale(pars=object$pars,coef=unlist(coef))$coef
   return(coef)
