@@ -24,6 +24,10 @@ for(family in c("gaussian","binomial","poisson")){
       y <- 1*(eta>=0)
     } else if(family=="poisson"){
       y <- round(exp(eta))
+    } else if(family=="cox"){
+      time <- stats::rexp(n=n,rate=exp(eta))
+      status <- stats::rbinom(n=n,prob=0.5,size=1)
+      y <- survival::Surv(time=time,event=status)
     }
     
     # without standardisation
