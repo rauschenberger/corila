@@ -294,14 +294,14 @@ coef.multiridge <- function(object,...){
 #'@examples
 #'n <- 100; p <- 5
 #'x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
-#'mean <- combine_features(x=x,mode="mean")
-#'comp <- combine_features(x=x,mode="pca")
+#'mean <- combine_features(x=x,fuse="mean")
+#'comp <- combine_features(x=x,fuse="pca")
 #'plot(mean,comp)
 #'
-combine_features <- function(x,mode="mean"){
-  if(mode=="mean"){
+combine_features <- function(x,fuse="mean"){
+  if(fuse=="mean"){
     rowMeans(x)
-  } else if(mode=="pca"){
+  } else if(fuse=="pca"){
     stats::princomp(x=x)$scores[,"Comp.1"]
   }
 }
@@ -332,7 +332,7 @@ combine_features <- function(x,mode="mean"){
 #'@return
 #'See description.
 #'
-construct_matrices <- function(x,group,type,mode="mean"){
+construct_matrices <- function(x,group,type,fuse="mean"){
   index <- seq_len(ncol(x))
   n <- nrow(x)
   if(is.numeric(group)){
@@ -346,17 +346,17 @@ construct_matrices <- function(x,group,type,mode="mean"){
   for(i in seq_len(m)){
     for(j in seq_len(q)){
       if(is.numeric(group)){
-        sep[[i]][,j] <- combine_features(x=x[,type==i & group==j,drop=FALSE],mode=mode)
+        sep[[i]][,j] <- combine_features(x=x[,type==i & group==j,drop=FALSE],fuse=fuse)
       } else {
-        sep[[i]][,j] <- combine_features(x=x[,type==i & index %in% group[[j]],drop=FALSE],mode=mode)
+        sep[[i]][,j] <- combine_features(x=x[,type==i & index %in% group[[j]],drop=FALSE],fuse=fuse)
       }
     }
   }
   for(j in seq_len(q)){
     if(is.numeric(group)){
-      com[,j] <- combine_features(x=x[,group==j,drop=FALSE],mode=mode)
+      com[,j] <- combine_features(x=x[,group==j,drop=FALSE],fuse=fuse)
     } else {
-      com[,j] <- combine_features(x=x[,index %in% group[[j]],drop=FALSE],mode=mode)
+      com[,j] <- combine_features(x=x[,index %in% group[[j]],drop=FALSE],fuse=fuse)
     }
   }
   return(list(all=cbind(x,-x),com=com,sep=sep))
@@ -391,7 +391,7 @@ if(FALSE){
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
 #'@param cond \code{NULL}
 #'@param lambda.com,lambda.sep,lambda.ind \code{NULL}
-#'@param mode character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
+#'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
 #'@param init.multi logical
 #'@param trial logical
 #'
@@ -413,7 +413,7 @@ if(FALSE){
 #'hyper <- data.frame(local=0.5,global=0.5)
 #'object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 #'
-corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,mode="mean",init.multi=FALSE){
+corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"
   
   n <- nrow(x) # sample size
@@ -446,7 +446,7 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
     mat <- list()
     mat$all <- cbind(scale$x,-scale$x) # scale was forgotten! (2029-09-05)
   } else {
-    mat <- construct_matrices(x=scale$x,group=group,type=type,mode=mode)
+    mat <- construct_matrices(x=scale$x,group=group,type=type,fuse=fuse)
   }
   
   index <- seq_len(p)
@@ -742,12 +742,12 @@ predict.corila <- function(object,newx,index,s,...){
 #'@examples
 #'1+1
 #'
-cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
+cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
   if(is.null(type)){
     type <- rep(x=1,times=ncol(x))
   }
   
-  # family="gaussian"; mode="mean"; foldid=NULL
+  # family="gaussian"; fuse="mean"; foldid=NULL
   n <- nrow(x) # sample size
   #p <- ncol(x) # number of features
   #p <- length(unique(group)) # number of groups
@@ -806,7 +806,7 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode=
   }
   
   # Use foldid already for full run?
-  object.ext <- corila(x=x,y=y,group=group,type=type,family=family,cor=cor,hyper=hyper,mode=mode,init.multi=init.multi,trial=trial)
+  object.ext <- corila(x=x,y=y,group=group,type=type,family=family,cor=cor,hyper=hyper,fuse=fuse,init.multi=init.multi,trial=trial)
   lambda <- lapply(X=object.ext$model,FUN=function(x) x$lambda)
   
   hat <- list()
@@ -816,7 +816,7 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",mode=
   
   
   for(i in seq_len(nfolds)){
-    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,type=type,family=family,cor=cor,hyper=hyper,mode=mode,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi,trial=trial)
+    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,type=type,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi,trial=trial)
     for(j in seq_len(nrow(hyper))){
       hat[[j]][foldid==i,] <- stats::predict(object=object.int,newx=x[foldid==i,],index=j,s=lambda[[j]])
     }
@@ -1418,7 +1418,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
         coef$pcLasso <- c(object$glmfit$a0[which(object$lambda==object$lambda.min)],object$glmfit$beta[, which(object$lambda==object$lambda.min)]) # this is different for overlapping groups
     } else if(i=="corila"){
       #--- lasso with feature groups and modalities ---
-      object <- cv.corila(x=x_train,y=y_train,group=group,type=type,family=family,mode="mean",foldid=foldid,init.multi=init.multi,trial=trial)
+      object <- cv.corila(x=x_train,y=y_train,group=group,type=type,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,trial=trial)
       print(object$hyper[object$id.hyper,])
       if(!is.null(x_test)){
         y_hat$corila <- stats::predict(object=object,newx=x_test)

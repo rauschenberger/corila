@@ -11,7 +11,7 @@ cv.corila(
   type = NULL,
   family = "gaussian",
   cor = "spearman",
-  mode = "mean",
+  fuse = "mean",
   init.multi = FALSE,
   trial = TRUE,
   foldid = NULL
@@ -30,7 +30,7 @@ cv.corila(
 
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 
-\item{mode}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
+\item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
 \item{init.multi}{logical}
 

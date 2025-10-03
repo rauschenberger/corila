@@ -17,7 +17,7 @@ corila(
   lambda.sep = NULL,
   lambda.ind = NULL,
   trial = TRUE,
-  mode = "mean",
+  fuse = "mean",
   init.multi = FALSE
 )
 }
@@ -42,7 +42,7 @@ corila(
 
 \item{trial}{logical}
 
-\item{mode}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
+\item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
 \item{init.multi}{logical}
 }

@@ -4,12 +4,12 @@
 \alias{combine_features}
 \title{Combine variables}
 \usage{
-combine_features(x, mode = "mean")
+combine_features(x, fuse = "mean")
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group}
 
-\item{mode}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
+\item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 }
 \value{
 Returns an \eqn{n_0}-dimensional numeric vector.
@@ -20,8 +20,8 @@ Calculates the mean or the first principal component of a group of variables
 \examples{
 n <- 100; p <- 5
 x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
-mean <- combine_features(x=x,mode="mean")
-comp <- combine_features(x=x,mode="pca")
+mean <- combine_features(x=x,fuse="mean")
+comp <- combine_features(x=x,fuse="pca")
 plot(mean,comp)
 
 }

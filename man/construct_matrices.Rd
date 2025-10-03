@@ -4,7 +4,7 @@
 \alias{construct_matrices}
 \title{Construct Matrices}
 \usage{
-construct_matrices(x, group, type, mode = "mean")
+construct_matrices(x, group, type, fuse = "mean")
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables}
@@ -13,7 +13,7 @@ construct_matrices(x, group, type, mode = "mean")
 
 \item{type}{\eqn{p}-dimensional vector}
 
-\item{mode}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
+\item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 }
 \value{
 See description.
