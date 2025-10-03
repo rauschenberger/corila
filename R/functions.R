@@ -1008,21 +1008,49 @@ simulate_overlap <- function(){
 
 #----- comparison -----
 
-if(FALSE){
-  truth <- sample(x=c(-1,0,1),size=10,replace=TRUE)
-  estim <- sample(x=c(-1,0,1),size=10,replace=TRUE)
-  calc_sign_prec(truth=truth,estim=estim)
-  calc_sign_prec(truth=truth,estim=-truth)
-  calc_sign_prec(truth=truth,estim=abs(truth))
-  calc_sign_prec(truth=truth,estim=-abs(truth))
-  calc_sign_prec(truth=truth,estim=0*truth+1)
-  calc_sign_prec(truth=truth,estim=0*truth-1)
-  calc_sign_prec(truth=truth,estim=truth)
-}
+#'@title
+#'Calculates precision for sign variable
+#'
+#'@description
+#'Calculates precision for ternary variables with support \eqn{\{-1, 0, 1\}}.
+#'@export
+#'
+#'@param truth integer vector with values in \eqn{\{-1, 0, 1\}} 
+#'@param estim integer vector of same length with values in \eqn{\{-1, 0, 1\}}
+#'
+#'@examples
+#'truth <- sample(x=c(-1,0,1),size=10,replace=TRUE)
+#'estim <- sample(x=c(-1,0,1),size=10,replace=TRUE)
+#'calc_sign_prec(truth=truth,estim=estim) # observed value
+#'calc_sign_prec(truth=truth,estim=-truth) # lower limit 0
+#'calc_sign_prec(truth=truth,estim=truth) # upper limit 1
+#'
 calc_sign_prec <- function(truth,estim){
   sum(estim!=0 & truth!=0 & sign(estim)==sign(truth))/sum(estim!=0)
 }
 
+#'@title
+#'Comparison with hold-out
+#'
+#'@description
+#'Compares methods using hold-out method
+#'
+#'@export
+#'
+#'@inheritParams corila
+#'
+#'@param x_train \eqn{n_0 \times p} matrix
+#'@param y_train \eqn{n_0}-dimensional vector
+#'@param x_test \eqn{n_1 \times p} matrix
+#'@param y_test \eqn{n_1}-dimensional vector
+#'@param method character vector listing all methods to be compared
+#'@param nfolds number of internal cross-validation folds (integer scalar)
+#'@param foldid internal cross-validation fold identifiers (\eqn{p}-dimensional integer vector)
+#'@param seed random seed (integer scalar)
+#'
+#'@examples
+#'NULL
+#'
 holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE; trial <- TRUE
   
@@ -1040,7 +1068,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
   
   if(is.null(method)){
     if(is.numeric(group)){
-      method <- c("mean","ridge","lasso","gglasso","grpreg","sparsegl","SGL","grpregOverlap","scoop","ecpc","squeezy","MLGL","pcLasso","corila") # multiridge could also be added (needs some coding) # multiview is not for groups (only modalities)
+      method <- c("mean","ridge","multiridge","lasso","gglasso","grpreg","sparsegl","SGL","grpregOverlap","scoop","ecpc","squeezy","MLGL","pcLasso","corila") # multiridge could also be added (needs some coding) # multiview is not for groups (only modalities)
     } else if(is.list(group)){
       method <- c("mean","ridge","lasso","grpregOverlap","ecpc","squeezy","corila") # overlapping groups (multiridge could also be adapted)
     }
@@ -1375,7 +1403,27 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
   return(list)
 }
 
-crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi=FALSE,trial=FALSE,method=NULL,...){
+#'@title
+#'Cross-validation method
+#'
+#'@description
+#'Compares methods with cross-validation method
+#'
+#'@export
+#'
+#'@inheritParams corila
+#'@inheritParams holdout
+#'
+#'@param iter number of cross-validation iterations
+#'@param nfolds number of cross-validation folds
+#'
+#'@details
+#'This function implements repeated $k$-fold cross-validation (e.g., 5 repetitions of 10-fold cross-validation).
+#'
+#'@examples
+#'NULL
+#'
+crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi=FALSE,trial=FALSE,method=NULL){
   n <- nrow(x)
   p <- ncol(x)
   if(is.null(group)){group <- seq_len(p)}
@@ -1411,6 +1459,24 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
   return(list)
 }
 
+#'@title
+#'Custom box plot function
+#'
+#'@description
+#'Creates box plots for paired/matched data, using Wilcoxon's signed-rank test to compare a group with the other groups. 
+#'
+#'@export
+#'
+#'@param x data frame with names slots
+#'@param base character string naming the slot of interest (e.g., "corila")
+#'@param main character string used as a title
+#'@param decrease \code{TRUE} for decreasing arrow, \code{FALSE} for increasing arrow
+#'@param ylim limits for the vertical axis, or \code{NULL}
+#'
+#'@examples
+#'x <- data.frame(mean=0,corila=rnorm(100)-1,other=rnorm(100))
+#'plot_boxes(x)
+#'
 plot_boxes <- function(x,base="corila",main="",decrease=TRUE,ylim=NULL){
   #--- hypothesis testing ---
   p.worse <- apply(x,2,function(c) ifelse(all(is.na(c)),NA,stats::wilcox.test(x=c,y=x[,base],paired=TRUE,alternative=ifelse(decrease,"greater","less"),exact=FALSE)$p.value))
@@ -1423,7 +1489,9 @@ plot_boxes <- function(x,base="corila",main="",decrease=TRUE,ylim=NULL){
   for(i in seq_along(col)){
     graphics::axis(side=1,at=seq_len(ncol(x))[col[[i]]],labels=colnames(x)[col[[i]]],las=2,col.axis=names(col)[i],tick=FALSE,line=-0.5)
   }
-  graphics::abline(h=stats::median(x[,"mean"]),lty=2,col="grey") # temporary
+  if("mean" %in% colnames(x)){
+    graphics::abline(h=stats::median(x[,"mean"]),lty=2,col="grey")
+  }
   #--- vertical axis ---
   usr <- graphics::par("usr")
   mar.big <- 0.05*(usr[4]-usr[3])
