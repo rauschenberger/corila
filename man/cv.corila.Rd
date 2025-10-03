@@ -42,7 +42,7 @@ cv.corila(
 Optimises the parameters and the hyperparameters of the sparse group lasso.
 }
 \examples{
-1+1
+NULL
 
 }
 \references{

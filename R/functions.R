@@ -654,6 +654,7 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
         temp <- (sign(cor[,j])*abs(cor[,j])^1*coef.ind)
         weight$ind[j] <- sum(pmax(0,temp)) # was mean!
         weight$ind[p+j] <- sum(pmax(0,-temp)) # was mean!
+        
         # Ad-hoc solution for features that are in no group:
         weight$com[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
       }
@@ -744,7 +745,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 #'
 #'@examples
-#'1+1
+#'NULL
 #'
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
   if(is.null(type)){
@@ -802,6 +803,14 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
   if(trial){
     cand <- seq(from=0,to=1,by=0.1) # for weighted sums
     hyper <- data.frame(local=cand,global=1-cand) # for weighted sums
+  }
+  
+  if(FALSE){
+    # 
+    cand <- seq(from=0,to=1,by=0.1)
+    hyper <- data.frame(weight.local=cand,weight.global=1-cand,exp.local=1,exp.global=1)
+    cand <- seq(from=0,to=2,by=0.2)
+    hyper <- data.frame(weight.local=0,weight.global=1,exp.local=0,exp.global=cand)
   }
   
   nfolds <- 10
@@ -959,7 +968,15 @@ coef.cv.corila <- function(object,s="lambda.min"){
 #'}
 #'
 #'@examples
-#'NULL
+#'data <- simulate()
+#'dims <- function(x){
+#'   if(is.matrix(x)||is.data.frame(x)){
+#'     paste(base::dim(x),collapse=" x ")
+#'   } else {
+#'     paste0(base::length(x))
+#'   }
+#'}
+#'sapply(X=data,FUN=dims)
 #'
 simulate <- function(family="gaussian",n0=100,n1=10000,n.group=20,n.type=2,size.group=c(5,3),effect.size=c(1,1),corfac.feature=0.5,corfac.type=0.5,corfac.group=0.25,n.group.causal=2,prop.causal=0.5,noise.factor=1,plot=TRUE){
   # family="gaussian";n0=100;n1=10000;n.group=20;n.type=2;size.group=c(5,3);effect.size=c(1,1);corfac.feature=0.5;corfac.type=0.5;corfac.group=0.25;n.group.causal=2;prop.causal=0.5; noise.factor=1; plot=TRUE
@@ -1122,7 +1139,8 @@ calc_sign_prec <- function(truth,estim){
 #'}
 #'
 #'@examples
-#'NULL
+#'data <- simulate()
+#'results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,x_test=data$x_test,y_test=data$y_test,family="gaussian",method=c("mean","ridge","multiridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
 #'
 holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE; trial <- TRUE

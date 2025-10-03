@@ -59,6 +59,7 @@ Returns a list with the following slots:
 Compares methods using hold-out method
 }
 \examples{
-NULL
+data <- simulate()
+results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,x_test=data$x_test,y_test=data$y_test,family="gaussian",method=c("mean","ridge","multiridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
 
 }
