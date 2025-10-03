@@ -390,9 +390,9 @@ if(FALSE){
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
 #'@param cond \code{NULL}
-#'@param lambda.com,lambda.sep,lambda.ind \code{NULL}
+#'@param lambda.com,lambda.sep,lambda.ind regularisation parameters, or \code{NULL} (cross-validation)
 #'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
-#'@param init.multi logical
+#'@param init.multi Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})
 #'@param trial logical
 #'
 #'@return
@@ -415,6 +415,10 @@ if(FALSE){
 #'
 corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"
+  if(init.multi & family=="poisson"){
+    warning("Setting init.multi=FALSE due to family=\"poisson\".")
+    init.multi <- FALSE
+  }
   
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
@@ -440,7 +444,7 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
     }
   }
   
-  scale <- forescale(x=x,y=y,family=family)
+  scale <- forescale(x=x,y=y,family=family); rm(x,y)
   
   if(trial){
     mat <- list()
@@ -939,7 +943,7 @@ coef.cv.corila <- function(object,s="lambda.min"){
 #'@param n.group.causal number of causal groups
 #'@param prop.causal proportion of causal features within causal groups
 #'@param noise.factor noise factor
-#'@param plot logical
+#'@param plot Attempt to visualise effects of and correlation between variables? (\code{TRUE} or \code{FALSE})
 #'
 #'@return
 #'Returns a list with the following slots:
@@ -1175,10 +1179,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       }
       coef$ridge <- stats::coef(object=object,s="lambda.min")
     } else if(i=="multiridge"){
-      if(family %in% c("cox","poisson")){
-        warning("Implement Cox regression for multiridge.")
-        next
-      }
+      if(family=="poisson"){next}
       #--- multiridge ---
       object <- multiridge(x=x_train,y=y_train,z=type,family=family)
       if(!is.null(x_test)){

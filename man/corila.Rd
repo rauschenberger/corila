@@ -38,13 +38,13 @@ corila(
 
 \item{cond}{\code{NULL}}
 
-\item{lambda.com, lambda.sep, lambda.ind}{\code{NULL}}
+\item{lambda.com, lambda.sep, lambda.ind}{regularisation parameters, or \code{NULL} (cross-validation)}
 
 \item{trial}{logical}
 
 \item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
-\item{init.multi}{logical}
+\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})}
 }
 \value{
 Returns an object of class \code{"corila"}.

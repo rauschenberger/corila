@@ -48,7 +48,7 @@ simulate(
 
 \item{noise.factor}{noise factor}
 
-\item{plot}{logical}
+\item{plot}{Attempt to visualise effects of and correlation between variables? (\code{TRUE} or \code{FALSE})}
 }
 \value{
 Returns a list with the following slots:

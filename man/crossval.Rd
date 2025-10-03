@@ -32,7 +32,7 @@ crossval(
 
 \item{nfolds}{number of cross-validation folds}
 
-\item{init.multi}{logical}
+\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})}
 
 \item{trial}{logical}
 

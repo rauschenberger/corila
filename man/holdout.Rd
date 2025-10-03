@@ -43,7 +43,7 @@ holdout(
 
 \item{seed}{random seed (integer scalar)}
 
-\item{init.multi}{logical}
+\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})}
 
 \item{trial}{logical}
 }
