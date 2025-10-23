@@ -48,7 +48,7 @@ cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
 
 y_hat <- list()
 object <- multiridge(x=x[cond,],y=y[cond],z=z,family=family)
-y_hat$multiridge <- stats::predict(object,newx=x[!cond,])
+y_hat$multiridge <- stats::predict(object=object,newx=x[!cond,])
 
 # comparison
 glmnet <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=0)
