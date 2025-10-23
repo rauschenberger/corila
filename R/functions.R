@@ -155,7 +155,7 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}.
 #'
 #'@examples
-#'
+#'# simulation
 #'set.seed(1)
 #'n0 <- 100
 #'n1 <- 10000
@@ -177,14 +177,23 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'}
 #'cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
 #'
-#'y_hat <- list()
+#'y_hat <- coef <- list()
+#'
+#'# standard ridge regression
+#'object <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=0)
+#'coef$glmnet <- stats::coef(object=object,s="lambda.min")
+#'y_hat$glmnet <- stats::predict(object=object,newx=x[!cond,],type="response",s="lambda.min")
+#'
+#'# multi-penalty ridge regression
 #'object <- multiridge(x=x[cond,],y=y[cond],z=z,family=family)
+#'coef$multiridge <- stats::coef(object=object)
 #'y_hat$multiridge <- stats::predict(object=object,newx=x[!cond,])
 #'
-#'# comparison
-#'glmnet <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=0)
-#'y_hat$glmnet <- stats::predict(object=glmnet,newx=x[!cond,],type="response")
+#'# estimation performance
+#'sapply(coef,function(x) stats::cor(beta,x[-1]))
+#'sapply(coef,function(x) mean((beta-x[-1])^2))
 #'
+#'# predictive performance
 #'if(family=="gaussian"){
 #'  metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
 #'} else if(family=="binomial"){
@@ -252,6 +261,8 @@ multiridge <- function(x,y,z,family,penalties=NULL){
 #'@seealso
 #'Fit models with \code{\link{multiridge}()} and extract coefficients with \code{\link{coef.multiridge}()}.
 #'
+#'@inherit multiridge examples
+#'
 predict.multiridge <- function(object,newx,...){
   if(length(object$z)!=ncol(newx)){
     stop("Argument \"newx\" must have one column for each variable used in model fitting.") 
@@ -284,6 +295,8 @@ predict.multiridge <- function(object,newx,...){
 #'
 #'@seealso
 #'Fit models with \code{\link{multiridge}()} and make predictions with \code{\link{predict.multiridge}()}.
+#'
+#'@inherit multiridge examples
 #'
 coef.multiridge <- function(object,...){
   Xblocks <- multiridge::createXblocks(datablocks=object$datablocks)
@@ -433,14 +446,19 @@ if(FALSE){
 #'Estimate parameters and tune hyperparameters (using cross-validation) with \code{\link{cv.corila}()}. Make predictions for a range of hyperparameters with \code{\link{predict.corila}()}.
 #'
 #'@examples
+#'# simulation
 #'n <- 100
 #'p <- 50
 #'group <- rep(x=1:10,each=5)
 #'type <- rep(x=1,times=length(group))
 #'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
 #'y <- rnorm(n=n)
+#'
+#'# model fitting
 #'hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
 #'object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
+#'
+#'y_hat <- predict(object,newx=x,index=1,s=0)
 #'
 corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"
@@ -753,6 +771,8 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
 #'@return
 #'Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
 #'
+#'@inherit corila examples
+#'
 predict.corila <- function(object,newx,index,s,...){
   newx_stand <- forescale(x=newx,pars=object$scale)$x
   y_hat_stand <- stats::predict(object=object$model[[index]],newx=cbind(newx_stand,-newx_stand),s=s,type=ifelse(object$scale$family=="cox","link","response"))
@@ -777,13 +797,53 @@ predict.corila <- function(object,newx,index,s,...){
 #'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 #'
 #'@examples
-#'n <- 100
-#'p <- 50
-#'group <- rep(x=1:10,each=5)
-#'type <- rep(x=1,times=length(group))
-#'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
-#'y <- rnorm(n=n)
-#'object <- cv.corila(x,y,group,type,family="gaussian")
+#'# simulation
+#'set.seed(1)
+#'n0 <- 100
+#'n1 <- 10000
+#'n <- n0 + n1
+#'p <- c(100,50)
+#'z <- rep(x=seq_along(p),times=p)
+#'x <- sapply(X=z,FUN=function(x) stats::rnorm(n=n,sd=x))
+#'beta <- stats::rnorm(n=sum(p),mean=1,sd=0)*stats::rbinom(n=sum(p),size=1,prob=0.2)
+#'eta <- x %*% beta
+#'family <- "gaussian"
+#'if(family=="gaussian"){
+#'  y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
+#'} else if(family=="binomial"){
+#'  y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
+#'} else if(family=="cox"){
+#'  time <- stats::rexp(n=n,rate=exp(eta))
+#'  status <- stats::rbinom(n=n,prob=0.5,size=1)
+#'  y <- survival::Surv(time=time,event=status)
+#'}
+#'cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
+#'
+#'y_hat <- coef <- list()
+#'
+#'# standard lasso regression
+#'object <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=1)
+#'coef$glmnet <- stats::coef(object=object,s="lambda.min")
+#'y_hat$glmnet <- stats::predict(object=object,newx=x[!cond,],type="response",s="lambda.min")
+#'
+#'# flexible group lasso regression
+#'object <- cv.corila(x=x[cond,],y=y[cond],group=z,family=family)
+#'coef$corila <- stats::coef(object=object)
+#'y_hat$corila <- stats::predict(object=object,newx=x[!cond,])
+#'
+#'# estimation performance
+#'sapply(coef,function(x) stats::cor(beta,x[-1]))
+#'sapply(coef,function(x) mean((beta-x[-1])^2))
+#'
+#'# predictive performance
+#'if(family=="gaussian"){
+#'  metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
+#'} else if(family=="binomial"){
+#'  metric <- sapply(X=y_hat,FUN=function(x) pROC::auc(response=y[!cond],predictor=as.vector(x),levels=c(0,1),direction="<"))
+#'} else if(family=="cox"){
+#'  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
+#'}
+#'metric
 #'
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
   if(nrow(x)!=length(y)){
@@ -933,6 +993,8 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
 #'@seealso
 #'Fit models with \code{\link{cv.corila}()} and extract coefficients with \code{\link{coef.cv.corila}()}.
 #'
+#'@inherit cv.corila examples
+#'
 predict.cv.corila <- function(object,newx,s="lambda.min",...){
   if(s=="lambda.min"){
     s <- object$lambda.min
@@ -958,6 +1020,8 @@ predict.cv.corila <- function(object,newx,s="lambda.min",...){
 #'
 #'@seealso
 #'Fit models with \code{\link{cv.corila}()} and make predictions with \code{\link{predict.cv.corila}()}.
+#'
+#'@inherit cv.corila examples
 #'
 coef.cv.corila <- function(object,s="lambda.min"){
   if(s=="lambda.min"){

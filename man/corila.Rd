@@ -54,14 +54,19 @@ Fits an initial ridge regression to obtain weights for an adaptive lasso
 regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
 }
 \examples{
+# simulation
 n <- 100
 p <- 50
 group <- rep(x=1:10,each=5)
 type <- rep(x=1,times=length(group))
 x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
 y <- rnorm(n=n)
+
+# model fitting
 hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
 object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
+
+y_hat <- predict(object,newx=x,index=1,s=0)
 
 }
 \references{
