@@ -410,7 +410,7 @@ if(FALSE){
 #'type <- rep(x=1,times=length(group))
 #'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
 #'y <- rnorm(n=n)
-#'hyper <- data.frame(local=0.5,global=0.5)
+#'hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
 #'object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 #'
 corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
@@ -677,7 +677,7 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
     #pf.ext <- 1/pmax(0,weights)
     #pf.ext <- 1/(weights$com^hyper$com[i]*weights$sep^hyper$sep[i]*weights$ind^hyper$ind[i])
     #pf.ext <- 1/(weight$com*hyper$com[i]+weight$sep*hyper$sep[i]+weight$ind*hyper$ind[i])
-    warning("temporary next line")
+    #warning("temporary next line")
     #pf.ext <- 1/weight$com
     #pf.ext <- 1/(weight$com*hyper$com[i]+weight$ind*hyper$ind[i])
     # pf.ext <- 1/(weight$com*hyper$local[i]+weight$ind*hyper$global[i]) # ORIGINAL
