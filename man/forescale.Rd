@@ -11,7 +11,7 @@ forescale(x, y = NULL, family = NULL, pars = NULL)
 
 \item{y}{\eqn{n_0}-dimensional response vector or \code{NULL}, only for Gaussian family}
 
-\item{family}{character string \code{"gaussian"}, \code{NULL}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}; or \code{NULL} (if \code{pars} is provided)}
 
 \item{pars}{list or \code{NULL} (see section "Value")}
 }
