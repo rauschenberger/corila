@@ -647,11 +647,13 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
         } else if(is.matrix(group)){
           cond.temp <- group[,j]==1
         }
-        temp <- (sign(cor[,j])*abs(cor[,j])^1*coef.ind)*cond.temp
+        #temp <- (sign(cor[,j])*abs(cor[,j])^1*coef.ind)*cond.temp # ORIGINAL
+        temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.local[i]*coef.ind)*cond.temp # GENERAL FORMULATION
         weight$com[j] <- sum(pmax(0,temp)[cond.temp]) # was mean!
         weight$com[p+j] <- sum(pmax(0,-temp)[cond.temp]) # was mean!
         # all features
-        temp <- (sign(cor[,j])*abs(cor[,j])^1*coef.ind)
+        # temp <- (sign(cor[,j])*abs(cor[,j])^1*coef.ind) # ORIGINAL
+        temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.global[i]*coef.ind) # GENERAL FORMULATION
         weight$ind[j] <- sum(pmax(0,temp)) # was mean!
         weight$ind[p+j] <- sum(pmax(0,-temp)) # was mean!
         
@@ -678,7 +680,8 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
     warning("temporary next line")
     #pf.ext <- 1/weight$com
     #pf.ext <- 1/(weight$com*hyper$com[i]+weight$ind*hyper$ind[i])
-    pf.ext <- 1/(weight$com*hyper$local[i]+weight$ind*hyper$global[i])
+    # pf.ext <- 1/(weight$com*hyper$local[i]+weight$ind*hyper$global[i]) # ORIGINAL
+    pf.ext <- 1/(weight$com*hyper$wgt.local[i]+weight$ind*hyper$wgt.global[i]) # GENERAL FORMULATION
     if(any(pf.ext<0)){stop(paste0("negative pf:",min(pf.ext)))}
     object[[i]] <- glmnet::glmnet(x=mat$all[cond,],y=scale$y[cond],family=family,penalty.factor=pf.ext,lower.limits=0,alpha=1)
   }
@@ -800,9 +803,18 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
   #  hyper <- data.frame(alpha=cand,beta=2-cand)
   #}
   
+  # ORIGINAL
+  #if(trial){
+  #  cand <- seq(from=0,to=1,by=0.1) # for weighted sums
+  #  hyper <- data.frame(local=cand,global=1-cand) # for weighted sums
+  #}
+  
+  # GENERAL FORMULATION
   if(trial){
-    cand <- seq(from=0,to=1,by=0.1) # for weighted sums
-    hyper <- data.frame(local=cand,global=1-cand) # for weighted sums
+    exp.cand <- 1; wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
+    hyper <- data.frame(wgt.local=wgt.cand,exp.local=exp.cand,wgt.global=1-wgt.cand,exp.global=exp.cand)
+    #exp.cand <- seq(from=0,to=1,by=0.1)
+    #hyper <- data.frame(wgt.local=0,exp.local=0,wgt.global=1,exp.global=exp.cand)
   }
   
   if(FALSE){
