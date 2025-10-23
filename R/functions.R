@@ -25,7 +25,18 @@
 #'@inherit backscale examples
 #'
 forescale <- function(x,y=NULL,family=NULL,pars=NULL){
-  if(is.null(family)==is.null(pars)){stop("Provide either family or pars.")}
+  if(!is.null(y)){
+    if(nrow(x)!=length(y)){
+      stop("For each observation, \"x\" should have one row and \"y\" should have one entry.")
+    }
+  }
+  if(is.null(family)==is.null(pars)){
+    stop("Provide either family or pars.")
+  } else {
+    if(!c(family,pars$family) %in% c("gaussian","binomial","poisson","cox")){
+      stop("Argument \"family\" must equal \"gaussian\", \"binomial\", \"poisson\", or \"cox\".")
+    }
+  }
   if(is.null(family)){family <- pars$family}
   if(is.null(pars)){
     pars <- list()
@@ -168,7 +179,7 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'
 #'y_hat <- list()
 #'object <- multiridge(x=x[cond,],y=y[cond],z=z,family=family)
-#'y_hat$multiridge <- stats::predict(object,newx=x[!cond,])
+#'y_hat$multiridge <- stats::predict(object=object,newx=x[!cond,])
 #'
 #'# comparison
 #'glmnet <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=0)
@@ -184,8 +195,17 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'metric
 #'
 multiridge <- function(x,y,z,family,penalties=NULL){
+  if(nrow(x)!=length(y)){
+    stop("For each observation, \"x\" should have one row and \"y\" should have one entry.")
+  }
+  if(is.matrix(x) && ncol(x)!=length(z)){
+    stop("For each variable, \"x\" should have one column and \"z\" should have one entry")
+  }
   if(!family %in% c("gaussian","linear","binomial","logistic","cox")){
     stop("Argument \"family\" must equal \"gaussian\" (or \"linear\"), \"binomial\" (or \"logistic\"), or \"cox\".")
+  }
+  if(!is.null(penalties) & !is.null(z) & length(unique(z))!=length(penalties)){
+    stop("Argument \"penalty\" must have one entry for each group.")
   }
   scale <- forescale(x=x,y=y,family=family)
   model <- ifelse(family=="gaussian",yes="linear",no=ifelse(family=="binomial",yes="logistic",no=family))
@@ -233,6 +253,9 @@ multiridge <- function(x,y,z,family,penalties=NULL){
 #'Fit models with \code{\link{multiridge}()} and extract coefficients with \code{\link{coef.multiridge}()}.
 #'
 predict.multiridge <- function(object,newx,...){
+  if(length(object$z)!=ncol(newx)){
+    stop("Argument \"newx\" must have one column for each variable used in model fitting.") 
+  }
   scale <- forescale(x=newx,pars=object$pars)
   newX <- lapply(X=unique(object$z),FUN=function(x) scale$x[,object$z==x])
   XXblocks <- multiridge::createXXblocks(datablocks=object$datablocks,datablocksnew=newX)
@@ -299,6 +322,9 @@ coef.multiridge <- function(object,...){
 #'plot(mean,comp)
 #'
 combine_features <- function(x,fuse="mean"){
+  if(!fuse %in% c("mean","pca")){
+    stop("Argument \"fuse\" must equal \"mean\" or \"pca\".")
+  }
   if(fuse=="mean"){
     rowMeans(x)
   } else if(fuse=="pca"){
@@ -333,6 +359,9 @@ combine_features <- function(x,fuse="mean"){
 #'See description.
 #'
 construct_matrices <- function(x,group,type,fuse="mean"){
+  if((is.numeric(group) && ncol(x)!=length(group)) | ncol(x)!=length(type)){
+    stop("For each variable, the matrix \"x\" must have one column, and the vectors \"group\" (if applicable) and \"type\" must have one entry.")
+  }
   index <- seq_len(ncol(x))
   n <- nrow(x)
   if(is.numeric(group)){
@@ -384,9 +413,9 @@ if(FALSE){
 #'
 #'@param x \eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables
 #'@param y \eqn{n}-dimensional response vector
-#'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{(th)}}} row and the \eqn{k^{\text{(th)}}} column indicates whether information should be transferred from the \eqn{j^{\text{(th)}}} to the \eqn{k^{\text{(th)}}} variable 
+#'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
 #'@param type \eqn{p}-dimensional vector
-#'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}
+#'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
 #'@param cond \code{NULL}
@@ -748,9 +777,19 @@ predict.corila <- function(object,newx,index,s,...){
 #'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 #'
 #'@examples
-#'NULL
+#'n <- 100
+#'p <- 50
+#'group <- rep(x=1:10,each=5)
+#'type <- rep(x=1,times=length(group))
+#'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
+#'y <- rnorm(n=n)
+#'object <- cv.corila(x,y,group,type,family="gaussian")
 #'
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
+  if(nrow(x)!=length(y)){
+    stop("For each observation, the matrix \"x\" must have one row, and the vector \"y\" must have one entry.")
+  }
+  
   if(is.null(type)){
     type <- rep(x=1,times=ncol(x))
   }
@@ -1120,6 +1159,9 @@ simulate_overlap <- function(){
 #'calc_sign_prec(truth=truth,estim=truth) # upper limit 1
 #'
 calc_sign_prec <- function(truth,estim){
+  if(length(estim)!=length(truth)){
+    stop("Arguments \"truth\" and \"estim\" must have the same length.") 
+  }
   sum(estim!=0 & truth!=0 & sign(estim)==sign(truth))/sum(estim!=0)
 }
 
