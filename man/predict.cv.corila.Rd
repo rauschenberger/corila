@@ -16,7 +16,7 @@
 \item{...}{(not used)}
 }
 \value{
-Returns an \eqn{n_1}-dimensional vector of predicted values.
+Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
 }
 \description{
 Makes predictions from an object of class \code{"cv.corila"}.
@@ -69,7 +69,6 @@ if(family=="gaussian"){
  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
-
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}

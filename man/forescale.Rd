@@ -13,14 +13,14 @@ forescale(x, y = NULL, family = NULL, pars = NULL)
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}; or \code{NULL} (if \code{pars} is provided)}
 
-\item{pars}{list or \code{NULL} (see section "Value")}
+\item{pars}{list as defined in section \emph{Value}, or \code{NULL} (if \code{family} is provided)}
 }
 \value{
 \itemize{
 \item standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
 \item standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
-\item list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
 \item character string \code{family} indicates the model (\code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}), determined by argument \code{family} or \code{pars$family}
+\item list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
 }
 }
 \description{
@@ -35,12 +35,12 @@ x <- sapply(X=sd,FUN=function(x) stats::rnorm(n=n,sd=x))
 beta <- stats::rnorm(n=p)
 y <- x \%*\% beta + stats::rnorm(n=n)
 
-# without standardisation
+# regression without standardisation
 lm1 <- stats::lm(y~x)
 y_hat1 <- fitted(lm1)
 coef1 <- coef(lm1)
 
-# with standardisation
+# regression with standardisation
 scale <- forescale(x=x,y=y,family="gaussian")
 lm2 <- stats::lm(scale$y~scale$x)
 result <- backscale(pars=scale$pars,y=fitted(lm2),coef=coef(lm2))
@@ -53,5 +53,5 @@ all.equal(coef1,coef2,check.attributes=FALSE)
 
 }
 \seealso{
-Use function \code{\link{backscale}} to bring coefficients and predictions back to original scale.
+Use function \code{\link{backscale}()} to bring coefficients and predictions back to original scale.
 }

@@ -23,7 +23,7 @@ cv.corila(
 
 \item{y}{\eqn{n}-dimensional response vector}
 
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
+\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
 \item{type}{\eqn{p}-dimensional vector}
 
@@ -40,6 +40,9 @@ cv.corila(
 \item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
 
 \item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
+}
+\value{
+Returns an object of class \code{cv.corila}.
 }
 \description{
 Optimises the parameters and the hyperparameters of the sparse group lasso.
@@ -92,7 +95,6 @@ if(family=="gaussian"){
  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
-
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}

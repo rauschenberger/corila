@@ -8,17 +8,17 @@
 #'@inheritParams corila
 #'@param y \eqn{n_0}-dimensional response vector or \code{NULL}, only for Gaussian family 
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}; or \code{NULL} (if \code{pars} is provided)
-#'@param pars list or \code{NULL} (see section "Value")
+#'@param pars list as defined in section \emph{Value}, or \code{NULL} (if \code{family} is provided)
 #'
 #'@return
 #'\itemize{
 #'\item standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
 #'\item standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
-#'\item list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
 #'\item character string \code{family} indicates the model (\code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}), determined by argument \code{family} or \code{pars$family}
+#'\item list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
 #'}
 #'
-#'@seealso Use function \code{\link{backscale}} to bring coefficients and predictions back to original scale.
+#'@seealso Use function \code{\link{backscale}()} to bring coefficients and predictions back to original scale.
 #'
 #'@inherit backscale examples
 #'@export
@@ -58,14 +58,12 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
   } else {
     y_scaled <- NULL 
   }
-  list <- list(x=x_scaled,y=y_scaled,pars=pars,family=family)
+  list <- list(x=x_scaled,y=y_scaled,family=family,pars=pars)
   return(list)
 }
 
 #'@title
 #'Inverse Standardisation
-#'
-#'@export
 #'
 #'@description
 #'Transforms response variable back to original scale or transforms coefficients for predictor variables and response variable on original scales.
@@ -88,12 +86,12 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
 #'beta <- stats::rnorm(n=p)
 #'y <- x %*% beta + stats::rnorm(n=n)
 #'
-#'# without standardisation
+#'# regression without standardisation
 #'lm1 <- stats::lm(y~x)
 #'y_hat1 <- fitted(lm1)
 #'coef1 <- coef(lm1)
 #'
-#'# with standardisation
+#'# regression with standardisation
 #'scale <- forescale(x=x,y=y,family="gaussian")
 #'lm2 <- stats::lm(scale$y~scale$x)
 #'result <- backscale(pars=scale$pars,y=fitted(lm2),coef=coef(lm2))
@@ -104,6 +102,7 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
 #'all.equal(y_hat1,y_hat2)
 #'all.equal(coef1,coef2,check.attributes=FALSE)
 #'
+#'@export
 backscale <- function(pars,y=NULL,coef=NULL){
   list <- list()
   if(!is.null(y) & pars$family=="gaussian"){
@@ -124,8 +123,6 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'@title
 #'Multi-Penalty Ridge Regression
 #'
-#'@export
-#'
 #'@description
 #'Fits multi-penalty ridge regression (tuning regularisation parameters and estimating regression coefficients).
 #'
@@ -134,6 +131,12 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'@param z groups: \eqn{p}-dimensional vector with entries in \eqn{\{1,\ldots,q\}} (if \code{x} is a matrix), or \code{NULL} (if \code{x} is a list of matrices)
 #'@param family character \code{"linear"} (or \code{"gaussian"}), \code{"logistic"} (or \code{"binomial"}), or \code{"cox"} 
 #'@param penalties \eqn{q}-dimensional vector of penalty parameters, or \code{NULL} (cross-validation)
+#'
+#'@details
+#'Observations (samples) are indexed by \eqn{i} in \eqn{\{1,\ldots,n\}},
+#'variables (features) are indexed by \eqn{j} in \eqn{\{1,\ldots,p\}},
+#'and variable groups are indexed by \eqn{k} in \eqn{\{1,\ldots,q\}}.
+#'The number of variables in the \eqn{k^{\text{th}}} group is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 #'
 #'@references
 #'\href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
@@ -147,10 +150,18 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
 #'
 #'@return
-#'Returns an object of class \code{"multiridge"}.
+#'Returns an object of class \code{"multiridge"}, a list with the following slots:
+#'\itemize{
+#'\item slots from \code{\link[multiridge]{IWLSridge}} \code{multiridge::IWLSridge} or \code{multiridge::IWLSCoxridge}
+#'\item family:
+#'\item penalties
+#'\item datablocks
+#'\item z
+#'\item pars
+#'}
 #'
 #'@seealso
-#'Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}.
+#'Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}. Use \code{\link{cv.corila}()} to estimate sparse models.
 #'
 #'@examples
 #'# simulation
@@ -200,7 +211,7 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 #'}
 #'metric
-#'
+#'@export
 multiridge <- function(x,y,z,family,penalties=NULL){
   if(nrow(x)!=length(y)){
     stop("For each observation, \"x\" should have one row and \"y\" should have one entry.")
@@ -243,8 +254,6 @@ multiridge <- function(x,y,z,family,penalties=NULL){
 #'@title
 #'Make Predictions
 #'
-#'@export
-#'
 #'@description
 #'Makes predictions from a multi-penalty ridge regression model.
 #'
@@ -261,6 +270,7 @@ multiridge <- function(x,y,z,family,penalties=NULL){
 #'
 #'@inherit multiridge examples
 #'
+#'@export
 predict.multiridge <- function(object,newx,...){
   if(length(object$z)!=ncol(newx)){
     stop("Argument \"newx\" must have one column for each variable used in model fitting.") 
@@ -278,8 +288,6 @@ predict.multiridge <- function(object,newx,...){
 #'@title
 #'Extract Coefficients
 #'
-#'@export
-#'
 #'@description
 #'Extracts coefficients from a multi-penalty ridge regression model.
 #'
@@ -289,13 +297,14 @@ predict.multiridge <- function(object,newx,...){
 #'@inherit multiridge references
 #'
 #'@return
-#'Returns an \eqn{1+p}-dimensional vector of estimated coefficients (estimated intercept and estimated slopes).
+#'Returns an \eqn{(1+p)}-dimensional vector of estimated coefficients (estimated intercept and estimated slopes).
 #'
 #'@seealso
 #'Fit models with \code{\link{multiridge}()} and make predictions with \code{\link{predict.multiridge}()}.
 #'
 #'@inherit multiridge examples
 #'
+#'@export
 coef.multiridge <- function(object,...){
   Xblocks <- multiridge::createXblocks(datablocks=object$datablocks)
   coef <- multiridge::betasout(object,Xblocks=Xblocks,penalties=object$penalties)
@@ -310,8 +319,6 @@ coef.multiridge <- function(object,...){
 
 #'@title
 #'Combine variables
-#'
-#'@export
 #'
 #'@description
 #'Calculates the mean or the first principal component of a group of variables
@@ -332,6 +339,7 @@ coef.multiridge <- function(object,...){
 #'comp <- combine_features(x=x,fuse="pca")
 #'plot(mean,comp)
 #'
+#'@export
 combine_features <- function(x,fuse="mean"){
   if(!fuse %in% c("mean","pca")){
     stop("Argument \"fuse\" must equal \"mean\" or \"pca\".")
@@ -345,8 +353,6 @@ combine_features <- function(x,fuse="mean"){
 
 #'@title
 #'Construct Matrices
-#'
-#'@export
 #'
 #'@description
 #'Constructs matrices with (i) the original data concatenated with the inverted data, (ii) one meta-variable for each group, and (iii) one meta-variable for each group in each type.
@@ -369,6 +375,7 @@ combine_features <- function(x,fuse="mean"){
 #'@return
 #'See description.
 #'
+#'@export
 construct_matrices <- function(x,group,type,fuse="mean"){
   if((is.numeric(group) && ncol(x)!=length(group)) | ncol(x)!=length(type)){
     stop("For each variable, the matrix \"x\" must have one column, and the vectors \"group\" (if applicable) and \"type\" must have one entry.")
@@ -416,15 +423,13 @@ if(FALSE){
 #'@title
 #'Group lasso
 #'
-#'@export
-#'
 #'@description
 #'Fits an initial ridge regression to obtain weights for an adaptive lasso 
 #'regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
 #'
 #'@param x \eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables
 #'@param y \eqn{n}-dimensional response vector
-#'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
+#'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
 #'@param type \eqn{p}-dimensional vector
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for hyperparameters
@@ -458,6 +463,7 @@ if(FALSE){
 #'
 #'y_hat <- predict(object,newx=x,index=1,s=0)
 #'
+#'@export
 corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"
   if(init.multi & family=="poisson"){
@@ -749,8 +755,6 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
 #'@title
 #'predict (S3 method)
 #'
-#'@export
-#'
 #'@description
 #'Makes prediction from an object of class \code{"corila"}.
 #'
@@ -761,16 +765,17 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
 #'@param s numeric scalar specifying the value of the regularisation hyperparameter
 #'@param ... (not used)
 #'
+#'@return
+#'Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
+#'
 #'@inherit corila-package references
 #'
 #'@seealso
 #'Estimate parameters with \code{\link{corila}()}, or estimate parameters and tune hyperparameters with \code{\link{cv.corila}()}.
 #'
-#'@return
-#'Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
-#'
 #'@inherit corila examples
 #'
+#'@export
 predict.corila <- function(object,newx,index,s,...){
   newx_stand <- forescale(x=newx,pars=object$scale)$x
   y_hat_stand <- stats::predict(object=object$model[[index]],newx=cbind(newx_stand,-newx_stand),s=s,type=ifelse(object$scale$family=="cox","link","response"))
@@ -780,8 +785,6 @@ predict.corila <- function(object,newx,index,s,...){
 
 #'@title
 #'Sparse Group Lasso
-#'
-#'@export
 #'
 #'@description
 #'Optimises the parameters and the hyperparameters of the sparse group lasso.
@@ -794,6 +797,9 @@ predict.corila <- function(object,newx,index,s,...){
 #'
 #'@seealso
 #'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
+#'
+#'@return
+#'Returns an object of class \code{cv.corila}.
 #'
 #'@examples
 #'# simulation
@@ -843,7 +849,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 #'}
 #'metric
-#'
+#'@export
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
   if(nrow(x)!=length(y)){
     stop("For each observation, the matrix \"x\" must have one row, and the vector \"y\" must have one entry.")
@@ -913,9 +919,9 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
       exp.cand <- 1; wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
       hyper <- data.frame(wgt.local=wgt.cand,exp.local=exp.cand,wgt.global=1-wgt.cand,exp.global=exp.cand)
     } else if(tune=="exp"){
-      exp.cand <- seq(from=0,to=1,by=0.1)
-      wgt.cand <- 0.5
-      hyper <- data.frame(wgt.local=0,exp.local=exp.cand,wgt.global=1,exp.global=exp.cand)
+      exp.cand <- c(0.1,0.5,1,2,5)
+      #wgt.cand <- 0.5
+      hyper <- data.frame(wgt.local=1,exp.local=exp.cand,wgt.global=0,exp.global=exp.cand)
     } else if(tune=="both"){
       wgt.cand <- seq(from=0,to=1,by=0.25)
       hyper <- data.frame(wgt.local=wgt.cand,wgt.global=1-wgt.cand)
@@ -982,8 +988,6 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
 #'@title
 #'predict (S3 method)
 #'
-#'@export
-#'
 #'@description
 #'Makes predictions from an object of class \code{"cv.corila"}. 
 #'
@@ -996,14 +1000,11 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
 #'
 #'@inherit corila-package references
 #'
-#'@return
-#'Returns an \eqn{n_1}-dimensional vector of predicted values.
-#'
 #'@seealso
 #'Fit models with \code{\link{cv.corila}()} and extract coefficients with \code{\link{coef.cv.corila}()}.
 #'
 #'@inherit cv.corila examples
-#'
+#'@export
 predict.cv.corila <- function(object,newx,s="lambda.min",...){
   if(s=="lambda.min"){
     s <- object$lambda.min
@@ -1020,18 +1021,22 @@ predict.cv.corila <- function(object,newx,s="lambda.min",...){
 #'@title
 #'Extract coefficients
 #'
-#'@export
-#'
 #'@description
 #'Extracts coefficients from an object of class \code{"cv.corila"}.
 #'
 #'@inheritParams predict.cv.corila
 #'
+#'@return
+#'Returns an \eqn{(1+p)}-dimensional vector of the estimated coefficients.
+#'The first entry is the estimated intercept, and the other \eqn{p} entries are the estimated slopes.
+#'
+#'@inherit corila-package references
+#'
 #'@seealso
 #'Fit models with \code{\link{cv.corila}()} and make predictions with \code{\link{predict.cv.corila}()}.
 #'
 #'@inherit cv.corila examples
-#'
+#'@export
 coef.cv.corila <- function(object,s="lambda.min"){
   if(s=="lambda.min"){
     s <- object$lambda.min
@@ -1057,8 +1062,6 @@ coef.cv.corila <- function(object,s="lambda.min"){
 
 #'@title
 #'Data simulation
-#'
-#'@export
 #'
 #'@description
 #'Simulates data with grouped predictor variables
@@ -1102,6 +1105,7 @@ coef.cv.corila <- function(object,s="lambda.min"){
 #'}
 #'sapply(X=data,FUN=dims)
 #'
+#'@export
 simulate <- function(family="gaussian",n0=100,n1=10000,n.group=20,n.type=2,size.group=c(5,3),effect.size=c(1,1),corfac.feature=0.5,corfac.type=0.5,corfac.group=0.25,n.group.causal=2,prop.causal=0.5,noise.factor=1,plot=TRUE){
   # family="gaussian";n0=100;n1=10000;n.group=20;n.type=2;size.group=c(5,3);effect.size=c(1,1);corfac.feature=0.5;corfac.type=0.5;corfac.group=0.25;n.group.causal=2;prop.causal=0.5; noise.factor=1; plot=TRUE
   n <- n0 + n1
@@ -1219,7 +1223,6 @@ simulate_overlap <- function(){
 #'
 #'@description
 #'Calculates precision for ternary variables with support \eqn{\{-1, 0, 1\}}.
-#'@export
 #'
 #'@param truth integer vector with values in \eqn{\{-1, 0, 1\}} 
 #'@param estim integer vector of same length with values in \eqn{\{-1, 0, 1\}}
@@ -1231,6 +1234,7 @@ simulate_overlap <- function(){
 #'calc_sign_prec(truth=truth,estim=-truth) # lower limit 0
 #'calc_sign_prec(truth=truth,estim=truth) # upper limit 1
 #'
+#'@export
 calc_sign_prec <- function(truth,estim){
   if(length(estim)!=length(truth)){
     stop("Arguments \"truth\" and \"estim\" must have the same length.") 
@@ -1243,8 +1247,6 @@ calc_sign_prec <- function(truth,estim){
 #'
 #'@description
 #'Compares methods using hold-out method
-#'
-#'@export
 #'
 #'@inheritParams cv.corila
 #'
@@ -1269,6 +1271,7 @@ calc_sign_prec <- function(truth,estim){
 #'data <- simulate()
 #'results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,x_test=data$x_test,y_test=data$y_test,family="gaussian",method=c("mean","ridge","multiridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
 #'
+#'@export
 holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE,tune="both"){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE; trial <- TRUE
   
@@ -1624,8 +1627,6 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
 #'@description
 #'Compares methods with cross-validation method
 #'
-#'@export
-#'
 #'@inheritParams cv.corila
 #'@inheritParams holdout
 #'
@@ -1650,6 +1651,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
 #'y <- stats::rnorm(n)
 #'results <- crossval(x,y,family="gaussian",method=c("mean","corila"),trial=TRUE)
 #'
+#'@export
 crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi=FALSE,trial=TRUE,method=NULL,tune="both"){
   n <- nrow(x)
   p <- ncol(x)
@@ -1692,8 +1694,6 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
 #'@description
 #'Creates box plots for paired/matched data, using Wilcoxon's signed-rank test to compare a group with the other groups. 
 #'
-#'@export
-#'
 #'@param x data frame with names slots
 #'@param base character string naming the slot of interest (e.g., \code{"corila"})
 #'@param main character string used as a title
@@ -1707,6 +1707,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
 #'x <- data.frame(mean=0,corila=rnorm(100)-1,other=rnorm(100))
 #'plot_boxes(x)
 #'
+#'@export
 plot_boxes <- function(x,base="corila",main="",decrease=TRUE,ylim=NULL){
   #--- hypothesis testing ---
   p.worse <- apply(x,2,function(c) ifelse(all(is.na(c)),NA,stats::wilcox.test(x=c,y=x[,base],paired=TRUE,alternative=ifelse(decrease,"greater","less"),exact=FALSE)$p.value))

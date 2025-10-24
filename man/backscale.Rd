@@ -7,7 +7,7 @@
 backscale(pars, y = NULL, coef = NULL)
 }
 \arguments{
-\item{pars}{list or \code{NULL} (see section "Value")}
+\item{pars}{list as defined in section \emph{Value}, or \code{NULL} (if \code{family} is provided)}
 
 \item{y}{\eqn{n_1}-dimensional response vector}
 
@@ -28,12 +28,12 @@ x <- sapply(X=sd,FUN=function(x) stats::rnorm(n=n,sd=x))
 beta <- stats::rnorm(n=p)
 y <- x \%*\% beta + stats::rnorm(n=n)
 
-# without standardisation
+# regression without standardisation
 lm1 <- stats::lm(y~x)
 y_hat1 <- fitted(lm1)
 coef1 <- coef(lm1)
 
-# with standardisation
+# regression with standardisation
 scale <- forescale(x=x,y=y,family="gaussian")
 lm2 <- stats::lm(scale$y~scale$x)
 result <- backscale(pars=scale$pars,y=fitted(lm2),coef=coef(lm2))
