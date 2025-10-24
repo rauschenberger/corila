@@ -24,7 +24,6 @@ Returns an object of class \code{"multiridge"}.
 Fits multi-penalty ridge regression (tuning regularisation parameters and estimating regression coefficients).
 }
 \examples{
-
 # simulation
 set.seed(1)
 n0 <- 100

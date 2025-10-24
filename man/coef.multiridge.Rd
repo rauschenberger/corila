@@ -18,7 +18,6 @@ Returns an \eqn{1+p}-dimensional vector of estimated coefficients (estimated int
 Extracts coefficients from a multi-penalty ridge regression model.
 }
 \examples{
-
 # simulation
 set.seed(1)
 n0 <- 100

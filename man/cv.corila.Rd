@@ -14,6 +14,7 @@ cv.corila(
   fuse = "mean",
   init.multi = FALSE,
   trial = TRUE,
+  tune = "both",
   foldid = NULL
 )
 }
@@ -35,6 +36,8 @@ cv.corila(
 \item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})}
 
 \item{trial}{logical}
+
+\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
 
 \item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
 }

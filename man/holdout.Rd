@@ -17,7 +17,8 @@ holdout(
   method = NULL,
   seed = NULL,
   init.multi = FALSE,
-  trial = TRUE
+  trial = TRUE,
+  tune = "both"
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ holdout(
 \item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})}
 
 \item{trial}{logical}
+
+\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
 }
 \value{
 Returns a list with the following slots:

@@ -13,8 +13,9 @@ crossval(
   iter = 5,
   nfolds = 10,
   init.multi = FALSE,
-  trial = FALSE,
-  method = NULL
+  trial = TRUE,
+  method = NULL,
+  tune = "both"
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ crossval(
 \item{trial}{logical}
 
 \item{method}{character vector listing all methods to be compared}
+
+\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
 }
 \value{
 Returns a list with the following slots:

@@ -20,7 +20,6 @@ Returns an \eqn{n_0}-dimensional vector of fitted values or an \eqn{n_1}-dimensi
 Makes predictions from a multi-penalty ridge regression model.
 }
 \examples{
-
 # simulation
 set.seed(1)
 n0 <- 100
