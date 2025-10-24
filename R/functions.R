@@ -2,8 +2,6 @@
 #'@title
 #'Standardisation
 #'
-#'@export
-#'
 #'@description
 #'Transforming variables to mean 0 and variance 1.
 #'
@@ -23,7 +21,7 @@
 #'@seealso Use function \code{\link{backscale}} to bring coefficients and predictions back to original scale.
 #'
 #'@inherit backscale examples
-#'
+#'@export
 forescale <- function(x,y=NULL,family=NULL,pars=NULL){
   if(!is.null(y)){
     if(nrow(x)!=length(y)){
@@ -790,6 +788,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'
 #'@inheritParams corila
 #'@param foldid \eqn{n}-dimensional vector containing the fold identifiers
+#'@param tune character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)
 #'
 #'@inherit corila-package references
 #'
@@ -845,7 +844,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'}
 #'metric
 #'
-cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,foldid=NULL){
+cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
   if(nrow(x)!=length(y)){
     stop("For each observation, the matrix \"x\" must have one row, and the vector \"y\" must have one entry.")
   }
@@ -910,10 +909,20 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
   
   # GENERAL FORMULATION
   if(trial){
-    exp.cand <- 1; wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
-    hyper <- data.frame(wgt.local=wgt.cand,exp.local=exp.cand,wgt.global=1-wgt.cand,exp.global=exp.cand)
-    #exp.cand <- seq(from=0,to=1,by=0.1)
-    #hyper <- data.frame(wgt.local=0,exp.local=0,wgt.global=1,exp.global=exp.cand)
+    if(tune=="wgt"){
+      exp.cand <- 1; wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
+      hyper <- data.frame(wgt.local=wgt.cand,exp.local=exp.cand,wgt.global=1-wgt.cand,exp.global=exp.cand)
+    } else if(tune=="exp"){
+      exp.cand <- seq(from=0,to=1,by=0.1)
+      wgt.cand <- 0.5
+      hyper <- data.frame(wgt.local=0,exp.local=exp.cand,wgt.global=1,exp.global=exp.cand)
+    } else if(tune=="both"){
+      wgt.cand <- seq(from=0,to=1,by=0.25)
+      hyper <- data.frame(wgt.local=wgt.cand,wgt.global=1-wgt.cand)
+      exp.cand <- c(0.1,0.5,1,2,5)
+      hyper <- hyper[rep(seq_len(nrow(hyper)),each=length(exp.cand)),]
+      hyper$exp.local <- hyper$exp.global <- exp.cand
+    }
   }
   
   if(FALSE){
@@ -1237,7 +1246,7 @@ calc_sign_prec <- function(truth,estim){
 #'
 #'@export
 #'
-#'@inheritParams corila
+#'@inheritParams cv.corila
 #'
 #'@param x_train \eqn{n_0 \times p} matrix
 #'@param y_train \eqn{n_0}-dimensional vector
@@ -1260,7 +1269,7 @@ calc_sign_prec <- function(truth,estim){
 #'data <- simulate()
 #'results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,x_test=data$x_test,y_test=data$y_test,family="gaussian",method=c("mean","ridge","multiridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
 #'
-holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE){
+holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE,tune="both"){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE; trial <- TRUE
   
   p <- ncol(x_train)
@@ -1555,7 +1564,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
         coef$pcLasso <- c(object$glmfit$a0[which(object$lambda==object$lambda.min)],object$glmfit$beta[, which(object$lambda==object$lambda.min)]) # this is different for overlapping groups
     } else if(i=="corila"){
       #--- lasso with feature groups and modalities ---
-      object <- cv.corila(x=x_train,y=y_train,group=group,type=type,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,trial=trial)
+      object <- cv.corila(x=x_train,y=y_train,group=group,type=type,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,trial=trial,tune=tune)
       print(object$hyper[object$id.hyper,])
       if(!is.null(x_test)){
         y_hat$corila <- stats::predict(object=object,newx=x_test)
@@ -1617,7 +1626,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
 #'
 #'@export
 #'
-#'@inheritParams corila
+#'@inheritParams cv.corila
 #'@inheritParams holdout
 #'
 #'@param iter number of cross-validation iterations
@@ -1641,7 +1650,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
 #'y <- stats::rnorm(n)
 #'results <- crossval(x,y,family="gaussian",method=c("mean","corila"),trial=TRUE)
 #'
-crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi=FALSE,trial=FALSE,method=NULL){
+crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi=FALSE,trial=TRUE,method=NULL,tune="both"){
   n <- nrow(x)
   p <- ncol(x)
   if(is.null(group)){group <- seq_len(p)}
@@ -1656,7 +1665,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
     for(i in seq_len(nfolds)){
       cat("fold",i,"\n")
       cond <- foldid==i
-      results <- holdout(x_train=x[!cond,],y_train=y[!cond],x_test=x[cond,],y_test=y[cond],group=group,type=type,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,trial=trial)
+      results <- holdout(x_train=x[!cond,],y_train=y[!cond],x_test=x[cond,],y_test=y[cond],group=group,type=type,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,trial=trial,tune=tune)
       for(j in seq_along(results$y_hat)){
         y_hat[[names(results$y_hat)[j]]][cond] <- results$y_hat[[j]]
       }
@@ -1669,7 +1678,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
       list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) survival::concordance(y~I(-x))$concordance)
     }
     set.seed(k)
-    refit <- holdout(x_train=x,y_train=y,group=group,type=type,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,trial=trial)
+    refit <- holdout(x_train=x,y_train=y,group=group,type=type,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,trial=trial,tune=tune)
     list$nzero[[k]] <- sapply(X=refit$coef,FUN=function(x) sum(x[-1]!=0))
   }
   list <- lapply(X=list,FUN=function(x) do.call(what="rbind",args=x))
