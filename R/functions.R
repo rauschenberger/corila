@@ -915,12 +915,13 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
   
   # GENERAL FORMULATION
   if(trial){
-    if(tune=="wgt"){
-      exp.cand <- 1; wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
-      hyper <- data.frame(wgt.local=wgt.cand,exp.local=exp.cand,wgt.global=1-wgt.cand,exp.global=exp.cand)
+    if(tune=="none"){
+      hyper <- data.frame(wgt.local=1,exp.local=Inf,wgt.global=0,exp.global=Inf)
+    } else if(tune=="wgt"){
+      wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
+      hyper <- data.frame(wgt.local=wgt.cand,exp.local=1,wgt.global=1-wgt.cand,exp.global=1)
     } else if(tune=="exp"){
       exp.cand <- c(0.1,0.5,1,2,5)
-      #wgt.cand <- 0.5
       hyper <- data.frame(wgt.local=1,exp.local=exp.cand,wgt.global=0,exp.global=exp.cand)
     } else if(tune=="both"){
       wgt.cand <- seq(from=0,to=1,by=0.25)
