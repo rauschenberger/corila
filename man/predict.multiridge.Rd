@@ -20,6 +20,7 @@ Returns an \eqn{n_0}-dimensional vector of fitted values or an \eqn{n_1}-dimensi
 Makes predictions from a multi-penalty ridge regression model.
 }
 \examples{
+\donttest{
 # simulation
 set.seed(1)
 n0 <- 100
@@ -67,6 +68,7 @@ if(family=="gaussian"){
  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
+}
 }
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},

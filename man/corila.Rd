@@ -54,6 +54,7 @@ Fits an initial ridge regression to obtain weights for an adaptive lasso
 regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
 }
 \examples{
+\donttest{
 # simulation
 n <- 100
 p <- 50
@@ -67,7 +68,7 @@ hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
 object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 
 y_hat <- predict(object,newx=x,index=1,s=0)
-
+}
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
@@ -77,4 +78,6 @@ y_hat <- predict(object,newx=x,index=1,s=0)
 }
 \seealso{
 Estimate parameters and tune hyperparameters (using cross-validation) with \code{\link{cv.corila}()}. Make predictions for a range of hyperparameters with \code{\link{predict.corila}()}.
+
+This function calls \code{\link{forescale}} and \code{\link{backscale}} for standardising data and bringing results back to the original scale, respectively, \code{\link{multiridge}} for obtaining initial group penalties, and \code{\link[glmnet]{cv.glmnet}} and \code{\link[glmnet]{glmnet}} for adaptive lasso regression.
 }

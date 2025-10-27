@@ -24,6 +24,7 @@ Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dime
 Makes prediction from an object of class \code{"corila"}.
 }
 \examples{
+\donttest{
 # simulation
 n <- 100
 p <- 50
@@ -37,7 +38,7 @@ hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
 object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 
 y_hat <- predict(object,newx=x,index=1,s=0)
-
+}
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}

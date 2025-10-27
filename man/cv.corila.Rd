@@ -48,6 +48,7 @@ Returns an object of class \code{cv.corila}.
 Optimises the parameters and the hyperparameters of the sparse group lasso.
 }
 \examples{
+\donttest{
 # simulation
 set.seed(1)
 n0 <- 100
@@ -96,6 +97,7 @@ if(family=="gaussian"){
 }
 metric
 }
+}
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
 (2025).
@@ -104,4 +106,6 @@ metric
 }
 \seealso{
 Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
+
+This user function repeatedly calls \code{\link{corila}} with different values for the hyperparameters.
 }

@@ -12,12 +12,13 @@
 \item{...}{(not used)}
 }
 \value{
-Returns an \eqn{1+p}-dimensional vector of estimated coefficients (estimated intercept and estimated slopes).
+Returns an \eqn{(1+p)}-dimensional vector of estimated coefficients (estimated intercept and estimated slopes).
 }
 \description{
 Extracts coefficients from a multi-penalty ridge regression model.
 }
 \examples{
+\donttest{
 # simulation
 set.seed(1)
 n0 <- 100
@@ -65,6 +66,7 @@ if(family=="gaussian"){
  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
+}
 }
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},

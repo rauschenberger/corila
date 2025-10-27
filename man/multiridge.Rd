@@ -18,7 +18,15 @@ multiridge(x, y, z, family, penalties = NULL)
 \item{penalties}{\eqn{q}-dimensional vector of penalty parameters, or \code{NULL} (cross-validation)}
 }
 \value{
-Returns an object of class \code{"multiridge"}.
+Returns an object of class \code{"multiridge"}, a list with the following slots:
+\itemize{
+\item slots from \code{\link[multiridge]{IWLSridge}} or \code{\link[multiridge]{IWLSCoxridge}}
+\item family:
+\item penalties
+\item datablocks
+\item z
+\item pars
+}
 }
 \description{
 Fits multi-penalty ridge regression (tuning regularisation parameters and estimating regression coefficients).
@@ -30,6 +38,7 @@ and variable groups are indexed by \eqn{k} in \eqn{\{1,\ldots,q\}}.
 The number of variables in the \eqn{k^{\text{th}}} group is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 }
 \examples{
+\donttest{
 # simulation
 set.seed(1)
 n0 <- 100
@@ -78,6 +87,7 @@ if(family=="gaussian"){
 }
 metric
 }
+}
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
 \href{https://orcid.org/0000-0001-7715-1446}{Mirrelijn M. van Nee},
@@ -90,5 +100,7 @@ and
 \href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
 }
 \seealso{
-Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}.
+Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}. Use \code{\link{cv.corila}()} to estimate sparse models.
+
+This wrapper function calls various functions from the \code{\link[multiridge]{multiridge-package}}, namely \code{\link[multiridge]{createXXblocks}}, \code{\link[multiridge]{fastCV2}}, \code{\link[multiridge]{CVfolds}}, \code{\link[multiridge]{optLambdasWrap}}, \code{\link[multiridge]{SigmaFromBlocks}}, \code{\link[multiridge]{IWLSridge}}, and \code{\link[multiridge]{IWLSCoxridge}}.
 }

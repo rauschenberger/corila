@@ -12,13 +12,14 @@
 \item{s}{character \code{"lambda.min"} or numeric value}
 }
 \value{
-Returns an \eqn{1+p}-dimensional vector of the estimated coefficients.
+Returns an \eqn{(1+p)}-dimensional vector of the estimated coefficients.
 The first entry is the estimated intercept, and the other \eqn{p} entries are the estimated slopes.
 }
 \description{
 Extracts coefficients from an object of class \code{"cv.corila"}.
 }
 \examples{
+\donttest{
 # simulation
 set.seed(1)
 n0 <- 100
@@ -66,6 +67,7 @@ if(family=="gaussian"){
  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
+}
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
