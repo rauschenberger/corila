@@ -152,7 +152,7 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'@return
 #'Returns an object of class \code{"multiridge"}, a list with the following slots:
 #'\itemize{
-#'\item slots from \code{\link[multiridge]{IWLSridge}} \code{multiridge::IWLSridge} or \code{multiridge::IWLSCoxridge}
+#'\item slots from \code{\link[multiridge]{IWLSridge}} or \code{\link[multiridge]{IWLSCoxridge}}
 #'\item family:
 #'\item penalties
 #'\item datablocks
@@ -161,6 +161,8 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'}
 #'
 #'@seealso
+#'This wrapper function calls various functions from the \code{\link[multiridge]{multiridge-package}}, namely \code{\link[multiridge]{createXXblocks}}, \code{\link[multiridge]{fastCV2}}, \code{\link[multiridge]{CVfolds}}, \code{\link[multiridge]{optLambdasWrap}}, \code{\link[multiridge]{SigmaFromBlocks}}, \code{\link[multiridge]{IWLSridge}}, and \code{\link[multiridge]{IWLSCoxridge}}.
+#'
 #'Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}. Use \code{\link{cv.corila}()} to estimate sparse models.
 #'
 #'@examples
@@ -242,7 +244,7 @@ multiridge <- function(x,y,z,family,penalties=NULL){
   } else {
     object <- multiridge::IWLSridge(XXT=XXT,Y=scale$y,model=model)
   }
-  object$family <- family
+  object$family <- ifelse(family=="linear",yes="gaussian",no=ifelse(family=="logistic",yes="binomial",no=family))
   object$penalties <- penalties
   object$datablocks <- X
   object$z <- z
