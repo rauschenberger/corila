@@ -161,11 +161,12 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'}
 #'
 #'@seealso
-#'This wrapper function calls various functions from the \code{\link[multiridge]{multiridge-package}}, namely \code{\link[multiridge]{createXXblocks}}, \code{\link[multiridge]{fastCV2}}, \code{\link[multiridge]{CVfolds}}, \code{\link[multiridge]{optLambdasWrap}}, \code{\link[multiridge]{SigmaFromBlocks}}, \code{\link[multiridge]{IWLSridge}}, and \code{\link[multiridge]{IWLSCoxridge}}.
-#'
 #'Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}. Use \code{\link{cv.corila}()} to estimate sparse models.
 #'
+#'This wrapper function calls various functions from the \code{\link[multiridge]{multiridge-package}}, namely \code{\link[multiridge]{createXXblocks}}, \code{\link[multiridge]{fastCV2}}, \code{\link[multiridge]{CVfolds}}, \code{\link[multiridge]{optLambdasWrap}}, \code{\link[multiridge]{SigmaFromBlocks}}, \code{\link[multiridge]{IWLSridge}}, and \code{\link[multiridge]{IWLSCoxridge}}.
+#'
 #'@examples
+#'\donttest{
 #'# simulation
 #'set.seed(1)
 #'n0 <- 100
@@ -213,6 +214,7 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 #'}
 #'metric
+#'}
 #'@export
 multiridge <- function(x,y,z,family,penalties=NULL){
   if(nrow(x)!=length(y)){
@@ -450,7 +452,10 @@ if(FALSE){
 #'@seealso
 #'Estimate parameters and tune hyperparameters (using cross-validation) with \code{\link{cv.corila}()}. Make predictions for a range of hyperparameters with \code{\link{predict.corila}()}.
 #'
+#'This function calls \code{\link{forescale}} and \code{\link{backscale}} for standardising data and bringing results back to the original scale, respectively, \code{\link{multiridge}} for obtaining initial group penalties, and \code{\link[glmnet]{cv.glmnet} and \code{\link[glmnet]{glmnet} for adaptive lasso regression.
+#'
 #'@examples
+#'\donttest{
 #'# simulation
 #'n <- 100
 #'p <- 50
@@ -464,7 +469,7 @@ if(FALSE){
 #'object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 #'
 #'y_hat <- predict(object,newx=x,index=1,s=0)
-#'
+#'}
 #'@export
 corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"
@@ -800,10 +805,13 @@ predict.corila <- function(object,newx,index,s,...){
 #'@seealso
 #'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 #'
+#'This user function repeatedly calls \code{\link{corila}} with different values for the hyperparameters.
+#'
 #'@return
 #'Returns an object of class \code{cv.corila}.
 #'
 #'@examples
+#'\donttest{
 #'# simulation
 #'set.seed(1)
 #'n0 <- 100
@@ -851,6 +859,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 #'}
 #'metric
+#'}
 #'@export
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
   if(nrow(x)!=length(y)){
