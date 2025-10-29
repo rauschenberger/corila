@@ -28,7 +28,7 @@ corila(
 
 \item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
-\item{type}{\eqn{p}-dimensional vector}
+\item{type}{\eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
@@ -44,7 +44,7 @@ corila(
 
 \item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
-\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})}
+\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.}
 }
 \value{
 Returns an object of class \code{"corila"}.
@@ -67,7 +67,7 @@ y <- rnorm(n=n)
 hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
 object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 
-y_hat <- predict(object,newx=x,index=1,s=0)
+y_hat <- stats::predict(object,newx=x,index=1,s=0)
 }
 }
 \references{
@@ -79,5 +79,5 @@ y_hat <- predict(object,newx=x,index=1,s=0)
 \seealso{
 Estimate parameters and tune hyperparameters (using cross-validation) with \code{\link{cv.corila}()}. Make predictions for a range of hyperparameters with \code{\link{predict.corila}()}.
 
-This function calls \code{\link{forescale}} and \code{\link{backscale}} for standardising data and bringing results back to the original scale, respectively, \code{\link{multiridge}} for obtaining initial group penalties, and \code{\link[glmnet]{cv.glmnet}} and \code{\link[glmnet]{glmnet}} for adaptive lasso regression.
+This function calls \code{\link{forescale}()} and \code{\link{backscale}()} for standardising data and bringing results back to the original scale, respectively, \code{\link{multiridge}()} for obtaining initial group penalties, and \code{\link[glmnet]{cv.glmnet}()} and \code{\link[glmnet]{glmnet}()} for adaptive lasso regression.
 }

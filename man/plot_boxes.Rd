@@ -18,7 +18,7 @@ plot_boxes(x, base = "corila", main = "", decrease = TRUE, ylim = NULL)
 \item{ylim}{limits for the vertical axis, or \code{NULL}}
 }
 \value{
-Returns a figure.
+Returns \code{NULL} (and plots a figure).
 }
 \description{
 Creates box plots for paired/matched data, using Wilcoxon's signed-rank test to compare a group with the other groups.

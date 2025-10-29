@@ -30,13 +30,13 @@ y <- x \%*\% beta + stats::rnorm(n=n)
 
 # regression without standardisation
 lm1 <- stats::lm(y~x)
-y_hat1 <- fitted(lm1)
-coef1 <- coef(lm1)
+y_hat1 <- stats::fitted(lm1)
+coef1 <- stats::coef(lm1)
 
 # regression with standardisation
 scale <- forescale(x=x,y=y,family="gaussian")
 lm2 <- stats::lm(scale$y~scale$x)
-result <- backscale(pars=scale$pars,y=fitted(lm2),coef=coef(lm2))
+result <- backscale(pars=scale$pars,y=stats::fitted(lm2),coef=stats::coef(lm2))
 y_hat2 <- result$y_original
 coef2 <- result$coef
 

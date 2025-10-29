@@ -18,7 +18,7 @@ forescale(x, y = NULL, family = NULL, pars = NULL)
 \value{
 \itemize{
 \item standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
-\item standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
+\item standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \eqn{y} is provided and \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
 \item character string \code{family} indicates the model (\code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}), determined by argument \code{family} or \code{pars$family}
 \item list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
 }
@@ -37,13 +37,13 @@ y <- x \%*\% beta + stats::rnorm(n=n)
 
 # regression without standardisation
 lm1 <- stats::lm(y~x)
-y_hat1 <- fitted(lm1)
-coef1 <- coef(lm1)
+y_hat1 <- stats::fitted(lm1)
+coef1 <- stats::coef(lm1)
 
 # regression with standardisation
 scale <- forescale(x=x,y=y,family="gaussian")
 lm2 <- stats::lm(scale$y~scale$x)
-result <- backscale(pars=scale$pars,y=fitted(lm2),coef=coef(lm2))
+result <- backscale(pars=scale$pars,y=stats::fitted(lm2),coef=stats::coef(lm2))
 y_hat2 <- result$y_original
 coef2 <- result$coef
 

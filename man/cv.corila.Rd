@@ -10,6 +10,7 @@ cv.corila(
   group,
   type = NULL,
   family = "gaussian",
+  nfolds = 10,
   cor = "spearman",
   fuse = "mean",
   init.multi = FALSE,
@@ -25,15 +26,17 @@ cv.corila(
 
 \item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
-\item{type}{\eqn{p}-dimensional vector}
+\item{type}{\eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+
+\item{nfolds}{integer specifying the number of folds}
 
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 
 \item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
-\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})}
+\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.}
 
 \item{trial}{logical}
 
@@ -107,5 +110,5 @@ metric
 \seealso{
 Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 
-This user function repeatedly calls \code{\link{corila}} with different values for the hyperparameters.
+This user function repeatedly calls \code{\link{corila}()} with different values for the hyperparameters.
 }

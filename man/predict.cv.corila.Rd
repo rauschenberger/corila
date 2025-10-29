@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{object of class \code{"cv.corila"}}
 
-\item{newx}{\eqn{n_1 \times p} matrix}
+\item{newx}{\eqn{n_0 \times p} predictor matrix (training data) to obtain fitted values, \eqn{n_1 \times p} predictor matrix (testing data) to obtain predicted values}
 
 \item{s}{character \code{"lambda.min"} or numeric value}
 

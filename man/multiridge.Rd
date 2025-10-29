@@ -20,12 +20,12 @@ multiridge(x, y, z, family, penalties = NULL)
 \value{
 Returns an object of class \code{"multiridge"}, a list with the following slots:
 \itemize{
-\item slots from \code{\link[multiridge]{IWLSridge}} or \code{\link[multiridge]{IWLSCoxridge}}
-\item family:
-\item penalties
-\item datablocks
-\item z
-\item pars
+\item slots from \code{\link[multiridge]{IWLSridge}()} or \code{\link[multiridge]{IWLSCoxridge}()}
+\item character \code{family} with value \code{"gaussian"} (also for \code{"linear"}), \code{"binomial"} (also for \code{"logistic"}), \code{"poisson"}, or \code{"cox"}
+\item \eqn{q}-dimensional vector \code{penalties} containing optimised regularisation parameters (one for each variable group)
+\item list \code{datablocks} with \eqn{q} slots (one for each variable group), each containing an \eqn{n_0 \times p_k} matrix, where \eqn{k \in \{1,\ldots,q\}}
+\item \eqn{p}-dimensional group vector \code{z} (see argument)
+\item list \code{pars} with slots \code{family} (see above), the \eqn{n_0}-dimensional vectors \code{mu.x} and \code{sd.x} and the scalars \code{mu.y} and \code{sd.y}
 }
 }
 \description{
@@ -102,5 +102,5 @@ and
 \seealso{
 Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}. Use \code{\link{cv.corila}()} to estimate sparse models.
 
-This wrapper function calls various functions from the \code{\link[multiridge]{multiridge-package}}, namely \code{\link[multiridge]{createXXblocks}}, \code{\link[multiridge]{fastCV2}}, \code{\link[multiridge]{CVfolds}}, \code{\link[multiridge]{optLambdasWrap}}, \code{\link[multiridge]{SigmaFromBlocks}}, \code{\link[multiridge]{IWLSridge}}, and \code{\link[multiridge]{IWLSCoxridge}}.
+This wrapper function calls various functions from the \code{\link[multiridge]{multiridge-package}}, namely \code{\link[multiridge]{createXXblocks}()}, \code{\link[multiridge]{fastCV2}()}, \code{\link[multiridge]{CVfolds}()}, \code{\link[multiridge]{optLambdasWrap}()}, \code{\link[multiridge]{SigmaFromBlocks}()}, \code{\link[multiridge]{IWLSridge}()}, and \code{\link[multiridge]{IWLSCoxridge}()}.
 }

@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{object of class \code{"corila"}}
 
-\item{newx}{\eqn{n_1 \times p} matrix}
+\item{newx}{\eqn{n_0 \times p} predictor matrix (training data) to obtain fitted values, \eqn{n_1 \times p} predictor matrix (testing data) to obtain predicted values}
 
 \item{index}{integer scalar specifying the index of the mixing hyperparameter(s)}
 
@@ -37,7 +37,7 @@ y <- rnorm(n=n)
 hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
 object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 
-y_hat <- predict(object,newx=x,index=1,s=0)
+y_hat <- stats::predict(object,newx=x,index=1,s=0)
 }
 }
 \references{

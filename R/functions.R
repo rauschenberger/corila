@@ -118,6 +118,57 @@ backscale <- function(pars,y=NULL,coef=NULL){
   return(list)
 }
 
+
+#'@title
+#'Fold Identifiers
+#'
+#'@description
+#'Splits observations into balanced and stratified folds
+#'
+#'@inheritParams cv.corila
+#'
+#'@return
+#'Returns an \eqn{n_1}-dimensional vector with entries \eqn{\{1,\ldots,}\code{nfolds}\eqn{\}}
+#'
+#'@details
+#'Randomly splits observations into balanced folds (approximately the same number of observations per fold) and stratified folds (separate splitting for both classes in binomial family or censored/uncensored observations in Cox model).
+#'
+#'@examples
+#'# Gaussian and Poisson families
+#'y <- stats::rnorm(n=100)
+#'foldid <- folds(y=y,family="gaussian",nfolds=10)
+#'table(foldid)
+#'
+#'# binomial families
+#'y <- stats::rbinom(n=100,prob=0.2,size=1)
+#'foldid <- folds(y=y,family="binomial",nfolds=10)
+#'table(y,foldid)
+#'
+#'# Cox model
+#'time <- stats::rexp(n=100,rate=5)
+#'status <- stats::rbinom(n=100,prob=0.2,size=1)
+#'y <- survival::Surv(time=time,event=status)
+#'foldid <- folds(y=y,family="cox",nfolds=10)
+#'table(y[,"status"],foldid)
+#'
+#'@export
+folds <- function(y,family,nfolds){
+  if(length(y)<nfolds){
+    stop("There must be more observations than cross-validation folds.")
+  }
+  if(family %in% c("binomial","logistic","cox")){
+    if(family=="cox"){
+      y <- y[,"status"]
+    }
+    foldid <- rep(x=NA,times=length(y))
+    foldid[y==0] <- sample(x=rep(x=sample(seq_len(nfolds)),length.out=sum(y==0)))
+    foldid[y==1] <- sample(x=rep(x=sample(seq_len(nfolds)),length.out=sum(y==1)))
+  } else {
+    foldid <- sample(rep(x=sample(seq_len(nfolds)),length.out=length(y)))
+  }
+  return(foldid)
+}
+
 #----- group-ridge -----
 
 #'@title
@@ -129,7 +180,7 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'@param x predictors: \eqn{n \times p} matrix, or list of length \eqn{q} of \eqn{n \times p_k} matrices, with \eqn{k} in \eqn{\{1,\ldots,q\}}.
 #'@param y response: \eqn{n}-dimensional vector
 #'@param z groups: \eqn{p}-dimensional vector with entries in \eqn{\{1,\ldots,q\}} (if \code{x} is a matrix), or \code{NULL} (if \code{x} is a list of matrices)
-#'@param family character \code{"linear"} (or \code{"gaussian"}), \code{"logistic"} (or \code{"binomial"}), or \code{"cox"} 
+#'@param family character \code{"linear"} (or \code{"gaussian"}), \code{"logistic"} (or \code{"binomial"}), or \code{"cox"}
 #'@param penalties \eqn{q}-dimensional vector of penalty parameters, or \code{NULL} (cross-validation)
 #'
 #'@details
@@ -798,6 +849,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'
 #'@inheritParams corila
 #'@param foldid \eqn{n}-dimensional vector containing the fold identifiers
+#'@param nfolds integer specifying the number of folds
 #'@param tune character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)
 #'
 #'@inherit corila-package references
@@ -861,7 +913,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'metric
 #'}
 #'@export
-cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
+cv.corila <- function(x,y,group,type=NULL,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
   if(nrow(x)!=length(y)){
     stop("For each observation, the matrix \"x\" must have one row, and the vector \"y\" must have one entry.")
   }
@@ -951,10 +1003,9 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
     hyper <- data.frame(weight.local=0,weight.global=1,exp.local=0,exp.global=cand)
   }
   
-  nfolds <- 10
   if(is.null(foldid)){
-    foldid <- sample(rep(x=seq_len(nfolds),length.out=n))
-    # implemented stratified foldids!
+    #foldid <- sample(rep(x=seq_len(nfolds),length.out=n))
+    foldid <- folds(y=y,family=family,nfolds=nfolds) # balanced/stratified folds
   }
   
   # Use foldid already for full run?
@@ -1306,7 +1357,8 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
   }
   
   if(is.null(foldid)){
-    foldid <- sample(rep(x=seq_len(nfolds),length.out=n0))
+    #foldid <- sample(rep(x=seq_len(nfolds),length.out=n0))
+    foldid <- folds(y=y_train,family=family,nfolds=nfolds) # balanced/stratified folds!
   }
   
   if(is.null(method)){
@@ -1684,7 +1736,8 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
   for(k in seq_len(iter)){
     set.seed(k)
     cat("iter",k,"\n")
-    foldid <- sample(rep(x=seq_len(nfolds),length.out=n)) # use balanced folds for binomial family (same for internal folds)
+    #foldid <- sample(rep(x=seq_len(nfolds),length.out=n))
+    foldid <- folds(y=y,family=family,nfolds=nfolds) # balanced/stratified folds
     y_hat <- data.frame(row.names=seq_len(n))
     for(i in seq_len(nfolds)){
       cat("fold",i,"\n")

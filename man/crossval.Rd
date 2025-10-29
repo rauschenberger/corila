@@ -27,13 +27,13 @@ crossval(
 
 \item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
-\item{type}{\eqn{p}-dimensional vector}
+\item{type}{\eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)}
 
 \item{iter}{number of cross-validation iterations}
 
 \item{nfolds}{number of cross-validation folds}
 
-\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})}
+\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.}
 
 \item{trial}{logical}
 
