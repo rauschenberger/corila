@@ -13,7 +13,7 @@
 #'@return
 #'\itemize{
 #'\item standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
-#'\item standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
+#'\item standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \eqn{y} is provided and \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
 #'\item character string \code{family} indicates the model (\code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}), determined by argument \code{family} or \code{pars$family}
 #'\item list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
 #'}
@@ -88,13 +88,13 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
 #'
 #'# regression without standardisation
 #'lm1 <- stats::lm(y~x)
-#'y_hat1 <- fitted(lm1)
-#'coef1 <- coef(lm1)
+#'y_hat1 <- stats::fitted(lm1)
+#'coef1 <- stats::coef(lm1)
 #'
 #'# regression with standardisation
 #'scale <- forescale(x=x,y=y,family="gaussian")
 #'lm2 <- stats::lm(scale$y~scale$x)
-#'result <- backscale(pars=scale$pars,y=fitted(lm2),coef=coef(lm2))
+#'result <- backscale(pars=scale$pars,y=stats::fitted(lm2),coef=stats::coef(lm2))
 #'y_hat2 <- result$y_original
 #'coef2 <- result$coef
 #'
@@ -152,18 +152,18 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'@return
 #'Returns an object of class \code{"multiridge"}, a list with the following slots:
 #'\itemize{
-#'\item slots from \code{\link[multiridge]{IWLSridge}} or \code{\link[multiridge]{IWLSCoxridge}}
-#'\item family:
-#'\item penalties
-#'\item datablocks
-#'\item z
-#'\item pars
+#'\item slots from \code{\link[multiridge]{IWLSridge}()} or \code{\link[multiridge]{IWLSCoxridge}()}
+#'\item character \code{family} with value \code{"gaussian"} (also for \code{"linear"}), \code{"binomial"} (also for \code{"logistic"}), \code{"poisson"}, or \code{"cox"}
+#'\item \eqn{q}-dimensional vector \code{penalties} containing optimised regularisation parameters (one for each variable group)
+#'\item list \code{datablocks} with \eqn{q} slots (one for each variable group), each containing an \eqn{n_0 \times p_k} matrix, where \eqn{k \in \{1,\ldots,q\}}
+#'\item \eqn{p}-dimensional group vector \code{z} (see argument)
+#'\item list \code{pars} with slots \code{family} (see above), the \eqn{n_0}-dimensional vectors \code{mu.x} and \code{sd.x} and the scalars \code{mu.y} and \code{sd.y}
 #'}
 #'
 #'@seealso
 #'Extract coefficients with \code{\link[=coef.multiridge]{coef}()} or make predictions with \code{\link[=predict.multiridge]{predict}()}. Use \code{\link{cv.corila}()} to estimate sparse models.
 #'
-#'This wrapper function calls various functions from the \code{\link[multiridge]{multiridge-package}}, namely \code{\link[multiridge]{createXXblocks}}, \code{\link[multiridge]{fastCV2}}, \code{\link[multiridge]{CVfolds}}, \code{\link[multiridge]{optLambdasWrap}}, \code{\link[multiridge]{SigmaFromBlocks}}, \code{\link[multiridge]{IWLSridge}}, and \code{\link[multiridge]{IWLSCoxridge}}.
+#'This wrapper function calls various functions from the \code{\link[multiridge]{multiridge-package}}, namely \code{\link[multiridge]{createXXblocks}()}, \code{\link[multiridge]{fastCV2}()}, \code{\link[multiridge]{CVfolds}()}, \code{\link[multiridge]{optLambdasWrap}()}, \code{\link[multiridge]{SigmaFromBlocks}()}, \code{\link[multiridge]{IWLSridge}()}, and \code{\link[multiridge]{IWLSCoxridge}()}.
 #'
 #'@examples
 #'\donttest{
@@ -227,7 +227,7 @@ multiridge <- function(x,y,z,family,penalties=NULL){
     stop("Argument \"family\" must equal \"gaussian\" (or \"linear\"), \"binomial\" (or \"logistic\"), or \"cox\".")
   }
   if(!is.null(penalties) & !is.null(z) & length(unique(z))!=length(penalties)){
-    stop("Argument \"penalty\" must have one entry for each group.")
+    stop("Argument \"penalties\" must have one entry for each group.")
   }
   scale <- forescale(x=x,y=y,family=family)
   model <- ifelse(family=="gaussian",yes="linear",no=ifelse(family=="binomial",yes="logistic",no=family))
@@ -434,14 +434,14 @@ if(FALSE){
 #'@param x \eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables
 #'@param y \eqn{n}-dimensional response vector
 #'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
-#'@param type \eqn{p}-dimensional vector
+#'@param type \eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
 #'@param cond \code{NULL}
 #'@param lambda.com,lambda.sep,lambda.ind regularisation parameters, or \code{NULL} (cross-validation)
 #'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
-#'@param init.multi Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients? (\code{TRUE} or \code{FALSE})
+#'@param init.multi Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.
 #'@param trial logical
 #'
 #'@return
@@ -452,7 +452,7 @@ if(FALSE){
 #'@seealso
 #'Estimate parameters and tune hyperparameters (using cross-validation) with \code{\link{cv.corila}()}. Make predictions for a range of hyperparameters with \code{\link{predict.corila}()}.
 #'
-#'This function calls \code{\link{forescale}} and \code{\link{backscale}} for standardising data and bringing results back to the original scale, respectively, \code{\link{multiridge}} for obtaining initial group penalties, and \code{\link[glmnet]{cv.glmnet}} and \code{\link[glmnet]{glmnet}} for adaptive lasso regression.
+#'This function calls \code{\link{forescale}()} and \code{\link{backscale}()} for standardising data and bringing results back to the original scale, respectively, \code{\link{multiridge}()} for obtaining initial group penalties, and \code{\link[glmnet]{cv.glmnet}()} and \code{\link[glmnet]{glmnet}()} for adaptive lasso regression.
 #'
 #'@examples
 #'\donttest{
@@ -468,7 +468,7 @@ if(FALSE){
 #'hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
 #'object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
 #'
-#'y_hat <- predict(object,newx=x,index=1,s=0)
+#'y_hat <- stats::predict(object,newx=x,index=1,s=0)
 #'}
 #'@export
 corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
@@ -805,7 +805,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'@seealso
 #'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 #'
-#'This user function repeatedly calls \code{\link{corila}} with different values for the hyperparameters.
+#'This user function repeatedly calls \code{\link{corila}()} with different values for the hyperparameters.
 #'
 #'@return
 #'Returns an object of class \code{cv.corila}.
@@ -954,6 +954,7 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
   nfolds <- 10
   if(is.null(foldid)){
     foldid <- sample(rep(x=seq_len(nfolds),length.out=n))
+    # implemented stratified foldids!
   }
   
   # Use foldid already for full run?
@@ -1004,7 +1005,7 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",cor="spearman",fuse=
 #'Makes predictions from an object of class \code{"cv.corila"}. 
 #'
 #'@param object object of class \code{"cv.corila"}
-#'@param newx \eqn{n_1 \times p} matrix
+#'@param newx \eqn{n_0 \times p} predictor matrix (training data) to obtain fitted values, \eqn{n_1 \times p} predictor matrix (testing data) to obtain predicted values 
 #'@param s character \code{"lambda.min"} or numeric value
 #'@param ... (not used)
 #'
@@ -1055,7 +1056,7 @@ coef.cv.corila <- function(object,s="lambda.min"){
   } else if(!is.numeric(s)||length(s)!=1){
     stop("Set s=\"lambda.min\" or provide numeric value.")
   }
-  coef_stand <- coef(object=object$object[[object$id.hyper]],s=s)
+  coef_stand <- stats::coef(object=object$object[[object$id.hyper]],s=s)
   if(object$scale$family=="cox"){
     alpha <- NA
     beta <- coef_stand
@@ -1234,10 +1235,13 @@ simulate_overlap <- function(){
 #'Calculates precision for sign variable
 #'
 #'@description
-#'Calculates precision for ternary variables with support \eqn{\{-1, 0, 1\}}.
+#'Calculates precision for ternary variables with support \eqn{\{-1, 0, 1\}}, i.e., the proportion of positive or negative estimated signs that match the true sign.
 #'
 #'@param truth integer vector with values in \eqn{\{-1, 0, 1\}} 
 #'@param estim integer vector of same length with values in \eqn{\{-1, 0, 1\}}
+#'
+#'@return
+#'Returns a scalar between 0 (minimum precision) and 1 (maximum precision), or \code{NA} if all estimated signs equal 0.
 #'
 #'@examples
 #'truth <- sample(x=c(-1,0,1),size=10,replace=TRUE)
@@ -1245,13 +1249,19 @@ simulate_overlap <- function(){
 #'calc_sign_prec(truth=truth,estim=estim) # observed value
 #'calc_sign_prec(truth=truth,estim=-truth) # lower limit 0
 #'calc_sign_prec(truth=truth,estim=truth) # upper limit 1
+#'calc_sign_prec(truth=truth,estim=0*estim) # not defined
 #'
 #'@export
 calc_sign_prec <- function(truth,estim){
   if(length(estim)!=length(truth)){
     stop("Arguments \"truth\" and \"estim\" must have the same length.") 
   }
-  sum(estim!=0 & truth!=0 & sign(estim)==sign(truth))/sum(estim!=0)
+  if(all(estim==0)){
+    return(NA)
+  } else {
+    value <- sum(estim!=0 & truth!=0 & sign(estim)==sign(truth))/sum(estim!=0)
+    return(value)
+  }
 }
 
 #'@title
@@ -1269,7 +1279,7 @@ calc_sign_prec <- function(truth,estim){
 #'@param method character vector listing all methods to be compared
 #'@param nfolds number of internal cross-validation folds (integer scalar)
 #'@param foldid internal cross-validation fold identifiers (\eqn{p}-dimensional integer vector)
-#'@param seed random seed (integer scalar)
+#'@param seed random seed (integer scalar) for reproducibility, or \code{NULL}
 #'
 #'@return
 #'Returns a list with the following slots:
@@ -1498,7 +1508,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
           y_hat$MLGL <- 1/(1+exp(-temp))
         }
       }
-      coef$MLGL <- coef(object=object,s=cv$lambda.min)
+      coef$MLGL <- stats::coef(object=object,s=cv$lambda.min)
     } else if(i=="ecpc"){
       if(model=="poisson"){next}
       if(family=="cox"){
@@ -1713,7 +1723,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
 #'@param ylim limits for the vertical axis, or \code{NULL}
 #'
 #'@return
-#'Returns a figure.
+#'Returns \code{NULL} (and plots a figure).
 #'
 #'@examples
 #'x <- data.frame(mean=0,corila=rnorm(100)-1,other=rnorm(100))
@@ -1742,4 +1752,5 @@ plot_boxes <- function(x,base="corila",main="",decrease=TRUE,ylim=NULL){
   graphics::axis(side=2,col="grey",col.axis="grey")
   graphics::arrows(x0=usr[1],y0=usr[3]+mar.big,x1=usr[1],y1=usr[4]-mar.big,length=0.1,xpd=TRUE,code=ifelse(decrease,1,2),lwd=2)
   graphics::text(x=usr[1],y=c(usr[4]+mar.small,usr[3]-mar.small)[1+c(!decrease,decrease)],labels=c("-","+"),col=c("red","blue"),xpd=TRUE,cex=1.5,font=2)
+  return(NULL)
 }
