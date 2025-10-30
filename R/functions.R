@@ -153,7 +153,9 @@ backscale <- function(pars,y=NULL,coef=NULL){
 #'
 #'@export
 folds <- function(y,family,nfolds){
-  if(length(y)<nfolds){
+  if(nfolds<2){
+    stop("There must be at least two cross-validation folds.")
+  } else if(length(y)<nfolds){
     stop("There must be more observations than cross-validation folds.")
   }
   if(family %in% c("binomial","logistic","cox")){
