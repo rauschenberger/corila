@@ -185,11 +185,7 @@ folds <- function(y,family,nfolds){
 #'@param family character \code{"linear"} (or \code{"gaussian"}), \code{"logistic"} (or \code{"binomial"}), or \code{"cox"}
 #'@param penalties \eqn{q}-dimensional vector of penalty parameters, or \code{NULL} (cross-validation)
 #'
-#'@details
-#'Observations (samples) are indexed by \eqn{i} in \eqn{\{1,\ldots,n\}},
-#'variables (features) are indexed by \eqn{j} in \eqn{\{1,\ldots,p\}},
-#'and variable groups are indexed by \eqn{k} in \eqn{\{1,\ldots,q\}}.
-#'The number of variables in the \eqn{k^{\text{th}}} group is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
+#'@inherit corila details
 #'
 #'@references
 #'\href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
@@ -485,7 +481,7 @@ if(FALSE){
 #'regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
 #'
 #'@param x \eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables
-#'@param y \eqn{n}-dimensional response vector
+#'@param y \eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training
 #'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
 #'@param type \eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
@@ -496,6 +492,15 @@ if(FALSE){
 #'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
 #'@param init.multi Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.
 #'@param trial logical
+#'
+#'@details
+#'The number of observations (samples) for training or testing are indicated by \eqn{n_0} and \eqn{n_1}, respectively, the number of variables (features) is indicated by \eqn{p}, and the number of variable groups is indicated by \eqn{q}.
+#'
+#'Observations (samples) are indexed by \eqn{i} in \eqn{\{1,\ldots,n\}},
+#'variables (features) are indexed by \eqn{j} in \eqn{\{1,\ldots,p\}},
+#'and variable groups are indexed by \eqn{k} in \eqn{\{1,\ldots,q\}}.
+#'
+#'The number of variables in the \eqn{k^{\text{th}}} group is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 #'
 #'@return
 #'Returns an object of class \code{"corila"}.
@@ -854,15 +859,22 @@ predict.corila <- function(object,newx,index,s,...){
 #'@param nfolds integer specifying the number of folds
 #'@param tune character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)
 #'
+#'@inherit corila details
+#'
+#'@return
+#'Returns an object of class \code{cv.corila}, a list with the following slots:
+#'\begin{itemize}{
+#'\item
+#'\item
+#'\item
+#'}
+#'
 #'@inherit corila-package references
 #'
 #'@seealso
 #'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 #'
 #'This user function repeatedly calls \code{\link{corila}()} with different values for the hyperparameters.
-#'
-#'@return
-#'Returns an object of class \code{cv.corila}.
 #'
 #'@examples
 #'\donttest{
