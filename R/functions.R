@@ -173,14 +173,17 @@ folds <- function(y,family,nfolds){
 
 
 check_args <- function(x,y,family){
+  if(!is.character(family)|length(family)!=1){
+    stop("Argument \"family\" must be a character string.")
+  }
   if(!is.matrix(x)){
     stop("Argument \"x\" must be a matrix.")
   }
-  if(!is.vector(y)|!is.numeric(y)){
+  if(!(family=="cox"|(is.vector(y)&is.numeric(y))|(is.matrix(y)&&ncol(y)==1))){
     stop("Argument \"y\" must be a vector.")
   }
   if(nrow(x)!=length(y)){
-    stop("Matrix \"x\" must have one row and vector \"y\" must have one entry for each observation.")
+    stop("For each observation, matrix \"x\" must have one row, and vector \"y\" must have one entry.")
   }
   if(family %in% c("gaussian","linear")){
     if(all(y %in% c(0,1)) | all(y %in% c(-1,1))){
@@ -198,6 +201,8 @@ check_args <- function(x,y,family){
     if(class(y)!="Surv"){
       stop("Cox model requires a survival outcome.")
     }
+  } else {
+    stop("Invalid value for argument \"family\".")
   }
   return(NULL)
 }
