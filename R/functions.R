@@ -111,7 +111,7 @@ backscale <- function(pars,y=NULL,coef=NULL){
     list$y_original <- y
   }
   if(!is.null(coef)){
-    alpha <- pars$mu.y+pars$sd.y*(coef[1]-sum(coef[-1]*ifelse(test=pars$sd.x==0,yes=0,no=pars$mu.x/pars$sd.x))) # why yes=0? (same for below)
+    alpha <- pars$mu.y+pars$sd.y*(coef[1]-sum(coef[-1]*ifelse(test=pars$sd.x==0,yes=0,no=pars$mu.x/pars$sd.x)))
     beta <- coef[-1]*ifelse(test=pars$sd.x==0,yes=0,no=pars$sd.y/pars$sd.x)
     list$coef <- c(alpha,beta)
   }
