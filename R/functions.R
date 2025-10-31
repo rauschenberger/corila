@@ -864,9 +864,11 @@ predict.corila <- function(object,newx,index,s,...){
 #'@return
 #'Returns an object of class \code{cv.corila}, a list with the following slots:
 #'\begin{itemize}{
-#'\item
-#'\item
-#'\item
+#'\item \code{object}: list with one slot for each combination of hyperparameters, each slot contains an object of class \code{"glmnet"}
+#'\item \code{hyper}: data frame with one row for each combination of hyperparameters, four columns for the values of the hyperparameters (\code{wgt.local}, \code{wgt.global}, \code{exp.global}, and \code{exp.local}) and a column for the cross-validated loss (\code{cvm})
+#'\item \code{id.hyper}: index of combination of hyperparameters leading to the lowest cross-validated loss
+#'\item \code{lambda.min}: optimised regularisation parameter
+#'\item \code{scale}: output from \code{\link{forescale}()}
 #'}
 #'
 #'@inherit corila-package references
