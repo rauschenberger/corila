@@ -39,11 +39,11 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
   if(is.null(pars)){
     pars <- list()
     pars$family <- family
-    pars$mu.x <- apply(X=x,MARGIN=2,FUN=base::mean)
-    pars$sd.x <- apply(X=x,MARGIN=2,FUN=stats::sd)
+    pars$mu.x <- apply(X=x,MARGIN=2,FUN=base::mean,na.rm=TRUE)
+    pars$sd.x <- apply(X=x,MARGIN=2,FUN=stats::sd,na.rm=TRUE)
     if(!is.null(y) & family=="gaussian"){
-      pars$mu.y <- mean(y)
-      pars$sd.y <- stats::sd(y)
+      pars$mu.y <- mean(y,na.rm=TRUE)
+      pars$sd.y <- stats::sd(y,na.rm=TRUE)
     } else if(!is.null(y)){
       pars$mu.y <- 0
       pars$sd.y <- 1
