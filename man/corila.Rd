@@ -24,7 +24,7 @@ corila(
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables}
 
-\item{y}{\eqn{n}-dimensional response vector}
+\item{y}{\eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training}
 
 \item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
@@ -52,6 +52,15 @@ Returns an object of class \code{"corila"}.
 \description{
 Fits an initial ridge regression to obtain weights for an adaptive lasso 
 regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
+}
+\details{
+The number of observations (samples) for training or testing are indicated by \eqn{n_0} and \eqn{n_1}, respectively, the number of variables (features) is indicated by \eqn{p}, and the number of variable groups is indicated by \eqn{q}.
+
+Observations (samples) are indexed by \eqn{i} in \eqn{\{1,\ldots,n\}},
+variables (features) are indexed by \eqn{j} in \eqn{\{1,\ldots,p\}},
+and variable groups are indexed by \eqn{k} in \eqn{\{1,\ldots,q\}}.
+
+The number of variables in the \eqn{k^{\text{th}}} group is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 }
 \examples{
 \donttest{

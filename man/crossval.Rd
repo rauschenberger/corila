@@ -21,7 +21,7 @@ crossval(
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables}
 
-\item{y}{\eqn{n}-dimensional response vector}
+\item{y}{\eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 

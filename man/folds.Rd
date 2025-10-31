@@ -7,7 +7,7 @@
 folds(y, family, nfolds)
 }
 \arguments{
-\item{y}{\eqn{n}-dimensional response vector}
+\item{y}{\eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
