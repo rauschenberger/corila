@@ -1700,9 +1700,9 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
     
     if(!is.null(x_test)){
       if(family=="binomial" & any(sapply(X=y_hat,FUN=function(x) any(x<0|x>1,na.rm=TRUE)))){stop("invalid y_hat range")}
-      if(any(sapply(X=y_hat,FUN=base::length)!=n1)){"invalid y_hat length"}
+      if(any(sapply(X=y_hat,FUN=base::length)!=n1)){stop("invalid y_hat length")}
     }
-    if(any(sapply(X=coef,FUN=base::length)!=p+1)){"invalid coef length"}
+    if(any(sapply(X=coef,FUN=base::length)!=p+1)){stop("invalid coef length")}
   } else {
     warning("Implement checks for Cox regression.")
   }
