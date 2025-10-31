@@ -21,7 +21,7 @@
 #' to open the vignette.
 #' 
 #' This package also includes the wrapper function \code{\link[=multiridge]{multiridge()}} for multi-penalty ridge regression with
-#' the R package \code{multiridge}.
+#' the \code{\link[multiridge]{multiridge-package}}.
 #' 
 #' @seealso
 #' First use \code{\link[=cv.corila]{cv.corila()}} to fit the model,
