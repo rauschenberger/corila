@@ -171,6 +171,37 @@ folds <- function(y,family,nfolds){
   return(foldid)
 }
 
+
+check_args <- function(x,y,family){
+  if(!is.matrix(x)){
+    stop("Argument \"x\" must be a matrix.")
+  }
+  if(!is.vector(y)|!is.numeric(y)){
+    stop("Argument \"y\" must be a vector.")
+  }
+  if(nrow(x)!=length(y)){
+    stop("Matrix \"x\" must have one row and vector \"y\" must have one entry for each observation.")
+  }
+  if(family %in% c("gaussian","linear")){
+    if(all(y %in% c(0,1)) | all(y %in% c(-1,1))){
+      stop("Gaussian family requires a numeric outcome.")
+    }
+  } else if(family %in% c("binomial","logistic")){
+    if(!all(y %in% c(0,1))){
+      stop("Binomial family requires a binary outcome.")
+    }
+  } else if(family=="poisson"){
+    if(any(y %% 1 != 0)){
+       stop("Poisson family requires a count outcome.")
+    }
+  } else if(family=="cox"){
+    if(class(y)!="Surv"){
+      stop("Cox model requires a survival outcome.")
+    }
+  }
+  return(NULL)
+}
+
 #----- group-ridge -----
 
 #'@title
@@ -266,6 +297,7 @@ folds <- function(y,family,nfolds){
 #'}
 #'@export
 multiridge <- function(x,y,z,family,penalties=NULL){
+  check_args(x=x,y=y,family=family)
   if(nrow(x)!=length(y)){
     stop("For each observation, \"x\" should have one row and \"y\" should have one entry.")
   }
@@ -930,6 +962,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'}
 #'@export
 cv.corila <- function(x,y,group,type=NULL,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
+  check_args(x=x,y=y,family=family)
   if(nrow(x)!=length(y)){
     stop("For each observation, the matrix \"x\" must have one row, and the vector \"y\" must have one entry.")
   }
