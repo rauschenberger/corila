@@ -32,13 +32,13 @@ corila(
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
-\item{hyper}{list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for hyperparameters}
+\item{hyper}{list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters}
 
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 
 \item{cond}{\code{NULL}}
 
-\item{lambda.com, lambda.sep, lambda.ind}{regularisation parameters, or \code{NULL} (cross-validation)}
+\item{lambda.com, lambda.sep, lambda.ind}{regularisation hyperparameters, or \code{NULL} (cross-validation)}
 
 \item{trial}{logical}
 

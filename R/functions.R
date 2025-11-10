@@ -171,7 +171,6 @@ folds <- function(y,family,nfolds){
   return(foldid)
 }
 
-
 check_args <- function(x,y,family){
   if(!is.character(family)|length(family)!=1){
     stop("Argument \"family\" must be a character string.")
@@ -213,7 +212,7 @@ check_args <- function(x,y,family){
 #'Multi-Penalty Ridge Regression
 #'
 #'@description
-#'Fits multi-penalty ridge regression (tuning regularisation parameters and estimating regression coefficients).
+#'Fits multi-penalty ridge regression (tuning regularisation hyperparameters and estimating regression coefficients).
 #'
 #'@param x predictors: \eqn{n \times p} matrix, or list of length \eqn{q} of \eqn{n \times p_k} matrices, with \eqn{k} in \eqn{\{1,\ldots,q\}}.
 #'@param y response: \eqn{n}-dimensional vector
@@ -239,7 +238,7 @@ check_args <- function(x,y,family){
 #'\itemize{
 #'\item slots from \code{\link[multiridge]{IWLSridge}()} or \code{\link[multiridge]{IWLSCoxridge}()}
 #'\item character \code{family} with value \code{"gaussian"} (also for \code{"linear"}), \code{"binomial"} (also for \code{"logistic"}), \code{"poisson"}, or \code{"cox"}
-#'\item \eqn{q}-dimensional vector \code{penalties} containing optimised regularisation parameters (one for each variable group)
+#'\item \eqn{q}-dimensional vector \code{penalties} containing optimised regularisation hyperparameters (one for each variable group)
 #'\item list \code{datablocks} with \eqn{q} slots (one for each variable group), each containing an \eqn{n_0 \times p_k} matrix, where \eqn{k \in \{1,\ldots,q\}}
 #'\item \eqn{p}-dimensional group vector \code{z} (see argument)
 #'\item list \code{pars} with slots \code{family} (see above), the \eqn{n_0}-dimensional vectors \code{mu.x} and \code{sd.x} and the scalars \code{mu.y} and \code{sd.y}
@@ -522,10 +521,10 @@ if(FALSE){
 #'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
 #'@param type \eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
-#'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for hyperparameters
+#'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
 #'@param cond \code{NULL}
-#'@param lambda.com,lambda.sep,lambda.ind regularisation parameters, or \code{NULL} (cross-validation)
+#'@param lambda.com,lambda.sep,lambda.ind regularisation hyperparameters, or \code{NULL} (cross-validation)
 #'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
 #'@param init.multi Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.
 #'@param trial logical
@@ -904,7 +903,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'\item \code{object}: list with one slot for each combination of hyperparameters, each slot contains an object of class \code{"glmnet"}
 #'\item \code{hyper}: data frame with one row for each combination of hyperparameters, four columns for the values of the hyperparameters (\code{wgt.local}, \code{wgt.global}, \code{exp.global}, and \code{exp.local}) and a column for the cross-validated loss (\code{cvm})
 #'\item \code{id.hyper}: index of combination of hyperparameters leading to the lowest cross-validated loss
-#'\item \code{lambda.min}: optimised regularisation parameter
+#'\item \code{lambda.min}: optimised regularisation hyperparameter
 #'\item \code{scale}: output from \code{\link{forescale}()}
 #'}
 #'
@@ -913,7 +912,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'@seealso
 #'Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 #'
-#'This user function repeatedly calls \code{\link{corila}()} with different values for the hyperparameters.
+#'This user function repeatedly calls \code{\link{corila}()} with different values for the regularisation and mixing hyperparameters.
 #'
 #'@examples
 #'\donttest{

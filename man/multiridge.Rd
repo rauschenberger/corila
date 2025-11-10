@@ -22,14 +22,14 @@ Returns an object of class \code{"multiridge"}, a list with the following slots:
 \itemize{
 \item slots from \code{\link[multiridge]{IWLSridge}()} or \code{\link[multiridge]{IWLSCoxridge}()}
 \item character \code{family} with value \code{"gaussian"} (also for \code{"linear"}), \code{"binomial"} (also for \code{"logistic"}), \code{"poisson"}, or \code{"cox"}
-\item \eqn{q}-dimensional vector \code{penalties} containing optimised regularisation parameters (one for each variable group)
+\item \eqn{q}-dimensional vector \code{penalties} containing optimised regularisation hyperparameters (one for each variable group)
 \item list \code{datablocks} with \eqn{q} slots (one for each variable group), each containing an \eqn{n_0 \times p_k} matrix, where \eqn{k \in \{1,\ldots,q\}}
 \item \eqn{p}-dimensional group vector \code{z} (see argument)
 \item list \code{pars} with slots \code{family} (see above), the \eqn{n_0}-dimensional vectors \code{mu.x} and \code{sd.x} and the scalars \code{mu.y} and \code{sd.y}
 }
 }
 \description{
-Fits multi-penalty ridge regression (tuning regularisation parameters and estimating regression coefficients).
+Fits multi-penalty ridge regression (tuning regularisation hyperparameters and estimating regression coefficients).
 }
 \details{
 The number of observations (samples) for training or testing are indicated by \eqn{n_0} and \eqn{n_1}, respectively, the number of variables (features) is indicated by \eqn{p}, and the number of variable groups is indicated by \eqn{q}.

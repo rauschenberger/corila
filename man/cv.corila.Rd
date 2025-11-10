@@ -50,7 +50,7 @@ Returns an object of class \code{cv.corila}, a list with the following slots:
 \item \code{object}: list with one slot for each combination of hyperparameters, each slot contains an object of class \code{"glmnet"}
 \item \code{hyper}: data frame with one row for each combination of hyperparameters, four columns for the values of the hyperparameters (\code{wgt.local}, \code{wgt.global}, \code{exp.global}, and \code{exp.local}) and a column for the cross-validated loss (\code{cvm})
 \item \code{id.hyper}: index of combination of hyperparameters leading to the lowest cross-validated loss
-\item \code{lambda.min}: optimised regularisation parameter
+\item \code{lambda.min}: optimised regularisation hyperparameter
 \item \code{scale}: output from \code{\link{forescale}()}
 }
 }
@@ -126,5 +126,5 @@ metric
 \seealso{
 Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 
-This user function repeatedly calls \code{\link{corila}()} with different values for the hyperparameters.
+This user function repeatedly calls \code{\link{corila}()} with different values for the regularisation and mixing hyperparameters.
 }
