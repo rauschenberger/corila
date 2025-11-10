@@ -166,3 +166,12 @@ for(family in c("gaussian","binomial")){
     testthat::expect_true(all.equal(y_hat,temp))
   })
 }
+
+#------------------------
+#--- development ---
+#------------------------
+
+# Write short function (only for unit testing) to simulate data. Use this function in the different tests. Alternatively, consider using the simulation function from the simulation study.
+
+# Also check helper functions,
+# e.g. folds(y=y,family=family).

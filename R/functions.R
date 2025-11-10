@@ -166,7 +166,7 @@ folds <- function(y,family,nfolds){
     foldid[y==0] <- sample(x=rep(x=sample(seq_len(nfolds)),length.out=sum(y==0)))
     foldid[y==1] <- sample(x=rep(x=sample(seq_len(nfolds)),length.out=sum(y==1)))
   } else {
-    foldid <- sample(rep(x=sample(seq_len(nfolds)),length.out=length(y)))
+    foldid <- sample(x=rep(x=sample(x=seq_len(nfolds)),length.out=length(y)))
   }
   return(foldid)
 }
