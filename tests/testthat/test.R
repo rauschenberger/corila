@@ -1,9 +1,9 @@
 
 set.seed(1)
 
-#-------------------------------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #----- functions "forescale" and "backscale" -----
-#-------------------------------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 for(family in c("gaussian","binomial","poisson")){
   message(paste0("family=\"",family,"\""))
@@ -51,9 +51,9 @@ for(family in c("gaussian","binomial","poisson")){
   })
 }
 
-#-----------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #----- function "corila" -----
-#-----------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Run this code with trial=TRUE and trial=FALSE?
 trial <- TRUE
@@ -131,9 +131,9 @@ for(family in c("gaussian","binomial","poisson")){
   })
 }
 
-#-----------------------------
-#--- function "multiridge" ---
-#-----------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#----- function "multiridge" -----
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 for(family in c("gaussian","binomial")){
   # simulate
@@ -167,10 +167,9 @@ for(family in c("gaussian","binomial")){
   })
 }
 
-
-#-------------------------
-#--- function "nfolds" ---
-#-------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#----- function "nfolds" -----
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 n <- stats::rpois(n=1,lambda=50)
 for(family in c("gaussian","binomial","poisson","cox")){
@@ -196,9 +195,9 @@ for(family in c("gaussian","binomial","poisson","cox")){
   })
 }
 
-#---------------------------------
-#--- function "calc_sign_prec" ---
-#---------------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#----- function "calc_sign_prec" -----
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 truth <- sample(x=c(-1,0,1),size=10,replace=TRUE)
 estim <- sample(x=c(-1,0,1),size=10,replace=TRUE)

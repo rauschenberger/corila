@@ -306,7 +306,7 @@ multiridge <- function(x,y,z,family,penalties=NULL){
     stop("For each observation, \"x\" should have one row and \"y\" should have one entry.")
   }
   if(is.matrix(x) && ncol(x)!=length(z)){
-    stop("For each variable, \"x\" should have one column and \"z\" should have one entry")
+    stop("For each variable, \"x\" should have one column and \"z\" should have one entry.")
   }
   if(!family %in% c("gaussian","linear","binomial","logistic","cox")){
     stop("Argument \"family\" must equal \"gaussian\" (or \"linear\"), \"binomial\" (or \"logistic\"), or \"cox\".")
