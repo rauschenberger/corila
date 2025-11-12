@@ -216,3 +216,9 @@ testthat::test_that("precision is not defined if all signs equal zero",{
   prec <- calc_sign_prec(truth=truth,estim=0*estim)
   testthat::expect_true(is.na(prec))
 })
+
+testthat::test_that("precision is not influenced by estimated zeros",{
+  prec1 <- calc_sign_prec(truth=truth,estim=estim)
+  prec2 <- calc_sign_prec(truth=truth[estim!=0],estim=estim[estim!=0])
+  testthat::expect_true(prec1==prec2)
+})
