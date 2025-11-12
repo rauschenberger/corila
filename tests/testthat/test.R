@@ -167,11 +167,31 @@ for(family in c("gaussian","binomial")){
   })
 }
 
-#------------------------
-#--- development ---
-#------------------------
 
-# Write short function (only for unit testing) to simulate data. Use this function in the different tests. Alternatively, consider using the simulation function from the simulation study.
+#-------------------------
+#--- function "nfolds" ---
+#-------------------------
 
-# Also check helper functions,
-# e.g. folds(y=y,family=family).
+n <- stats::rpois(n=1,lambda=50)
+for(family in c("gaussian","binomial","poisson","cox")){
+  if(family=="gaussian"){
+    y <- stats::rnorm(n=n)
+    index <- rep(x=1,times=n)
+  } else if(family=="binomial"){
+    y <- stats::rbinom(n=n,size=1,prob=0.2)
+    index <- y
+  } else if(family=="poisson"){
+    y <- stats::rpois(n=n,lambda=4)
+    index <- rep(x=1,times=n)
+  } else if(family=="cox"){
+    time <- stats::rexp(n=n,rate=2)
+    status <- stats::rbinom(n=n,prob=0.2,size=1)
+    y <- survival::Surv(time=time,event=status)
+    index <- y[,"status"]
+  }
+  foldid <- folds(y=y,family=family,nfolds=10)
+  diff <- tapply(X=foldid,INDEX=index,FUN=function(x) diff(range(table(x))))
+  testthat::test_that("folds are stratified and balanced",{
+    testthat::expect_true(all(diff<=1))
+  })
+}
