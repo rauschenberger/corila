@@ -1049,7 +1049,17 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",nfolds=10,cor="spear
       exp.cand <- c(0.1,0.5,1,2,10)
       hyper <- hyper[rep(seq_len(nrow(hyper)),each=length(exp.cand)),]
       hyper$exp.local <- hyper$exp.global <- exp.cand
+    } else if(tune=="all"){
+      wgt.cand <- seq(from=0,to=1,by=0.5)
+      exp.cand <- c(0.1,0.5,1,2,10)
+      hyper <- expand.grid(wgt.local=wgt.cand,exp.local=exp.cand,exp.global=exp.cand)
+      hyper$wgt.global <- 1-hyper$wgt.local
+      hyper$exp.local[hyper$wgt.local==0] <- Inf
+      hyper$exp.global[hyper$wgt.global==0] <- Inf
+      hyper <- unique(hyper)
+      rownames(hyper) <- seq_len(nrow(hyper))
     }
+
   }
   
   if(FALSE){
