@@ -1435,7 +1435,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
   } else {
     y_hat <- NULL
   }
-  coef <- sapply(X=method,FUN=function(x) rep(x=NA,times=p),simplify=FALSE)
+  coef <- sapply(X=method,FUN=function(x) rep(x=NA,times=p+1),simplify=FALSE)
   #y_hat <- coef <- list()
   
   difftime <- numeric()
@@ -1449,7 +1449,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
         y_hat$mean <- rep(x=mean(y_train),times=nrow(x_test))
       }
       if(family=="cox"){warning("Implement intercept-only model for Cox regression.")}
-      coef$mean <- c(ifelse(family=="binomial",log(mean(y_train)/(1-mean(y_train))),mean(y_train)),rep(x=0,times=ncol(x_train)))
+      coef$mean <- c(ifelse(family=="binomial",log(mean(y_train)/(1-mean(y_train))),ifelse(family=="poisson",log(mean(y_train)),mean(y_train))),rep(x=0,times=ncol(x_train)))
     } else if(i=="ridge"){
       #--- ridge ---
       object <- glmnet::cv.glmnet(x=x_train,y=y_train,family=family,alpha=0,foldid=foldid)
@@ -1485,6 +1485,8 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
         temp <- stats::predict(object=object,newx=x_test,s="lambda.min",type="link")
         if(family=="binomial"){
           y_hat$gglasso <- 1/(1+exp(-temp))
+        } else if(family=="poisson"){
+          y_hat$gglasso <- exp(eta)
         } else {
           y_hat$gglasso <- temp
         }
@@ -1720,9 +1722,13 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       for(i in seq_along(method)){
         original <- y_hat[[i]]
         if(all(is.na(original))){next}
-        manual <- coef[[i]][1] + x_test %*% coef[[i]][-1]
-        if(family=="binomial"){
-          manual <- 1/(1+exp(-manual)) 
+        eta <- coef[[i]][1] + x_test %*% coef[[i]][-1]
+        if(family %in% c("gaussian","cox")){
+          manual <- eta
+        } else if(family=="binomial"){
+          manual <- 1/(1+exp(-eta)) 
+        } else if(family=="poisson"){
+          manual <- exp(eta)
         }
         #cond <- is.na(original)|is.na(manual)
         #if(any(cond)){
