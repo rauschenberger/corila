@@ -1364,7 +1364,7 @@ calc_sign_prec <- function(truth,estim){
   if(length(estim)!=length(truth)){
     stop("Arguments \"truth\" and \"estim\" must have the same length.") 
   }
-  if(all(estim==0)){
+  if(all(is.na(estim))||all(estim==0)){
     return(NA)
   } else {
     value <- sum(estim!=0 & truth!=0 & sign(estim)==sign(truth))/sum(estim!=0)
@@ -1456,7 +1456,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       if(!is.null(x_test)){
         y_hat$ridge <- stats::predict(object=object,newx=x_test,s="lambda.min",type="response")
       }
-      coef$ridge <- stats::coef(object=object,s="lambda.min")
+      coef$ridge <- c(if(family=="cox") NA,as.numeric(stats::coef(object=object,s="lambda.min")))
     } else if(i=="multiridge"){
       if(family=="poisson"){next}
       #--- multiridge ---
@@ -1471,22 +1471,24 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       if(!is.null(x_test)){
         y_hat$lasso <- stats::predict(object=object,newx=x_test,s="lambda.min",type="response")
       }
-      coef$lasso <- stats::coef(object=object,s="lambda.min")
+      coef$lasso <- c(if(family=="cox") NA,as.numeric(stats::coef(object=object,s="lambda.min")))
     } else if(i=="gglasso"){
-      if(family=="cox"){next}
+      if(family %in% c("poisson","cox")){next}
       #--- group lasso (gglasso) ---
       if(family=="binomial"){
-        temp <- as.factor(y_train)
+        temp.y_train <- 2*y_train-1
+        temp.loss <- "logit"
       } else {
-        temp <- y_train
+        temp.y_train <- y_train
+        temp.loss <- "ls"
       }
-      object <- gglasso::cv.gglasso(x=x_train,y=y_train,group=group,foldid=foldid)
+      object <- gglasso::cv.gglasso(x=x_train,y=temp.y_train,loss=temp.loss,group=group,foldid=foldid)
       if(!is.null(x_test)){
         temp <- stats::predict(object=object,newx=x_test,s="lambda.min",type="link")
         if(family=="binomial"){
           y_hat$gglasso <- 1/(1+exp(-temp))
-        } else if(family=="poisson"){
-          y_hat$gglasso <- exp(eta)
+        #} else if(family=="poisson"){
+        #  y_hat$gglasso <- exp(temp)
         } else {
           y_hat$gglasso <- temp
         }
@@ -1503,7 +1505,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       if(!is.null(x_test)){
         y_hat$grpreg <- stats::predict(object=object,X=x_test,type="response",lambda=object$lambda.min)
       }
-      coef$grpreg <- stats::coef(object=object,lambda=object$lambda.min)
+      coef$grpreg <- c(if(family=="cox") NA,as.numeric(stats::coef(object=object,lambda=object$lambda.min)))
     } else if(i=="grplasso"){
       #--- group lasso (grplasso) ---
       ## This package requires the user to implement hyperparameter tuning.
@@ -1566,7 +1568,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       if(!is.null(x_test)){
         y_hat$grpregOverlap <- stats::predict(object=object,X=x_test,type="response",lambda=object$lambda.min)
       }
-      coef$grpregOverlap <- stats::coef(object=object,lambda=object$lambda.min)
+      coef$grpregOverlap <- c(if(family=="cox") NA,stats::coef(object=object,lambda=object$lambda.min))
     } else if(i=="multiview"){
       #--- multiview (agreement between different modalities) ---
       object <- list()
