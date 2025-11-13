@@ -1037,12 +1037,16 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",nfolds=10,cor="spear
       wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
       hyper <- data.frame(wgt.local=wgt.cand,exp.local=1,wgt.global=1-wgt.cand,exp.global=1)
     } else if(tune=="exp"){
-      exp.cand <- c(0.1,0.5,1,2,5)
+      exp.cand <- c(0,0.1,0.25,0.5,1,2,4,10,Inf)
       hyper <- data.frame(wgt.local=1,exp.local=exp.cand,wgt.global=0,exp.global=exp.cand)
+    } else if(tune=="sep"){
+      exp.cand <- c(0.1,0.5,1,2,10)
+      hyper <- expand.grid(exp.local=exp.cand,exp.global=exp.cand)
+      hyper$wgt.local <- hyper$wgt.global <- 0.5
     } else if(tune=="both"){
       wgt.cand <- seq(from=0,to=1,by=0.25)
       hyper <- data.frame(wgt.local=wgt.cand,wgt.global=1-wgt.cand)
-      exp.cand <- c(0.1,0.5,1,2,5)
+      exp.cand <- c(0.1,0.5,1,2,10)
       hyper <- hyper[rep(seq_len(nrow(hyper)),each=length(exp.cand)),]
       hyper$exp.local <- hyper$exp.global <- exp.cand
     }
