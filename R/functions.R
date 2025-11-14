@@ -1436,7 +1436,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
     }
     warning("omitting slow methods ...")
     method <- method[!method %in% c("SGL","ecpc","squeezy","scoop")] # omit slow methods (temporary)
-    method <- method[method!="pcLasso"] # bug in application (singletons?)
+    #method <- method[method!="pcLasso"] # bug in application (singletons?)
   }
   
   if(!is.null(x_test)){
@@ -1695,7 +1695,17 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       # refit on full training data with optimal lambda
       stop("Not yet implemented.")
     } else if(i=="pcLasso"){
+      if(!family %in% c("gaussian","binomial")){next}
       group_temp <- lapply(unique(group),function(x) which(x==group))
+      # duplicating singletons:
+      group_temp <- lapply(group_temp,function(x) if(length(x)==1){rep(x,times=2)}else{x})
+      # combining remaining features
+      indices <- seq_len(ncol(x_train))
+      extra <- indices[!indices %in% unlist(group_temp)]
+      if(length(extra)>0){
+        group_temp <- c(group_temp,extra)
+      }
+      #group_temp <- c(group_temp[!cond],list(unlist(group_temp[cond])))
       if(!family %in% c("gaussian","binomial")){next}
       ratio <- c(seq(from=0.25,to=0.75,by=0.25),0.9,0.95,1) # set is from paper
       object <- list()
@@ -1707,8 +1717,8 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       if(!is.null(x_test)){
         y_hat$pcLasso <- pcLasso::predict.cv.pcLasso(object=object,xnew=x_test,s="lambda.min")
       }
-      fit <- 
-        coef$pcLasso <- c(object$glmfit$a0[which(object$lambda==object$lambda.min)],object$glmfit$beta[, which(object$lambda==object$lambda.min)]) # this is different for overlapping groups
+      #fit <- 
+      #  coef$pcLasso <- c(object$glmfit$a0[which(object$lambda==object$lambda.min)],object$glmfit$beta[, which(object$lambda==object$lambda.min)]) # this is different for overlapping groups
     } else if(i=="corila"){
       #--- lasso with feature groups and modalities ---
       object <- cv.corila(x=x_train,y=y_train,group=group,type=type,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,trial=trial,tune=tune)
@@ -1731,6 +1741,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
         if(max(sapply(X=y_hat,FUN=function(x) base::max(x,na.rm=TRUE)))>1){stop("too large")}
       }
       for(i in seq_along(method)){
+        if(method[i]=="pcLasso"){next}
         original <- y_hat[[i]]
         if(all(is.na(original))){next}
         eta <- coef[[i]][1] + x_test %*% coef[[i]][-1]
