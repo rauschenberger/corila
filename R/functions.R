@@ -1430,14 +1430,13 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
   
   if(is.null(method)){
     if(is.numeric(group)){
-      method <- c("mean","ridge","multiridge","lasso","gglasso","grpreg","sparsegl","SGL","grpregOverlap","scoop","ecpc","squeezy","MLGL","pcLasso","corila") # multiridge could also be added (needs some coding) # multiview is not for groups (only modalities)
+      method <- c("mean","ridge","multiridge","lasso","gglasso","grpreg","sparsegl","SGL","grpregOverlap","scoop","ecpc","squeezy","MLGL","pcLasso","corila") # multiview is not for groups (only modalities)
     } else if(is.list(group)){
       method <- c("mean","ridge","lasso","grpregOverlap","ecpc","squeezy","corila") # overlapping groups (multiridge could also be adapted)
     }
     warning("omitting slow methods ...")
     method <- method[!method %in% c("SGL","ecpc","squeezy","scoop")] # omit slow methods (temporary)
     method <- method[method!="pcLasso"] # bug in application (singletons?)
-    #method <- method[method!="multiridge"] # bug in binomial case
   }
   
   if(!is.null(x_test)){
@@ -1633,7 +1632,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       }
       coef$MLGL <- stats::coef(object=object,s=cv$lambda.min)
     } else if(i=="ecpc"){
-      if(model=="poisson"){next}
+      if(family=="poisson"){next}
       if(family=="cox"){
         Y_temp <- y_train
       } else {
@@ -1815,6 +1814,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
     foldid <- folds(y=y,family=family,nfolds=nfolds) # balanced/stratified folds
     y_hat <- data.frame(row.names=seq_len(n))
     for(i in seq_len(nfolds)){
+      set.seed(i)
       cat("fold",i,"\n")
       cond <- foldid==i
       results <- holdout(x_train=x[!cond,],y_train=y[!cond],x_test=x[cond,],y_test=y[cond],group=group,type=type,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,trial=trial,tune=tune)
