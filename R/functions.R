@@ -1860,6 +1860,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
 #'@param main character string used as a title
 #'@param decrease \code{TRUE} for decreasing arrow, \code{FALSE} for increasing arrow
 #'@param ylim limits for the vertical axis, or \code{NULL}
+#'@param cex.main numeric
 #'
 #'@return
 #'Returns \code{NULL} (and plots a figure).
@@ -1869,13 +1870,13 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
 #'plot_boxes(x)
 #'
 #'@export
-plot_boxes <- function(x,base="corila",main="",decrease=TRUE,ylim=NULL){
+plot_boxes <- function(x,base="corila",main="",decrease=TRUE,ylim=NULL,cex.main=1.2){
   #--- hypothesis testing ---
   p.worse <- apply(x,2,function(c) ifelse(all(is.na(c)),NA,stats::wilcox.test(x=c,y=x[,base],paired=TRUE,alternative=ifelse(decrease,"greater","less"),exact=FALSE)$p.value))
   p.better <- apply(x,2,function(c) ifelse(all(is.na(c)),NA, stats::wilcox.test(x=c,y=x[,base],paired=TRUE,alternative=ifelse(decrease,"less","greater"),exact=FALSE)$p.value))
   col <- ifelse(p.worse<=0.05,"red",ifelse(p.better<=0.05,"blue","grey"))
   #--- boxplot ---
-  graphics::boxplot(x=x,main=main,las=2,col=col,frame.plot=FALSE,xaxt="n",yaxt="n",ylim=ylim)
+  graphics::boxplot(x=x,main=main,las=2,col=col,frame.plot=FALSE,xaxt="n",yaxt="n",ylim=ylim,cex.main=cex.main)
   #--- horizontal axis ---
   col <- list(grey=which(p.worse<=0.05|is.na(p.worse)),black=which(p.worse>0.05))
   for(i in seq_along(col)){
