@@ -4,7 +4,14 @@
 \alias{plot_boxes}
 \title{Custom box plot function}
 \usage{
-plot_boxes(x, base = "corila", main = "", decrease = TRUE, ylim = NULL)
+plot_boxes(
+  x,
+  base = "corila",
+  main = "",
+  decrease = TRUE,
+  ylim = NULL,
+  cex.main = 1.2
+)
 }
 \arguments{
 \item{x}{data frame with names slots}
@@ -16,6 +23,8 @@ plot_boxes(x, base = "corila", main = "", decrease = TRUE, ylim = NULL)
 \item{decrease}{\code{TRUE} for decreasing arrow, \code{FALSE} for increasing arrow}
 
 \item{ylim}{limits for the vertical axis, or \code{NULL}}
+
+\item{cex.main}{numeric}
 }
 \value{
 Returns \code{NULL} (and plots a figure).
