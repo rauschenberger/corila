@@ -1678,9 +1678,9 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
     } else if(i=="CBPE"){
       if(FALSE){
         n <- 100
-        p <- 200
+        p <- 50
         x_train <- matrix(rnorm(n * p), n, p)
-        beta_true <- c(0.5, -1, 2, 5,rep(0,times=196))
+        beta_true <- c(0.5, -1, 2, 5,rep(0,times=p-4))
         y_train <- rbinom(n, 1, 1 / (1 + exp(-x_train %*% beta_true)))
       }
       if(family=="gaussian"){
@@ -1691,6 +1691,11 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
         next
       }
       lambda <- exp(seq(from=log(1e06),to=log(1e-06),length.out=20))
+      # no predict function implemented
+      #for(i in seq_len(nfolds)){
+      #  coef <- CBPE(X=x_train[foldid!=i,],y=y_train[foldid!=i],lambda=0)
+      #  x_train[foldid==i,] %*% coef
+      #}
       # internal cross-validation to tune lambda
       # refit on full training data with optimal lambda
       stop("Not yet implemented.")
