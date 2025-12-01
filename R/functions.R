@@ -1430,7 +1430,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
   
   if(is.null(method)){
     if(is.numeric(group)){
-      method <- c("mean","ridge","multiridge","lasso","gglasso","grpreg","sparsegl","SGL","grpregOverlap","scoop","ecpc","squeezy","MLGL","pcLasso","corila") # multiview is not for groups (only modalities)
+      method <- c("mean","ridge","multiridge","lasso","gglasso","grpreg","sparsegl","SGL","graper","grpregOverlap","scoop","ecpc","squeezy","MLGL","pcLasso","corila") # multiview is not for groups (only modalities)
     } else if(is.list(group)){
       method <- c("mean","ridge","lasso","grpregOverlap","ecpc","squeezy","corila") # overlapping groups (multiridge could also be adapted)
     }
@@ -1559,6 +1559,13 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       } else {
         coef$SGL <- c(object$intercept[which.min(cv_object$lldiff)],object$beta[,which.min(cv_object$lldiff)])
       }
+    } else if(i=="graper"){
+      if(!family %in% c("gaussian","binomial")){next}
+      null <- utils::capture.output(object <- suppressMessages(graper::graper(X=x_train,y=y_train,annot=as.factor(group),family=family)))
+      if(!is.null(x_test)){
+        y_hat$graper <- predict(object=object,newX=x_test,type="response")
+      }
+      coef$graper <- coef(object=object)
     } else if(i=="grpregOverlap"){
       #--- grpregOverlap (only on GitHub) ---
       func <- grpregOverlap::expandX
