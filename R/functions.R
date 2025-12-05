@@ -788,8 +788,8 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
           cond.temp <- group[,j]==1 & type==type[j]
         }
         temp <- (sign(cor[,j])*abs(cor[,j])^1*coef.ind)*cond.temp
-        weight$sep[j] <- sum(pmax(0,temp)[cond.temp]) # was mean!
-        weight$sep[p+j] <- sum(pmax(0,-temp)[cond.temp]) # was mean!
+        weight$sep[j] <- sum(pmax(0,temp)[cond.temp])/sum(cond.temp) # was mean # added sum(cond.tep)
+        weight$sep[p+j] <- sum(pmax(0,-temp)[cond.temp])/sum(cond.temp) # was mean! # added sum(cond.temp)
         # features in same group
         if(is.numeric(group)&&!is.array(group)){
           cond.temp <- group[j]==group
@@ -801,13 +801,13 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
         }
         #temp <- (sign(cor[,j])*abs(cor[,j])^1*coef.ind)*cond.temp # ORIGINAL
         temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.local[i]*coef.ind)*cond.temp # GENERAL FORMULATION
-        weight$com[j] <- sum(pmax(0,temp)[cond.temp]) # was mean!
-        weight$com[p+j] <- sum(pmax(0,-temp)[cond.temp]) # was mean!
+        weight$com[j] <- sum(pmax(0,temp)[cond.temp])/sum(cond.temp) # was mean! # added sum(cond.temp)
+        weight$com[p+j] <- sum(pmax(0,-temp)[cond.temp])/sum(cond.temp) # was mean!
         # all features
         # temp <- (sign(cor[,j])*abs(cor[,j])^1*coef.ind) # ORIGINAL
         temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.global[i]*coef.ind) # GENERAL FORMULATION
-        weight$ind[j] <- sum(pmax(0,temp)) # was mean!
-        weight$ind[p+j] <- sum(pmax(0,-temp)) # was mean!
+        weight$ind[j] <- sum(pmax(0,temp))/sum(p) # was mean! #  added sum(p)
+        weight$ind[p+j] <- sum(pmax(0,-temp))/sum(p) # was mean! # added sum(p)
         
         # Ad-hoc solution for features that are in no group:
         weight$com[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
@@ -824,7 +824,7 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
       #    weight$com[j] <- mean(pmax(0,temp)[cond.temp])
       #    weight$com[p+j] <- mean(pmax(0,-temp)[cond.temp])
       # }
-      weight <- lapply(weight,function(x) 2*p*x/sum(x)) # standardising weights
+      weight <- lapply(weight,function(x) p*x/sum(x)) # standardising weights # was with 2*
     }
     #pf.ext <- 1/pmax(0,weights)
     #pf.ext <- 1/(weights$com^hyper$com[i]*weights$sep^hyper$sep[i]*weights$ind^hyper$ind[i])
