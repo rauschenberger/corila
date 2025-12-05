@@ -1563,9 +1563,9 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       if(!family %in% c("gaussian","binomial")){next}
       null <- utils::capture.output(object <- suppressMessages(graper::graper(X=x_train,y=y_train,annot=as.factor(group),family=family)))
       if(!is.null(x_test)){
-        y_hat$graper <- predict(object=object,newX=x_test,type="response")
+        y_hat$graper <- stats::predict(object=object,newX=x_test,type="response")
       }
-      coef$graper <- coef(object=object)
+      coef$graper <- stats::coef(object=object)
     } else if(i=="grpregOverlap"){
       #--- grpregOverlap (only on GitHub) ---
       func <- grpregOverlap::expandX
