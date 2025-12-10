@@ -18,7 +18,8 @@ simulate(
   n.group.causal = 2,
   prop.causal = 0.5,
   noise.factor = 1,
-  plot = TRUE
+  plot = TRUE,
+  trial = FALSE
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ simulate(
 \item{noise.factor}{noise factor}
 
 \item{plot}{Attempt to visualise effects of and correlation between variables? (\code{TRUE} or \code{FALSE})}
+
+\item{trial}{logical (groups of negatively correlated subgroups)}
 }
 \value{
 Returns a list with the following slots:

@@ -1211,6 +1211,7 @@ coef.cv.corila <- function(object,s="lambda.min"){
 #'@param prop.causal proportion of causal features within causal groups
 #'@param noise.factor noise factor
 #'@param plot Attempt to visualise effects of and correlation between variables? (\code{TRUE} or \code{FALSE})
+#'@param trial logical (groups of negatively correlated subgroups)
 #'
 #'@return
 #'Returns a list with the following slots:
@@ -1237,7 +1238,7 @@ coef.cv.corila <- function(object,s="lambda.min"){
 #'sapply(X=data,FUN=dims)
 #'
 #'@export
-simulate <- function(family="gaussian",n0=100,n1=10000,n.group=20,n.type=2,size.group=c(5,3),effect.size=c(1,1),corfac.feature=0.5,corfac.type=0.5,corfac.group=0.25,n.group.causal=2,prop.causal=0.5,noise.factor=1,plot=TRUE){
+simulate <- function(family="gaussian",n0=100,n1=10000,n.group=20,n.type=2,size.group=c(5,3),effect.size=c(1,1),corfac.feature=0.5,corfac.type=0.5,corfac.group=0.25,n.group.causal=2,prop.causal=0.5,noise.factor=1,plot=TRUE,trial=FALSE){
   # family="gaussian";n0=100;n1=10000;n.group=20;n.type=2;size.group=c(5,3);effect.size=c(1,1);corfac.feature=0.5;corfac.type=0.5;corfac.group=0.25;n.group.causal=2;prop.causal=0.5; noise.factor=1; plot=TRUE
   n <- n0 + n1
   
@@ -1245,21 +1246,28 @@ simulate <- function(family="gaussian",n0=100,n1=10000,n.group=20,n.type=2,size.
   
   #- - - feature modalities and groups - - -
   p <- sum(n.group*size.group)
-  type <- rep(x=seq_len(n.type),times=n.group*size.group) # original
-  group <- unlist(lapply(size.group,function(x) rep(x=seq_len(n.group),each=x))) # original
   
-  #group <- rep(x=seq_len(n.group),each=sum(size.group)) # trial 2025-09-22
-  #type <- rep(x=rep(x=seq_len(n.type),times=size.group),times=n.group) # trial 2025-09-22
+  if(!trial){
+    type <- rep(x=seq_len(n.type),times=n.group*size.group) # original
+    group <- unlist(lapply(size.group,function(x) rep(x=seq_len(n.group),each=x))) # original
+  } else {
+    group <- rep(x=seq_len(n.group),each=sum(size.group)) # trial 2025-09-22
+    type <- rep(x=rep(x=seq_len(n.type),times=size.group),times=n.group) # trial 2025-09-22
+  }
   
   #- - - effect vector - - -
   beta <- rep(x=0,times=p)
   index.common <- sample(x=seq_len(n.group),size=n.group.causal)
   cond <- group %in% index.common
   beta[cond] <- stats::rbinom(n=sum(cond),size=1,prob=prop.causal)*abs(stats::rnorm(n=sum(cond)))
-  beta <- beta*rep(x=effect.size,times=table(type)) # original, added on 2025-06-20
-  #for(i in seq_along(unique(type))){ # trial 2025-09-22
-  #  beta[type==i] <- beta[type==i]*effect.size[i] # trial 2025-09-22
-  #} # trial 2025-09-22
+  if(!trial){
+    beta <- beta*rep(x=effect.size,times=table(type)) # original, added on 2025-06-20
+  } else {
+    for(i in seq_along(unique(type))){ # trial 2025-09-22
+      beta[type==i] <- beta[type==i]*effect.size[i] # trial 2025-09-22
+    } # trial 2025-09-22
+  }
+  
   if(plot){
     tryCatch(expr=graphics::plot(x=beta,col=group,pch=type),error=function(x) NULL)
   }
@@ -1269,8 +1277,11 @@ simulate <- function(family="gaussian",n0=100,n1=10000,n.group=20,n.type=2,size.
   sigma <- matrix(data=NA,nrow=p,ncol=p)
   for(i in seq_len(p)){
     for(j in seq_len(p)){
-      sigma[i,j] <- corfac.feature^(i!=j)*corfac.type^(type[i]!=type[j])*corfac.group^(group[i]!=group[j]) # original
-      #sigma[i,j] <- ifelse(i==j,1,ifelse(group[i]==group[j] & type[i]==type[j],0.5,ifelse(group[i]==group[j],-0.25,ifelse(type[i]==type[j],0.125,-0.0625)))) # trial 2025-09-22
+      if(!trial){
+        sigma[i,j] <- corfac.feature^(i!=j)*corfac.type^(type[i]!=type[j])*corfac.group^(group[i]!=group[j]) # original
+      } else {
+        sigma[i,j] <- ifelse(i==j,1,ifelse(group[i]==group[j] & type[i]==type[j],0.5,ifelse(group[i]==group[j],-0.25,ifelse(type[i]==type[j],0.125,-0.125)))) # Consider not only + but also - (but then use + and - for effect sizes), was -0.0625
+      }
     }
   }
   if(any(diag(sigma)!=1)){stop("diagonal!=1")}
