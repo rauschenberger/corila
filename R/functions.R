@@ -1740,8 +1740,8 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       if(!is.null(x_test)){
         y_hat$pcLasso <- pcLasso::predict.cv.pcLasso(object=object,xnew=x_test,s="lambda.min")
       }
-      #fit <- 
-      #  coef$pcLasso <- c(object$glmfit$a0[which(object$lambda==object$lambda.min)],object$glmfit$beta[, which(object$lambda==object$lambda.min)]) # this is different for overlapping groups
+      coef$pcLasso <- c(object$glmfit$a0[which(object$lambda==object$lambda.min)],object$glmfit$beta[, which(object$lambda==object$lambda.min)])
+      # Under overlapping groups, use object$glmfit$origbeta.
     } else if(i=="corila"){
       #--- lasso with feature groups and modalities ---
       object <- cv.corila(x=x_train,y=y_train,group=group,type=type,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,trial=trial,tune=tune)
