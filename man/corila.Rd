@@ -8,6 +8,7 @@ corila(
   x,
   y,
   group,
+  include,
   type,
   family,
   hyper,
@@ -27,6 +28,8 @@ corila(
 \item{y}{\eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training}
 
 \item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
+
+\item{include}{\eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model}
 
 \item{type}{\eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)}
 
@@ -69,12 +72,13 @@ n <- 100
 p <- 50
 group <- rep(x=1:10,each=5)
 type <- rep(x=1,times=length(group))
+include <- NULL
 x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
 y <- rnorm(n=n)
 
 # model fitting
 hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
-object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
+object <- corila(x,y,group,include,type,family="gaussian",hyper=hyper)
 
 y_hat <- stats::predict(object,newx=x,index=1,s=0)
 }

@@ -519,6 +519,7 @@ if(FALSE){
 #'@param x \eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables
 #'@param y \eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training
 #'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
+#'@param include \eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model
 #'@param type \eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters
@@ -555,17 +556,18 @@ if(FALSE){
 #'p <- 50
 #'group <- rep(x=1:10,each=5)
 #'type <- rep(x=1,times=length(group))
+#'include <- NULL
 #'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
 #'y <- rnorm(n=n)
 #'
 #'# model fitting
 #'hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
-#'object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
+#'object <- corila(x,y,group,include,type,family="gaussian",hyper=hyper)
 #'
 #'y_hat <- stats::predict(object,newx=x,index=1,s=0)
 #'}
 #'@export
-corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
+corila <- function(x,y,group,include,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"
   if(init.multi & family=="poisson"){
     warning("Setting init.multi=FALSE due to family=\"poisson\".")
@@ -834,6 +836,7 @@ corila <- function(x,y,group,type,family,hyper,cor="spearman",cond=NULL,lambda.c
     #pf.ext <- 1/(weight$com*hyper$com[i]+weight$ind*hyper$ind[i])
     # pf.ext <- 1/(weight$com*hyper$local[i]+weight$ind*hyper$global[i]) # ORIGINAL
     pf.ext <- 1/(weight$com*hyper$wgt.local[i]+weight$ind*hyper$wgt.global[i]) # GENERAL FORMULATION
+    pf.ext[!c(include,include)] <- Inf # trial
     if(any(pf.ext<0)){stop(paste0("negative pf:",min(pf.ext)))}
     object[[i]] <- glmnet::glmnet(x=mat$all[cond,],y=scale$y[cond],family=family,penalty.factor=pf.ext,lower.limits=0,alpha=1)
   }
@@ -965,7 +968,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'metric
 #'}
 #'@export
-cv.corila <- function(x,y,group,type=NULL,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
+cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
   check_args(x=x,y=y,family=family)
   if(nrow(x)!=length(y)){
     stop("For each observation, the matrix \"x\" must have one row, and the vector \"y\" must have one entry.")
@@ -973,6 +976,10 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",nfolds=10,cor="spear
   
   if(is.null(type)){
     type <- rep(x=1,times=ncol(x))
+  }
+  
+  if(is.null(include)){
+    include <- rep(x=TRUE,times=ncol(x))
   }
   
   # family="gaussian"; fuse="mean"; foldid=NULL
@@ -1076,7 +1083,7 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",nfolds=10,cor="spear
   }
   
   # Use foldid already for full run?
-  object.ext <- corila(x=x,y=y,group=group,type=type,family=family,cor=cor,hyper=hyper,fuse=fuse,init.multi=init.multi,trial=trial)
+  object.ext <- corila(x=x,y=y,group=group,include=include,type=type,family=family,cor=cor,hyper=hyper,fuse=fuse,init.multi=init.multi,trial=trial)
   lambda <- lapply(X=object.ext$model,FUN=function(x) x$lambda)
   
   hat <- list()
@@ -1086,7 +1093,7 @@ cv.corila <- function(x,y,group,type=NULL,family="gaussian",nfolds=10,cor="spear
   
   
   for(i in seq_len(nfolds)){
-    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,type=type,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi,trial=trial)
+    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,type=type,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi,trial=trial)
     for(j in seq_len(nrow(hyper))){
       hat[[j]][foldid==i,] <- stats::predict(object=object.int,newx=x[foldid==i,],index=j,s=lambda[[j]])
     }

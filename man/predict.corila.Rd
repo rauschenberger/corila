@@ -30,12 +30,13 @@ n <- 100
 p <- 50
 group <- rep(x=1:10,each=5)
 type <- rep(x=1,times=length(group))
+include <- NULL
 x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
 y <- rnorm(n=n)
 
 # model fitting
 hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
-object <- corila(x,y,group,type,family="gaussian",hyper=hyper)
+object <- corila(x,y,group,include,type,family="gaussian",hyper=hyper)
 
 y_hat <- stats::predict(object,newx=x,index=1,s=0)
 }
