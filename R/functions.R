@@ -966,6 +966,11 @@ predict.corila <- function(object,newx,index,s,...){
 #'  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 #'}
 #'metric
+#'
+#'# privileged information
+#'#include <- stats::rbinom(n=p,size=1,prob=0.5)
+#'#object <- cv.corila(x=x[cond,],y=y[cond],group=z,include=include,family=family)
+#'
 #'}
 #'@export
 cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
