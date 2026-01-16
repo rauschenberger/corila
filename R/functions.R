@@ -851,7 +851,7 @@ corila <- function(x,y,group,include,type,family,hyper,cor="spearman",cond=NULL,
     }
   }
   
-  list <- list(model=object,lambda.com=lambda.com,lambda.sep=lambda.sep,lambda.ind=lambda.ind,scale=scale$pars)
+  list <- list(model=object,include=include,lambda.com=lambda.com,lambda.sep=lambda.sep,lambda.ind=lambda.ind,scale=scale$pars)
   class(list) <- "corila"
   return(list)
 }
@@ -1118,7 +1118,7 @@ cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=
   id.hyper <- which.min(cvm.min)
   lambda.min <- object.ext$model[[id.hyper]]$lambda[which.min(cvm[[id.hyper]])]
   
-  list <- list(object=object.ext$model,hyper=hyper,id.hyper=id.hyper,lambda.min=lambda.min,scale=object.ext$scale)
+  list <- list(object=object.ext$model,include=include,hyper=hyper,id.hyper=id.hyper,lambda.min=lambda.min,scale=object.ext$scale)
   class(list) <- "cv.corila"
   return(list)
 }
@@ -1148,6 +1148,11 @@ predict.cv.corila <- function(object,newx,s="lambda.min",...){
     s <- object$lambda.min
   } else if(!is.numeric(s)||length(s)!=1){
     stop("Set s=\"lambda.min\" or provide numeric value.")
+  }
+  if(!all(object$include) & sum(object$include)==ncol(newx)){
+    full <- matrix(data=0,nrow=nrow(newx),ncol=length(object$include))
+    full[,include] <- newx
+    newx <- full
   }
   newx_stand <- forescale(x=newx,pars=object$scale)$x
   x_all <- cbind(newx_stand,-newx_stand) 
