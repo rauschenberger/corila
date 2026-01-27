@@ -1056,9 +1056,11 @@ cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=
       hyper <- expand.grid(exp.local=exp.cand,exp.global=exp.cand)
       hyper$wgt.local <- hyper$wgt.global <- 0.5
     } else if(tune=="both"){
-      wgt.cand <- seq(from=0,to=1,by=0.25)
+      #wgt.cand <- seq(from=0,to=1,by=0.25) # original
+      wgt.cand <- seq(from=0,to=1,by=0.1) # trial
       hyper <- data.frame(wgt.local=wgt.cand,wgt.global=1-wgt.cand)
-      exp.cand <- c(0.1,0.5,1,2,10)
+      #exp.cand <- c(0.1,0.5,1,2,10) # original
+      exp.cand <- c(0.1,0.5,0.8,1,1.25,2,10)
       hyper <- hyper[rep(seq_len(nrow(hyper)),each=length(exp.cand)),]
       hyper$exp.local <- hyper$exp.global <- exp.cand
     } else if(tune=="all"){
