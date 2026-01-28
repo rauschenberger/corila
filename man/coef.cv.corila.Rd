@@ -67,6 +67,11 @@ if(family=="gaussian"){
  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
+
+# privileged information
+#include <- stats::rbinom(n=p,size=1,prob=0.5)
+#object <- cv.corila(x=x[cond,],y=y[cond],group=z,include=include,family=family)
+
 }
 }
 \references{
