@@ -1190,7 +1190,7 @@ predict.cv.corila <- function(object,newx,s="lambda.min",...){
 #'
 #'@inherit cv.corila examples
 #'@export
-coef.cv.corila <- function(object,s="lambda.min"){
+coef.cv.corila <- function(object,s="lambda.min",...){
   if(s=="lambda.min"){
     s <- object$lambda.min
   } else if(!is.numeric(s)||length(s)!=1){
