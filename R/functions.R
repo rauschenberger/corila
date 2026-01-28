@@ -291,11 +291,17 @@ check_args <- function(x,y,family){
 #'
 #'# predictive performance
 #'if(family=="gaussian"){
-#'  metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
+#'  metric <- sapply(X=y_hat,FUN=function(x)
+#'    mean((x-y[!cond])^2))
 #'} else if(family=="binomial"){
-#'  metric <- sapply(X=y_hat,FUN=function(x) pROC::auc(response=y[!cond],predictor=as.vector(x),levels=c(0,1),direction="<"))
+#'  metric <- sapply(X=y_hat,FUN=function(x)
+#'    pROC::auc(response=y[!cond],
+#'              predictor=as.vector(x),
+#'              levels=c(0,1),
+#'              direction="<"))
 #'} else if(family=="cox"){
-#'  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
+#'  metric <- sapply(X=y_hat,FUN=function(x)
+#'    survival::concordance(y[!cond]~I(-x))$concordance)
 #'}
 #'metric
 #'}
@@ -576,6 +582,8 @@ corila <- function(x,y,group,include,type,family,hyper,cor="spearman",cond=NULL,
   
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
+  
+  if(is.null(include)){include <- rep(x=TRUE,times=p}
   if(is.null(group)){group <- seq_len(p)}
   if(is.null(type)){type <- rep(x=1,times=p)}
   #if(length(group)!=p){stop("Argument \"group\" must be a vector of length p.")}
@@ -959,11 +967,17 @@ predict.corila <- function(object,newx,index,s,...){
 #'
 #'# predictive performance
 #'if(family=="gaussian"){
-#'  metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
+#'  metric <- sapply(X=y_hat,FUN=function(x) 
+#'    mean((x-y[!cond])^2))
 #'} else if(family=="binomial"){
-#'  metric <- sapply(X=y_hat,FUN=function(x) pROC::auc(response=y[!cond],predictor=as.vector(x),levels=c(0,1),direction="<"))
+#'  metric <- sapply(X=y_hat,FUN=function(x) 
+#'    pROC::auc(response=y[!cond],
+#'              predictor=as.vector(x),
+#'              levels=c(0,1),
+#'              direction="<"))
 #'} else if(family=="cox"){
-#'  metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
+#'  metric <- sapply(X=y_hat,FUN=function(x)
+#'    survival::concordance(y[!cond]~I(-x))$concordance)
 #'}
 #'metric
 #'
