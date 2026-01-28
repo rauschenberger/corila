@@ -583,7 +583,7 @@ corila <- function(x,y,group,include,type,family,hyper,cor="spearman",cond=NULL,
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
   
-  if(is.null(include)){include <- rep(x=TRUE,times=p}
+  if(is.null(include)){include <- rep(x=TRUE,times=p)}
   if(is.null(group)){group <- seq_len(p)}
   if(is.null(type)){type <- rep(x=1,times=p)}
   #if(length(group)!=p){stop("Argument \"group\" must be a vector of length p.")}
@@ -984,7 +984,6 @@ predict.corila <- function(object,newx,index,s,...){
 #'# privileged information
 #'#include <- stats::rbinom(n=p,size=1,prob=0.5)
 #'#object <- cv.corila(x=x[cond,],y=y[cond],group=z,include=include,family=family)
-#'
 #'}
 #'@export
 cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
@@ -1455,9 +1454,10 @@ calc_sign_prec <- function(truth,estim){
 #'}
 #'
 #'@examples
+#'\donttest{
 #'data <- simulate()
 #'results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,x_test=data$x_test,y_test=data$y_test,family="gaussian",method=c("mean","ridge","multiridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
-#'
+#'}
 #'@export
 holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE,tune="both"){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE; trial <- TRUE
@@ -1863,12 +1863,13 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
 #'Both slot contain a data frame with one row for each iteration (\code{iter}) and one column for each \code{method}.
 #'
 #'@examples
+#'\donttest{
 #'n <- 100
 #'p <- 20
 #'x <- matrix(rnorm(n*p),nrow=n,ncol=p)
 #'y <- stats::rnorm(n)
 #'results <- crossval(x,y,family="gaussian",method=c("mean","corila"),trial=TRUE)
-#'
+#'}
 #'@export
 crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi=FALSE,trial=TRUE,method=NULL,tune="both"){
   n <- nrow(x)

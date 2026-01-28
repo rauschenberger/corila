@@ -82,11 +82,17 @@ sapply(coef,function(x) mean((beta-x[-1])^2))
 
 # predictive performance
 if(family=="gaussian"){
- metric <- sapply(X=y_hat,FUN=function(x) mean((x-y[!cond])^2))
+ metric <- sapply(X=y_hat,FUN=function(x)
+   mean((x-y[!cond])^2))
 } else if(family=="binomial"){
- metric <- sapply(X=y_hat,FUN=function(x) pROC::auc(response=y[!cond],predictor=as.vector(x),levels=c(0,1),direction="<"))
+ metric <- sapply(X=y_hat,FUN=function(x)
+   pROC::auc(response=y[!cond],
+             predictor=as.vector(x),
+             levels=c(0,1),
+             direction="<"))
 } else if(family=="cox"){
- metric <- sapply(X=y_hat,FUN=function(x) survival::concordance(y[!cond]~I(-x))$concordance)
+ metric <- sapply(X=y_hat,FUN=function(x)
+   survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
 }

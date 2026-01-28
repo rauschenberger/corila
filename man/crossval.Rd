@@ -56,10 +56,11 @@ Compares methods with cross-validation method
 This function implements repeated \eqn{k}-fold cross-validation (e.g., 5 repetitions of 10-fold cross-validation).
 }
 \examples{
+\donttest{
 n <- 100
 p <- 20
 x <- matrix(rnorm(n*p),nrow=n,ncol=p)
 y <- stats::rnorm(n)
 results <- crossval(x,y,family="gaussian",method=c("mean","corila"),trial=TRUE)
-
+}
 }
