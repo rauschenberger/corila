@@ -1045,6 +1045,9 @@ cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=
   if(trial){
     if(tune=="none"){
       hyper <- data.frame(wgt.local=1,exp.local=Inf,wgt.global=0,exp.global=Inf)
+    } else if(tune="trial"){
+      wgt.cand <- seq(from=0,to=1,by=0.1) 
+      hyper <- data.frame(wgt.local=wgt.cand,exp.local=0,wgt.global=1-wgt.cand,exp.global=1)
     } else if(tune=="wgt"){
       wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
       hyper <- data.frame(wgt.local=wgt.cand,exp.local=1,wgt.global=1-wgt.cand,exp.global=1)
