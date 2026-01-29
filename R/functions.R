@@ -837,7 +837,7 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
       #    weight$com[j] <- mean(pmax(0,temp)[cond.temp])
       #    weight$com[p+j] <- mean(pmax(0,-temp)[cond.temp])
       # }
-      weight <- lapply(weight,function(x) p*x/sum(x)) # standardising weights # was with 2*
+      weight <- lapply(weight,function(x) p*ifelse(x==0,0,x/sum(x))) # standardising weights # was with 2*
     }
     #pf.ext <- 1/pmax(0,weights)
     #pf.ext <- 1/(weights$com^hyper$com[i]*weights$sep^hyper$sep[i]*weights$ind^hyper$ind[i])
@@ -848,6 +848,7 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
     # pf.ext <- 1/(weight$com*hyper$local[i]+weight$ind*hyper$global[i]) # ORIGINAL
     pf.ext <- 1/(weight$com*hyper$wgt.local[i]+weight$ind*hyper$wgt.global[i]) # GENERAL FORMULATION
     pf.ext[!c(include,include)] <- Inf # trial
+    if(any(is.na(pf.ext))){stop("missing pf:",sum(is.na(pf.ext)))}
     if(any(pf.ext<0)){stop(paste0("negative pf:",min(pf.ext)))}
     object[[i]] <- glmnet::glmnet(x=mat$all[cond,],y=scale$y[cond],family=family,penalty.factor=pf.ext,lower.limits=0,alpha=alpha.final)
   }
@@ -1116,7 +1117,6 @@ cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,type=NUL
   for(j in seq_len(nrow(hyper))){
     hat[[j]] <- matrix(data=NA,nrow=n,ncol=length(object.ext$model[[j]]$lambda))
   }
-  
   
   for(i in seq_len(nfolds)){
     object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,type=type,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi,trial=trial)
