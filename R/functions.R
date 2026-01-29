@@ -1,4 +1,5 @@
 
+
 #'@title
 #'Standardisation
 #'
@@ -1057,7 +1058,7 @@ cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=
   # GENERAL FORMULATION
   if(trial){
     if(tune=="none"){
-      hyper <- data.frame(wgt.local=1,exp.local=Inf,wgt.global=0,exp.global=Inf)
+      hyper <- data.frame(wgt.local=1,exp.local=1,wgt.global=0,exp.global=Inf)
     } else if(tune=="trial"){
       wgt.cand <- seq(from=0,to=1,by=0.1) 
       hyper <- data.frame(wgt.local=wgt.cand,exp.local=0,wgt.global=1-wgt.cand,exp.global=1)
@@ -1065,7 +1066,7 @@ cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=
       wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
       hyper <- data.frame(wgt.local=wgt.cand,exp.local=1,wgt.global=1-wgt.cand,exp.global=1)
     } else if(tune=="exp"){
-      exp.cand <- c(0,0.1,0.25,0.5,1,2,4,10,Inf)
+      exp.cand <- c(0,0.1,0.25,1/3,0.5,1,2,3,4,10,Inf)
       hyper <- data.frame(wgt.local=1,exp.local=exp.cand,wgt.global=0,exp.global=exp.cand)
     } else if(tune=="sep"){
       exp.cand <- c(0.1,0.5,1,2,10)
@@ -1080,7 +1081,7 @@ cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=
       hyper <- hyper[rep(seq_len(nrow(hyper)),each=length(exp.cand)),]
       hyper$exp.local <- hyper$exp.global <- exp.cand
     } else if(tune=="all"){
-      wgt.cand <- seq(from=0,to=1,by=0.5)
+      wgt.cand <- seq(from=0,to=1,by=0.25)
       exp.cand <- c(0.1,0.5,1,2,10)
       hyper <- expand.grid(wgt.local=wgt.cand,exp.local=exp.cand,exp.global=exp.cand)
       hyper$wgt.global <- 1-hyper$wgt.local
