@@ -12,6 +12,8 @@ corila(
   type,
   family,
   hyper,
+  alpha.init = 0,
+  alpha.final = 1,
   cor = "spearman",
   cond = NULL,
   lambda.com = NULL,
@@ -36,6 +38,10 @@ corila(
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
 \item{hyper}{list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters}
+
+\item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0)}
+
+\item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
 
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 

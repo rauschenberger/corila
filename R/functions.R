@@ -527,6 +527,8 @@ if(FALSE){
 #'@param y \eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training
 #'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
 #'@param include \eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model
+#'@param alpha.init elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0)
+#'@param alpha.final elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)
 #'@param type \eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters
@@ -574,7 +576,7 @@ if(FALSE){
 #'y_hat <- stats::predict(object,newx=x,index=1,s=0)
 #'}
 #'@export
-corila <- function(x,y,group,include,type,family,hyper,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
+corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=1,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,trial=TRUE,fuse="mean",init.multi=FALSE){
   # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;trial=TRUE;mode<-"mean";cor="spearman"
   if(init.multi & family=="poisson"){
     warning("Setting init.multi=FALSE due to family=\"poisson\".")
@@ -626,11 +628,11 @@ corila <- function(x,y,group,include,type,family,hyper,cor="spearman",cond=NULL,
     # group-wise combination
     cond.coef <- rep(c(FALSE,TRUE),times=c(family!="cox",q))
     if(is.null(lambda.com)){
-      fit.com <- glmnet::cv.glmnet(x=mat$com[cond,,drop=FALSE],y=scale$y[cond],family=family,alpha=0)
+      fit.com <- glmnet::cv.glmnet(x=mat$com[cond,,drop=FALSE],y=scale$y[cond],family=family,alpha=alpha.init)
       s <- "lambda.min"
       #coef.com <- stats::coef(object=fit.com,s="lambda.min")[-1]
     } else {
-      fit.com <- glmnet::glmnet(x=mat$com[cond,,drop=FALSE],y=scale$y[cond],family=family,alpha=0)
+      fit.com <- glmnet::glmnet(x=mat$com[cond,,drop=FALSE],y=scale$y[cond],family=family,alpha=alpha.init)
       s <- lambda.com
       #coef.com <- stats::coef(object=fit.com,s=lambda.com)[-1]  
     }
@@ -642,11 +644,11 @@ corila <- function(x,y,group,include,type,family,hyper,cor="spearman",cond=NULL,
     coef.sep <- matrix(data=NA,nrow=q,ncol=m) # Why not nrow=q,ncol=m? # was nrow=p,ncol=q
     for(i in seq_len(m)){
       if(is.null(lambda.sep)){
-        fit.sep[[i]] <- glmnet::cv.glmnet(x=mat$sep[[i]][cond,],y=scale$y[cond],family=family,alpha=0)
+        fit.sep[[i]] <- glmnet::cv.glmnet(x=mat$sep[[i]][cond,],y=scale$y[cond],family=family,alpha=alpha.init)
         s <- "lambda.min"
         coef.sep[,i] <- stats::coef(object=fit.sep[[i]],s="lambda.min")[cond.coef]
       } else {
-        fit.sep[[i]] <- glmnet::glmnet(x=mat$sep[[i]][cond,],y=scale$y[cond],family=family,alpha=0)
+        fit.sep[[i]] <- glmnet::glmnet(x=mat$sep[[i]][cond,],y=scale$y[cond],family=family,alpha=alpha.init)
         coef.sep[,i] <- stats::coef(object=fit.sep[[i]],s=lambda.sep[i])[cond.coef]
       }
     }
@@ -667,11 +669,11 @@ corila <- function(x,y,group,include,type,family,hyper,cor="spearman",cond=NULL,
     # no combination
     cond.coef <- rep(c(FALSE,TRUE),times=c(family!="cox",p))
     if(is.null(lambda.ind)){
-      fit.ind <- glmnet::cv.glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=0)
+      fit.ind <- glmnet::cv.glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=alpha.init)
       coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[cond.coef]
       lambda.ind <- fit.ind$lambda.min
     } else {
-      fit.ind <- glmnet::glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=0)
+      fit.ind <- glmnet::glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=alpha.init)
       coef.ind <- stats::coef(object=fit.ind,s=lambda.ind)[cond.coef]
     }
   }
@@ -847,7 +849,7 @@ corila <- function(x,y,group,include,type,family,hyper,cor="spearman",cond=NULL,
     pf.ext <- 1/(weight$com*hyper$wgt.local[i]+weight$ind*hyper$wgt.global[i]) # GENERAL FORMULATION
     pf.ext[!c(include,include)] <- Inf # trial
     if(any(pf.ext<0)){stop(paste0("negative pf:",min(pf.ext)))}
-    object[[i]] <- glmnet::glmnet(x=mat$all[cond,],y=scale$y[cond],family=family,penalty.factor=pf.ext,lower.limits=0,alpha=1)
+    object[[i]] <- glmnet::glmnet(x=mat$all[cond,],y=scale$y[cond],family=family,penalty.factor=pf.ext,lower.limits=0,alpha=alpha.final)
   }
   
   if(!trial){
@@ -987,7 +989,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'#object <- cv.corila(x=x[cond,],y=y[cond],group=z,include=include,family=family)
 #'}
 #'@export
-cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
+cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,type=NULL,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,trial=TRUE,tune="both",foldid=NULL){
   check_args(x=x,y=y,family=family)
   if(nrow(x)!=length(y)){
     stop("For each observation, the matrix \"x\" must have one row, and the vector \"y\" must have one entry.")
@@ -1107,7 +1109,7 @@ cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=
   }
   
   # Use foldid already for full run?
-  object.ext <- corila(x=x,y=y,group=group,include=include,type=type,family=family,cor=cor,hyper=hyper,fuse=fuse,init.multi=init.multi,trial=trial)
+  object.ext <- corila(x=x,y=y,group=group,include=include,type=type,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,init.multi=init.multi,trial=trial)
   lambda <- lapply(X=object.ext$model,FUN=function(x) x$lambda)
   
   hat <- list()
@@ -1117,7 +1119,7 @@ cv.corila <- function(x,y,group,include=NULL,type=NULL,family="gaussian",nfolds=
   
   
   for(i in seq_len(nfolds)){
-    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,type=type,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi,trial=trial)
+    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,type=type,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi,trial=trial)
     for(j in seq_len(nrow(hyper))){
       hat[[j]][foldid==i,] <- stats::predict(object=object.int,newx=x[foldid==i,],index=j,s=lambda[[j]])
     }
@@ -1460,7 +1462,7 @@ calc_sign_prec <- function(truth,estim){
 #'results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,x_test=data$x_test,y_test=data$y_test,family="gaussian",method=c("mean","ridge","multiridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
 #'}
 #'@export
-holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE,tune="both"){
+holdout <- function(x_train,y_train,group,type,family,alpha.init=0,alpha.final=1,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE,tune="both"){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE; trial <- TRUE
   
   p <- ncol(x_train)
@@ -1781,7 +1783,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
       # Under overlapping groups, use object$glmfit$origbeta.
     } else if(i=="corila"){
       #--- lasso with feature groups and modalities ---
-      object <- cv.corila(x=x_train,y=y_train,group=group,type=type,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,trial=trial,tune=tune)
+      object <- cv.corila(x=x_train,y=y_train,group=group,type=type,alpha.init=alpha.init,alpha.final=alpha.final,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,trial=trial,tune=tune)
       print(object$hyper[object$id.hyper,])
       if(!is.null(x_test)){
         y_hat$corila <- stats::predict(object=object,newx=x_test)
@@ -1872,7 +1874,7 @@ holdout <- function(x_train,y_train,group,type,family,x_test=NULL,y_test=NULL,nf
 #'results <- crossval(x,y,family="gaussian",method=c("mean","corila"),trial=TRUE)
 #'}
 #'@export
-crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi=FALSE,trial=TRUE,method=NULL,tune="both"){
+crossval <- function(x,y,family,group=NULL,type=NULL,alpha.init=0,alpha.final=1,iter=5,nfolds=10,init.multi=FALSE,trial=TRUE,method=NULL,tune="both"){
   n <- nrow(x)
   p <- ncol(x)
   if(is.null(group)){group <- seq_len(p)}
@@ -1889,7 +1891,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
       set.seed(i)
       cat("fold",i,"\n")
       cond <- foldid==i
-      results <- holdout(x_train=x[!cond,],y_train=y[!cond],x_test=x[cond,],y_test=y[cond],group=group,type=type,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,trial=trial,tune=tune)
+      results <- holdout(x_train=x[!cond,],y_train=y[!cond],x_test=x[cond,],y_test=y[cond],group=group,type=type,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,trial=trial,tune=tune)
       for(j in seq_along(results$y_hat)){
         y_hat[[names(results$y_hat)[j]]][cond] <- results$y_hat[[j]]
       }
@@ -1902,7 +1904,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,iter=5,nfolds=10,init.multi
       list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) survival::concordance(y~I(-x))$concordance)
     }
     set.seed(k)
-    refit <- holdout(x_train=x,y_train=y,group=group,type=type,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,trial=trial,tune=tune)
+    refit <- holdout(x_train=x,y_train=y,group=group,type=type,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,trial=trial,tune=tune)
     list$nzero[[k]] <- sapply(X=refit$coef,FUN=function(x) sum(x[-1]!=0))
   }
   list <- lapply(X=list,FUN=function(x) do.call(what="rbind",args=x))

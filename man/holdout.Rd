@@ -10,6 +10,8 @@ holdout(
   group,
   type,
   family,
+  alpha.init = 0,
+  alpha.final = 1,
   x_test = NULL,
   y_test = NULL,
   nfolds = 10,
@@ -31,6 +33,10 @@ holdout(
 \item{type}{\eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+
+\item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0)}
+
+\item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
 
 \item{x_test}{\eqn{n_1 \times p} matrix}
 
