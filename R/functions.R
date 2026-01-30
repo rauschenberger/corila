@@ -40,8 +40,13 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
   if(is.null(pars)){
     pars <- list()
     pars$family <- family
-    pars$mu.x <- apply(X=x,MARGIN=2,FUN=base::mean,na.rm=TRUE)
-    pars$sd.x <- apply(X=x,MARGIN=2,FUN=stats::sd,na.rm=TRUE)
+    if(family=="cox"){
+      cond <- y[,2]==1
+    } else {
+      cond <- rep(x=TRUE,times=length(y)) 
+    }
+    pars$mu.x <- apply(X=x[cond,],MARGIN=2,FUN=base::mean,na.rm=TRUE)
+    pars$sd.x <- apply(X=x[cond,],MARGIN=2,FUN=stats::sd,na.rm=TRUE)
     if(!is.null(y) & family=="gaussian"){
       pars$mu.y <- mean(y,na.rm=TRUE)
       pars$sd.y <- stats::sd(y,na.rm=TRUE)
@@ -79,23 +84,48 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
 #'@seealso forescale
 #'
 #'@examples
+#'stop("SCALING PROBLEM IS APPRENTLY ONLY IN GLMNET")
+#'stop("MODIFY FUNCS FORE AND BACK SCALE SO THAT THEY INTERNALLY ADD NA FOR THE COX INTERCEPT)
+#'
 #'
 #'# simulate data
+#'family <- "cox"
 #'n <- 100; p <- 3
 #'sd <- stats::rpois(n=p,lambda=5)
 #'x <- sapply(X=sd,FUN=function(x) stats::rnorm(n=n,sd=x))
 #'beta <- stats::rnorm(n=p)
-#'y <- x %*% beta + stats::rnorm(n=n)
+#'eta <- x %*% beta
+#'if(family=="gaussian"){
+#' y <- stats::rnorm(n=n,mean=eta)
+#'} else if(family=="binomial"){
+#' y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
+#'} else if(family=="poisson"){
+#' y <- stats::rpois(n=n,lambda=exp(eta))
+#'} else if(family=="cox"){
+#'  time <- stats::rexp(n=n,rate=exp(eta))
+#'  status <- stats::rbinom(n=n,prob=0.5,size=1)
+#'  y <- survival::Surv(time=time,event=status)
+#'}
 #'
 #'# regression without standardisation
-#'lm1 <- stats::lm(y~x)
+#'if(family=="cox"){
+#' lm1 <- survival::coxph(y~x)
+#'} else {
+#' lm1 <- stats::glm(y~x,family=family)
+#'}
 #'y_hat1 <- stats::fitted(lm1)
 #'coef1 <- stats::coef(lm1)
 #'
 #'# regression with standardisation
-#'scale <- forescale(x=x,y=y,family="gaussian")
-#'lm2 <- stats::lm(scale$y~scale$x)
-#'result <- backscale(pars=scale$pars,y=stats::fitted(lm2),coef=stats::coef(lm2))
+#'scale <- forescale(x=x,y=y,family=family)
+#'if(family=="cox"){
+#'  lm2 <- survival::coxph(scale$y~scale$x)
+#'  result <- backscale(pars=scale$pars,y=stats::fitted(lm2),coef=c(NA,stats::coef(lm2)))
+#'} else {
+#'  lm2 <- stats::glm(scale$y~scale$x,family=family)
+#'  result <- backscale(pars=scale$pars,y=stats::fitted(lm2),coef=stats::coef(lm2))
+#'}
+#'
 #'y_hat2 <- result$y_original
 #'coef2 <- result$coef
 #'

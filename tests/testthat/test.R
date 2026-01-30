@@ -38,6 +38,7 @@ for(family in c("gaussian","binomial","poisson")){
     object.original <- glmnet::glmnet(x=x[foldid==0,],y=y[foldid==0],family=family,lambda=0)
     y_hat.original <- predict(object=object.original,newx=x[foldid==1,],type="response",s=0)
     coef.original <- c(NA[family=="cox"],as.numeric(coef(object.original,s=0)))
+    #all.equal(as.numeric(y_hat.original),as.numeric(coef.original[1]+x[foldid==1,] %*% coef.original[-1])) # Gaussian
     
     # with standardisation
     data.scaled <- forescale(x=x[foldid==0,],y=y[foldid==0],family=family)
@@ -46,9 +47,23 @@ for(family in c("gaussian","binomial","poisson")){
     y_hat.scaled <- predict(object=object.scaled,newx=newx.scaled$x,type="response",s=0)
     coef.scaled <- c(NA[family=="cox"],as.numeric(coef(object=object.scaled,s=0)))
     backscaled <- backscale(pars=data.scaled$pars,y=y_hat.scaled,coef=coef.scaled)
+    #all.equal(as.numeric(y_hat.scaled),as.numeric(coef.scaled[1]+newx.scaled$x %*% coef.scaled[-1])) # Gaussian
+    
+    if(family=="cox"){
+      testthat::expect_true(all.equal(y[foldid==0,1],data.scaled$y[,1]))
+      testthat::expect_true(all.equal(y[foldid==0,2],data.scaled$y[,2]))
+      testthat::expect_true(all.equal(y_hat.scaled,backscaled$y_original))
+    }
+    
+    if(family!="gaussian"){
+      testthat::expect_true(all.equal(y[foldid==0],data.scaled$y))
+      testthat::expect_true(all.equal(y_hat.original,y_hat.scaled))
+      testthat::expect_true(all.equal(y_hat.scaled,backscaled$y_original))
+    }
     
     testthat::expect_true(all.equal(target=backscaled$coef,current=coef.original))
     testthat::expect_true(all.equal(target=backscaled$y_original,current=y_hat.original))
+    
     
     if(FALSE){
       all(data.scaled$y[,1]==y[foldid==0,1])
@@ -56,14 +71,8 @@ for(family in c("gaussian","binomial","poisson")){
       
       # examine problem for Cox
       range(y_hat.original)
-      
-      eta1 <- x[foldid==1,] %*% coef.original[-1]
-      hat1 <- exp(eta1)
-      range(hat1)
-      
-      eta2 <- newx.scaled$x %*% coef.scaled[-1]
-      hat2 <- exp(eta2)
-      range(hat2)
+      range(exp(x[foldid==1,] %*% coef.original[-1]))
+      #
       
       # use type="link" and backscale eta instead of y? (scaling y is only done in Gaussian case, where eta=y, use link function after this?)
   
@@ -72,6 +81,9 @@ for(family in c("gaussian","binomial","poisson")){
       range(y_hat.scaled*factor)
       
       # linear predictor?
+      
+      range(exp(newx.scaled$x %*% coef.scaled[-1]))
+      
       temp <- predict(object=object.scaled,newx=newx.scaled$x,type="link")
       range(exp(temp))
       
