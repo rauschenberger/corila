@@ -971,9 +971,9 @@ predict.corila <- function(object,newx,index,s,...){
 #'coef$corila <- stats::coef(object=object)
 #'y_hat$corila <- stats::predict(object=object,newx=x[!cond,])
 #'
-#'# estimation performance
-#'sapply(coef,function(x) stats::cor(beta,x[-1]))
-#'sapply(coef,function(x) mean((beta-x[-1])^2))
+#'# selection performance
+#'sapply(coef,function(x) mean(sign(x[-1])==sign(beta)))
+#'sapply(coef,function(x) sum(sign(x[-1])!=0 & sign(x[-1])==sign(beta))/sum(x[-1]!=0))
 #'
 #'# predictive performance
 #'if(family=="gaussian"){
