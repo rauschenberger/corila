@@ -586,7 +586,13 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
   
-  if(is.null(include)){include <- rep(x=TRUE,times=p)}
+  if(is.null(include)){
+    include <- rep(x=TRUE,times=p)
+  } else {
+    if(!is.logical(include)){
+      stop("Argument \"include\" should be a logical vector (or NULL).")
+    }
+  }
   if(is.null(group)){group <- seq_len(p)}
   if(is.null(type)){type <- rep(x=1,times=p)}
   #if(length(group)!=p){stop("Argument \"group\" must be a vector of length p.")}
@@ -986,7 +992,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'metric
 #'
 #'# privileged information
-#'#include <- stats::rbinom(n=p,size=1,prob=0.5)
+#'#include <- stats::rbinom(n=sum(p),size=1,prob=0.5)==1
 #'#object <- cv.corila(x=x[cond,],y=y[cond],group=z,include=include,family=family)
 #'}
 #'@export
@@ -1224,6 +1230,8 @@ coef.cv.corila <- function(object,s="lambda.min",...){
   beta_sum <- beta[1:(length(beta)/2)]-beta[(length(beta)/2+1):(length(beta))]
   coef <- c(alpha,beta_sum)
   coef <- backscale(coef=coef,pars=object$scale)$coef
+  if(any(coef[c(FALSE,!object$include==1)]!=0)){stop("Excluded coefs must equal zero.")}
+  coef <- coef[c(TRUE,object$include==1)]
   return(coef)
 }
 
@@ -1459,17 +1467,20 @@ calc_sign_prec <- function(truth,estim){
 #'@examples
 #'\donttest{
 #'data <- simulate()
-#'results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,x_test=data$x_test,y_test=data$y_test,family="gaussian",method=c("mean","ridge","multiridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
+#'results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,include=rep(c(TRUE,FALSE),each=80),x_test=data$x_test,y_test=data$y_test,family=data$info$family,method=c("mean","ridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
 #'}
+#'stop("Also subset group and type with include!")
 #'@export
 holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha.final=1,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE,tune="both"){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE; trial <- TRUE
   
-  if(!is.null(include)){stop("Argument include is not yet implemeted in function holdout.")}
-  
   p <- ncol(x_train)
   n0 <- nrow(x_train)
   n1 <- nrow(x_test)
+  
+  if(is.null(include)){
+    include <- rep(x=TRUE,times=p)
+  }
   
   if(is.null(x_test)!=is.null(y_test)){
     stop("Provide either both or none of x_test and y_test.")
@@ -1507,30 +1518,30 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
     if(i=="mean"){
       #--- prediction by the mean ---
       if(!is.null(x_test)){
-        y_hat$mean <- rep(x=mean(y_train),times=nrow(x_test))
+        y_hat$mean <- rep(x=mean(y_train),times=n1)
       }
       if(family=="cox"){warning("Implement intercept-only model for Cox regression.")}
-      coef$mean <- c(ifelse(family=="binomial",log(mean(y_train)/(1-mean(y_train))),ifelse(family=="poisson",log(mean(y_train)),mean(y_train))),rep(x=0,times=ncol(x_train)))
+      coef$mean <- c(ifelse(family=="binomial",log(mean(y_train)/(1-mean(y_train))),ifelse(family=="poisson",log(mean(y_train)),mean(y_train))),rep(x=0,times=sum(include)))
     } else if(i=="ridge"){
       #--- ridge ---
-      object <- glmnet::cv.glmnet(x=x_train,y=y_train,family=family,alpha=0,foldid=foldid)
+      object <- glmnet::cv.glmnet(x=x_train[,include],y=y_train,family=family,alpha=0,foldid=foldid)
       if(!is.null(x_test)){
-        y_hat$ridge <- stats::predict(object=object,newx=x_test,s="lambda.min",type="response")
+        y_hat$ridge <- stats::predict(object=object,newx=x_test[,include],s="lambda.min",type="response")
       }
       coef$ridge <- c(if(family=="cox") NA,as.numeric(stats::coef(object=object,s="lambda.min")))
     } else if(i=="multiridge"){
       if(family=="poisson"){next}
       #--- multiridge ---
-      object <- multiridge(x=x_train,y=y_train,z=type,family=family)
+      object <- multiridge(x=x_train[,include],y=y_train,z=type,family=family)
       if(!is.null(x_test)){
-        y_hat$multiridge <- stats::predict(object=object,newx=x_test)
+        y_hat$multiridge <- stats::predict(object=object,newx=x_test[,include])
       }
       coef$multiridge <- stats::coef(object=object)
     } else if(i=="lasso"){
       #--- lasso ---
-      object <- glmnet::cv.glmnet(x=x_train,y=y_train,family=family,alpha=1,foldid=foldid)
+      object <- glmnet::cv.glmnet(x=x_train[,include],y=y_train,family=family,alpha=1,foldid=foldid)
       if(!is.null(x_test)){
-        y_hat$lasso <- stats::predict(object=object,newx=x_test,s="lambda.min",type="response")
+        y_hat$lasso <- stats::predict(object=object,newx=x_test[,include],s="lambda.min",type="response")
       }
       coef$lasso <- c(if(family=="cox") NA,as.numeric(stats::coef(object=object,s="lambda.min")))
     } else if(i=="gglasso"){
@@ -1543,9 +1554,9 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
         temp.y_train <- y_train
         temp.loss <- "ls"
       }
-      object <- gglasso::cv.gglasso(x=x_train,y=temp.y_train,loss=temp.loss,group=group,foldid=foldid)
+      object <- gglasso::cv.gglasso(x=x_train[,include],y=temp.y_train,loss=temp.loss,group=group,foldid=foldid)
       if(!is.null(x_test)){
-        temp <- stats::predict(object=object,newx=x_test,s="lambda.min",type="link")
+        temp <- stats::predict(object=object,newx=x_test[,include],s="lambda.min",type="link")
         if(family=="binomial"){
           y_hat$gglasso <- 1/(1+exp(-temp))
         #} else if(family=="poisson"){
@@ -1559,12 +1570,12 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       #if(family=="cox"){next}
       #--- group lasso (grpreg) ---
       if(family=="cox"){
-        object <- grpreg::cv.grpsurv(X=x_train,y=y_train,group=group,fold=foldid)
+        object <- grpreg::cv.grpsurv(X=x_train[,include],y=y_train,group=group,fold=foldid)
       } else {
-        object <- grpreg::cv.grpreg(X=x_train,y=y_train,family=family,group=group,fold=foldid)
+        object <- grpreg::cv.grpreg(X=x_train[,include],y=y_train,family=family,group=group,fold=foldid)
       }
       if(!is.null(x_test)){
-        y_hat$grpreg <- stats::predict(object=object,X=x_test,type="response",lambda=object$lambda.min)
+        y_hat$grpreg <- stats::predict(object=object,X=x_test[,include],type="response",lambda=object$lambda.min)
       }
       coef$grpreg <- c(if(family=="cox") NA,as.numeric(stats::coef(object=object,lambda=object$lambda.min)))
     } else if(i=="grplasso"){
@@ -1578,18 +1589,18 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       # } else if(family=="poisson"){
       #   model <- grplasso::PoissReg()
       # }
-      # lambda <- grplasso::lambdamax(x=cbind(1,x_train),y=y_train,index=c(NA,group),penscale=base::sqrt,model=model)*0.9^(0:100)
-      # object <- grplasso::grplasso(x=cbind(1,x_train),y=y_train,index=c(NA,group),model=model,lambda=lambda,control=grplasso::grpl.control(update.hess="lambda",trace=0))
+      # lambda <- grplasso::lambdamax(x=cbind(1,x_train[,include]),y=y_train,index=c(NA,group),penscale=base::sqrt,model=model)*0.9^(0:100)
+      # object <- grplasso::grplasso(x=cbind(1,x_train[,include]),y=y_train,index=c(NA,group),model=model,lambda=lambda,control=grplasso::grpl.control(update.hess="lambda",trace=0))
       # if(!is.null(x_test)){
-      #   y_hat$grplasso <- stats::predict(object=object,newdata=cbind(1,x_test),type="response")
+      #   y_hat$grplasso <- stats::predict(object=object,newdata=cbind(1,x_test[,include]),type="response")
       # }
       # coef$grplasso <- object$coefficients[,1]
     } else if(i=="sparsegl"){
       if(family %in% c("poisson","cox")){next}
       #--- sparse group lasso (sparsegl) ---
-      object <- sparsegl::cv.sparsegl(x=x_train,y=y_train,group=group,family=family,foldid=foldid)
+      object <- sparsegl::cv.sparsegl(x=x_train[,include],y=y_train,group=group,family=family,foldid=foldid)
       if(!is.null(x_test)){
-        y_hat$sparsegl <- stats::predict(object=object,newx=x_test,type="response",s="lambda.min")
+        y_hat$sparsegl <- stats::predict(object=object,newx=x_test[,include],type="response",s="lambda.min")
       }
       coef$sparsegl <- stats::coef(object,s="lambda.min")
     } else if(i=="SGL"){
@@ -1597,14 +1608,14 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       #--- sparse group lasso (SGL) ---
       family_temp <- ifelse(family=="gaussian","linear",ifelse(family=="binomial","logit",family))
       if(family=="cox"){
-        data_temp <- list(x=x_train,time=as.matrix(y_train)[,"time"],status=as.matrix(y_train)[,"status"])
+        data_temp <- list(x=x_train[,include],time=as.matrix(y_train)[,"time"],status=as.matrix(y_train)[,"status"])
       } else {
-        data_temp <- list(x=x_train,y=y_train)
+        data_temp <- list(x=x_train[,include],y=y_train)
       }
       cv_object <- SGL::cvSGL(data=data_temp,index=group,type=family_temp,foldid=foldid)
       object <- SGL::SGL(data=data_temp,index=group,type=family_temp,lambdas=cv_object$lambdas)
       if(!is.null(x_test)){
-        y_hat$SGL <- SGL::predictSGL(x=object,newX=x_test,lam=which.min(cv_object$lldiff))
+        y_hat$SGL <- SGL::predictSGL(x=object,newX=x_test[,include],lam=which.min(cv_object$lldiff))
       }
       if(family=="gaussian"){
         coef$SGL <- c(object$intercept,object$beta[,which.min(cv_object$lldiff)])
@@ -1613,9 +1624,9 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       }
     } else if(i=="graper"){
       if(!family %in% c("gaussian","binomial")){next}
-      null <- utils::capture.output(object <- suppressMessages(graper::graper(X=x_train,y=y_train,annot=as.factor(group),family=family)))
+      null <- utils::capture.output(object <- suppressMessages(graper::graper(X=x_train[,include],y=y_train,annot=as.factor(group),family=family)))
       if(!is.null(x_test)){
-        y_hat$graper <- stats::predict(object=object,newX=x_test,type="response")
+        y_hat$graper <- stats::predict(object=object,newX=x_test[,include],type="response")
       }
       coef$graper <- stats::coef(object=object)
     } else if(i=="grpregOverlap"){
@@ -1629,12 +1640,12 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
         list <- group
       }
       if(family=="cox"){
-        object <- grpregOverlap::cv.grpsurvOverlap(X=x_train,y=y_train,group=list)
+        object <- grpregOverlap::cv.grpsurvOverlap(X=x_train[,include],y=y_train,group=list)
       } else {
-        object <- grpregOverlap::cv.grpregOverlap(X=x_train,y=y_train,group=list,family=family)
+        object <- grpregOverlap::cv.grpregOverlap(X=x_train[,include],y=y_train,group=list,family=family)
       }
       if(!is.null(x_test)){
-        y_hat$grpregOverlap <- stats::predict(object=object,X=x_test,type="response",lambda=object$lambda.min)
+        y_hat$grpregOverlap <- stats::predict(object=object,X=x_test[,include],type="response",lambda=object$lambda.min)
       }
       coef$grpregOverlap <- c(if(family=="cox") NA,stats::coef(object=object,lambda=object$lambda.min))
     } else if(i=="multiview"){
@@ -1649,25 +1660,25 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       }
       rho <- c(0.00,0.10,0.25,0.50,1.00)
       for(j in seq_along(rho)){
-        object[[j]] <- multiview::cv.multiview(x_list=lapply(X=unique(type),FUN=function(z) x_train[,type==z]),y=y_train,family=temp,rho=rho[j],foldid=foldid)
+        object[[j]] <- multiview::cv.multiview(x_list=lapply(X=unique(type),FUN=function(z) x_train[,include & type==z]),y=y_train,family=temp,rho=rho[j],foldid=foldid)
       }
       id <- which.min(sapply(object,function(x) min(x$cvm)))
       if(!is.null(x_test)){
-        y_hat$multiview <- stats::predict(object=object[[id]],newx=lapply(X=unique(type),FUN=function(z) x_test[,type==z]),type="response",s="lambda.min")
+        y_hat$multiview <- stats::predict(object=object[[id]],newx=lapply(X=unique(type),FUN=function(z) x_test[,include & type==z]),type="response",s="lambda.min")
       }
       coef$multiview <- stats::coef(object=object[[id]],s="lambda.min")
     } else if(i=="scoop"){
       if(!family %in% c("gaussian","binomial")){next}
       if(all(table(group)==1)){
         #group_temp <- rep(x=1,times=length(group))
-        object <- scoop::coop.lasso(x=x_train,y=y_train,group=group,family=family)
+        object <- scoop::coop.lasso(x=x_train[,include],y=y_train,group=group,family=family)
       } else {
-        object <- scoop::sparse.coop.lasso(x=x_train,y=y_train,group=group,family=family)
+        object <- scoop::sparse.coop.lasso(x=x_train[,include],y=y_train,group=group,family=family)
       }
       object.cv <- scoop::crossval(object)
       id <- which(object.cv@lambda==object.cv@lambda.min)
       if(!is.null(x_test)){
-        y_hat$scoop <- scoop::predict(object=object,newx=x_test)[,id]
+        y_hat$scoop <- scoop::predict(object=object,newx=x_test[,include])[,id]
       }
       coef$scoop <- object.cv@beta.min
     } else if(i=="MLGL"){
@@ -1679,10 +1690,10 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       } else {
         y_train_temp <- y_train
       }
-      cv <- MLGL::cv.MLGL(X=x_train,y=y_train_temp,loss=loss)
-      object <- MLGL::MLGL(X=x_train,y=y_train_temp,loss=loss)
+      cv <- MLGL::cv.MLGL(X=x_train[,include],y=y_train_temp,loss=loss)
+      object <- MLGL::MLGL(X=x_train[,include],y=y_train_temp,loss=loss)
       if(!is.null(x_test)){
-        temp <- stats::predict(object=object,newx=x_test,type="fit",s=cv$lambda.min)
+        temp <- stats::predict(object=object,newx=x_test[,include],type="fit",s=cv$lambda.min)
         if(loss=="ls"){
           y_hat$MLGL <- temp
         } else {
@@ -1709,7 +1720,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       }
       null <- utils::capture.output(typeset <- ecpc::createGroupset(values=as.factor(type)))
       datablocks <- lapply(X=unique(type),FUN=function(x) which(type==x))
-      null <- tryCatch(utils::capture.output(object <- ecpc::ecpc(Y=Y_temp,X=x_train,groupsets=list(groupset),X2=x_test,model=model,fold=nfolds,datablocks=NULL)),error=function(x) NULL)
+      null <- tryCatch(utils::capture.output(object <- ecpc::ecpc(Y=Y_temp,X=x_train[,include],groupsets=list(groupset),X2=x_test[,include],model=model,fold=nfolds,datablocks=NULL)),error=function(x) NULL)
       # Currently typeset/datablocks is ignored!
       if(!is.null(object)){
         coef$ecpc <- unlist(stats::coef(object))
@@ -1719,7 +1730,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       }
     } else if(i=="gren"){
       #partitions <- list(group=lapply(X=unique(group),FUN=function(x) which(group==x)),type=lapply(X=unique(type),FUN=function(x) which(type==x)))
-      #object <- gren::cv.gren(x=x_train,y=y_train,partitions=list(group=group,type=type),trace=TRUE)
+      #object <- gren::cv.gren(x=x_train[,include],y=y_train,partitions=list(group=group,type=type),trace=TRUE)
       warning("Implement GREN.")
     } else if(i=="squeezy"){
       if(family %in% c("poisson","cox")){next}
@@ -1731,7 +1742,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
         extra <- list(seq_len(p)[!seq_len(p) %in% unlist(base)])# second alternative
         groupset <- c(base,extra)
       }
-      object <- squeezy::squeezy(Y=y_train,X=x_train,groupset=groupset,X2=x_test) # Check whether type can be included (e.g., as groups).
+      object <- squeezy::squeezy(Y=y_train,X=x_train[,include],groupset=groupset,X2=x_test[,include]) # Check whether type can be included (e.g., as groups).
       y_hat$squeezy <- object$YpredApprox
       coef$squeezy <- c(object$a0Approx,object$betaApprox)
     } else if(i=="CBPE"){
@@ -1752,8 +1763,8 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       lambda <- exp(seq(from=log(1e06),to=log(1e-06),length.out=20))
       # no predict function implemented
       #for(i in seq_len(nfolds)){
-      #  coef <- CBPE(X=x_train[foldid!=i,],y=y_train[foldid!=i],lambda=0)
-      #  x_train[foldid==i,] %*% coef
+      #  coef <- CBPE(X=x_train[foldid!=i,include],y=y_train[foldid!=i],lambda=0)
+      #  x_train[foldid==i,include] %*% coef
       #}
       # internal cross-validation to tune lambda
       # refit on full training data with optimal lambda
@@ -1764,7 +1775,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       # duplicating singletons:
       group_temp <- lapply(group_temp,function(x) if(length(x)==1){rep(x,times=2)}else{x})
       # combining remaining features
-      indices <- seq_len(ncol(x_train))
+      indices <- seq_len(ncol(x_train[,include]))
       extra <- indices[!indices %in% unlist(group_temp)]
       if(length(extra)>0){
         group_temp <- c(group_temp,extra)
@@ -1774,21 +1785,21 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       ratio <- c(seq(from=0.25,to=0.75,by=0.25),0.9,0.95,1) # set is from paper
       object <- list()
       for(j in seq_along(ratio)){
-        null <- utils::capture.output(object[[j]] <- pcLasso::cv.pcLasso(x=x_train,y=y_train,family=family,groups=group_temp,ratio=ratio[j]))
+        null <- utils::capture.output(object[[j]] <- pcLasso::cv.pcLasso(x=x_train[,include],y=y_train,family=family,groups=group_temp,ratio=ratio[j]))
       }
       id <- which.min(sapply(X=object,FUN=function(x) min(x$cvm)))
       object <- object[[id]]
       if(!is.null(x_test)){
-        y_hat$pcLasso <- pcLasso::predict.cv.pcLasso(object=object,xnew=x_test,s="lambda.min")
+        y_hat$pcLasso <- pcLasso::predict.cv.pcLasso(object=object,xnew=x_test[,include],s="lambda.min")
       }
       coef$pcLasso <- c(object$glmfit$a0[which(object$lambda==object$lambda.min)],object$glmfit$beta[, which(object$lambda==object$lambda.min)])
       # Under overlapping groups, use object$glmfit$origbeta.
     } else if(i=="corila"){
       #--- lasso with feature groups and modalities ---
-      object <- cv.corila(x=x_train,y=y_train,group=group,type=type,alpha.init=alpha.init,alpha.final=alpha.final,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,trial=trial,tune=tune)
+      object <- cv.corila(x=x_train,y=y_train,group=group,type=type,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,trial=trial,tune=tune)
       print(object$hyper[object$id.hyper,])
       if(!is.null(x_test)){
-        y_hat$corila <- stats::predict(object=object,newx=x_test)
+        y_hat$corila <- stats::predict(object=object,newx=x_test[,include])
       }
       coef$corila <- stats::coef(object=object)
     }
@@ -1808,7 +1819,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
         if(method[i]=="pcLasso"){next}
         original <- y_hat[[i]]
         if(all(is.na(original))){next}
-        eta <- coef[[i]][1] + x_test %*% coef[[i]][-1]
+        eta <- coef[[i]][1] + x_test[,include] %*% coef[[i]][-1]
         if(family %in% c("gaussian","cox")){
           manual <- eta
         } else if(family=="binomial"){
@@ -1835,7 +1846,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       if(family=="binomial" & any(sapply(X=y_hat,FUN=function(x) any(x<0|x>1,na.rm=TRUE)))){stop("invalid y_hat range")}
       if(any(sapply(X=y_hat,FUN=base::length)!=n1)){stop("invalid y_hat length")}
     }
-    if(any(sapply(X=coef,FUN=base::length)!=p+1)){stop("invalid coef length")}
+    if(any(sapply(X=coef,FUN=base::length)!=sum(include)+1)){stop("invalid coef length")}
   } else {
     warning("Implement checks for Cox regression.")
   }
