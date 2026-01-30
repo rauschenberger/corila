@@ -1469,7 +1469,6 @@ calc_sign_prec <- function(truth,estim){
 #'data <- simulate()
 #'results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,include=rep(c(TRUE,FALSE),each=80),x_test=data$x_test,y_test=data$y_test,family=data$info$family,method=c("mean","ridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
 #'}
-#'stop("Also subset group and type with include!")
 #'@export
 holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha.final=1,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE,tune="both"){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE; trial <- TRUE
