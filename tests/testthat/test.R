@@ -36,14 +36,14 @@ for(family in c("gaussian","binomial","poisson")){
     
     # without standardisation
     object.original <- glmnet::glmnet(x=x[foldid==0,],y=y[foldid==0],family=family,lambda=0)
-    y_hat.original <- predict(object=object.original,newx=x[foldid==1,],type="response")
+    y_hat.original <- predict(object=object.original,newx=x[foldid==1,],type="response",s=0)
     coef.original <- c(NA[family=="cox"],as.numeric(coef(object.original,s=0)))
     
     # with standardisation
     data.scaled <- forescale(x=x[foldid==0,],y=y[foldid==0],family=family)
     object.scaled <- glmnet::glmnet(x=data.scaled$x,y=data.scaled$y,family=family,lambda=0)
     newx.scaled <- forescale(x=x[foldid==1,],pars=data.scaled$pars)
-    y_hat.scaled <- predict(object=object.scaled,newx=newx.scaled$x,type="response")
+    y_hat.scaled <- predict(object=object.scaled,newx=newx.scaled$x,type="response",s=0)
     coef.scaled <- c(NA[family=="cox"],as.numeric(coef(object=object.scaled,s=0)))
     backscaled <- backscale(pars=data.scaled$pars,y=y_hat.scaled,coef=coef.scaled)
     
@@ -51,14 +51,30 @@ for(family in c("gaussian","binomial","poisson")){
     testthat::expect_true(all.equal(target=backscaled$y_original,current=y_hat.original))
     
     if(FALSE){
+      all(data.scaled$y[,1]==y[foldid==0,1])
+      all(y_hat.scaled[,1]==backscaled$y_original[,1])
+      
       # examine problem for Cox
-      eta <- x[foldid==1,] %*% coef.original[-1]
-      rl <- exp(eta)
       range(y_hat.original)
-      range(rl)
+      
+      eta1 <- x[foldid==1,] %*% coef.original[-1]
+      hat1 <- exp(eta1)
+      range(hat1)
+      
+      eta2 <- newx.scaled$x %*% coef.scaled[-1]
+      hat2 <- exp(eta2)
+      range(hat2)
+      
       # use type="link" and backscale eta instead of y? (scaling y is only done in Gaussian case, where eta=y, use link function after this?)
+  
+      # scaling factor?
       factor <- unique(round(unique(as.numeric(rl))/unique(as.numeric(y_hat.scaled)),digits=10))
       range(y_hat.scaled*factor)
+      
+      # linear predictor?
+      temp <- predict(object=object.scaled,newx=newx.scaled$x,type="link")
+      range(exp(temp))
+      
       range(y_hat.scaled)
       range(backscaled$y_original)
     }
