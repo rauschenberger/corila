@@ -1,4 +1,6 @@
 
+# Add unit tests for Cox model!
+
 set.seed(1)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -35,19 +37,31 @@ for(family in c("gaussian","binomial","poisson")){
     # without standardisation
     object.original <- glmnet::glmnet(x=x[foldid==0,],y=y[foldid==0],family=family,lambda=0)
     y_hat.original <- predict(object=object.original,newx=x[foldid==1,],type="response")
-    coef.original <- as.numeric(coef(object.original,s=0))
+    coef.original <- c(NA[family=="cox"],as.numeric(coef(object.original,s=0)))
     
     # with standardisation
     data.scaled <- forescale(x=x[foldid==0,],y=y[foldid==0],family=family)
-    object.scaled <- glmnet::glmnet(x=data.scaled$x,y=data.scaled$y,family=family,lambda=0,intercept=(family!="gaussian"))
+    object.scaled <- glmnet::glmnet(x=data.scaled$x,y=data.scaled$y,family=family,lambda=0)
     newx.scaled <- forescale(x=x[foldid==1,],pars=data.scaled$pars)
     y_hat.scaled <- predict(object=object.scaled,newx=newx.scaled$x,type="response")
-    coef.scaled <- coef(object=object.scaled,s=0)
+    coef.scaled <- c(NA[family=="cox"],as.numeric(coef(object=object.scaled,s=0)))
     backscaled <- backscale(pars=data.scaled$pars,y=y_hat.scaled,coef=coef.scaled)
     
-    # equality
-    testthat::expect_true(all.equal(target=backscaled$y,current=y_hat.original))
     testthat::expect_true(all.equal(target=backscaled$coef,current=coef.original))
+    testthat::expect_true(all.equal(target=backscaled$y_original,current=y_hat.original))
+    
+    if(FALSE){
+      # examine problem for Cox
+      eta <- x[foldid==1,] %*% coef.original[-1]
+      rl <- exp(eta)
+      range(y_hat.original)
+      range(rl)
+      # use type="link" and backscale eta instead of y? (scaling y is only done in Gaussian case, where eta=y, use link function after this?)
+      factor <- unique(round(unique(as.numeric(rl))/unique(as.numeric(y_hat.scaled)),digits=10))
+      range(y_hat.scaled*factor)
+      range(y_hat.scaled)
+      range(backscaled$y_original)
+    }
   })
 }
 
@@ -222,3 +236,25 @@ testthat::test_that("precision is not influenced by estimated zeros",{
   prec2 <- calc_sign_prec(truth=truth[estim!=0],estim=estim[estim!=0])
   testthat::expect_true(prec1==prec2)
 })
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#----- privileged information -----
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+for(family in c("gaussian","binomial","poisson","cox")){
+  # simulate data
+  data <- simulate(family=family)
+  include <- stats::rbinom(n=data$info$p,size=1,prob=0.5)==1
+  # fit model
+  object <- cv.corila(x=data$x_train,y=data$y_train,group=data$group,include=include,family=family)
+  testthat::test_that("predict is not influenced by auxiliary predictors",{
+    y_hat1 <- predict(object=object,newx=data$x_test)
+    y_hat2 <- predict(object=object,newx=data$x_test[,include])
+    newx <- data$x_test
+    newx[,!include] <- 0
+    y_hat3 <- predict(object=object,newx=newx)
+    testthat::expect_true(all(y_hat1==y_hat2))
+    testthat::expect_true(all(y_hat1==y_hat3))
+    testthat::expect_true(all(y_hat2==y_hat3))
+  })
+}
