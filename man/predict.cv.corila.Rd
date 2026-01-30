@@ -78,7 +78,7 @@ if(family=="gaussian"){
 metric
 
 # privileged information
-#include <- stats::rbinom(n=p,size=1,prob=0.5)
+#include <- stats::rbinom(n=sum(p),size=1,prob=0.5)==1
 #object <- cv.corila(x=x[cond,],y=y[cond],group=z,include=include,family=family)
 }
 }
