@@ -1474,6 +1474,10 @@ calc_sign_prec <- function(truth,estim){
 holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha.final=1,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,trial=TRUE,tune="both"){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE; trial <- TRUE
   
+  if(!is.null(include) && any(include==0) && !is.numeric(group)){
+    stop("Function holdout is not fully implemented for privileged learning with overlapping groups.")
+  }
+  
   p <- ncol(x_train)
   n0 <- nrow(x_train)
   n1 <- nrow(x_test)
@@ -1532,7 +1536,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
     } else if(i=="multiridge"){
       if(family=="poisson"){next}
       #--- multiridge ---
-      object <- multiridge(x=x_train[,include],y=y_train,z=type,family=family)
+      object <- multiridge(x=x_train[,include],y=y_train,z=type[include],family=family)
       if(!is.null(x_test)){
         y_hat$multiridge <- stats::predict(object=object,newx=x_test[,include])
       }
@@ -1554,7 +1558,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
         temp.y_train <- y_train
         temp.loss <- "ls"
       }
-      object <- gglasso::cv.gglasso(x=x_train[,include],y=temp.y_train,loss=temp.loss,group=group,foldid=foldid)
+      object <- gglasso::cv.gglasso(x=x_train[,include],y=temp.y_train,loss=temp.loss,group=group[include],foldid=foldid)
       if(!is.null(x_test)){
         temp <- stats::predict(object=object,newx=x_test[,include],s="lambda.min",type="link")
         if(family=="binomial"){
@@ -1570,9 +1574,9 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       #if(family=="cox"){next}
       #--- group lasso (grpreg) ---
       if(family=="cox"){
-        object <- grpreg::cv.grpsurv(X=x_train[,include],y=y_train,group=group,fold=foldid)
+        object <- grpreg::cv.grpsurv(X=x_train[,include],y=y_train,group=group[include],fold=foldid)
       } else {
-        object <- grpreg::cv.grpreg(X=x_train[,include],y=y_train,family=family,group=group,fold=foldid)
+        object <- grpreg::cv.grpreg(X=x_train[,include],y=y_train,family=family,group=group[include],fold=foldid)
       }
       if(!is.null(x_test)){
         y_hat$grpreg <- stats::predict(object=object,X=x_test[,include],type="response",lambda=object$lambda.min)
@@ -1589,8 +1593,8 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       # } else if(family=="poisson"){
       #   model <- grplasso::PoissReg()
       # }
-      # lambda <- grplasso::lambdamax(x=cbind(1,x_train[,include]),y=y_train,index=c(NA,group),penscale=base::sqrt,model=model)*0.9^(0:100)
-      # object <- grplasso::grplasso(x=cbind(1,x_train[,include]),y=y_train,index=c(NA,group),model=model,lambda=lambda,control=grplasso::grpl.control(update.hess="lambda",trace=0))
+      # lambda <- grplasso::lambdamax(x=cbind(1,x_train[,include]),y=y_train,index=c(NA,group[include]),penscale=base::sqrt,model=model)*0.9^(0:100)
+      # object <- grplasso::grplasso(x=cbind(1,x_train[,include]),y=y_train,index=c(NA,group[include]),model=model,lambda=lambda,control=grplasso::grpl.control(update.hess="lambda",trace=0))
       # if(!is.null(x_test)){
       #   y_hat$grplasso <- stats::predict(object=object,newdata=cbind(1,x_test[,include]),type="response")
       # }
@@ -1598,7 +1602,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
     } else if(i=="sparsegl"){
       if(family %in% c("poisson","cox")){next}
       #--- sparse group lasso (sparsegl) ---
-      object <- sparsegl::cv.sparsegl(x=x_train[,include],y=y_train,group=group,family=family,foldid=foldid)
+      object <- sparsegl::cv.sparsegl(x=x_train[,include],y=y_train,group=group[include],family=family,foldid=foldid)
       if(!is.null(x_test)){
         y_hat$sparsegl <- stats::predict(object=object,newx=x_test[,include],type="response",s="lambda.min")
       }
@@ -1612,8 +1616,8 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       } else {
         data_temp <- list(x=x_train[,include],y=y_train)
       }
-      cv_object <- SGL::cvSGL(data=data_temp,index=group,type=family_temp,foldid=foldid)
-      object <- SGL::SGL(data=data_temp,index=group,type=family_temp,lambdas=cv_object$lambdas)
+      cv_object <- SGL::cvSGL(data=data_temp,index=group[include],type=family_temp,foldid=foldid)
+      object <- SGL::SGL(data=data_temp,index=group[include],type=family_temp,lambdas=cv_object$lambdas)
       if(!is.null(x_test)){
         y_hat$SGL <- SGL::predictSGL(x=object,newX=x_test[,include],lam=which.min(cv_object$lldiff))
       }
@@ -1624,7 +1628,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       }
     } else if(i=="graper"){
       if(!family %in% c("gaussian","binomial")){next}
-      null <- utils::capture.output(object <- suppressMessages(graper::graper(X=x_train[,include],y=y_train,annot=as.factor(group),family=family)))
+      null <- utils::capture.output(object <- suppressMessages(graper::graper(X=x_train[,include],y=y_train,annot=as.factor(group[include]),family=family)))
       if(!is.null(x_test)){
         y_hat$graper <- stats::predict(object=object,newX=x_test[,include],type="response")
       }
@@ -1635,7 +1639,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       body(func)[[3]] <- quote(over.mat <- Matrix(incidence.mat %*% t(incidence.mat), sparse=TRUE))
       utils::assignInNamespace(x="expandX",value=func,ns="grpregOverlap")
       if(is.numeric(group)){
-        list <- c(lapply(X=unique(group),FUN=function(z) which(group==z)),lapply(X=unique(type),FUN=function(z) which(type==z)))
+        list <- c(lapply(X=unique(group[include]),FUN=function(z) which(group[include]==z)),lapply(X=unique(type[include]),FUN=function(z) which(type[include]==z)))
       } else {
         list <- group
       }
@@ -1660,20 +1664,20 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       }
       rho <- c(0.00,0.10,0.25,0.50,1.00)
       for(j in seq_along(rho)){
-        object[[j]] <- multiview::cv.multiview(x_list=lapply(X=unique(type),FUN=function(z) x_train[,include & type==z]),y=y_train,family=temp,rho=rho[j],foldid=foldid)
+        object[[j]] <- multiview::cv.multiview(x_list=lapply(X=unique(type[include]),FUN=function(z) x_train[,type[include]==z]),y=y_train,family=temp,rho=rho[j],foldid=foldid)
       }
       id <- which.min(sapply(object,function(x) min(x$cvm)))
       if(!is.null(x_test)){
-        y_hat$multiview <- stats::predict(object=object[[id]],newx=lapply(X=unique(type),FUN=function(z) x_test[,include & type==z]),type="response",s="lambda.min")
+        y_hat$multiview <- stats::predict(object=object[[id]],newx=lapply(X=unique(type[include]),FUN=function(z) x_test[,type[include]==z]),type="response",s="lambda.min")
       }
       coef$multiview <- stats::coef(object=object[[id]],s="lambda.min")
     } else if(i=="scoop"){
       if(!family %in% c("gaussian","binomial")){next}
-      if(all(table(group)==1)){
+      if(all(table(group[include])==1)){
         #group_temp <- rep(x=1,times=length(group))
         object <- scoop::coop.lasso(x=x_train[,include],y=y_train,group=group,family=family)
       } else {
-        object <- scoop::sparse.coop.lasso(x=x_train[,include],y=y_train,group=group,family=family)
+        object <- scoop::sparse.coop.lasso(x=x_train[,include],y=y_train,group=group[include],family=family)
       }
       object.cv <- scoop::crossval(object)
       id <- which(object.cv@lambda==object.cv@lambda.min)
@@ -1710,8 +1714,8 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       }
       #--- ecpc ---
       model <- ifelse(family=="gaussian","linear",ifelse(family=="binomial","logistic",family))
-      if(is.numeric(group)){
-        null <- utils::capture.output(groupset <- ecpc::createGroupset(values=as.factor(group)))
+      if(is.numeric(group[include])){
+        null <- utils::capture.output(groupset <- ecpc::createGroupset(values=as.factor(group[include])))
       } else if(is.list(group)){
         base <- lapply(group,function(x) as.integer(x))
         #extra <- seq_len(p)[!seq_len(p) %in% unlist(base)] # first alternative
@@ -1719,7 +1723,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
         groupset <- c(base,extra)
       }
       null <- utils::capture.output(typeset <- ecpc::createGroupset(values=as.factor(type)))
-      datablocks <- lapply(X=unique(type),FUN=function(x) which(type==x))
+      datablocks <- lapply(X=unique(type[include]),FUN=function(x) which(type[include]==x))
       null <- tryCatch(utils::capture.output(object <- ecpc::ecpc(Y=Y_temp,X=x_train[,include],groupsets=list(groupset),X2=x_test[,include],model=model,fold=nfolds,datablocks=NULL)),error=function(x) NULL)
       # Currently typeset/datablocks is ignored!
       if(!is.null(object)){
@@ -1735,7 +1739,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
     } else if(i=="squeezy"){
       if(family %in% c("poisson","cox")){next}
       if(is.numeric(group)){
-        groupset <- lapply(unique(group),function(x) which(group==x))
+        groupset <- lapply(unique(group[include]),function(x) which(group[include]==x))
       } else if(is.list(group)){
         base <- lapply(group,function(x) as.integer(x))
         #extra <- seq_len(p)[!seq_len(p) %in% unlist(base)] # first alternative
@@ -1771,7 +1775,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       stop("Not yet implemented.")
     } else if(i=="pcLasso"){
       if(!family %in% c("gaussian","binomial")){next}
-      group_temp <- lapply(unique(group),function(x) which(x==group))
+      group_temp <- lapply(unique(group[include]),function(x) which(x==group[include]))
       # duplicating singletons:
       group_temp <- lapply(group_temp,function(x) if(length(x)==1){rep(x,times=2)}else{x})
       # combining remaining features
