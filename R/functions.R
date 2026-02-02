@@ -40,11 +40,11 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
   if(is.null(pars)){
     pars <- list()
     pars$family <- family
-    if(family=="cox"){
-      cond <- y[,2]==1
-    } else {
+    #if(family=="cox"){
+    #  cond <- y[,2]==1
+    #} else {
       cond <- rep(x=TRUE,times=length(y)) 
-    }
+    #}
     pars$mu.x <- apply(X=x[cond,],MARGIN=2,FUN=base::mean,na.rm=TRUE)
     pars$sd.x <- apply(X=x[cond,],MARGIN=2,FUN=stats::sd,na.rm=TRUE)
     if(!is.null(y) & family=="gaussian"){
@@ -409,7 +409,11 @@ predict.multiridge <- function(object,newx,...){
   XXblocks <- multiridge::createXXblocks(datablocks=object$datablocks,datablocksnew=newX)
   Sigmanew <- multiridge::SigmaFromBlocks(XXblocks=XXblocks,penalties=object$penalties)
   eta <- multiridge::predictIWLS(IWLSfit=object,Sigmanew=Sigmanew)
-  y_hat <- starnet:::.mean.function(eta,family=object$family)
+  if(family=="cox"){
+    y_hat <- exp(eta)
+  } else {
+    y_hat <- starnet:::.mean.function(eta,family=object$family)
+  }
   y_hat <- backscale(pars=object$pars,y=y_hat)$y
   return(y_hat)
 }
@@ -437,9 +441,9 @@ predict.multiridge <- function(object,newx,...){
 coef.multiridge <- function(object,...){
   Xblocks <- multiridge::createXblocks(datablocks=object$datablocks)
   coef <- multiridge::betasout(object,Xblocks=Xblocks,penalties=object$penalties)
-  if(object$family=="cox" & is.null(coef[[1]])){
-    coef[[1]] <- NA # was 0
-  }
+  #if(object$family=="cox" & is.null(coef[[1]])){
+  #  coef[[1]] <- NA # was 0
+  #}
   coef <- backscale(pars=object$pars,coef=unlist(coef))$coef
   return(coef)
 }
@@ -933,7 +937,8 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
 #'@export
 predict.corila <- function(object,newx,index,s,...){
   newx_stand <- forescale(x=newx,pars=object$scale)$x
-  y_hat_stand <- stats::predict(object=object$model[[index]],newx=cbind(newx_stand,-newx_stand),s=s,type=ifelse(object$scale$family=="cox","link","response"))
+  y_hat_stand <- stats::predict(object=object$model[[index]],newx=cbind(newx_stand,-newx_stand),s=s,type="response")
+  #type=ifelse(object$scale$family=="cox","link","response"))
   y_hat <- backscale(y=y_hat_stand,pars=object$scale)$y
   return(y_hat)
 }
