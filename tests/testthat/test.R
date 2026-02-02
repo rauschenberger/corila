@@ -7,9 +7,85 @@ set.seed(1)
 #----- functions "forescale" and "backscale" -----
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+for(glmnet in c(FALSE,TRUE)){
+  for(family in c("gaussian","binomial","poisson","cox")){
+    cat(paste0(ifelse(glmnet,"glmnet::cv.glmnet","stats::glm"),", family=\"",family,"\"\n"))
+    testthat::test_that("stats::glm without/with scale returns same results",{
+      #--- simulate data ---
+      n0 <- 100; n1 <- 500; p <- 3
+      n <- n0 + n1
+      fold <- rep(x=c(0,1),times=c(n0,n1))
+      foldid <- sample(rep(seq_len(10),length.out=n0))
+      sd <- stats::rpois(n=p,lambda=5)
+      x <- sapply(X=sd,FUN=function(x) stats::rnorm(n=n,sd=x))
+      beta <- stats::rnorm(n=p)
+      eta <- x %*% beta
+      if(family=="gaussian"){
+        y <- stats::rnorm(n=n,mean=eta)
+      } else if(family=="binomial"){
+        y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
+      } else if(family=="poisson"){
+        y <- stats::rpois(n=n,lambda=exp(eta))
+      } else if(family=="cox"){
+        time <- stats::rexp(n=n,rate=exp(eta))
+        status <- stats::rbinom(n=n,prob=0.5,size=1)
+        y <- survival::Surv(time=time,event=status)
+      }
+      data <- data.frame(x=x)
+      #--- regression without standardisation ---
+      if(glmnet){
+        lm1 <- glmnet::cv.glmnet(x=x[fold==0,],y=y[fold==0],family=family,foldid=foldid)
+        y_hat1 <- as.numeric(stats::predict(object=lm1,newx=x[fold==1,],s="lambda.min",type="response"))
+      } else {
+        if(family=="cox"){
+          lm1 <- survival::coxph(y[fold==0]~.,data=data[fold==0,])
+        } else {
+          lm1 <- stats::glm(y[fold==0]~.,family=family,data=data[fold==0,])
+        }
+        y_hat1 <- stats::predict(object=lm1,newdata=data[fold==1,],type=ifelse(family=="cox","risk","response"))
+      }
+      if(family=="cox"){
+        coef1 <- c(NA,as.numeric(stats::coef(lm1,s="lambda.min")))
+      } else {
+        coef1 <- as.numeric(stats::coef(lm1,s="lambda.min"))
+      }
+      #--- regression with standardisation ---
+      scale <- forescale(x=x[fold==0,],y=y[fold==0],family=family)
+      newx <- forescale(x=x[fold==1,],pars=scale$pars)$x
+      if(glmnet){
+        lm2 <- glmnet::cv.glmnet(x=scale$x,y=scale$y,family=family,foldid=foldid)
+        temp <- as.numeric(stats::predict(object=lm2,newx=newx,s="lambda.min",type="response"))
+      } else {
+        if(family=="cox"){
+          lm2 <- survival::coxph(scale$y~.,data=data.frame(x=scale$x))
+        } else {
+          lm2 <- stats::glm(scale$y~.,family=family,data=data.frame(x=scale$x))
+        }
+        temp <- as.numeric(stats::predict(object=lm2,newdata=data.frame(x=newx),type=ifelse(family=="cox","risk","response")))
+      }
+      if(family=="cox"){
+        result <- backscale(pars=scale$pars,y=temp,coef=c(NA,as.numeric(stats::coef(lm2,s="lambda.min"))))
+      } else {
+        result <- backscale(pars=scale$pars,y=temp,coef=as.numeric(stats::coef(lm2,s="lambda.min")))
+      }
+      y_hat2 <- result$y_original
+      coef2 <- result$coef
+      #--- equality ---
+      testthat::expect_true(all.equal(coef1,coef2,check.attributes=FALSE))
+      if(glmnet & family=="cox"){
+        testthat::expect_true(all.equal(y_hat1,y_hat2*mean(y_hat1/y_hat2)))
+      } else {
+        testthat::expect_true(all.equal(y_hat1,y_hat2,check.attributes=FALSE))
+      }
+    })
+  }
+}
+
+
+
 for(family in c("gaussian","binomial","poisson")){
   message(paste0("family=\"",family,"\""))
-  testthat::test_that("regression without and with standardisation returns same results",{
+  testthat::test_that("glmnet with/without scale returns same results",{
     
     # simulate data
     n0 <- 100
