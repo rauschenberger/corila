@@ -67,7 +67,7 @@ for(glmnet in c(FALSE,TRUE)){
       #--- equality ---
       testthat::expect_true(all.equal(coef1,coef2,check.attributes=FALSE))
       if(glmnet & family=="cox"){
-        testthat::expect_true(all.equal(y_hat1,y_hat2*mean(y_hat1/y_hat2),check.attributes=FALSE)) # baseline hazard is different
+        testthat::expect_true(all.equal(y_hat1,y_hat2*mean(y_hat1/y_hat2),check.attributes=FALSE)) # different baseline hazard?
       } else {
         testthat::expect_true(all.equal(y_hat1,y_hat2,check.attributes=FALSE))
       }
@@ -79,24 +79,24 @@ for(glmnet in c(FALSE,TRUE)){
 #----- function "corila" -----
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-for(family in c("gaussian","binomial","poisson")){
+for(family in c("gaussian","binomial","poisson","cox")){
   message(paste0("family=\"",family,"\""))
-
-  data <- simulate(family=family)
+  
+  data <- simulate(family=family,n1=50,n.group=3,size.group=c(3,2))
   group <- list()
   group$vector <- data$group
   group$list <- lapply(X=unique(group$vector),FUN=function(x) which(group$vector==x))
   group$matrix <- 1*outer(X=group$vector,Y=group$vector,FUN="==")
-
+  
   model <- sapply(X=group,FUN=function(x) NULL)
   for(i in seq_along(group)){
     set.seed(1)
     model[[i]] <- cv.corila(x=data$x_train,y=data$y_train,group=group[[i]],type=data$type,family=family)
   }
   
-  coef <- lapply(X=model,FUN=coef)
+  coef <- lapply(X=model,FUN=stats::coef)
   y_hat <- lapply(X=model,FUN=function(x) predict(object=x,newx=data$x_test))
-
+  
   testthat::test_that("corila returns same coefficients with argument group as vector, list, or matrix",{
     testthat::expect_true(all.equal(coef[[1]],coef[[2]]))
     testthat::expect_true(all.equal(coef[[2]],coef[[3]]))
@@ -106,21 +106,33 @@ for(family in c("gaussian","binomial","poisson")){
     testthat::expect_true(all.equal(y_hat[[1]],y_hat[[2]]))
     testthat::expect_true(all.equal(y_hat[[2]],y_hat[[3]]))
   })
-
+  
   testthat::test_that("function predict returns same results as feature matrix times coef",{
-  if(is.na(coef$vector[1])){
-    coef$vector[1] <- 0
-  }
-  eta <- coef$vector[1] + data$x_test %*% coef$vector[-1]
-  if(family %in% c("gaussian","cox")){
-    pred <- eta
-  } else if(family=="binomial"){
-    pred <- 1/(1+exp(-eta))
-  } else if(family=="poisson"){
-    pred <- exp(eta)
-  }
-  testthat::expect_true(all.equal(as.numeric(pred),as.numeric(y_hat$vector)))
-})
+    eta <- cbind(c(1)[family!="cox"],data$x_test) %*% coef$vector
+    if(family %in% c("gaussian")){
+      pred <- eta
+    } else if(family=="binomial"){
+      pred <- 1/(1+exp(-eta))
+    } else if(family %in% c("poisson","cox")){
+      pred <- exp(eta)
+    }
+    if(family=="cox"){
+      testthat::expect_true(all.equal(as.numeric(pred),as.numeric(y_hat$vector*mean(pred/y_hat$vector))))
+    } else {
+      testthat::expect_true(all.equal(as.numeric(pred),as.numeric(y_hat$vector)))
+    }
+  })
+}
+
+
+if(FALSE){
+  data <- simulate(family="cox",n1=50,n.group=3,size.group=c(3,2))
+  object <- glmnet::cv.glmnet(x=data$x_train,y=data$y_train,family="cox")
+  manual <- data$x_test %*% coef(object,s="lambda.min")
+  link <- predict(object,newx=data$x_test,type="link",s="lambda.min")
+  all.equal(as.numeric(manual),as.numeric(link)) # TRUE
+  risk <- predict(object,newx=data$x_test,type="response",s="lambda.min")
+  all.equal(exp(link),risk) # TRUE
 }
 
 for(family in c("gaussian","binomial","poisson")){
