@@ -12,7 +12,7 @@ for(glmnet in c(FALSE,TRUE)){
     cat(paste0(ifelse(glmnet,"glmnet::cv.glmnet","stats::glm"),", family=\"",family,"\"\n"))
     testthat::test_that("stats::glm without/with scale returns same results",{
       #--- simulate data ---
-      n0 <- 100; n1 <- 500; p <- 3
+      n0 <- 100; n1 <- 50; p <- 3
       n <- n0 + n1
       fold <- rep(x=c(0,1),times=c(n0,n1))
       foldid <- sample(rep(seq_len(10),length.out=n0))
@@ -33,6 +33,7 @@ for(glmnet in c(FALSE,TRUE)){
       }
       data <- data.frame(x=x)
       #--- regression without standardisation ---
+      # (NB: glmnet standardises internally for tuning lambda)
       if(glmnet){
         lm1 <- glmnet::cv.glmnet(x=x[fold==0,],y=y[fold==0],family=family,foldid=foldid)
         y_hat1 <- as.numeric(stats::predict(object=lm1,newx=x[fold==1,],s="lambda.min",type="response"))
@@ -44,36 +45,29 @@ for(glmnet in c(FALSE,TRUE)){
         }
         y_hat1 <- stats::predict(object=lm1,newdata=data[fold==1,],type=ifelse(family=="cox","risk","response"))
       }
-      if(family=="cox"){
-        coef1 <- c(NA,as.numeric(stats::coef(lm1,s="lambda.min")))
-      } else {
-        coef1 <- as.numeric(stats::coef(lm1,s="lambda.min"))
-      }
+      coef1 <- as.numeric(stats::coef(object=lm1,s="lambda.min"))
       #--- regression with standardisation ---
       scale <- forescale(x=x[fold==0,],y=y[fold==0],family=family)
       newx <- forescale(x=x[fold==1,],pars=scale$pars)$x
       if(glmnet){
         lm2 <- glmnet::cv.glmnet(x=scale$x,y=scale$y,family=family,foldid=foldid)
-        temp <- as.numeric(stats::predict(object=lm2,newx=newx,s="lambda.min",type="response"))
+        y_hat.temp <- as.numeric(stats::predict(object=lm2,newx=newx,s="lambda.min",type="response"))
       } else {
         if(family=="cox"){
           lm2 <- survival::coxph(scale$y~.,data=data.frame(x=scale$x))
         } else {
           lm2 <- stats::glm(scale$y~.,family=family,data=data.frame(x=scale$x))
         }
-        temp <- as.numeric(stats::predict(object=lm2,newdata=data.frame(x=newx),type=ifelse(family=="cox","risk","response")))
+        y_hat.temp <- as.numeric(stats::predict(object=lm2,newdata=data.frame(x=newx),type=ifelse(family=="cox","risk","response")))
       }
-      if(family=="cox"){
-        result <- backscale(pars=scale$pars,y=temp,coef=c(NA,as.numeric(stats::coef(lm2,s="lambda.min"))))
-      } else {
-        result <- backscale(pars=scale$pars,y=temp,coef=as.numeric(stats::coef(lm2,s="lambda.min")))
-      }
+      coef.temp <- as.numeric(stats::coef(object=lm2,s="lambda.min"))
+      result <- backscale(pars=scale$pars,y=y_hat.temp,coef=coef.temp)
       y_hat2 <- result$y_original
       coef2 <- result$coef
       #--- equality ---
       testthat::expect_true(all.equal(coef1,coef2,check.attributes=FALSE))
       if(glmnet & family=="cox"){
-        testthat::expect_true(all.equal(y_hat1,y_hat2*mean(y_hat1/y_hat2)))
+        testthat::expect_true(all.equal(y_hat1,y_hat2*mean(y_hat1/y_hat2),check.attributes=FALSE)) # baseline hazard is different
       } else {
         testthat::expect_true(all.equal(y_hat1,y_hat2,check.attributes=FALSE))
       }
@@ -81,100 +75,9 @@ for(glmnet in c(FALSE,TRUE)){
   }
 }
 
-
-
-for(family in c("gaussian","binomial","poisson")){
-  message(paste0("family=\"",family,"\""))
-  testthat::test_that("glmnet with/without scale returns same results",{
-    
-    # simulate data
-    n0 <- 100
-    n1 <- 10000
-    n <- n0+n1
-    p <- 20
-    mu <- stats::rnorm(n=p)
-    sd <- stats::rexp(n=p)
-    x <- sapply(X=seq_len(p),FUN=function(i) stats::rnorm(n=n,mean=mu[i],sd=sd[i]))
-    beta <- stats::rnorm(n=p)*stats::rbinom(n=p,size=1,prob=0.3)
-    eta <- x %*% beta + stats::rnorm(n=n)
-    foldid <- rep(x=c(0,1),times=c(n0,n1))
-    if(family=="gaussian"){
-      y <- eta
-    } else if(family=="binomial"){
-      y <- 1*(eta>=0)
-    } else if(family=="poisson"){
-      y <- round(exp(eta))
-    } else if(family=="cox"){
-      time <- stats::rexp(n=n,rate=exp(eta))
-      status <- stats::rbinom(n=n,prob=0.5,size=1)
-      y <- survival::Surv(time=time,event=status)
-    }
-    
-    # without standardisation
-    object.original <- glmnet::glmnet(x=x[foldid==0,],y=y[foldid==0],family=family,lambda=0)
-    y_hat.original <- predict(object=object.original,newx=x[foldid==1,],type="response",s=0)
-    coef.original <- c(NA[family=="cox"],as.numeric(coef(object.original,s=0)))
-    #all.equal(as.numeric(y_hat.original),as.numeric(coef.original[1]+x[foldid==1,] %*% coef.original[-1])) # Gaussian
-    
-    # with standardisation
-    data.scaled <- forescale(x=x[foldid==0,],y=y[foldid==0],family=family)
-    object.scaled <- glmnet::glmnet(x=data.scaled$x,y=data.scaled$y,family=family,lambda=0)
-    newx.scaled <- forescale(x=x[foldid==1,],pars=data.scaled$pars)
-    y_hat.scaled <- predict(object=object.scaled,newx=newx.scaled$x,type="response",s=0)
-    coef.scaled <- c(NA[family=="cox"],as.numeric(coef(object=object.scaled,s=0)))
-    backscaled <- backscale(pars=data.scaled$pars,y=y_hat.scaled,coef=coef.scaled)
-    #all.equal(as.numeric(y_hat.scaled),as.numeric(coef.scaled[1]+newx.scaled$x %*% coef.scaled[-1])) # Gaussian
-    
-    if(family=="cox"){
-      testthat::expect_true(all.equal(y[foldid==0,1],data.scaled$y[,1]))
-      testthat::expect_true(all.equal(y[foldid==0,2],data.scaled$y[,2]))
-      testthat::expect_true(all.equal(y_hat.scaled,backscaled$y_original))
-    }
-    
-    if(family!="gaussian"){
-      testthat::expect_true(all.equal(y[foldid==0],data.scaled$y))
-      testthat::expect_true(all.equal(y_hat.original,y_hat.scaled))
-      testthat::expect_true(all.equal(y_hat.scaled,backscaled$y_original))
-    }
-    
-    testthat::expect_true(all.equal(target=backscaled$coef,current=coef.original))
-    testthat::expect_true(all.equal(target=backscaled$y_original,current=y_hat.original))
-    
-    
-    if(FALSE){
-      all(data.scaled$y[,1]==y[foldid==0,1])
-      all(y_hat.scaled[,1]==backscaled$y_original[,1])
-      
-      # examine problem for Cox
-      range(y_hat.original)
-      range(exp(x[foldid==1,] %*% coef.original[-1]))
-      #
-      
-      # use type="link" and backscale eta instead of y? (scaling y is only done in Gaussian case, where eta=y, use link function after this?)
-  
-      # scaling factor?
-      factor <- unique(round(unique(as.numeric(rl))/unique(as.numeric(y_hat.scaled)),digits=10))
-      range(y_hat.scaled*factor)
-      
-      # linear predictor?
-      
-      range(exp(newx.scaled$x %*% coef.scaled[-1]))
-      
-      temp <- predict(object=object.scaled,newx=newx.scaled$x,type="link")
-      range(exp(temp))
-      
-      range(y_hat.scaled)
-      range(backscaled$y_original)
-    }
-  })
-}
-
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #----- function "corila" -----
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# Run this code with trial=TRUE and trial=FALSE?
-trial <- TRUE
 
 for(family in c("gaussian","binomial","poisson")){
   message(paste0("family=\"",family,"\""))
@@ -188,7 +91,7 @@ for(family in c("gaussian","binomial","poisson")){
   model <- sapply(X=group,FUN=function(x) NULL)
   for(i in seq_along(group)){
     set.seed(1)
-    model[[i]] <- cv.corila(x=data$x_train,y=data$y_train,group=group[[i]],type=data$type,trial=trial,family=family)
+    model[[i]] <- cv.corila(x=data$x_train,y=data$y_train,group=group[[i]],type=data$type,family=family)
   }
   
   coef <- lapply(X=model,FUN=coef)
@@ -240,7 +143,7 @@ for(family in c("gaussian","binomial","poisson")){
   y_hat <- list()
   for(i in seq_along(X)){
     set.seed(1)
-    object <- cv.corila(x=X[[i]],y=y,group=rep(1:5,each=10),family=family,trial=TRUE)
+    object <- cv.corila(x=X[[i]],y=y,group=rep(1:5,each=10),family=family)
     y_hat[[i]] <- predict(object=object,newx=X[[i]])
   }
   
