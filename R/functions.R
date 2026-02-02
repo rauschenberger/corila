@@ -1253,7 +1253,7 @@ coef.cv.corila <- function(object,s="lambda.min",...){
   }
   coef_stand <- stats::coef(object=object$object[[object$id.hyper]],s=s)
   if(object$scale$family=="cox"){
-    alpha <- NA
+    alpha <- NULL
     beta <- coef_stand
   } else {
     alpha <- coef_stand[1]
@@ -1263,8 +1263,8 @@ coef.cv.corila <- function(object,s="lambda.min",...){
   beta_sum <- beta[1:(length(beta)/2)]-beta[(length(beta)/2+1):(length(beta))]
   coef <- c(alpha,beta_sum)
   coef <- backscale(coef=coef,pars=object$scale)$coef
-  if(any(coef[c(FALSE,!object$include==1)]!=0)){stop("Excluded coefs must equal zero.")}
-  coef <- coef[c(TRUE,object$include==1)]
+  if(any(coef[c(FALSE[object$scale$family!="cox"],!object$include==1)]!=0)){stop("Excluded coefs must equal zero.")}
+  coef <- coef[c(TRUE[object$scale$family!="cox"],object$include==1)]
   return(coef)
 }
 
