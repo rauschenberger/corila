@@ -409,7 +409,7 @@ predict.multiridge <- function(object,newx,...){
   XXblocks <- multiridge::createXXblocks(datablocks=object$datablocks,datablocksnew=newX)
   Sigmanew <- multiridge::SigmaFromBlocks(XXblocks=XXblocks,penalties=object$penalties)
   eta <- multiridge::predictIWLS(IWLSfit=object,Sigmanew=Sigmanew)
-  if(family=="cox"){
+  if(object$family=="cox"){
     y_hat <- exp(eta)
   } else {
     y_hat <- starnet:::.mean.function(eta,family=object$family)

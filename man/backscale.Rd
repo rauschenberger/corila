@@ -20,30 +20,53 @@ Returns a list with slots \code{y_original} or \code{coef}.
 Transforms response variable back to original scale or transforms coefficients for predictor variables and response variable on original scales.
 }
 \examples{
-
 # simulate data
-n <- 100; p <- 3
+family <- "cox"
+n0 <- 100; n1 <- 50; p <- 3
+n <- n0 + n1
+fold <- rep(c(0,1),times=c(n0,n1))
 sd <- stats::rpois(n=p,lambda=5)
-x <- sapply(X=sd,FUN=function(x) stats::rnorm(n=n,sd=x))
+x <- data.frame(x=sapply(X=sd,FUN=function(x) stats::rnorm(n=n,sd=x)))
 beta <- stats::rnorm(n=p)
-y <- x \%*\% beta + stats::rnorm(n=n)
+eta <- as.matrix(x) \%*\% beta
+if(family=="gaussian"){
+ y <- stats::rnorm(n=n,mean=eta)
+} else if(family=="binomial"){
+ y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
+} else if(family=="poisson"){
+ y <- stats::rpois(n=n,lambda=exp(eta))
+} else if(family=="cox"){
+ time <- stats::rexp(n=n,rate=exp(eta))
+ status <- stats::rbinom(n=n,prob=0.5,size=1)
+ y <- survival::Surv(time=time,event=status)
+}
 
 # regression without standardisation
-lm1 <- stats::lm(y~x)
-y_hat1 <- stats::fitted(lm1)
+if(family=="cox"){
+ lm1 <- survival::coxph(y[fold==0]~.,data=x[fold==0,])
+} else {
+ lm1 <- stats::glm(y[fold==0]~.,data=x[fold==0,],family=family)
+}
 coef1 <- stats::coef(lm1)
+yhat1 <- predict(lm1,newdata=x[fold==1,])
 
 # regression with standardisation
-scale <- forescale(x=x,y=y,family="gaussian")
-lm2 <- stats::lm(scale$y~scale$x)
-result <- backscale(pars=scale$pars,y=stats::fitted(lm2),coef=stats::coef(lm2))
-y_hat2 <- result$y_original
+scale <- forescale(x=x[fold==0,],y=y[fold==0],family=family)
+if(family=="cox"){
+ lm2 <- survival::coxph(scale$y~.,data=data.frame(scale$x))
+} else {
+ lm2 <- stats::glm(scale$y~.,data=data.frame(scale$x),family=family)
+}
+coef_temp <- stats::coef(lm2)
+newx_temp <- forescale(x=x[fold==1,],pars=scale$pars)$x
+yhat_temp <- predict(object=lm2,newdata=data.frame(newx_temp))
+result <- backscale(pars=scale$pars,y=yhat_temp,coef=coef_temp)
 coef2 <- result$coef
+yhat2 <- result$y_original
 
 # equality
-all.equal(y_hat1,y_hat2)
 all.equal(coef1,coef2,check.attributes=FALSE)
-
+all.equal(yhat1,yhat2)
 }
 \seealso{
 forescale
