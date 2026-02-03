@@ -564,7 +564,7 @@ if(FALSE){
 #'@param y \eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training
 #'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
 #'@param include \eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model
-#'@param alpha.init elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0)
+#'@param alpha.init elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 0
 #'@param alpha.final elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)
 #'@param type \eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
@@ -709,15 +709,20 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
       coef.ind <- stats::coef(object=fit.ind)[-1]
     }
   } else {
-    # no combination
-    cond.coef <- rep(c(FALSE,TRUE),times=c(family!="cox",p))
-    if(is.null(lambda.ind)){
-      fit.ind <- glmnet::cv.glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=alpha.init)
-      coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[cond.coef]
-      lambda.ind <- fit.ind$lambda.min
+    if(all(is.na(alpha.init))){
+      coef.ind <- rep(x=0,times=p)
+    } else if(is.character(alpha.init)){
+      coef.int <- stats::cor(x=scale$x[cond,],y=scale$y[cond],method=alpha.init,use="pairwise.complete")
     } else {
-      fit.ind <- glmnet::glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=alpha.init)
-      coef.ind <- stats::coef(object=fit.ind,s=lambda.ind)[cond.coef]
+      cond.coef <- rep(c(FALSE,TRUE),times=c(family!="cox",p))
+      if(is.null(lambda.ind)){
+        fit.ind <- glmnet::cv.glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=alpha.init)
+        coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[cond.coef]
+        lambda.ind <- fit.ind$lambda.min
+      } else {
+        fit.ind <- glmnet::glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=alpha.init)
+        coef.ind <- stats::coef(object=fit.ind,s=lambda.ind)[cond.coef]
+      }
     }
   }
   
@@ -765,7 +770,7 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
   
   # CONTINUE HERE: Replace by prior coef without cor.
   if(!is.matrix(cor)){
-    cor <- stats::cor(x=scale$x,method=cor)
+    cor <- stats::cor(x=scale$x,method=cor,use="pairwise.complete")
   }
   cor[is.na(cor)] <- 0
   
