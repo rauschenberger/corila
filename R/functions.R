@@ -564,7 +564,7 @@ if(FALSE){
 #'@param y \eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training
 #'@param group \emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable 
 #'@param include \eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model
-#'@param alpha.init elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 0
+#'@param alpha.init elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 1
 #'@param alpha.final elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)
 #'@param type \eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
@@ -710,9 +710,10 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
     }
   } else {
     if(all(is.na(alpha.init))){
-      coef.ind <- rep(x=0,times=p)
+      coef.ind <- rep(x=1,times=p)
     } else if(is.character(alpha.init)){
-      coef.int <- stats::cor(x=scale$x[cond,],y=scale$y[cond],method=alpha.init,use="pairwise.complete")
+      coef.ind <- stats::cor(x=scale$x[cond,],y=scale$y[cond],method=alpha.init,use="pairwise.complete")
+      coef.ind[is.na(coef.ind)] <- 0
     } else {
       cond.coef <- rep(c(FALSE,TRUE),times=c(family!="cox",p))
       if(is.null(lambda.ind)){
@@ -895,6 +896,7 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
     #pf.ext <- 1/(weight$com*hyper$com[i]+weight$ind*hyper$ind[i])
     # pf.ext <- 1/(weight$com*hyper$local[i]+weight$ind*hyper$global[i]) # ORIGINAL
     pf.ext <- 1/(weight$com*hyper$wgt.local[i]+weight$ind*hyper$wgt.global[i]) # GENERAL FORMULATION
+    # Set pf.ext equal to 1 to obtain standard lasso.
     pf.ext[!c(include,include)] <- Inf # trial
     if(any(is.na(pf.ext))){stop("missing pf:",sum(is.na(pf.ext)))}
     if(any(pf.ext<0)){stop(paste0("negative pf:",min(pf.ext)))}
