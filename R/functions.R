@@ -544,11 +544,6 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
   
   scale <- forescale(x=x,y=y,family=family); rm(x,y)
   
-  mat <- list()
-  mat$all <- cbind(scale$x,-scale$x)
-  
-  index <- seq_len(p)
-  
   #--- initial coefficients ---
   fit.init <- NULL
   if(all(is.na(alpha.init))){
@@ -614,25 +609,15 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
       weight$global[p+j] <- sum(pmax(0,-temp))/p
     }
     # # temporary code with beta distribution:
-    # for(j in seq_len(p)){
-    #    if(is.numeric(group)){
-    #      cond.temp <- group[j]==group
-    #    } else {
-    #      group_index <- sapply(group,function(x) j %in% x)
-    #      cond.temp <- seq_len(p) %in% unlist(group[group_index]) 
-    #    }
-    #    temp <- sign(cor[,j])*stats::qbeta(p=abs(cor[,j]),shape1=hyper$alpha[i],shape2=hyper$beta[i])*coef.init*cond.temp
-    #    weight$com[j] <- mean(pmax(0,temp)[cond.temp])
-    #    weight$com[p+j] <- mean(pmax(0,-temp)[cond.temp])
-    # }
+    # temp <- sign(cor[,j])*stats::qbeta(p=abs(cor[,j]),shape1=hyper$alpha[i],shape2=hyper$beta[i])*coef.init*cond.temp
     weight <- lapply(weight,function(x) p*ifelse(x==0,0,x/sum(x)))
     
     pf.ext <- 1/(weight$local*hyper$wgt.local[i]+weight$global*hyper$wgt.global[i])
-    # Set pf.ext equal to 1 to obtain standard lasso.
-    pf.ext[!c(include,include)] <- Inf # trial
+    # To obtain standard lasso set pf.ext equal to 1.
+    pf.ext[!c(include,include)] <- Inf # excluded features
     if(any(is.na(pf.ext))){stop("missing pf:",sum(is.na(pf.ext)))}
     if(any(pf.ext<0)){stop(paste0("negative pf:",min(pf.ext)))}
-    object[[i]] <- glmnet::glmnet(x=mat$all,y=scale$y,family=family,penalty.factor=pf.ext,lower.limits=0,alpha=alpha.final)
+    object[[i]] <- glmnet::glmnet(x=cbind(scale$x,-scale$x),y=scale$y,family=family,penalty.factor=pf.ext,lower.limits=0,alpha=alpha.final)
   }
   
   list <- list(model=object,include=include,lambda.init=lambda.init,scale=scale$pars)
