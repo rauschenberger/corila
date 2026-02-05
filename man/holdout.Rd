@@ -8,7 +8,6 @@ holdout(
   x_train,
   y_train,
   group,
-  type,
   include,
   family,
   alpha.init = 0,

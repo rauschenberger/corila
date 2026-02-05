@@ -1280,7 +1280,7 @@ calc_sign_prec <- function(truth,estim){
 #'results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,include=rep(c(TRUE,FALSE),each=80),x_test=data$x_test,y_test=data$y_test,family=data$info$family,method=c("mean","ridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
 #'}
 #'@export
-holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha.final=1,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,tune="both"){
+holdout <- function(x_train,y_train,group,include,family,alpha.init=0,alpha.final=1,x_test=NULL,y_test=NULL,nfolds=10,foldid=NULL,method=NULL,seed=NULL,init.multi=FALSE,tune="both"){
   # nfolds <- 10; foldid <- NULL; seed <- NULL; init.multi <- FALSE
   
   if(!is.null(include) && any(include==0) && !is.numeric(group)){
@@ -1609,7 +1609,7 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
       # Under overlapping groups, use object$glmfit$origbeta.
     } else if(i=="corila"){
       #--- lasso with feature groups and modalities ---
-      object <- cv.corila(x=x_train,y=y_train,group=group,type=type,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,tune=tune)
+      object <- cv.corila(x=x_train,y=y_train,group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,fuse="mean",foldid=foldid,init.multi=init.multi,tune=tune)
       print(object$hyper[object$id.hyper,])
       if(!is.null(x_test)){
         y_hat$corila <- stats::predict(object=object,newx=x_test[,include])
@@ -1700,11 +1700,10 @@ holdout <- function(x_train,y_train,group,type,include,family,alpha.init=0,alpha
 #'results <- crossval(x,y,family="gaussian",method=c("mean","corila"))
 #'}
 #'@export
-crossval <- function(x,y,family,group=NULL,type=NULL,include=NULL,alpha.init=0,alpha.final=1,iter=5,nfolds=10,init.multi=FALSE,method=NULL,tune="both"){
+crossval <- function(x,y,family,group=NULL,include=NULL,alpha.init=0,alpha.final=1,iter=5,nfolds=10,init.multi=FALSE,method=NULL,tune="both"){
   n <- nrow(x)
   p <- ncol(x)
   if(is.null(group)){group <- seq_len(p)}
-  if(is.null(type)){type <- rep(x=1,times=p)}
   list <- list()
   list$metric <- list$nzero <- list()
   for(k in seq_len(iter)){
@@ -1717,7 +1716,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,include=NULL,alpha.init=0,a
       set.seed(i)
       cat("fold",i,"\n")
       cond <- foldid==i
-      results <- holdout(x_train=x[!cond,],y_train=y[!cond],x_test=x[cond,],y_test=y[cond],group=group,type=type,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,tune=tune)
+      results <- holdout(x_train=x[!cond,],y_train=y[!cond],x_test=x[cond,],y_test=y[cond],group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,tune=tune)
       for(j in seq_along(results$y_hat)){
         y_hat[[names(results$y_hat)[j]]][cond] <- results$y_hat[[j]]
       }
@@ -1730,7 +1729,7 @@ crossval <- function(x,y,family,group=NULL,type=NULL,include=NULL,alpha.init=0,a
       list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) survival::concordance(y~I(-x))$concordance)
     }
     set.seed(k)
-    refit <- holdout(x_train=x,y_train=y,group=group,type=type,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,tune=tune)
+    refit <- holdout(x_train=x,y_train=y,group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,init.multi=init.multi,tune=tune)
     list$nzero[[k]] <- sapply(X=refit$coef,FUN=function(x) sum(x[-1]!=0))
   }
   list <- lapply(X=list,FUN=function(x) do.call(what="rbind",args=x))

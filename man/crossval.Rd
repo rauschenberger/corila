@@ -9,7 +9,6 @@ crossval(
   y,
   family,
   group = NULL,
-  type = NULL,
   include = NULL,
   alpha.init = 0,
   alpha.final = 1,
