@@ -14,7 +14,6 @@ cv.corila(
   family = "gaussian",
   nfolds = 10,
   cor = "spearman",
-  fuse = "mean",
   tune = "both",
   foldid = NULL
 )
@@ -37,8 +36,6 @@ cv.corila(
 \item{nfolds}{integer specifying the number of folds}
 
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
-
-\item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
 \item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
 

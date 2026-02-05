@@ -1,5 +1,4 @@
 
-
 #'@title
 #'Standardisation
 #'
@@ -43,7 +42,7 @@ forescale <- function(x,y=NULL,family=NULL,pars=NULL){
     #if(family=="cox"){
     #  cond <- y[,2]==1
     #} else {
-      cond <- rep(x=TRUE,times=length(y)) 
+    cond <- rep(x=TRUE,times=length(y)) 
     #}
     pars$mu.x <- apply(X=x[cond,],MARGIN=2,FUN=base::mean,na.rm=TRUE)
     pars$sd.x <- apply(X=x[cond,],MARGIN=2,FUN=stats::sd,na.rm=TRUE)
@@ -228,7 +227,7 @@ check_args <- function(x,y,family){
     }
   } else if(family=="poisson"){
     if(any(y %% 1 != 0)){
-       stop("Poisson family requires a count outcome.")
+      stop("Poisson family requires a count outcome.")
     }
   } else if(family=="cox"){
     if(class(y)!="Surv"){
@@ -451,109 +450,6 @@ coef.multiridge <- function(object,...){
 #----- group-lasso -----
 
 #'@title
-#'Combine variables
-#'
-#'@description
-#'Calculates the mean or the first principal component of a group of variables
-#'
-#'@inheritParams construct_matrices
-#'@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group
-#'
-#'@return
-#'Returns an \eqn{n_0}-dimensional numeric vector.
-#'
-#'@seealso
-#'This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
-#'
-#'@examples
-#'n <- 100; p <- 5
-#'x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
-#'mean <- combine_features(x=x,fuse="mean")
-#'comp <- combine_features(x=x,fuse="pca")
-#'plot(mean,comp)
-#'
-#'@export
-combine_features <- function(x,fuse="mean"){
-  if(!fuse %in% c("mean","pca")){
-    stop("Argument \"fuse\" must equal \"mean\" or \"pca\".")
-  }
-  if(fuse=="mean"){
-    rowMeans(x)
-  } else if(fuse=="pca"){
-    stats::princomp(x=x)$scores[,"Comp.1"]
-  }
-}
-
-#'@title
-#'Construct Matrices
-#'
-#'@description
-#'Constructs matrices with (i) the original data concatenated with the inverted data, (ii) one meta-variable for each group, and (iii) one meta-variable for each group in each type.
-#'
-#'@param group \eqn{p}-dimensional vector of group labels or indices, or list with one slot for each group containing the variable labels or indices
-#'@param type \eqn{p}-dimensional vector
-#'@inheritParams corila
-#'
-#'@examples
-#'n <- 5
-#'p <- 6
-#'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
-#'group <- rep(1:2,each=p/2)
-#'type <- rep(x=1,times=p)
-#'x <- construct_matrices(x=x,group=group,type=type)
-#'
-#'@seealso
-#'This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
-#'
-#'@return
-#'See description.
-#'
-#'@export
-construct_matrices <- function(x,group,type,fuse="mean"){
-  if((is.numeric(group) && ncol(x)!=length(group)) | ncol(x)!=length(type)){
-    stop("For each variable, the matrix \"x\" must have one column, and the vectors \"group\" (if applicable) and \"type\" must have one entry.")
-  }
-  index <- seq_len(ncol(x))
-  n <- nrow(x)
-  if(is.numeric(group)){
-    q <- length(unique(group))
-  } else {
-    q <- length(group)
-  }
-  m <- length(unique(type))
-  com <- matrix(data=NA,nrow=n,ncol=q,dimnames=list(NULL,seq_len(q)))
-  sep <- replicate(n=m,expr=com,simplify=FALSE)
-  for(i in seq_len(m)){
-    for(j in seq_len(q)){
-      if(is.numeric(group)){
-        sep[[i]][,j] <- combine_features(x=x[,type==i & group==j,drop=FALSE],fuse=fuse)
-      } else {
-        sep[[i]][,j] <- combine_features(x=x[,type==i & index %in% group[[j]],drop=FALSE],fuse=fuse)
-      }
-    }
-  }
-  for(j in seq_len(q)){
-    if(is.numeric(group)){
-      com[,j] <- combine_features(x=x[,group==j,drop=FALSE],fuse=fuse)
-    } else {
-      com[,j] <- combine_features(x=x[,index %in% group[[j]],drop=FALSE],fuse=fuse)
-    }
-  }
-  return(list(all=cbind(x,-x),com=com,sep=sep))
-}
-
-if(FALSE){
-  n <- 100
-  p <- 50
-  x <- matrix(data=stats::rnorm(n*p),nrow=n,ncol=p)
-  y <- stats::rnorm(n=n)
-  group <- rep(1:10,each=5)
-  type <- rep(1,times=p)
-  family <- "gaussian"
-  hyper <- data.frame(com=0.5,sep=0.25,ind=0.25)
-}
-
-#'@title
 #'Group lasso
 #'
 #'@description
@@ -570,7 +466,6 @@ if(FALSE){
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
 #'@param lambda.init regularisation hyperparameter(s), or \code{NULL} (cross-validation)
-#'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
 #'
 #'@details
 #'The number of observations (samples) for training or testing are indicated by \eqn{n_0} and \eqn{n_1}, respectively, the number of variables (features) is indicated by \eqn{p}, and the number of variable groups is indicated by \eqn{q}.
@@ -608,7 +503,7 @@ if(FALSE){
 #'y_hat <- stats::predict(object,newx=x,index=1,s=0)
 #'}
 #'@export
-corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor="spearman",lambda.init=NULL,fuse="mean"){
+corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor="spearman",lambda.init=NULL){
   #lambda.init=NULL;mode<-"mean";cor="spearman"
   if(is.character(alpha.init) && alpha.init=="multiridge" & family=="poisson"){
     warning("Setting alpha.init=0 due to family=\"poisson\".")
@@ -684,43 +579,43 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
   
   object <- list()
   for(i in seq_len(nrow(hyper))){
-      weight <- list()
-      weight$com <- weight$sep <- weight$ind <- rep(x=NA,times=p)
-      for(j in seq_len(p)){
-        # features in same group
-        if(is.numeric(group)&&!is.array(group)){
-          cond.temp <- group[j]==group
-        } else if(is.list(group)){
-          group_index <- sapply(group,function(x) j %in% x)
-          cond.temp <- seq_len(p) %in% unlist(group[group_index]) 
-        } else if(is.matrix(group)){
-          cond.temp <- group[,j]==1
-        }
-        temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.local[i]*coef.ind)*cond.temp
-        weight$com[j] <- sum(pmax(0,temp)[cond.temp])/sum(cond.temp)
-        weight$com[p+j] <- sum(pmax(0,-temp)[cond.temp])/sum(cond.temp)
-        
-        # all features
-        temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.global[i]*coef.ind)
-        weight$ind[j] <- sum(pmax(0,temp))/p
-        weight$ind[p+j] <- sum(pmax(0,-temp))/p
-        
-        # Ad-hoc solution for features that are in no group:
-        weight$com[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
+    weight <- list()
+    weight$com <- weight$sep <- weight$ind <- rep(x=NA,times=p)
+    for(j in seq_len(p)){
+      # features in same group
+      if(is.numeric(group)&&!is.array(group)){
+        cond.temp <- group[j]==group
+      } else if(is.list(group)){
+        group_index <- sapply(group,function(x) j %in% x)
+        cond.temp <- seq_len(p) %in% unlist(group[group_index]) 
+      } else if(is.matrix(group)){
+        cond.temp <- group[,j]==1
       }
-      # # temporary code with beta distribution:
-      # for(j in seq_len(p)){
-      #    if(is.numeric(group)){
-      #      cond.temp <- group[j]==group
-      #    } else {
-      #      group_index <- sapply(group,function(x) j %in% x)
-      #      cond.temp <- seq_len(p) %in% unlist(group[group_index]) 
-      #    }
-      #    temp <- sign(cor[,j])*stats::qbeta(p=abs(cor[,j]),shape1=hyper$alpha[i],shape2=hyper$beta[i])*coef.ind*cond.temp
-      #    weight$com[j] <- mean(pmax(0,temp)[cond.temp])
-      #    weight$com[p+j] <- mean(pmax(0,-temp)[cond.temp])
-      # }
-      weight <- lapply(weight,function(x) p*ifelse(x==0,0,x/sum(x)))
+      temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.local[i]*coef.ind)*cond.temp
+      weight$com[j] <- sum(pmax(0,temp)[cond.temp])/sum(cond.temp)
+      weight$com[p+j] <- sum(pmax(0,-temp)[cond.temp])/sum(cond.temp)
+      
+      # all features
+      temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.global[i]*coef.ind)
+      weight$ind[j] <- sum(pmax(0,temp))/p
+      weight$ind[p+j] <- sum(pmax(0,-temp))/p
+      
+      # Ad-hoc solution for features that are in no group:
+      weight$com[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
+    }
+    # # temporary code with beta distribution:
+    # for(j in seq_len(p)){
+    #    if(is.numeric(group)){
+    #      cond.temp <- group[j]==group
+    #    } else {
+    #      group_index <- sapply(group,function(x) j %in% x)
+    #      cond.temp <- seq_len(p) %in% unlist(group[group_index]) 
+    #    }
+    #    temp <- sign(cor[,j])*stats::qbeta(p=abs(cor[,j]),shape1=hyper$alpha[i],shape2=hyper$beta[i])*coef.ind*cond.temp
+    #    weight$com[j] <- mean(pmax(0,temp)[cond.temp])
+    #    weight$com[p+j] <- mean(pmax(0,-temp)[cond.temp])
+    # }
+    weight <- lapply(weight,function(x) p*ifelse(x==0,0,x/sum(x)))
     
     pf.ext <- 1/(weight$com*hyper$wgt.local[i]+weight$ind*hyper$wgt.global[i])
     # Set pf.ext equal to 1 to obtain standard lasso.
@@ -858,7 +753,7 @@ predict.corila <- function(object,newx,index,s,...){
 #'#object <- cv.corila(x=x[cond,],y=y[cond],group=z,include=include,family=family)
 #'}
 #'@export
-cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,family="gaussian",nfolds=10,cor="spearman",fuse="mean",tune="both",foldid=NULL){
+cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,family="gaussian",nfolds=10,cor="spearman",tune="both",foldid=NULL){
   check_args(x=x,y=y,family=family)
   if(nrow(x)!=length(y)){
     stop("For each observation, the matrix \"x\" must have one row, and the vector \"y\" must have one entry.")
@@ -868,45 +763,45 @@ cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,family="
     include <- rep(x=TRUE,times=ncol(x))
   }
   
-  # family="gaussian"; fuse="mean"; foldid=NULL
+  # family="gaussian"; foldid=NULL
   n <- nrow(x) # sample size
   #p <- ncol(x) # number of features
   #p <- length(unique(group)) # number of groups
   
   # GENERAL FORMULATION
-    if(tune=="none"){
-      hyper <- data.frame(wgt.local=1,exp.local=1,wgt.global=0,exp.global=Inf)
-    } else if(tune=="trial"){
-      wgt.cand <- seq(from=0,to=1,by=0.1) 
-      hyper <- data.frame(wgt.local=wgt.cand,exp.local=0,wgt.global=1-wgt.cand,exp.global=1)
-    } else if(tune=="wgt"){
-      wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
-      hyper <- data.frame(wgt.local=wgt.cand,exp.local=1,wgt.global=1-wgt.cand,exp.global=1)
-    } else if(tune=="exp"){
-      exp.cand <- c(0,0.1,0.25,1/3,0.5,1,2,3,4,10,Inf)
-      hyper <- data.frame(wgt.local=1,exp.local=exp.cand,wgt.global=0,exp.global=exp.cand)
-    } else if(tune=="sep"){
-      exp.cand <- c(0.1,0.5,1,2,10)
-      hyper <- expand.grid(exp.local=exp.cand,exp.global=exp.cand)
-      hyper$wgt.local <- hyper$wgt.global <- 0.5
-    } else if(tune=="both"){
-      #wgt.cand <- seq(from=0,to=1,by=0.25) # original
-      wgt.cand <- seq(from=0,to=1,by=0.1) # trial
-      hyper <- data.frame(wgt.local=wgt.cand,wgt.global=1-wgt.cand)
-      #exp.cand <- c(0.1,0.5,1,2,10) # original
-      exp.cand <- c(0.1,0.5,0.8,1,1.25,2,10)
-      hyper <- hyper[rep(seq_len(nrow(hyper)),each=length(exp.cand)),]
-      hyper$exp.local <- hyper$exp.global <- exp.cand
-    } else if(tune=="all"){
-      wgt.cand <- seq(from=0,to=1,by=0.25)
-      exp.cand <- c(0.1,0.5,1,2,10)
-      hyper <- expand.grid(wgt.local=wgt.cand,exp.local=exp.cand,exp.global=exp.cand)
-      hyper$wgt.global <- 1-hyper$wgt.local
-      hyper$exp.local[hyper$wgt.local==0] <- Inf
-      hyper$exp.global[hyper$wgt.global==0] <- Inf
-      hyper <- unique(hyper)
-      rownames(hyper) <- seq_len(nrow(hyper))
-    }
+  if(tune=="none"){
+    hyper <- data.frame(wgt.local=1,exp.local=1,wgt.global=0,exp.global=Inf)
+  } else if(tune=="trial"){
+    wgt.cand <- seq(from=0,to=1,by=0.1) 
+    hyper <- data.frame(wgt.local=wgt.cand,exp.local=0,wgt.global=1-wgt.cand,exp.global=1)
+  } else if(tune=="wgt"){
+    wgt.cand <- seq(from=0,to=1,by=0.1) # for weighted sums
+    hyper <- data.frame(wgt.local=wgt.cand,exp.local=1,wgt.global=1-wgt.cand,exp.global=1)
+  } else if(tune=="exp"){
+    exp.cand <- c(0,0.1,0.25,1/3,0.5,1,2,3,4,10,Inf)
+    hyper <- data.frame(wgt.local=1,exp.local=exp.cand,wgt.global=0,exp.global=exp.cand)
+  } else if(tune=="sep"){
+    exp.cand <- c(0.1,0.5,1,2,10)
+    hyper <- expand.grid(exp.local=exp.cand,exp.global=exp.cand)
+    hyper$wgt.local <- hyper$wgt.global <- 0.5
+  } else if(tune=="both"){
+    #wgt.cand <- seq(from=0,to=1,by=0.25) # original
+    wgt.cand <- seq(from=0,to=1,by=0.1) # trial
+    hyper <- data.frame(wgt.local=wgt.cand,wgt.global=1-wgt.cand)
+    #exp.cand <- c(0.1,0.5,1,2,10) # original
+    exp.cand <- c(0.1,0.5,0.8,1,1.25,2,10)
+    hyper <- hyper[rep(seq_len(nrow(hyper)),each=length(exp.cand)),]
+    hyper$exp.local <- hyper$exp.global <- exp.cand
+  } else if(tune=="all"){
+    wgt.cand <- seq(from=0,to=1,by=0.25)
+    exp.cand <- c(0.1,0.5,1,2,10)
+    hyper <- expand.grid(wgt.local=wgt.cand,exp.local=exp.cand,exp.global=exp.cand)
+    hyper$wgt.global <- 1-hyper$wgt.local
+    hyper$exp.local[hyper$wgt.local==0] <- Inf
+    hyper$exp.global[hyper$wgt.global==0] <- Inf
+    hyper <- unique(hyper)
+    rownames(hyper) <- seq_len(nrow(hyper))
+  }
   
   if(FALSE){
     # 
@@ -922,7 +817,7 @@ cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,family="
   }
   
   # Use foldid already for full run?
-  object.ext <- corila(x=x,y=y,group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse)
+  object.ext <- corila(x=x,y=y,group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper)
   lambda <- lapply(X=object.ext$model,FUN=function(x) x$lambda)
   
   hat <- list()
@@ -931,7 +826,7 @@ cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,family="
   }
   
   for(i in seq_len(nfolds)){
-    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.init=object.ext$lambda.init)
+    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,lambda.init=object.ext$lambda.init)
     for(j in seq_len(nrow(hyper))){
       hat[[j]][foldid==i,] <- stats::predict(object=object.int,newx=x[foldid==i,],index=j,s=lambda[[j]])
     }
@@ -1368,8 +1263,8 @@ holdout <- function(x_train,y_train,group,include,family,alpha.init=0,alpha.fina
         temp <- stats::predict(object=object,newx=x_test[,include],s="lambda.min",type="link")
         if(family=="binomial"){
           y_hat$gglasso <- 1/(1+exp(-temp))
-        #} else if(family=="poisson"){
-        #  y_hat$gglasso <- exp(temp)
+          #} else if(family=="poisson"){
+          #  y_hat$gglasso <- exp(temp)
         } else {
           y_hat$gglasso <- temp
         }
@@ -1605,7 +1500,7 @@ holdout <- function(x_train,y_train,group,include,family,alpha.init=0,alpha.fina
       # Under overlapping groups, use object$glmfit$origbeta.
     } else if(i=="corila"){
       #--- lasso with feature groups and modalities ---
-      object <- cv.corila(x=x_train,y=y_train,group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,fuse="mean",foldid=foldid,tune=tune)
+      object <- cv.corila(x=x_train,y=y_train,group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,foldid=foldid,tune=tune)
       print(object$hyper[object$id.hyper,])
       if(!is.null(x_test)){
         y_hat$corila <- stats::predict(object=object,newx=x_test[,include])
@@ -1778,3 +1673,99 @@ plot_boxes <- function(x,base="corila",main="",decrease=TRUE,ylim=NULL,cex.main=
   graphics::text(x=usr[1],y=c(usr[4]+mar.small,usr[3]-mar.small)[1+c(!decrease,decrease)],labels=c("-","+"),col=c("red","blue"),xpd=TRUE,cex=1.5,font=2)
   return(NULL)
 }
+
+
+#'@title
+#'Combine variables
+#'
+#'@description
+#'Calculates the mean or the first principal component of a group of variables
+#'
+#'@inheritParams construct_matrices
+#'@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group
+#'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
+#'
+#'@return
+#'Returns an \eqn{n_0}-dimensional numeric vector.
+#'
+#'@seealso
+#'This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
+#'
+#'@examples
+#'n <- 100; p <- 5
+#'x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
+#'mean <- combine_features(x=x,fuse="mean")
+#'comp <- combine_features(x=x,fuse="pca")
+#'plot(mean,comp)
+#'
+#'@export
+combine_features <- function(x,fuse="mean"){
+  if(!fuse %in% c("mean","pca")){
+    stop("Argument \"fuse\" must equal \"mean\" or \"pca\".")
+  }
+  if(fuse=="mean"){
+    rowMeans(x)
+  } else if(fuse=="pca"){
+    stats::princomp(x=x)$scores[,"Comp.1"]
+  }
+}
+
+#'@title
+#'Construct Matrices
+#'
+#'@description
+#'Constructs matrices with (i) the original data concatenated with the inverted data, (ii) one meta-variable for each group, and (iii) one meta-variable for each group in each type.
+#'
+#'@param group \eqn{p}-dimensional vector of group labels or indices, or list with one slot for each group containing the variable labels or indices
+#'@param type \eqn{p}-dimensional vector
+#'@inheritParams corila
+#'
+#'@examples
+#'n <- 5
+#'p <- 6
+#'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
+#'group <- rep(1:2,each=p/2)
+#'type <- rep(x=1,times=p)
+#'x <- construct_matrices(x=x,group=group,type=type)
+#'
+#'@seealso
+#'This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
+#'
+#'@return
+#'See description.
+#'
+#'@export
+construct_matrices <- function(x,group,type,fuse="mean"){
+  if((is.numeric(group) && ncol(x)!=length(group)) | ncol(x)!=length(type)){
+    stop("For each variable, the matrix \"x\" must have one column, and the vectors \"group\" (if applicable) and \"type\" must have one entry.")
+  }
+  index <- seq_len(ncol(x))
+  n <- nrow(x)
+  if(is.numeric(group)){
+    q <- length(unique(group))
+  } else {
+    q <- length(group)
+  }
+  m <- length(unique(type))
+  com <- matrix(data=NA,nrow=n,ncol=q,dimnames=list(NULL,seq_len(q)))
+  sep <- replicate(n=m,expr=com,simplify=FALSE)
+  for(i in seq_len(m)){
+    for(j in seq_len(q)){
+      if(is.numeric(group)){
+        sep[[i]][,j] <- combine_features(x=x[,type==i & group==j,drop=FALSE],fuse=fuse)
+      } else {
+        sep[[i]][,j] <- combine_features(x=x[,type==i & index %in% group[[j]],drop=FALSE],fuse=fuse)
+      }
+    }
+  }
+  for(j in seq_len(q)){
+    if(is.numeric(group)){
+      com[,j] <- combine_features(x=x[,group==j,drop=FALSE],fuse=fuse)
+    } else {
+      com[,j] <- combine_features(x=x[,index %in% group[[j]],drop=FALSE],fuse=fuse)
+    }
+  }
+  return(list(all=cbind(x,-x),com=com,sep=sep))
+}
+
+

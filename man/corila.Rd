@@ -14,8 +14,7 @@ corila(
   alpha.init = 0,
   alpha.final = 1,
   cor = "spearman",
-  lambda.init = NULL,
-  fuse = "mean"
+  lambda.init = NULL
 )
 }
 \arguments{
@@ -38,8 +37,6 @@ corila(
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 
 \item{lambda.init}{regularisation hyperparameter(s), or \code{NULL} (cross-validation)}
-
-\item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 }
 \value{
 Returns an object of class \code{"corila"}.
