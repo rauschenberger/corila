@@ -119,7 +119,7 @@ for(family in c("gaussian","binomial","poisson","cox")){
   model <- sapply(X=group,FUN=function(x) NULL)
   for(i in seq_along(group)){
     set.seed(1)
-    model[[i]] <- cv.corila(x=data$x_train,y=data$y_train,group=group[[i]],type=data$type,family=family)
+    model[[i]] <- cv.corila(x=data$x_train,y=data$y_train,group=group[[i]],family=family)
   }
   
   coef <- lapply(X=model,FUN=stats::coef)

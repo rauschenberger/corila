@@ -566,7 +566,6 @@ if(FALSE){
 #'@param include \eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model
 #'@param alpha.init elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 1
 #'@param alpha.final elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)
-#'@param type \eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
@@ -599,19 +598,18 @@ if(FALSE){
 #'n <- 100
 #'p <- 50
 #'group <- rep(x=1:10,each=5)
-#'type <- rep(x=1,times=length(group))
 #'include <- NULL
 #'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
 #'y <- rnorm(n=n)
 #'
 #'# model fitting
 #'hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
-#'object <- corila(x,y,group,include,type,family="gaussian",hyper=hyper)
+#'object <- corila(x,y,group,include,family="gaussian",hyper=hyper)
 #'
 #'y_hat <- stats::predict(object,newx=x,index=1,s=0)
 #'}
 #'@export
-corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=1,cor="spearman",lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,fuse="mean",init.multi=FALSE){
+corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor="spearman",lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,fuse="mean",init.multi=FALSE){
   #lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;mode<-"mean";cor="spearman"
   if(init.multi & family=="poisson"){
     warning("Setting init.multi=FALSE due to family=\"poisson\".")
@@ -629,15 +627,12 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
     }
   }
   if(is.null(group)){group <- seq_len(p)}
-  if(is.null(type)){type <- rep(x=1,times=p)}
   #if(length(group)!=p){stop("Argument \"group\" must be a vector of length p.")}
-  if(length(type)!=p){stop("Argument \"type\" must be a vector of length p.")}
   if(is.numeric(group)&&!is.array(group)){
     q <- length(unique(group)) # number of groups = number of unique values
   } else if(is.list(group)){
     q <- length(group) # number of groups = number of slots
   }
-  m <- length(unique(type)) # number of modalities
   
   if(is.numeric(group)&&!is.array(group)){
     if(length(group)!=p||max(group)!=length(unique(group))||any(sort(unique(group))!=seq(from=1,to=max(group),by=1))){
@@ -660,11 +655,11 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
   if(init.multi){
     message("using multiridge for initialisation")
     if(is.null(lambda.ind)){
-      fit.ind <- multiridge(x=scale$x,y=scale$y,z=type,family=family)
+      fit.ind <- multiridge(x=scale$x,y=scale$y,z=group,family=family)
       coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[-1]
       lambda.ind <- fit.ind$penalties
     } else {
-      fit.ind <- multiridge(x=scale$x,y=scale$y,z=type,family=family,penalties=lambda.ind)
+      fit.ind <- multiridge(x=scale$x,y=scale$y,z=group,family=family,penalties=lambda.ind)
       coef.ind <- stats::coef(object=fit.ind)[-1]
     }
   } else {
@@ -867,14 +862,10 @@ predict.corila <- function(object,newx,index,s,...){
 #'#object <- cv.corila(x=x[cond,],y=y[cond],group=z,include=include,family=family)
 #'}
 #'@export
-cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,type=NULL,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,tune="both",foldid=NULL){
+cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,family="gaussian",nfolds=10,cor="spearman",fuse="mean",init.multi=FALSE,tune="both",foldid=NULL){
   check_args(x=x,y=y,family=family)
   if(nrow(x)!=length(y)){
     stop("For each observation, the matrix \"x\" must have one row, and the vector \"y\" must have one entry.")
-  }
-  
-  if(is.null(type)){
-    type <- rep(x=1,times=ncol(x))
   }
   
   if(is.null(include)){
@@ -885,18 +876,6 @@ cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,type=NUL
   n <- nrow(x) # sample size
   #p <- ncol(x) # number of features
   #p <- length(unique(group)) # number of groups
-  #q <- length(unique(type)) # number of modalities
-  
-  #if(all(type==1)){
-  #  cand <- seq(from=0,to=1,by=0.1)
-  #  hyper <- data.frame(com=1,sep=0) # for weighted sums
-  #  #hyper <- data.frame(com=cand,sep=0) # for exponents
-  #} else {
-  #  cand <- seq(from=0,to=1,by=0.1) # for weighted sums
-  #  hyper <- data.frame(com=cand,sep=1-cand) # for weighted sums
-  #  #cand <- seq(from=0,to=1,by=0.2) # for exponents
-  #  #hyper <- data.frame(com=cand,sep=cand) # for exponents
-  #}
   
   # GENERAL FORMULATION
     if(tune=="none"){
@@ -947,7 +926,7 @@ cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,type=NUL
   }
   
   # Use foldid already for full run?
-  object.ext <- corila(x=x,y=y,group=group,include=include,type=type,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,init.multi=init.multi)
+  object.ext <- corila(x=x,y=y,group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,init.multi=init.multi)
   lambda <- lapply(X=object.ext$model,FUN=function(x) x$lambda)
   
   hat <- list()
@@ -956,7 +935,7 @@ cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,type=NUL
   }
   
   for(i in seq_len(nfolds)){
-    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,type=type,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi)
+    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind,init.multi=init.multi)
     for(j in seq_len(nrow(hyper))){
       hat[[j]][foldid==i,] <- stats::predict(object=object.int,newx=x[foldid==i,],index=j,s=lambda[[j]])
     }

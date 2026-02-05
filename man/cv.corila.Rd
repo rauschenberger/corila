@@ -11,7 +11,6 @@ cv.corila(
   include = NULL,
   alpha.init = 0,
   alpha.final = 1,
-  type = NULL,
   family = "gaussian",
   nfolds = 10,
   cor = "spearman",
@@ -33,8 +32,6 @@ cv.corila(
 \item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 1}
 
 \item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
-
-\item{type}{\eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 

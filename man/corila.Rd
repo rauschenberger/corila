@@ -9,7 +9,6 @@ corila(
   y,
   group,
   include,
-  type,
   family,
   hyper,
   alpha.init = 0,
@@ -31,8 +30,6 @@ corila(
 
 \item{include}{\eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model}
 
-\item{type}{\eqn{p}-dimensional vector indicating the modalities, or \code{NULL} (assuming that all variables are from the same modality)}
-
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
 \item{hyper}{list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters}
@@ -48,8 +45,6 @@ corila(
 \item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
 \item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.}
-
-\item{cond}{\code{NULL}}
 }
 \value{
 Returns an object of class \code{"corila"}.
@@ -73,14 +68,13 @@ The number of variables in the \eqn{k^{\text{th}}} group is indicated by \eqn{p_
 n <- 100
 p <- 50
 group <- rep(x=1:10,each=5)
-type <- rep(x=1,times=length(group))
 include <- NULL
 x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
 y <- rnorm(n=n)
 
 # model fitting
 hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
-object <- corila(x,y,group,include,type,family="gaussian",hyper=hyper)
+object <- corila(x,y,group,include,family="gaussian",hyper=hyper)
 
 y_hat <- stats::predict(object,newx=x,index=1,s=0)
 }
