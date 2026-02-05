@@ -570,7 +570,6 @@ if(FALSE){
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
-#'@param cond \code{NULL}
 #'@param lambda.com,lambda.sep,lambda.ind regularisation hyperparameters, or \code{NULL} (cross-validation)
 #'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
 #'@param init.multi Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.
@@ -612,8 +611,8 @@ if(FALSE){
 #'y_hat <- stats::predict(object,newx=x,index=1,s=0)
 #'}
 #'@export
-corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=1,cor="spearman",cond=NULL,lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,fuse="mean",init.multi=FALSE){
-  # cond=NULL;lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;mode<-"mean";cor="spearman"
+corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=1,cor="spearman",lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,fuse="mean",init.multi=FALSE){
+  #lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;mode<-"mean";cor="spearman"
   if(init.multi & family=="poisson"){
     warning("Setting init.multi=FALSE due to family=\"poisson\".")
     init.multi <- FALSE
@@ -658,34 +657,30 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
   
   index <- seq_len(p)
   
-  if(is.null(cond)){
-    cond <- rep(x=TRUE,times=n)
-  }
-  
   if(init.multi){
     message("using multiridge for initialisation")
     if(is.null(lambda.ind)){
-      fit.ind <- multiridge(x=scale$x[cond,],y=scale$y[cond],z=type,family=family)
+      fit.ind <- multiridge(x=scale$x,y=scale$y,z=type,family=family)
       coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[-1]
       lambda.ind <- fit.ind$penalties
     } else {
-      fit.ind <- multiridge(x=scale$x[cond,],y=scale$y[cond],z=type,family=family,penalties=lambda.ind)
+      fit.ind <- multiridge(x=scale$x,y=scale$y,z=type,family=family,penalties=lambda.ind)
       coef.ind <- stats::coef(object=fit.ind)[-1]
     }
   } else {
     if(all(is.na(alpha.init))){
       coef.ind <- rep(x=1,times=p)
     } else if(is.character(alpha.init)){
-      coef.ind <- stats::cor(x=scale$x[cond,],y=scale$y[cond],method=alpha.init,use="pairwise.complete")
+      coef.ind <- stats::cor(x=scale$x,y=scale$y,method=alpha.init,use="pairwise.complete")
       coef.ind[is.na(coef.ind)] <- 0
     } else {
       cond.coef <- rep(c(FALSE,TRUE),times=c(family!="cox",p))
       if(is.null(lambda.ind)){
-        fit.ind <- glmnet::cv.glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=alpha.init)
+        fit.ind <- glmnet::cv.glmnet(x=scale$x,y=scale$y,family=family,alpha=alpha.init)
         coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[cond.coef]
         lambda.ind <- fit.ind$lambda.min
       } else {
-        fit.ind <- glmnet::glmnet(x=scale$x[cond,],y=scale$y[cond],family=family,alpha=alpha.init)
+        fit.ind <- glmnet::glmnet(x=scale$x,y=scale$y,family=family,alpha=alpha.init)
         coef.ind <- stats::coef(object=fit.ind,s=lambda.ind)[cond.coef]
       }
     }
@@ -741,7 +736,7 @@ corila <- function(x,y,group,include,type,family,hyper,alpha.init=0,alpha.final=
     pf.ext[!c(include,include)] <- Inf # trial
     if(any(is.na(pf.ext))){stop("missing pf:",sum(is.na(pf.ext)))}
     if(any(pf.ext<0)){stop(paste0("negative pf:",min(pf.ext)))}
-    object[[i]] <- glmnet::glmnet(x=mat$all[cond,],y=scale$y[cond],family=family,penalty.factor=pf.ext,lower.limits=0,alpha=alpha.final)
+    object[[i]] <- glmnet::glmnet(x=mat$all,y=scale$y,family=family,penalty.factor=pf.ext,lower.limits=0,alpha=alpha.final)
   }
   
   list <- list(model=object,include=include,lambda.com=lambda.com,lambda.sep=lambda.sep,lambda.ind=lambda.ind,scale=scale$pars)

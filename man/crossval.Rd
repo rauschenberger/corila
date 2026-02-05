@@ -16,7 +16,6 @@ crossval(
   iter = 5,
   nfolds = 10,
   init.multi = FALSE,
-  trial = TRUE,
   method = NULL,
   tune = "both"
 )
@@ -34,7 +33,7 @@ crossval(
 
 \item{include}{\eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model}
 
-\item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 0}
+\item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 1}
 
 \item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
 
@@ -43,8 +42,6 @@ crossval(
 \item{nfolds}{number of cross-validation folds}
 
 \item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.}
-
-\item{trial}{logical}
 
 \item{method}{character vector listing all methods to be compared}
 
@@ -70,6 +67,6 @@ n <- 100
 p <- 20
 x <- matrix(rnorm(n*p),nrow=n,ncol=p)
 y <- stats::rnorm(n)
-results <- crossval(x,y,family="gaussian",method=c("mean","corila"),trial=TRUE)
+results <- crossval(x,y,family="gaussian",method=c("mean","corila"))
 }
 }

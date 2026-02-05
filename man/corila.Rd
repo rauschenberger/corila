@@ -15,11 +15,9 @@ corila(
   alpha.init = 0,
   alpha.final = 1,
   cor = "spearman",
-  cond = NULL,
   lambda.com = NULL,
   lambda.sep = NULL,
   lambda.ind = NULL,
-  trial = TRUE,
   fuse = "mean",
   init.multi = FALSE
 )
@@ -39,21 +37,19 @@ corila(
 
 \item{hyper}{list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters}
 
-\item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 0}
+\item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 1}
 
 \item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
 
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 
-\item{cond}{\code{NULL}}
-
 \item{lambda.com, lambda.sep, lambda.ind}{regularisation hyperparameters, or \code{NULL} (cross-validation)}
-
-\item{trial}{logical}
 
 \item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 
 \item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.}
+
+\item{cond}{\code{NULL}}
 }
 \value{
 Returns an object of class \code{"corila"}.
