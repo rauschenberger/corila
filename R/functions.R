@@ -569,7 +569,7 @@ if(FALSE){
 #'@param family character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}
 #'@param hyper list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters
 #'@param cor character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix 
-#'@param lambda.com,lambda.sep,lambda.ind regularisation hyperparameters, or \code{NULL} (cross-validation)
+#'@param lambda.init regularisation hyperparameter(s), or \code{NULL} (cross-validation)
 #'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
 #'
 #'@details
@@ -608,8 +608,8 @@ if(FALSE){
 #'y_hat <- stats::predict(object,newx=x,index=1,s=0)
 #'}
 #'@export
-corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor="spearman",lambda.com=NULL,lambda.sep=NULL,lambda.ind=NULL,fuse="mean"){
-  #lambda.com=NULL;lambda.sep=NULL;lambda.ind=NULL;mode<-"mean";cor="spearman"
+corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor="spearman",lambda.init=NULL,fuse="mean"){
+  #lambda.init=NULL;mode<-"mean";cor="spearman"
   if(is.character(alpha.init) && alpha.init=="multiridge" & family=="poisson"){
     warning("Setting alpha.init=0 due to family=\"poisson\".")
     alpha.init <- 0
@@ -654,12 +654,12 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
   if(all(is.na(alpha.init))){
     coef.ind <- rep(x=1,times=p)
   } else if(is.character(alpha.init) & alpha.init=="multiridge"){
-    if(is.null(lambda.ind)){
+    if(is.null(lambda.init)){
       fit.ind <- multiridge(x=scale$x,y=scale$y,z=group,family=family)
       coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[-1]
-      lambda.ind <- fit.ind$penalties
+      lambda.init <- fit.ind$penalties
     } else {
-      fit.ind <- multiridge(x=scale$x,y=scale$y,z=group,family=family,penalties=lambda.ind)
+      fit.ind <- multiridge(x=scale$x,y=scale$y,z=group,family=family,penalties=lambda.init)
       coef.ind <- stats::coef(object=fit.ind)[-1]
     }
   } else if(is.character(alpha.init) & alpha.init %in% c("pearson","spearman","kendall")){
@@ -667,13 +667,13 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
     coef.ind[is.na(coef.ind)] <- 0
   } else {
     cond.coef <- rep(c(FALSE,TRUE),times=c(family!="cox",p))
-    if(is.null(lambda.ind)){
+    if(is.null(lambda.init)){
       fit.ind <- glmnet::cv.glmnet(x=scale$x,y=scale$y,family=family,alpha=alpha.init)
       coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[cond.coef]
-      lambda.ind <- fit.ind$lambda.min
+      lambda.init <- fit.ind$lambda.min
     } else {
       fit.ind <- glmnet::glmnet(x=scale$x,y=scale$y,family=family,alpha=alpha.init)
-      coef.ind <- stats::coef(object=fit.ind,s=lambda.ind)[cond.coef]
+      coef.ind <- stats::coef(object=fit.ind,s=lambda.init)[cond.coef]
     }
   }
   
@@ -730,7 +730,7 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
     object[[i]] <- glmnet::glmnet(x=mat$all,y=scale$y,family=family,penalty.factor=pf.ext,lower.limits=0,alpha=alpha.final)
   }
   
-  list <- list(model=object,include=include,lambda.com=lambda.com,lambda.sep=lambda.sep,lambda.ind=lambda.ind,scale=scale$pars)
+  list <- list(model=object,include=include,lambda.init=lambda.init,scale=scale$pars)
   class(list) <- "corila"
   return(list)
 }
@@ -931,7 +931,7 @@ cv.corila <- function(x,y,group,include=NULL,alpha.init=0,alpha.final=1,family="
   }
   
   for(i in seq_len(nfolds)){
-    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.com=object.ext$lambda.com,lambda.sep=object.ext$lambda.sep,lambda.ind=object.ext$lambda.ind)
+    object.int <- corila(x=x[foldid!=i,],y=y[foldid!=i],group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,cor=cor,hyper=hyper,fuse=fuse,lambda.init=object.ext$lambda.init)
     for(j in seq_len(nrow(hyper))){
       hat[[j]][foldid==i,] <- stats::predict(object=object.int,newx=x[foldid==i,],index=j,s=lambda[[j]])
     }
@@ -1341,7 +1341,7 @@ holdout <- function(x_train,y_train,group,include,family,alpha.init=0,alpha.fina
     } else if(i=="multiridge"){
       if(family=="poisson"){next}
       #--- multiridge ---
-      object <- multiridge(x=x_train[,include],y=y_train,z=type[include],family=family)
+      object <- multiridge(x=x_train[,include],y=y_train,z=group[include],family=family)
       if(!is.null(x_test)){
         y_hat$multiridge <- stats::predict(object=object,newx=x_test[,include])
       }
@@ -1444,7 +1444,7 @@ holdout <- function(x_train,y_train,group,include,family,alpha.init=0,alpha.fina
       body(func)[[3]] <- quote(over.mat <- Matrix(incidence.mat %*% t(incidence.mat), sparse=TRUE))
       utils::assignInNamespace(x="expandX",value=func,ns="grpregOverlap")
       if(is.numeric(group)){
-        list <- c(lapply(X=unique(group[include]),FUN=function(z) which(group[include]==z)),lapply(X=unique(type[include]),FUN=function(z) which(type[include]==z)))
+        list <- c(lapply(X=unique(group[include]),FUN=function(z) which(group[include]==z))) #lapply(X=unique(type[include]),FUN=function(z) which(type[include]==z))
       } else {
         list <- group
       }
@@ -1468,14 +1468,14 @@ holdout <- function(x_train,y_train,group,include,family,alpha.init=0,alpha.fina
         temp <- stats::poisson()
       }
       rho <- c(0.00,0.10,0.25,0.50,1.00)
-      for(j in seq_along(rho)){
-        object[[j]] <- multiview::cv.multiview(x_list=lapply(X=unique(type[include]),FUN=function(z) x_train[,type[include]==z]),y=y_train,family=temp,rho=rho[j],foldid=foldid)
-      }
-      id <- which.min(sapply(object,function(x) min(x$cvm)))
-      if(!is.null(x_test)){
-        y_hat$multiview <- stats::predict(object=object[[id]],newx=lapply(X=unique(type[include]),FUN=function(z) x_test[,type[include]==z]),type="response",s="lambda.min")
-      }
-      coef$multiview <- stats::coef(object=object[[id]],s="lambda.min")
+      #for(j in seq_along(rho)){
+      #  object[[j]] <- multiview::cv.multiview(x_list=lapply(X=unique(type[include]),FUN=function(z) x_train[,type[include]==z]),y=y_train,family=temp,rho=rho[j],foldid=foldid)
+      #}
+      #id <- which.min(sapply(object,function(x) min(x$cvm)))
+      #if(!is.null(x_test)){
+      #  y_hat$multiview <- stats::predict(object=object[[id]],newx=lapply(X=unique(type[include]),FUN=function(z) x_test[,type[include]==z]),type="response",s="lambda.min")
+      #}
+      #coef$multiview <- stats::coef(object=object[[id]],s="lambda.min")
     } else if(i=="scoop"){
       if(!family %in% c("gaussian","binomial")){next}
       if(all(table(group[include])==1)){
@@ -1527,9 +1527,9 @@ holdout <- function(x_train,y_train,group,include,family,alpha.init=0,alpha.fina
         extra <- list(seq_len(p)[!seq_len(p) %in% unlist(base)])# second alternative
         groupset <- c(base,extra)
       }
-      null <- utils::capture.output(typeset <- ecpc::createGroupset(values=as.factor(type)))
-      datablocks <- lapply(X=unique(type[include]),FUN=function(x) which(type[include]==x))
-      null <- tryCatch(utils::capture.output(object <- ecpc::ecpc(Y=Y_temp,X=x_train[,include],groupsets=list(groupset),X2=x_test[,include],model=model,fold=nfolds,datablocks=NULL)),error=function(x) NULL)
+      #null <- utils::capture.output(typeset <- ecpc::createGroupset(values=as.factor(type)))
+      #datablocks <- lapply(X=unique(type[include]),FUN=function(x) which(type[include]==x))
+      #null <- tryCatch(utils::capture.output(object <- ecpc::ecpc(Y=Y_temp,X=x_train[,include],groupsets=list(groupset),X2=x_test[,include],model=model,fold=nfolds,datablocks=NULL)),error=function(x) NULL)
       # Currently typeset/datablocks is ignored!
       if(!is.null(object)){
         coef$ecpc <- unlist(stats::coef(object))

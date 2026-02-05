@@ -14,9 +14,7 @@ corila(
   alpha.init = 0,
   alpha.final = 1,
   cor = "spearman",
-  lambda.com = NULL,
-  lambda.sep = NULL,
-  lambda.ind = NULL,
+  lambda.init = NULL,
   fuse = "mean"
 )
 }
@@ -39,7 +37,7 @@ corila(
 
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 
-\item{lambda.com, lambda.sep, lambda.ind}{regularisation hyperparameters, or \code{NULL} (cross-validation)}
+\item{lambda.init}{regularisation hyperparameter(s), or \code{NULL} (cross-validation)}
 
 \item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
 }
