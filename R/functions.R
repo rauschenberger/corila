@@ -1674,98 +1674,94 @@ plot_boxes <- function(x,base="corila",main="",decrease=TRUE,ylim=NULL,cex.main=
   return(NULL)
 }
 
+#@title
+#Combine variables
+#
+#@description
+#Calculates the mean or the first principal component of a group of variables
+#
+#@inheritParams construct_matrices
+#@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group
+#@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
+#
+#@return
+#Returns an \eqn{n_0}-dimensional numeric vector.
+#
+#@seealso
+#This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
+#
+#@examples
+#n <- 100; p <- 5
+#x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
+#mean <- combine_features(x=x,fuse="mean")
+#comp <- combine_features(x=x,fuse="pca")
+#plot(mean,comp)
+#
+#@export
+# combine_features <- function(x,fuse="mean"){
+#   if(!fuse %in% c("mean","pca")){
+#     stop("Argument \"fuse\" must equal \"mean\" or \"pca\".")
+#   }
+#   if(fuse=="mean"){
+#     rowMeans(x)
+#   } else if(fuse=="pca"){
+#     stats::princomp(x=x)$scores[,"Comp.1"]
+#   }
+# }
 
-#'@title
-#'Combine variables
-#'
-#'@description
-#'Calculates the mean or the first principal component of a group of variables
-#'
-#'@inheritParams construct_matrices
-#'@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group
-#'@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
-#'
-#'@return
-#'Returns an \eqn{n_0}-dimensional numeric vector.
-#'
-#'@seealso
-#'This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
-#'
-#'@examples
-#'n <- 100; p <- 5
-#'x <- matrix(data=stats::rnorm(n=n*p),nrow=n,ncol=p)
-#'mean <- combine_features(x=x,fuse="mean")
-#'comp <- combine_features(x=x,fuse="pca")
-#'plot(mean,comp)
-#'
-#'@export
-combine_features <- function(x,fuse="mean"){
-  if(!fuse %in% c("mean","pca")){
-    stop("Argument \"fuse\" must equal \"mean\" or \"pca\".")
-  }
-  if(fuse=="mean"){
-    rowMeans(x)
-  } else if(fuse=="pca"){
-    stats::princomp(x=x)$scores[,"Comp.1"]
-  }
-}
-
-#'@title
-#'Construct Matrices
-#'
-#'@description
-#'Constructs matrices with (i) the original data concatenated with the inverted data, (ii) one meta-variable for each group, and (iii) one meta-variable for each group in each type.
-#'
-#'@param group \eqn{p}-dimensional vector of group labels or indices, or list with one slot for each group containing the variable labels or indices
-#'@param type \eqn{p}-dimensional vector
-#'@inheritParams corila
-#'
-#'@examples
-#'n <- 5
-#'p <- 6
-#'x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
-#'group <- rep(1:2,each=p/2)
-#'type <- rep(x=1,times=p)
-#'x <- construct_matrices(x=x,group=group,type=type)
-#'
-#'@seealso
-#'This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
-#'
-#'@return
-#'See description.
-#'
-#'@export
-construct_matrices <- function(x,group,type,fuse="mean"){
-  if((is.numeric(group) && ncol(x)!=length(group)) | ncol(x)!=length(type)){
-    stop("For each variable, the matrix \"x\" must have one column, and the vectors \"group\" (if applicable) and \"type\" must have one entry.")
-  }
-  index <- seq_len(ncol(x))
-  n <- nrow(x)
-  if(is.numeric(group)){
-    q <- length(unique(group))
-  } else {
-    q <- length(group)
-  }
-  m <- length(unique(type))
-  com <- matrix(data=NA,nrow=n,ncol=q,dimnames=list(NULL,seq_len(q)))
-  sep <- replicate(n=m,expr=com,simplify=FALSE)
-  for(i in seq_len(m)){
-    for(j in seq_len(q)){
-      if(is.numeric(group)){
-        sep[[i]][,j] <- combine_features(x=x[,type==i & group==j,drop=FALSE],fuse=fuse)
-      } else {
-        sep[[i]][,j] <- combine_features(x=x[,type==i & index %in% group[[j]],drop=FALSE],fuse=fuse)
-      }
-    }
-  }
-  for(j in seq_len(q)){
-    if(is.numeric(group)){
-      com[,j] <- combine_features(x=x[,group==j,drop=FALSE],fuse=fuse)
-    } else {
-      com[,j] <- combine_features(x=x[,index %in% group[[j]],drop=FALSE],fuse=fuse)
-    }
-  }
-  return(list(all=cbind(x,-x),com=com,sep=sep))
-}
-
-
+#@title
+#Construct Matrices
+#
+#@description
+#Constructs matrices with (i) the original data concatenated with the inverted data, (ii) one meta-variable for each group, and (iii) one meta-variable for each group in each type.
+#
+#@param group \eqn{p}-dimensional vector of group labels or indices, or list with one slot for each group containing the variable labels or indices
+#@param type \eqn{p}-dimensional vector
+#@inheritParams corila
+#
+#@examples
+#n <- 5
+#p <- 6
+#x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
+#group <- rep(1:2,each=p/2)
+#type <- rep(x=1,times=p)
+#x <- construct_matrices(x=x,group=group,type=type)
+#
+#@seealso
+#This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
+#
+#@return
+#See description.
+#@export
+# construct_matrices <- function(x,group,type,fuse="mean"){
+#   if((is.numeric(group) && ncol(x)!=length(group)) | ncol(x)!=length(type)){
+#     stop("For each variable, the matrix \"x\" must have one column, and the vectors \"group\" (if applicable) and \"type\" must have one entry.")
+#   }
+#   index <- seq_len(ncol(x))
+#   n <- nrow(x)
+#   if(is.numeric(group)){
+#     q <- length(unique(group))
+#   } else {
+#     q <- length(group)
+#   }
+#   m <- length(unique(type))
+#   com <- matrix(data=NA,nrow=n,ncol=q,dimnames=list(NULL,seq_len(q)))
+#   sep <- replicate(n=m,expr=com,simplify=FALSE)
+#   for(i in seq_len(m)){
+#     for(j in seq_len(q)){
+#       if(is.numeric(group)){
+#         sep[[i]][,j] <- combine_features(x=x[,type==i & group==j,drop=FALSE],fuse=fuse)
+#       } else {
+#         sep[[i]][,j] <- combine_features(x=x[,type==i & index %in% group[[j]],drop=FALSE],fuse=fuse)
+#       }
+#     }
+#   }
+#   for(j in seq_len(q)){
+#     if(is.numeric(group)){
+#       com[,j] <- combine_features(x=x[,group==j,drop=FALSE],fuse=fuse)
+#     } else {
+#       com[,j] <- combine_features(x=x[,index %in% group[[j]],drop=FALSE],fuse=fuse)
+#     }
+#   }
+#   return(list(all=cbind(x,-x),com=com,sep=sep))
+# }
