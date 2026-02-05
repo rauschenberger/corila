@@ -513,6 +513,7 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
   
+  if(is.null(group)){group <- seq_len(p)}
   if(is.null(include)){
     include <- rep(x=TRUE,times=p)
   } else {
@@ -520,14 +521,16 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
       stop("Argument \"include\" should be a logical vector (or NULL).")
     }
   }
-  if(is.null(group)){group <- seq_len(p)}
+  if(!is.character(family)||length(family)!=1||!family %in% c("gaussian","binomial","poisson","cox")){
+    stop("Argument \"family\" must equal \"gaussian\", \"binomial\", \"poisson\", or \"cox\" (character vector of length 1).")
+  }
+
   #if(length(group)!=p){stop("Argument \"group\" must be a vector of length p.")}
   if(is.numeric(group)&&!is.array(group)){
     q <- length(unique(group)) # number of groups = number of unique values
   } else if(is.list(group)){
     q <- length(group) # number of groups = number of slots
   }
-  
   if(is.numeric(group)&&!is.array(group)){
     if(length(group)!=p||max(group)!=length(unique(group))||any(sort(unique(group))!=seq(from=1,to=max(group),by=1))){
       stop("Argument \"group\" should be of length p, with all entries in {1,...,q}.")
@@ -546,32 +549,38 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
   
   index <- seq_len(p)
   
+  #--- initial coefficients ---
+  fit.init <- NULL
   if(all(is.na(alpha.init))){
-    coef.ind <- rep(x=1,times=p)
+    coef.init <- rep(x=1,times=p)
   } else if(is.character(alpha.init) & alpha.init=="multiridge"){
     if(is.null(lambda.init)){
-      fit.ind <- multiridge(x=scale$x,y=scale$y,z=group,family=family)
-      coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[-1]
-      lambda.init <- fit.ind$penalties
+      fit.init <- multiridge(x=scale$x,y=scale$y,z=group,family=family)
+      coef.init <- stats::coef(object=fit.init,s="lambda.min")[-1]
+      lambda.init <- fit.init$penalties
     } else {
-      fit.ind <- multiridge(x=scale$x,y=scale$y,z=group,family=family,penalties=lambda.init)
-      coef.ind <- stats::coef(object=fit.ind)[-1]
+      fit.init <- multiridge(x=scale$x,y=scale$y,z=group,family=family,penalties=lambda.init)
+      coef.init <- stats::coef(object=fit.init)[-1]
     }
   } else if(is.character(alpha.init) & alpha.init %in% c("pearson","spearman","kendall")){
-    coef.ind <- stats::cor(x=scale$x,y=scale$y,method=alpha.init,use="pairwise.complete")
-    coef.ind[is.na(coef.ind)] <- 0
-  } else {
+    coef.init <- stats::cor(x=scale$x,y=scale$y,method=alpha.init,use="pairwise.complete")
+    coef.init[is.na(coef.init)] <- 0
+  } else if(is.numeric(alpha.init) & alpha.init>=0 & alpha.init<=1){
     cond.coef <- rep(c(FALSE,TRUE),times=c(family!="cox",p))
     if(is.null(lambda.init)){
-      fit.ind <- glmnet::cv.glmnet(x=scale$x,y=scale$y,family=family,alpha=alpha.init)
-      coef.ind <- stats::coef(object=fit.ind,s="lambda.min")[cond.coef]
-      lambda.init <- fit.ind$lambda.min
+      fit.init <- glmnet::cv.glmnet(x=scale$x,y=scale$y,family=family,alpha=alpha.init)
+      coef.init <- stats::coef(object=fit.init,s="lambda.min")[cond.coef]
+      lambda.init <- fit.init$lambda.min
     } else {
-      fit.ind <- glmnet::glmnet(x=scale$x,y=scale$y,family=family,alpha=alpha.init)
-      coef.ind <- stats::coef(object=fit.ind,s=lambda.init)[cond.coef]
+      fit.init <- glmnet::glmnet(x=scale$x,y=scale$y,family=family,alpha=alpha.init)
+      coef.init <- stats::coef(object=fit.init,s=lambda.init)[cond.coef]
     }
+  } else {
+    stop("Invalid value for agrument \"alpha.init\".")
   }
+  rm(fit.init)
   
+  #--- feature correlation ---
   if(!is.matrix(cor)){
     cor <- stats::cor(x=scale$x,method=cor,use="pairwise.complete")
   }
@@ -580,7 +589,8 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
   object <- list()
   for(i in seq_len(nrow(hyper))){
     weight <- list()
-    weight$com <- weight$sep <- weight$ind <- rep(x=NA,times=p)
+    weight$global <- weight$local <- rep(x=NA,times=p)
+    # rename to weight$local and weight$global
     for(j in seq_len(p)){
       # features in same group
       if(is.numeric(group)&&!is.array(group)){
@@ -591,17 +601,17 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
       } else if(is.matrix(group)){
         cond.temp <- group[,j]==1
       }
-      temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.local[i]*coef.ind)*cond.temp
-      weight$com[j] <- sum(pmax(0,temp)[cond.temp])/sum(cond.temp)
-      weight$com[p+j] <- sum(pmax(0,-temp)[cond.temp])/sum(cond.temp)
+      temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.local[i]*coef.init)*cond.temp
+      weight$local[j] <- sum(pmax(0,temp)[cond.temp])/sum(cond.temp)
+      weight$local[p+j] <- sum(pmax(0,-temp)[cond.temp])/sum(cond.temp)
+      
+      # ad-hoc solution for features that are in no group:
+      weight$local[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
       
       # all features
-      temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.global[i]*coef.ind)
-      weight$ind[j] <- sum(pmax(0,temp))/p
-      weight$ind[p+j] <- sum(pmax(0,-temp))/p
-      
-      # Ad-hoc solution for features that are in no group:
-      weight$com[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
+      temp <- (sign(cor[,j])*abs(cor[,j])^hyper$exp.global[i]*coef.init)
+      weight$global[j] <- sum(pmax(0,temp))/p
+      weight$global[p+j] <- sum(pmax(0,-temp))/p
     }
     # # temporary code with beta distribution:
     # for(j in seq_len(p)){
@@ -611,13 +621,13 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
     #      group_index <- sapply(group,function(x) j %in% x)
     #      cond.temp <- seq_len(p) %in% unlist(group[group_index]) 
     #    }
-    #    temp <- sign(cor[,j])*stats::qbeta(p=abs(cor[,j]),shape1=hyper$alpha[i],shape2=hyper$beta[i])*coef.ind*cond.temp
+    #    temp <- sign(cor[,j])*stats::qbeta(p=abs(cor[,j]),shape1=hyper$alpha[i],shape2=hyper$beta[i])*coef.init*cond.temp
     #    weight$com[j] <- mean(pmax(0,temp)[cond.temp])
     #    weight$com[p+j] <- mean(pmax(0,-temp)[cond.temp])
     # }
     weight <- lapply(weight,function(x) p*ifelse(x==0,0,x/sum(x)))
     
-    pf.ext <- 1/(weight$com*hyper$wgt.local[i]+weight$ind*hyper$wgt.global[i])
+    pf.ext <- 1/(weight$local*hyper$wgt.local[i]+weight$global*hyper$wgt.global[i])
     # Set pf.ext equal to 1 to obtain standard lasso.
     pf.ext[!c(include,include)] <- Inf # trial
     if(any(is.na(pf.ext))){stop("missing pf:",sum(is.na(pf.ext)))}
