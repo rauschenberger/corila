@@ -18,7 +18,6 @@ holdout(
   foldid = NULL,
   method = NULL,
   seed = NULL,
-  init.multi = FALSE,
   tune = "both"
 )
 }
@@ -33,7 +32,7 @@ holdout(
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
-\item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 1}
+\item{alpha.init}{elastic net mixing parameter (\eqn{0 \leq} \code{alpha.init} \eqn{\leq 1}) for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients (not implemented for \code{family="cox"}), "multiridge" for multi-penalty ridge regression with one penalty for each group (not implemented for \code{family="poisson"} or overlapping groups), or \code{NA} to set all initial coefficients equal to 1}
 
 \item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
 
@@ -48,8 +47,6 @@ holdout(
 \item{method}{character vector listing all methods to be compared}
 
 \item{seed}{random seed (integer scalar) for reproducibility, or \code{NULL}}
-
-\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.}
 
 \item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
 }
@@ -67,6 +64,6 @@ Compares methods using hold-out method
 \examples{
 \donttest{
 data <- simulate()
-results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,type=data$type,include=rep(c(TRUE,FALSE),each=80),x_test=data$x_test,y_test=data$y_test,family=data$info$family,method=c("mean","ridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
+results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,include=rep(c(TRUE,FALSE),each=80),x_test=data$x_test,y_test=data$y_test,family=data$info$family,method=c("mean","ridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
 }
 }

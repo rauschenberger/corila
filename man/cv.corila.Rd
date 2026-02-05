@@ -15,7 +15,6 @@ cv.corila(
   nfolds = 10,
   cor = "spearman",
   fuse = "mean",
-  init.multi = FALSE,
   tune = "both",
   foldid = NULL
 )
@@ -29,7 +28,7 @@ cv.corila(
 
 \item{include}{\eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model}
 
-\item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 1}
+\item{alpha.init}{elastic net mixing parameter (\eqn{0 \leq} \code{alpha.init} \eqn{\leq 1}) for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients (not implemented for \code{family="cox"}), "multiridge" for multi-penalty ridge regression with one penalty for each group (not implemented for \code{family="poisson"} or overlapping groups), or \code{NA} to set all initial coefficients equal to 1}
 
 \item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
 
@@ -40,8 +39,6 @@ cv.corila(
 \item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
 
 \item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
-
-\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.}
 
 \item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
 

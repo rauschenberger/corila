@@ -17,8 +17,7 @@ corila(
   lambda.com = NULL,
   lambda.sep = NULL,
   lambda.ind = NULL,
-  fuse = "mean",
-  init.multi = FALSE
+  fuse = "mean"
 )
 }
 \arguments{
@@ -34,7 +33,7 @@ corila(
 
 \item{hyper}{list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters}
 
-\item{alpha.init}{elastic net mixing parameter for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients, or \code{NA} to set all initial coefficients equal to 1}
+\item{alpha.init}{elastic net mixing parameter (\eqn{0 \leq} \code{alpha.init} \eqn{\leq 1}) for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients (not implemented for \code{family="cox"}), "multiridge" for multi-penalty ridge regression with one penalty for each group (not implemented for \code{family="poisson"} or overlapping groups), or \code{NA} to set all initial coefficients equal to 1}
 
 \item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
 
@@ -43,8 +42,6 @@ corila(
 \item{lambda.com, lambda.sep, lambda.ind}{regularisation hyperparameters, or \code{NULL} (cross-validation)}
 
 \item{fuse}{character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component}
-
-\item{init.multi}{Use multi-penalty ridge regression (one penalty for each group) to obtain initial coefficients (\code{TRUE} or \code{FALSE})? Not implemented for \code{family="poisson"}.}
 }
 \value{
 Returns an object of class \code{"corila"}.
