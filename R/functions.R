@@ -1565,6 +1565,7 @@ holdout <- function(x_train,y_train,group,include,family,alpha.init=0,alpha.fina
 #'
 #'@param iter number of cross-validation iterations
 #'@param nfolds number of cross-validation folds
+#'@param foldid cross-validation folds
 #'
 #'@details
 #'This function implements repeated \eqn{k}-fold cross-validation (e.g., 5 repetitions of 10-fold cross-validation).
@@ -1583,10 +1584,11 @@ holdout <- function(x_train,y_train,group,include,family,alpha.init=0,alpha.fina
 #'p <- 20
 #'x <- matrix(rnorm(n*p),nrow=n,ncol=p)
 #'y <- stats::rnorm(n)
-#'results <- crossval(x,y,family="gaussian",method=c("mean","corila"))
+#'foldid <- rep(c(0,1),times=c(50,50))
+#'results <- crossval(x,y,family="gaussian",method=c("mean","corila"),foldid=foldid)
 #'}
 #'@export
-crossval <- function(x,y,family,group=NULL,include=NULL,alpha.init=0,alpha.final=1,iter=5,nfolds=10,method=NULL,tune="both"){
+crossval <- function(x,y,family,group=NULL,include=NULL,alpha.init=0,alpha.final=1,iter=5,foldid=NULL,nfolds=10,method=NULL,tune="both"){
   n <- nrow(x)
   p <- ncol(x)
   if(is.null(group)){group <- seq_len(p)}
@@ -1595,8 +1597,12 @@ crossval <- function(x,y,family,group=NULL,include=NULL,alpha.init=0,alpha.final
   for(k in seq_len(iter)){
     set.seed(k)
     cat("iter",k,"\n")
-    #foldid <- sample(rep(x=seq_len(nfolds),length.out=n))
-    foldid <- folds(y=y,family=family,nfolds=nfolds) # balanced/stratified folds
+    if(is.null(fold)){
+      #foldid <- sample(rep(x=seq_len(nfolds),length.out=n))
+      foldid <- folds(y=y,family=family,nfolds=nfolds) # balanced/stratified folds
+    } else {
+      nfolds <- max(foldid)
+    }
     y_hat <- data.frame(row.names=seq_len(n))
     for(i in seq_len(nfolds)){
       set.seed(i)
@@ -1608,14 +1614,14 @@ crossval <- function(x,y,family,group=NULL,include=NULL,alpha.init=0,alpha.final
       }
     }
     if(family %in% c("gaussian","poisson")){
-      list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) mean((y-x)^2))
+      list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) mean((y[foldid!=0]-x[foldid!=0])^2))
     } else if(family=="binomial"){
-      list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) pROC::auc(response=y,predictor=as.vector(x),levels=c(0,1),direction="<"))
+      list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) pROC::auc(response=y[foldid!=0],predictor=as.vector(x[foldid!=0]),levels=c(0,1),direction="<"))
     } else if(family=="cox"){
-      list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) survival::concordance(y~I(-x))$concordance)
+      list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) survival::concordance(y[foldid!=0]~I(-x[foldid!=0]))$concordance)
     }
     set.seed(k)
-    refit <- holdout(x_train=x,y_train=y,group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,tune=tune)
+    refit <- holdout(x_train=x[foldid!=0,],y_train=y[foldid!=0],group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,tune=tune)
     list$nzero[[k]] <- sapply(X=refit$coef,FUN=function(x) sum(x[-1]!=0))
   }
   list <- lapply(X=list,FUN=function(x) do.call(what="rbind",args=x))
