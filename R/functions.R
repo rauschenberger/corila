@@ -547,7 +547,7 @@ corila <- function(x,y,group,include,family,hyper,alpha.init=0,alpha.final=1,cor
   #--- initial coefficients ---
   fit.init <- NULL
   if(all(is.na(alpha.init))){
-    coef.init <- rep(x=1,times=p)
+    coef.init <- rep(x=1,times=p) # Remove this confusing option? 
   } else if(is.character(alpha.init) & alpha.init=="multiridge"){
     if(is.null(lambda.init)){
       fit.init <- multiridge(x=scale$x,y=scale$y,z=group,family=family)
@@ -1597,7 +1597,7 @@ crossval <- function(x,y,family,group=NULL,include=NULL,alpha.init=0,alpha.final
   for(k in seq_len(iter)){
     set.seed(k)
     cat("iter",k,"\n")
-    if(is.null(fold)){
+    if(is.null(foldid)){
       #foldid <- sample(rep(x=seq_len(nfolds),length.out=n))
       foldid <- folds(y=y,family=family,nfolds=nfolds) # balanced/stratified folds
     } else {
@@ -1621,8 +1621,12 @@ crossval <- function(x,y,family,group=NULL,include=NULL,alpha.init=0,alpha.final
       list$metric[[k]] <- apply(X=y_hat,MARGIN=2,FUN=function(x) survival::concordance(y[foldid!=0]~I(-x[foldid!=0]))$concordance)
     }
     set.seed(k)
-    refit <- holdout(x_train=x[foldid!=0,],y_train=y[foldid!=0],group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,tune=tune)
-    list$nzero[[k]] <- sapply(X=refit$coef,FUN=function(x) sum(x[-1]!=0))
+    if(nfolds==1){
+      list$nzero[[k]] <- sapply(X=results$coef,FUN=function(x) sum(x[-1]!=0))
+    } else {
+      refit <- holdout(x_train=x[foldid!=0,],y_train=y[foldid!=0],group=group,include=include,alpha.init=alpha.init,alpha.final=alpha.final,family=family,nfolds=10,foldid=NULL,method=method,seed=NULL,tune=tune)
+      list$nzero[[k]] <- sapply(X=refit$coef,FUN=function(x) sum(x[-1]!=0))
+    }
   }
   list <- lapply(X=list,FUN=function(x) do.call(what="rbind",args=x))
   list$family <- family
