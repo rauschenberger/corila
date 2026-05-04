@@ -8,16 +8,16 @@ simulate(
   family = "gaussian",
   n0 = 100,
   n1 = 10000,
-  n.group = 20,
-  n.type = 2,
-  size.group = c(5, 3),
-  effect.size = c(1, 1),
-  corfac.feature = 0.5,
-  corfac.type = 0.5,
-  corfac.group = 0.25,
-  n.group.causal = 2,
-  prop.causal = 0.5,
-  noise.factor = 1,
+  n_group = 20,
+  n_type = 2,
+  size_group = c(5, 3),
+  effect_size = c(1, 1),
+  corfac_feature = 0.5,
+  corfac_type = 0.5,
+  corfac_group = 0.25,
+  n_group_causal = 2,
+  prop_causal = 0.5,
+  noise_factor = 1,
   plot = TRUE,
   trial = FALSE
 )
@@ -29,27 +29,28 @@ simulate(
 
 \item{n1}{number of testing observations}
 
-\item{n.group}{number of variable groups}
+\item{n_group}{number of variable groups}
 
-\item{n.type}{number of variable types}
+\item{n_type}{number of variable types}
 
-\item{size.group}{size of variable groups (per variable type)}
+\item{size_group}{size of variable groups (per variable type)}
 
-\item{effect.size}{effect sizes (per variable type)}
+\item{effect_size}{effect sizes (per variable type)}
 
-\item{corfac.feature}{decrease of correlation if different variable}
+\item{corfac_feature}{decrease of correlation if different variable}
 
-\item{corfac.type}{decrease of correlation if different type}
+\item{corfac_type}{decrease of correlation if different type}
 
-\item{corfac.group}{decrease of correlation if different group}
+\item{corfac_group}{decrease of correlation if different group}
 
-\item{n.group.causal}{number of causal groups}
+\item{n_group_causal}{number of causal groups}
 
-\item{prop.causal}{proportion of causal features within causal groups}
+\item{prop_causal}{proportion of causal features within causal groups}
 
-\item{noise.factor}{noise factor}
+\item{noise_factor}{noise factor}
 
-\item{plot}{Attempt to visualise effects of and correlation between variables? (\code{TRUE} or \code{FALSE})}
+\item{plot}{Attempt to visualise effects of and correlation between variables?
+(\code{TRUE} or \code{FALSE})}
 
 \item{trial}{logical (groups of negatively correlated subgroups)}
 }
@@ -63,7 +64,9 @@ Returns a list with the following slots:
 \item \eqn{n_1 \times p} matrix \code{x_test}
 \item \eqn{n_1}-dimensional vector \code{y_test}
 \item \eqn{p}-dimensional vector \code{beta}
-\item data frame \code{info} with entries \eqn{n_0}, \eqn{n_1}, \eqn{p}, \code{n.type}, \code{n.group}, and \code{family}
+\item data frame \code{info} with entries
+\eqn{n_0}, \eqn{n_1}, \eqn{p}, \code{n_type},
+\code{n_group}, and \code{family}
 }
 }
 \description{
@@ -71,13 +74,13 @@ Simulates data with grouped predictor variables
 }
 \examples{
 data <- simulate()
-dims <- function(x){
-  if(is.matrix(x)||is.data.frame(x)){
-    paste(base::dim(x),collapse=" x ")
+dims <- function(x) {
+  if (is.matrix(x)||is.data.frame(x)) {
+    paste(base::dim(x), collapse = " x ")
   } else {
     paste0(base::length(x))
   }
 }
-sapply(X=data,FUN=dims)
+sapply(X = data, FUN = dims)
 
 }

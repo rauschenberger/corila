@@ -9,7 +9,10 @@
 \arguments{
 \item{object}{object of class \code{"corila"}}
 
-\item{newx}{\eqn{n_0 \times p} predictor matrix (training data) to obtain fitted values, \eqn{n_1 \times p} predictor matrix (testing data) to obtain predicted values}
+\item{newx}{\eqn{n_0 \times p} predictor matrix (training data)
+to obtain fitted values,
+\eqn{n_1 \times p} predictor matrix (testing data)
+to obtain predicted values}
 
 \item{index}{integer scalar specifying the index of the mixing hyperparameter(s)}
 
@@ -18,7 +21,8 @@
 \item{...}{(not used)}
 }
 \value{
-Returns fitted or predicted values in an \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
+Returns fitted or predicted values in an
+\eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
 }
 \description{
 Makes prediction from an object of class \code{"corila"}.
@@ -28,16 +32,17 @@ Makes prediction from an object of class \code{"corila"}.
 # simulation
 n <- 100
 p <- 50
-group <- rep(x=1:10,each=5)
+group <- rep(x = 1:10, each = 5)
 include <- NULL
-x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
-y <- rnorm(n=n)
+x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
+y <- rnorm(n = n)
 
 # model fitting
-hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
-object <- corila(x,y,group,include,family="gaussian",hyper=hyper)
+hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
+                   exp_global = 1, wgt_global = 0.5)
+object <- corila(x, y, group, include, family = "gaussian", hyper = hyper)
 
-y_hat <- stats::predict(object,newx=x,index=1,s=0)
+y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 }
 }
 \references{
@@ -47,5 +52,7 @@ y_hat <- stats::predict(object,newx=x,index=1,s=0)
 \emph{In preparation}.
 }
 \seealso{
-Estimate parameters with \code{\link{corila}()}, or estimate parameters and tune hyperparameters with \code{\link{cv.corila}()}.
+Estimate parameters with \code{\link{corila}()},
+or estimate parameters and tune hyperparameters
+with \code{\link{cv.corila}()}.
 }

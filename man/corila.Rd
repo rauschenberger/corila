@@ -11,64 +11,104 @@ corila(
   include,
   family,
   hyper,
-  alpha.init = 0,
-  alpha.final = 1,
+  alpha_init = 0,
+  alpha_final = 1,
   cor = "spearman",
-  lambda.init = NULL
+  lambda_init = NULL
 )
 }
 \arguments{
-\item{x}{\eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables}
+\item{x}{\eqn{n_0 \times p} predictor matrix,
+where \eqn{n_0} is the number of observations used for model training
+and \eqn{p} is the number of variables}
 
-\item{y}{\eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training}
+\item{y}{\eqn{n_0}-dimensional response vector,
+where \eqn{n_0} is the number of observations used for model training}
 
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
+\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+(in \eqn{\{1, \ldots, q\}}) or labels,
+\emph{(ii)} list with \eqn{q} slots containing the variable indices
+(in \eqn{\{1, \ldots, p\}}) or labels,
+or \emph{(iii)} \eqn{p \times p} matrix,
+where the entry in the \eqn{j^{\text{th}}} row
+and the \eqn{k^{\text{th}}} column
+indicates whether information should be transferred
+from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
-\item{include}{\eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model}
+\item{include}{\eqn{p}-dimensional logical vector
+indicating whether a predictor may be included in (\code{TRUE})
+or must be excluded from (\code{FALSE}) the final model}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"}}
 
-\item{hyper}{list of of \eqn{m}-dimensional vectors or a data frame with \eqn{m} rows containing candidate values for the regularisation and mixing hyperparameters}
+\item{hyper}{list of of \eqn{m}-dimensional vectors
+or a data frame with \eqn{m} rows
+containing candidate values
+for the regularisation and mixing hyperparameters}
 
-\item{alpha.init}{elastic net mixing parameter (\eqn{0 \leq} \code{alpha.init} \eqn{\leq 1}) for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients (not implemented for \code{family="cox"}), "multiridge" for multi-penalty ridge regression with one penalty for each group (not implemented for \code{family="poisson"} or overlapping groups), or \code{NA} to set all initial coefficients equal to 1}
+\item{alpha_init}{elastic net mixing parameter
+(\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
+for initial regression
+(default: ridge penalisation with \code{alpha_init}=0);
+alternative choices are
+"pearson", "spearman", or "kendall"
+to use initial correlation coefficients
+(not implemented for \code{family="cox"}),
+"multiridge" for multi-penalty ridge regression
+with one penalty for each group
+(not implemented for \code{family="poisson"} or overlapping groups),
+or \code{NA} to set all initial coefficients equal to 1}
 
-\item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
+\item{alpha_final}{elastic net mixing parameter for final regression
+(default: lasso penalisation with \code{alpha_final}=1)}
 
-\item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
+\item{cor}{character string \code{"pearson"},
+\code{"spearman"} (default),
+or \code{"kendall"};
+or \eqn{p \times p} correlation matrix}
 
-\item{lambda.init}{regularisation hyperparameter(s), or \code{NULL} (cross-validation)}
+\item{lambda_init}{regularisation hyperparameter(s),
+or \code{NULL} (cross-validation)}
 }
 \value{
 Returns an object of class \code{"corila"}.
 }
 \description{
-Fits an initial ridge regression to obtain weights for an adaptive lasso 
-regression that allows for heterogeneous, overlapping and unknown groups of correlated variables.
+Fits an initial ridge regression to obtain weights
+for an adaptive lasso regression
+that allows for heterogeneous, overlapping and unknown groups
+of correlated variables.
 }
 \details{
-The number of observations (samples) for training or testing are indicated by \eqn{n_0} and \eqn{n_1}, respectively, the number of variables (features) is indicated by \eqn{p}, and the number of variable groups is indicated by \eqn{q}.
+The number of observations (samples) for training or testing
+are indicated by \eqn{n_0} and \eqn{n_1}, respectively,
+the number of variables (features) is indicated by \eqn{p},
+and the number of variable groups is indicated by \eqn{q}.
 
-Observations (samples) are indexed by \eqn{i} in \eqn{\{1,\ldots,n\}},
-variables (features) are indexed by \eqn{j} in \eqn{\{1,\ldots,p\}},
-and variable groups are indexed by \eqn{k} in \eqn{\{1,\ldots,q\}}.
+Observations (samples) are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
+variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
+and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
 
-The number of variables in the \eqn{k^{\text{th}}} group is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
+The number of variables in the \eqn{k^{\text{th}}} group
+is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 }
 \examples{
 \donttest{
 # simulation
 n <- 100
 p <- 50
-group <- rep(x=1:10,each=5)
+group <- rep(x = 1:10, each = 5)
 include <- NULL
-x <- matrix(data=rnorm(n*p),nrow=n,ncol=p)
-y <- rnorm(n=n)
+x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
+y <- rnorm(n = n)
 
 # model fitting
-hyper <- data.frame(exp.local=1,wgt.local=0.5,exp.global=1,wgt.global=0.5)
-object <- corila(x,y,group,include,family="gaussian",hyper=hyper)
+hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
+                   exp_global = 1, wgt_global = 0.5)
+object <- corila(x, y, group, include, family = "gaussian", hyper = hyper)
 
-y_hat <- stats::predict(object,newx=x,index=1,s=0)
+y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 }
 }
 \references{
@@ -78,7 +118,16 @@ y_hat <- stats::predict(object,newx=x,index=1,s=0)
 \emph{In preparation}.
 }
 \seealso{
-Estimate parameters and tune hyperparameters (using cross-validation) with \code{\link{cv.corila}()}. Make predictions for a range of hyperparameters with \code{\link{predict.corila}()}.
+Estimate parameters and tune hyperparameters (using cross-validation)
+with \code{\link{cv.corila}()}.
+Make predictions for a range of hyperparameters
+with \code{\link{predict.corila}()}.
 
-This function calls \code{\link{forescale}()} and \code{\link{backscale}()} for standardising data and bringing results back to the original scale, respectively, \code{\link{multiridge}()} for obtaining initial group penalties, and \code{\link[glmnet]{cv.glmnet}()} and \code{\link[glmnet]{glmnet}()} for adaptive lasso regression.
+This function calls
+\code{\link{forescale}()} and \code{\link{backscale}()}
+for standardising data and bringing results back to the original scale,
+respectively,
+\code{\link{multiridge}()} for obtaining initial group penalties,
+and \code{\link[glmnet]{cv.glmnet}()} and \code{\link[glmnet]{glmnet}()}
+for adaptive lasso regression.
 }

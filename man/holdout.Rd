@@ -10,8 +10,8 @@ holdout(
   group,
   include,
   family,
-  alpha.init = 0,
-  alpha.final = 1,
+  alpha_init = 0,
+  alpha_final = 1,
   x_test = NULL,
   y_test = NULL,
   nfolds = 10,
@@ -26,15 +26,38 @@ holdout(
 
 \item{y_train}{\eqn{n_0}-dimensional vector}
 
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
+\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+(in \eqn{\{1, \ldots, q\}}) or labels,
+\emph{(ii)} list with \eqn{q} slots containing the variable indices
+(in \eqn{\{1, \ldots, p\}}) or labels,
+or \emph{(iii)} \eqn{p \times p} matrix,
+where the entry in the \eqn{j^{\text{th}}} row
+and the \eqn{k^{\text{th}}} column
+indicates whether information should be transferred
+from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
-\item{include}{\eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model}
+\item{include}{\eqn{p}-dimensional logical vector
+indicating whether a predictor may be included in (\code{TRUE})
+or must be excluded from (\code{FALSE}) the final model}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"}}
 
-\item{alpha.init}{elastic net mixing parameter (\eqn{0 \leq} \code{alpha.init} \eqn{\leq 1}) for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients (not implemented for \code{family="cox"}), "multiridge" for multi-penalty ridge regression with one penalty for each group (not implemented for \code{family="poisson"} or overlapping groups), or \code{NA} to set all initial coefficients equal to 1}
+\item{alpha_init}{elastic net mixing parameter
+(\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
+for initial regression
+(default: ridge penalisation with \code{alpha_init}=0);
+alternative choices are
+"pearson", "spearman", or "kendall"
+to use initial correlation coefficients
+(not implemented for \code{family="cox"}),
+"multiridge" for multi-penalty ridge regression
+with one penalty for each group
+(not implemented for \code{family="poisson"} or overlapping groups),
+or \code{NA} to set all initial coefficients equal to 1}
 
-\item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
+\item{alpha_final}{elastic net mixing parameter for final regression
+(default: lasso penalisation with \code{alpha_final}=1)}
 
 \item{x_test}{\eqn{n_1 \times p} matrix}
 
@@ -48,14 +71,20 @@ holdout(
 
 \item{seed}{random seed (integer scalar) for reproducibility, or \code{NULL}}
 
-\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
+\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"}
+for determining the candidate values for the hyperparameters;
+or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
+and \code{exp_global} (not yet implemented)}
 }
 \value{
 Returns a list with the following slots:
 \itemize{
-\item \eqn{n_1}-dimensional vector \code{y_hat} containing predicted values
-\item \eqn{p}-dimensional vector \code{coef} containing estimated coefficients
-\item numerical vector \code{difftime} indicating the computation time of each \code{method}
+\item \eqn{n_1}-dimensional vector \code{y_hat}
+containing predicted values
+\item \eqn{p}-dimensional vector \code{coef}
+containing estimated coefficients
+\item numerical vector \code{difftime}
+indicating the computation time of each \code{method}
 }
 }
 \description{
@@ -64,6 +93,6 @@ Compares methods using hold-out method
 \examples{
 \donttest{
 data <- simulate()
-results <- holdout(x_train=data$x_train,y_train=data$y_train,group=data$group,include=rep(c(TRUE,FALSE),each=80),x_test=data$x_test,y_test=data$y_test,family=data$info$family,method=c("mean","ridge","lasso","corila")) # Why does holdout require y_test? Try to remove this
+results <- holdout(x_train = data$x_train, y_train = data$y_train, group = data$group, include = rep(c(TRUE, FALSE), each = 80), x_test = data$x_test, y_test = data$y_test, family = data$info$family, method = c("mean", "ridge", "lasso", "corila")) # Why does holdout require y_test? Try to remove this
 }
 }

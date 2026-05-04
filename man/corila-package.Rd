@@ -16,7 +16,9 @@ See the vignette for further examples.
 Type \code{vignette("corila")} or \code{browseVignettes("corila")}
 to open the vignette.
 
-This package also includes the wrapper function \code{\link[=multiridge]{multiridge}()} for multi-penalty ridge regression with
+This package also includes the wrapper function
+\code{\link[=multiridge]{multiridge}()}
+for multi-penalty ridge regression with
 the \code{\link[multiridge]{multiridge-package}}.
 }
 \examples{

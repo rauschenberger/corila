@@ -12,17 +12,20 @@ calc_sign_prec(truth, estim)
 \item{estim}{integer vector of same length with values in \eqn{\{-1, 0, 1\}}}
 }
 \value{
-Returns a scalar between 0 (minimum precision) and 1 (maximum precision), or \code{NA} if all estimated signs equal 0.
+Returns a scalar between 0 (minimum precision) and 1 (maximum precision),
+or \code{NA} if all estimated signs equal 0.
 }
 \description{
-Calculates precision for ternary variables with support \eqn{\{-1, 0, 1\}}, i.e., the proportion of positive or negative estimated signs that match the true sign.
+Calculates precision for ternary variables with support \eqn{\{-1, 0, 1\}},
+i.e., the proportion of positive or negative estimated signs
+that match the true sign.
 }
 \examples{
-truth <- sample(x=c(-1,0,1),size=10,replace=TRUE)
-estim <- sample(x=c(-1,0,1),size=10,replace=TRUE)
-calc_sign_prec(truth=truth,estim=estim) # observed value
-calc_sign_prec(truth=truth,estim=-truth) # lower limit 0
-calc_sign_prec(truth=truth,estim=truth) # upper limit 1
-calc_sign_prec(truth=truth,estim=0*estim) # not defined
+truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
+estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
+calc_sign_prec(truth = truth, estim = estim) # observed value
+calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
+calc_sign_prec(truth = truth, estim = truth) # upper limit 1
+calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
 
 }

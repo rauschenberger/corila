@@ -10,36 +10,68 @@ crossval(
   family,
   group = NULL,
   include = NULL,
-  alpha.init = 0,
-  alpha.final = 1,
+  alpha_init = 0,
+  alpha_final = 1,
   iter = 5,
+  foldid = NULL,
   nfolds = 10,
   method = NULL,
   tune = "both"
 )
 }
 \arguments{
-\item{x}{\eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables}
+\item{x}{\eqn{n_0 \times p} predictor matrix,
+where \eqn{n_0} is the number of observations used for model training
+and \eqn{p} is the number of variables}
 
-\item{y}{\eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training}
+\item{y}{\eqn{n_0}-dimensional response vector,
+where \eqn{n_0} is the number of observations used for model training}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"}}
 
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
+\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+(in \eqn{\{1, \ldots, q\}}) or labels,
+\emph{(ii)} list with \eqn{q} slots containing the variable indices
+(in \eqn{\{1, \ldots, p\}}) or labels,
+or \emph{(iii)} \eqn{p \times p} matrix,
+where the entry in the \eqn{j^{\text{th}}} row
+and the \eqn{k^{\text{th}}} column
+indicates whether information should be transferred
+from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
-\item{include}{\eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model}
+\item{include}{\eqn{p}-dimensional logical vector
+indicating whether a predictor may be included in (\code{TRUE})
+or must be excluded from (\code{FALSE}) the final model}
 
-\item{alpha.init}{elastic net mixing parameter (\eqn{0 \leq} \code{alpha.init} \eqn{\leq 1}) for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients (not implemented for \code{family="cox"}), "multiridge" for multi-penalty ridge regression with one penalty for each group (not implemented for \code{family="poisson"} or overlapping groups), or \code{NA} to set all initial coefficients equal to 1}
+\item{alpha_init}{elastic net mixing parameter
+(\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
+for initial regression
+(default: ridge penalisation with \code{alpha_init}=0);
+alternative choices are
+"pearson", "spearman", or "kendall"
+to use initial correlation coefficients
+(not implemented for \code{family="cox"}),
+"multiridge" for multi-penalty ridge regression
+with one penalty for each group
+(not implemented for \code{family="poisson"} or overlapping groups),
+or \code{NA} to set all initial coefficients equal to 1}
 
-\item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
+\item{alpha_final}{elastic net mixing parameter for final regression
+(default: lasso penalisation with \code{alpha_final}=1)}
 
 \item{iter}{number of cross-validation iterations}
+
+\item{foldid}{cross-validation folds}
 
 \item{nfolds}{number of cross-validation folds}
 
 \item{method}{character vector listing all methods to be compared}
 
-\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
+\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"}
+for determining the candidate values for the hyperparameters;
+or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
+and \code{exp_global} (not yet implemented)}
 }
 \value{
 Returns a list with the following slots:
@@ -47,20 +79,24 @@ Returns a list with the following slots:
 \item \code{nzero} non-zero coefficients
 \item \code{metric} metric
 }
-Both slot contain a data frame with one row for each iteration (\code{iter}) and one column for each \code{method}.
+Both slot contain a data frame with one row for each iteration (\code{iter})
+and one column for each \code{method}.
 }
 \description{
 Compares methods with cross-validation method
 }
 \details{
-This function implements repeated \eqn{k}-fold cross-validation (e.g., 5 repetitions of 10-fold cross-validation).
+This function implements repeated \eqn{k}-fold cross-validation
+(e.g., 5 repetitions of 10-fold cross-validation).
 }
 \examples{
 \donttest{
 n <- 100
 p <- 20
-x <- matrix(rnorm(n*p),nrow=n,ncol=p)
+x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 y <- stats::rnorm(n)
-results <- crossval(x,y,family="gaussian",method=c("mean","corila"))
+foldid <- rep(c(0, 1), times = c(50, 50))
+results <- crossval(x, y, family = "gaussian",
+                   method = c("mean", "corila"), foldid = foldid)
 }
 }

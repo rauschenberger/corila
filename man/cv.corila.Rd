@@ -9,8 +9,8 @@ cv.corila(
   y,
   group,
   include = NULL,
-  alpha.init = 0,
-  alpha.final = 1,
+  alpha_init = 0,
+  alpha_final = 1,
   family = "gaussian",
   nfolds = 10,
   cor = "spearman",
@@ -19,49 +19,97 @@ cv.corila(
 )
 }
 \arguments{
-\item{x}{\eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables}
+\item{x}{\eqn{n_0 \times p} predictor matrix,
+where \eqn{n_0} is the number of observations used for model training
+and \eqn{p} is the number of variables}
 
-\item{y}{\eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training}
+\item{y}{\eqn{n_0}-dimensional response vector,
+where \eqn{n_0} is the number of observations used for model training}
 
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices (in \eqn{\{1,\ldots,q\}}) or labels, \emph{(ii)} list with \eqn{q} slots containing the variable indices (in \eqn{\{1,\ldots,p\}}) or labels, or \emph{(iii)} \eqn{p \times p} matrix, where the entry in the \eqn{j^{\text{th}}} row and the \eqn{k^{\text{th}}} column indicates whether information should be transferred from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
+\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+(in \eqn{\{1, \ldots, q\}}) or labels,
+\emph{(ii)} list with \eqn{q} slots containing the variable indices
+(in \eqn{\{1, \ldots, p\}}) or labels,
+or \emph{(iii)} \eqn{p \times p} matrix,
+where the entry in the \eqn{j^{\text{th}}} row
+and the \eqn{k^{\text{th}}} column
+indicates whether information should be transferred
+from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
-\item{include}{\eqn{p}-dimensional logical vector indicating whether a predictor may be included in (\code{TRUE}) or must be excluded from (\code{FALSE}) the final model}
+\item{include}{\eqn{p}-dimensional logical vector
+indicating whether a predictor may be included in (\code{TRUE})
+or must be excluded from (\code{FALSE}) the final model}
 
-\item{alpha.init}{elastic net mixing parameter (\eqn{0 \leq} \code{alpha.init} \eqn{\leq 1}) for initial regression (default: ridge penalisation with \code{alpha.init}=0); alternative choices are "pearson", "spearman", or "kendall" to use initial correlation coefficients (not implemented for \code{family="cox"}), "multiridge" for multi-penalty ridge regression with one penalty for each group (not implemented for \code{family="poisson"} or overlapping groups), or \code{NA} to set all initial coefficients equal to 1}
+\item{alpha_init}{elastic net mixing parameter
+(\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
+for initial regression
+(default: ridge penalisation with \code{alpha_init}=0);
+alternative choices are
+"pearson", "spearman", or "kendall"
+to use initial correlation coefficients
+(not implemented for \code{family="cox"}),
+"multiridge" for multi-penalty ridge regression
+with one penalty for each group
+(not implemented for \code{family="poisson"} or overlapping groups),
+or \code{NA} to set all initial coefficients equal to 1}
 
-\item{alpha.final}{elastic net mixing parameter for final regression (default: lasso penalisation with \code{alpha.final}=1)}
+\item{alpha_final}{elastic net mixing parameter for final regression
+(default: lasso penalisation with \code{alpha_final}=1)}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"}}
 
 \item{nfolds}{integer specifying the number of folds}
 
-\item{cor}{character string \code{"pearson"}, \code{"spearman"} (default), or \code{"kendall"}; or \eqn{p \times p} correlation matrix}
+\item{cor}{character string \code{"pearson"},
+\code{"spearman"} (default),
+or \code{"kendall"};
+or \eqn{p \times p} correlation matrix}
 
-\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"} for determining the candidate values for the hyperparameters; or list with slots \code{wgt.local}, \code{wgt.global}, \code{exp.local}, and \code{exp.global} (not yet implemented)}
+\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"}
+for determining the candidate values for the hyperparameters;
+or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
+and \code{exp_global} (not yet implemented)}
 
 \item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
 }
 \value{
-Returns an object of class \code{cv.corila}, a list with the following slots:
+Returns an object of class \code{cv.corila},
+a list with the following slots:
 \itemize{
-\item \code{object}: list with one slot for each combination of hyperparameters, each slot contains an object of class \code{"glmnet"}
-\item \code{hyper}: data frame with one row for each combination of hyperparameters, four columns for the values of the hyperparameters (\code{wgt.local}, \code{wgt.global}, \code{exp.global}, and \code{exp.local}) and a column for the cross-validated loss (\code{cvm})
-\item \code{id.hyper}: index of combination of hyperparameters leading to the lowest cross-validated loss
-\item \code{lambda.min}: optimised regularisation hyperparameter
-\item \code{scale}: output from \code{\link{forescale}()}
+\item \code{object}:
+list with one slot for each combination of hyperparameters,
+each slot contains an object of class \code{"glmnet"}
+\item \code{hyper}:
+data frame with one row for each combination of hyperparameters,
+four columns for the values of the hyperparameters
+(\code{wgt_local}, \code{wgt_global},
+\code{exp_global}, and \code{exp_local})
+and a column for the cross-validated loss (\code{cvm})
+\item \code{id_hyper}:
+index of combination of hyperparameters
+leading to the lowest cross-validated loss
+\item \code{lambda.min}
+optimised regularisation hyperparameter
+\item \code{scale}:
+output from \code{\link{forescale}()}
 }
 }
 \description{
 Optimises the parameters and the hyperparameters of the sparse group lasso.
 }
 \details{
-The number of observations (samples) for training or testing are indicated by \eqn{n_0} and \eqn{n_1}, respectively, the number of variables (features) is indicated by \eqn{p}, and the number of variable groups is indicated by \eqn{q}.
+The number of observations (samples) for training or testing
+are indicated by \eqn{n_0} and \eqn{n_1}, respectively,
+the number of variables (features) is indicated by \eqn{p},
+and the number of variable groups is indicated by \eqn{q}.
 
-Observations (samples) are indexed by \eqn{i} in \eqn{\{1,\ldots,n\}},
-variables (features) are indexed by \eqn{j} in \eqn{\{1,\ldots,p\}},
-and variable groups are indexed by \eqn{k} in \eqn{\{1,\ldots,q\}}.
+Observations (samples) are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
+variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
+and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
 
-The number of variables in the \eqn{k^{\text{th}}} group is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
+The number of variables in the \eqn{k^{\text{th}}} group
+is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 }
 \examples{
 \donttest{
@@ -70,58 +118,62 @@ set.seed(1)
 n0 <- 100
 n1 <- 10000
 n <- n0 + n1
-p <- c(100,50)
-z <- rep(x=seq_along(p),times=p)
-x <- sapply(X=z,FUN=function(x) stats::rnorm(n=n,sd=x))
-beta <- stats::rnorm(n=sum(p),mean=1,sd=0)*stats::rbinom(n=sum(p),size=1,prob=0.2)
+p <- c(100, 50)
+z <- rep(x = seq_along(p), times = p)
+x <- sapply(X = z, FUN = function(x) stats::rnorm(n = n, sd = x))
+beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
+       stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 eta <- x \%*\% beta
 family <- "gaussian"
-if(family=="gaussian"){
- y <- eta + 0.5*stats::rnorm(n=n,sd=stats::sd(eta))
-} else if(family=="binomial"){
- y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
-} else if(family=="cox"){
- time <- stats::rexp(n=n,rate=exp(eta))
- status <- stats::rbinom(n=n,prob=0.5,size=1)
- y <- survival::Surv(time=time,event=status)
+if (family == "gaussian") {
+ y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
+} else if (family == "binomial") {
+ y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+} else if (family == "cox") {
+ time <- stats::rexp(n = n, rate = exp(eta))
+ status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+ y <- survival::Surv(time = time, event = status)
 }
-cond <- rep(x=c(TRUE,FALSE),times=c(n0,n1))
+cond <- rep(x = c(TRUE, FALSE), times = c(n0, n1))
 
 y_hat <- coef <- list()
 
 # standard lasso regression
-object <- glmnet::cv.glmnet(x=x[cond,],y=y[cond],family=family,alpha=1)
-coef$glmnet <- stats::coef(object=object,s="lambda.min")
-y_hat$glmnet <- stats::predict(object=object,newx=x[!cond,],type="response",s="lambda.min")
+object <- glmnet::cv.glmnet(x = x[cond, ], y = y[cond],
+                           family = family, alpha = 1)
+coef$glmnet <- stats::coef(object = object, s = "lambda.min")
+y_hat$glmnet <- stats::predict(object = object, newx = x[!cond, ],
+                              type = "response", s = "lambda.min")
 
 # flexible group lasso regression
-object <- cv.corila(x=x[cond,],y=y[cond],group=z,family=family)
-coef$corila <- stats::coef(object=object)
-y_hat$corila <- stats::predict(object=object,newx=x[!cond,])
+object <- cv.corila(x = x[cond, ], y = y[cond], group = z, family = family)
+coef$corila <- stats::coef(object = object)
+y_hat$corila <- stats::predict(object = object, newx = x[!cond, ])
 
 # selection performance
-sapply(coef,function(x) mean(sign(x[-1])==sign(beta)))
-sapply(coef,function(x) sum(sign(x[-1])!=0 & sign(x[-1])==sign(beta))/sum(x[-1]!=0))
+sapply(coef, function(x) mean(sign(x[-1]) == sign(beta)))
+sapply(coef, function(x) sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0))
 
 # predictive performance
-if(family=="gaussian"){
- metric <- sapply(X=y_hat,FUN=function(x) 
+if (family == "gaussian") {
+ metric <- sapply(X = y_hat, FUN = function(x)
    mean((x-y[!cond])^2))
-} else if(family=="binomial"){
- metric <- sapply(X=y_hat,FUN=function(x) 
-   pROC::auc(response=y[!cond],
-             predictor=as.vector(x),
-             levels=c(0,1),
-             direction="<"))
-} else if(family=="cox"){
- metric <- sapply(X=y_hat,FUN=function(x)
+} else if (family == "binomial") {
+ metric <- sapply(X = y_hat, FUN = function(x)
+   pROC::auc(response = y[!cond],
+             predictor = as.vector(x),
+             levels = c(0, 1),
+             direction = "<"))
+} else if (family == "cox") {
+ metric <- sapply(X = y_hat, FUN = function(x)
    survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
 
 # privileged information
-#include <- stats::rbinom(n=sum(p),size=1,prob=0.5)==1
-#object <- cv.corila(x=x[cond,],y=y[cond],group=z,include=include,family=family)
+#include <- stats::rbinom(n = sum(p), size = 1, prob = 0.5) == 1
+#object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
+#                     include = include, family = family)
 }
 }
 \references{
@@ -131,7 +183,9 @@ metric
 \emph{In preparation}.
 }
 \seealso{
-Extract coefficients with \code{\link[=coef.cv.corila]{coef}()} and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
+Extract coefficients with \code{\link[=coef.cv.corila]{coef}()}
+and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 
-This user function repeatedly calls \code{\link{corila}()} with different values for the regularisation and mixing hyperparameters.
+This user function repeatedly calls \code{\link{corila}()}
+with different values for the regularisation and mixing hyperparameters.
 }

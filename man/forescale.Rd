@@ -7,20 +7,34 @@
 forescale(x, y = NULL, family = NULL, pars = NULL)
 }
 \arguments{
-\item{x}{\eqn{n_0 \times p} predictor matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p} is the number of variables}
+\item{x}{\eqn{n_0 \times p} predictor matrix,
+where \eqn{n_0} is the number of observations used for model training
+and \eqn{p} is the number of variables}
 
-\item{y}{\eqn{n_0}-dimensional response vector or \code{NULL}, only for Gaussian family}
+\item{y}{\eqn{n_0}-dimensional response vector or \code{NULL},
+only for Gaussian family}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}; or \code{NULL} (if \code{pars} is provided)}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"}; or \code{NULL} (if \code{pars} is provided)}
 
-\item{pars}{list as defined in section \emph{Value}, or \code{NULL} (if \code{family} is provided)}
+\item{pars}{list as defined in section \emph{Value},
+or \code{NULL} (if \code{family} is provided)}
 }
 \value{
 \itemize{
 \item standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
-\item standardised \eqn{n_0}-dimensional response vector \eqn{y} (only if \eqn{y} is provided and \code{family="gaussian"} or \code{pars$family="gaussian"}; otherwise output equals input)
-\item character string \code{family} indicates the model (\code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}), determined by argument \code{family} or \code{pars$family}
-\item list \code{pars} with slots \code{mu.x} and \code{sd.x} (\eqn{p}-dimensional vectors of means and standard deviations of the predictor variables), and \code{mu.y} and \code{sd.y} (mean and standard deviation of response variable for Gaussian family, 0 and 1 for other families)
+\item standardised \eqn{n_0}-dimensional response vector \eqn{y}
+(only if \eqn{y} is provided and \code{family = "gaussian"}
+or \code{pars$family = "gaussian"}; otherwise output equals input)
+\item character string \code{family} indicates the model (\code{"gaussian"},
+\code{"binomial"}, \code{"poisson"}, or \code{"cox"}),
+determined by argument \code{family} or \code{pars$family}
+\item list \code{pars} with slots \code{mu.x} and \code{sd.x}
+(\eqn{p}-dimensional vectors of means and standard deviations
+of the predictor variables),
+and \code{mu.y} and \code{sd.y}
+(mean and standard deviation of response variable for Gaussian family,
+0 and 1 for other families)
 }
 }
 \description{
@@ -31,50 +45,52 @@ Transforming variables to mean 0 and variance 1.
 family <- "cox"
 n0 <- 100; n1 <- 50; p <- 3
 n <- n0 + n1
-fold <- rep(c(0,1),times=c(n0,n1))
-sd <- stats::rpois(n=p,lambda=5)
-x <- data.frame(x=sapply(X=sd,FUN=function(x) stats::rnorm(n=n,sd=x)))
-beta <- stats::rnorm(n=p)
+fold <- rep(c(0, 1), times = c(n0, n1))
+sd <- stats::rpois(n = p, lambda = 5)
+x <- data.frame(x = sapply(X = sd,
+                          FUN = function(x) stats::rnorm(n = n, sd = x)))
+beta <- stats::rnorm(n = p)
 eta <- as.matrix(x) \%*\% beta
-if(family=="gaussian"){
- y <- stats::rnorm(n=n,mean=eta)
-} else if(family=="binomial"){
- y <- stats::rbinom(n=n,size=1,prob=1/(1+exp(-eta)))
-} else if(family=="poisson"){
- y <- stats::rpois(n=n,lambda=exp(eta))
-} else if(family=="cox"){
- time <- stats::rexp(n=n,rate=exp(eta))
- status <- stats::rbinom(n=n,prob=0.5,size=1)
- y <- survival::Surv(time=time,event=status)
+if (family == "gaussian") {
+ y <- stats::rnorm(n = n, mean = eta)
+} else if (family == "binomial") {
+ y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+} else if (family == "poisson") {
+ y <- stats::rpois(n = n, lambda = exp(eta))
+} else if (family == "cox") {
+ time <- stats::rexp(n = n, rate = exp(eta))
+ status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+ y <- survival::Surv(time = time, event = status)
 }
 
 # regression without standardisation
-if(family=="cox"){
- lm1 <- survival::coxph(y[fold==0]~.,data=x[fold==0,])
+if (family == "cox") {
+ lm1 <- survival::coxph(y[fold == 0]~., data=x[fold == 0, ])
 } else {
- lm1 <- stats::glm(y[fold==0]~.,data=x[fold==0,],family=family)
+ lm1 <- stats::glm(y[fold == 0]~., data=x[fold == 0, ], family=family)
 }
 coef1 <- stats::coef(lm1)
-yhat1 <- predict(lm1,newdata=x[fold==1,])
+yhat1 <- predict(lm1, newdata = x[fold == 1, ])
 
 # regression with standardisation
-scale <- forescale(x=x[fold==0,],y=y[fold==0],family=family)
-if(family=="cox"){
- lm2 <- survival::coxph(scale$y~.,data=data.frame(scale$x))
+scale <- forescale(x = x[fold == 0, ], y = y[fold == 0], family = family)
+if (family == "cox") {
+ lm2 <- survival::coxph(scale$y~., data = data.frame(scale$x))
 } else {
- lm2 <- stats::glm(scale$y~.,data=data.frame(scale$x),family=family)
+ lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
 }
 coef_temp <- stats::coef(lm2)
-newx_temp <- forescale(x=x[fold==1,],pars=scale$pars)$x
-yhat_temp <- predict(object=lm2,newdata=data.frame(newx_temp))
-result <- backscale(pars=scale$pars,y=yhat_temp,coef=coef_temp)
+newx_temp <- forescale(x = x[fold == 1, ], pars = scale$pars)$x
+yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
+result <- backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
 coef2 <- result$coef
 yhat2 <- result$y_original
 
 # equality
-all.equal(coef1,coef2,check.attributes=FALSE)
-all.equal(yhat1,yhat2)
+all.equal(coef1, coef2, check.attributes = FALSE)
+all.equal(yhat1, yhat2)
 }
 \seealso{
-Use function \code{\link{backscale}()} to bring coefficients and predictions back to original scale.
+Use function \code{\link{backscale}()}
+to bring coefficients and predictions back to original scale.
 }

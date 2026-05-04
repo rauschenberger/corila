@@ -7,37 +7,44 @@
 folds(y, family, nfolds)
 }
 \arguments{
-\item{y}{\eqn{n_0}-dimensional response vector, where \eqn{n_0} is the number of observations used for model training}
+\item{y}{\eqn{n_0}-dimensional response vector,
+where \eqn{n_0} is the number of observations used for model training}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"}}
 
 \item{nfolds}{integer specifying the number of folds}
 }
 \value{
-Returns an \eqn{n_1}-dimensional vector with entries \eqn{\{1,\ldots,}\code{nfolds}\eqn{\}}
+Returns an \eqn{n_1}-dimensional vector
+with entries \eqn{\{1, \ldots, }\code{nfolds}\eqn{\}}
 }
 \description{
 Splits observations into balanced and stratified folds
 }
 \details{
-Randomly splits observations into balanced folds (approximately the same number of observations per fold) and stratified folds (separate splitting for both classes in binomial family or censored/uncensored observations in Cox model).
+Randomly splits observations into balanced folds
+(approximately the same number of observations per fold)
+and stratified folds
+(separate splitting for both classes in binomial family
+or censored/uncensored observations in Cox model).
 }
 \examples{
 # Gaussian and Poisson families
-y <- stats::rnorm(n=100)
-foldid <- folds(y=y,family="gaussian",nfolds=10)
+y <- stats::rnorm(n = 100)
+foldid <- folds(y = y, family = "gaussian", nfolds = 10)
 table(foldid)
 
 # binomial families
-y <- stats::rbinom(n=100,prob=0.2,size=1)
-foldid <- folds(y=y,family="binomial",nfolds=10)
-table(y,foldid)
+y <- stats::rbinom(n = 100, prob = 0.2, size = 1)
+foldid <- folds(y = y, family = "binomial", nfolds = 10)
+table(y, foldid)
 
 # Cox model
-time <- stats::rexp(n=100,rate=5)
-status <- stats::rbinom(n=100,prob=0.2,size=1)
-y <- survival::Surv(time=time,event=status)
-foldid <- folds(y=y,family="cox",nfolds=10)
-table(y[,"status"],foldid)
+time <- stats::rexp(n = 100, rate = 5)
+status <- stats::rbinom(n = 100, prob = 0.2, size = 1)
+y <- survival::Surv(time = time, event = status)
+foldid <- folds(y = y, family = "cox", nfolds = 10)
+table(y[, "status"], foldid)
 
 }

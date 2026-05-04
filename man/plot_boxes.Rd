@@ -16,11 +16,13 @@ plot_boxes(
 \arguments{
 \item{x}{data frame with names slots}
 
-\item{base}{character string naming the slot of interest (e.g., \code{"corila"})}
+\item{base}{character string naming the slot of interest
+(e.g., \code{"corila"})}
 
 \item{main}{character string used as a title}
 
-\item{decrease}{\code{TRUE} for decreasing arrow, \code{FALSE} for increasing arrow}
+\item{decrease}{\code{TRUE} for decreasing arrow,
+\code{FALSE} for increasing arrow}
 
 \item{ylim}{limits for the vertical axis, or \code{NULL}}
 
@@ -30,10 +32,11 @@ plot_boxes(
 Returns \code{NULL} (and plots a figure).
 }
 \description{
-Creates box plots for paired/matched data, using Wilcoxon's signed-rank test to compare a group with the other groups.
+Creates box plots for paired/matched data,
+using Wilcoxon's signed-rank test to compare a group with the other groups.
 }
 \examples{
-x <- data.frame(mean=0,corila=rnorm(100)-1,other=rnorm(100))
+x <- data.frame(mean = 0, corila = rnorm(100)-1, other = rnorm(100))
 plot_boxes(x)
 
 }
