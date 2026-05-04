@@ -8,7 +8,8 @@ Suggests: knitr, testthat, remotes, rmarkdown, CBPE, MLGL, Matrix, SGL, ecpc, gg
 Authors@R: person(given="Armin",family="Rauschenberger",email="armin.rauschenberger@lih.lu",role=c("aut","cre"),comment=c(ORCID="0000-0001-6498-4801"))
 Encoding: UTF-8
 VignetteBuilder: knitr
-RoxygenNote: 7.3.3
+Language: en_GB
 URL: https://github.com/rauschenberger/corila, https://rauschenberger.github.io/corila/
 BugReports: https://github.com/rauschenberger/corila/issues
 License: GPL-3
+Config/roxygen2/version: 8.0.0
