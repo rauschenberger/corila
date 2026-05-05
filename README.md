@@ -1,6 +1,7 @@
 
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/rauschenberger/corila?svg=true)](https://ci.appveyor.com/project/rauschenberger/corila)
 [![R-CMD-check](https://github.com/rauschenberger/corila/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/R-CMD-check.yaml)
+[![lint](https://github.com/rauschenberger/corila/actions/workflows/lint.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/lint.yaml)
 [![Codecov test coverage](https://codecov.io/gh/rauschenberger/corila/graph/badge.svg)](https://app.codecov.io/gh/rauschenberger/corila)
 
 # Sparse group lasso
