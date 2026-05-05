@@ -13,6 +13,6 @@ BDS
 BioAI
 DMI
 multiridge
-R-CMD-check
+CMD
 Codecov
 AR
