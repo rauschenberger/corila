@@ -281,7 +281,7 @@ check_args <- function(x, y, family) {
       stop("Poisson family requires a count outcome.")
     }
   } else if (family == "cox") {
-    if (class(y) != "Surv") {
+    if (!inherits(x=y,what="Surv")) {
       stop("Cox model requires a survival outcome.")
     }
   } else {
