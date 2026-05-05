@@ -292,6 +292,18 @@ check_args <- function(x, y, family) {
 
 #----- group-ridge -----
 
+.mean.function <- function (x, family){
+  if (family %in% c("gaussian", "cox")) {
+    return(x)
+  } else if (family == "binomial") {
+    return(1/(1 + exp(-x)))
+  } else if (family == "poisson") {
+    return(exp(x))
+  } else {
+    stop("Family not implemented.")
+  }
+}
+
 #'@title
 #'Multi-Penalty Ridge Regression
 #'
@@ -549,7 +561,7 @@ predict.multiridge <- function(object, newx, ...) {
   if (object$family == "cox") {
     y_hat <- exp(eta)
   } else {
-    y_hat <- starnet:::.mean.function(eta, family = object$family)
+    y_hat <- .mean.function(x = eta, family = object$family)
   }
   y_hat <- backscale(pars = object$pars, y = y_hat)$y
   return(y_hat)
