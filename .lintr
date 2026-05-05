@@ -1,1 +1,1 @@
-linters: linters_with_defaults(return_linter = return_linter(return_style = "explicit"), commented_code_linter = NULL, object_name_linter = object_name_linter(styles="snake_case",regexes=c("cv.corila","lambda.min","cex.main")))
+linters: linters_with_defaults(return_linter = return_linter(return_style = "explicit"), commented_code_linter = NULL, object_name_linter = object_name_linter(styles="snake_case", regexes=c("cv.corila", "lambda.min", "cex.main")))
