@@ -1566,7 +1566,15 @@ calc_sign_prec <- function(truth, estim) {
 #'@examples
 #'\donttest{
 #'data <- simulate()
-#'results <- holdout(x_train = data$x_train, y_train = data$y_train, group = data$group, include = rep(c(TRUE, FALSE), each = 80), x_test = data$x_test, y_test = data$y_test, family = data$info$family, method = c("mean", "ridge", "lasso", "corila")) # Why does holdout require y_test? Try to remove this
+#'results <- holdout(x_train = data$x_train,
+#'                   y_train = data$y_train,
+#'                   group = data$group,
+#'                   include = rep(c(TRUE, FALSE), each = 80),
+#'                   x_test = data$x_test,
+#'                   y_test = data$y_test,
+#'                   family = data$info$family,
+#'                   method = c("mean", "ridge", "lasso", "corila"))
+#'# Why does holdout require y_test? Try to remove this
 #'}
 #'@export
 holdout <- function(x_train, y_train, group, include, family,
