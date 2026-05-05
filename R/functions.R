@@ -9,7 +9,8 @@
 #'@param y \eqn{n_0}-dimensional response vector or \code{NULL},
 #'only for Gaussian family
 #'@param family character string \code{"gaussian"}, \code{"binomial"},
-#'\code{"poisson"}, or \code{"cox"}; or \code{NULL} (if \code{pars} is provided)
+#'\code{"poisson"}, or \code{"cox"};
+#'or \code{NULL} (if \code{pars} is provided)
 #'@param pars list as defined in section \emph{Value},
 #'or \code{NULL} (if \code{family} is provided)
 #'
@@ -281,7 +282,7 @@ check_args <- function(x, y, family) {
       stop("Poisson family requires a count outcome.")
     }
   } else if (family == "cox") {
-    if (!inherits(x=y,what="Surv")) {
+    if (!inherits(x = y, what = "Surv")) {
       stop("Cox model requires a survival outcome.")
     }
   } else {
@@ -292,11 +293,11 @@ check_args <- function(x, y, family) {
 
 #----- group-ridge -----
 
-.mean.function <- function (x, family){
+.mean_function <- function(x, family) {
   if (family %in% c("gaussian", "cox")) {
     return(x)
   } else if (family == "binomial") {
-    return(1/(1 + exp(-x)))
+    return(1 / (1 + exp(-x)))
   } else if (family == "poisson") {
     return(exp(x))
   } else {
@@ -345,7 +346,7 @@ check_args <- function(x, y, family) {
 #'"Fast cross-validation for multi-penalty high-dimensional ridge regression"
 #'\emph{Journal of Computational and Graphical Statistics}
 #'30(4):835-847.
-#'\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
+#'\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}. # nolint: line_length_linter.
 #'
 #'@return
 #'Returns an object of class \code{"multiridge"},
@@ -561,7 +562,7 @@ predict.multiridge <- function(object, newx, ...) {
   if (object$family == "cox") {
     y_hat <- exp(eta)
   } else {
-    y_hat <- .mean.function(x = eta, family = object$family)
+    y_hat <- .mean_function(x = eta, family = object$family)
   }
   y_hat <- backscale(pars = object$pars, y = y_hat)$y
   return(y_hat)
@@ -602,6 +603,27 @@ coef.multiridge <- function(object, ...) {
 }
 
 #----- group-lasso -----
+
+.deviance <- function(y_hat, y, family) {
+  eps <- 1e-06
+  if (family == "gaussian") {
+    deviance <- mean((y_hat - y)^2)
+  } else if (family == "binomial") {
+    deviance <- mean(
+      -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
+    )
+  } else if (family == "cox") {
+    deviance <- glmnet::coxnet.deviance(pred = y_hat, y = y)
+  } else if (family == "poisson") {
+    deviance <- mean(
+      2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat)
+    )
+  } else {
+    stop(paste0("Family \"", family, "\" is not implemented."))
+  }
+  return(deviance)
+}
+
 
 #'@title
 #'Group lasso
@@ -843,7 +865,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       } else if (is.matrix(group)) {
         cond_temp <- group[, j] == 1
       }
-      temp <- (sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i] * coef_init) * cond_temp
+      cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
+      temp <-  cor_trans * coef_init * cond_temp
       weight$local[j] <- sum(pmax(0, temp)[cond_temp]) / sum(cond_temp)
       weight$local[p + j] <- sum(pmax(0, -temp)[cond_temp]) / sum(cond_temp)
 
@@ -851,14 +874,18 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       weight$local[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
 
       # all features
-      temp <- (sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef_init)
+      temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef_init
       weight$global[j] <- sum(pmax(0, temp)) / p
       weight$global[p + j] <- sum(pmax(0, -temp)) / p
     }
     # # temporary code with beta distribution:
-    # temp <- sign(cor[, j]) * stats::qbeta(p = abs(cor[, j]), shape1 = hyper$alpha[i], shape2 = hyper$beta[i]) * coef_init * cond_temp
+    # temp <- sign(cor[, j]) *
+    # stats::qbeta(p = abs(cor[, j]),
+    # shape1 = hyper$alpha[i],
+    # shape2 = hyper$beta[i]) * coef_init * cond_temp
     weight <- lapply(weight, function(x) p * ifelse(x == 0, 0, x / sum(x)))
-    pf_ext <- 1 / (weight$local * hyper$wgt_local[i] + weight$global * hyper$wgt_global[i])
+    pf_ext <- 1 / (weight$local * hyper$wgt_local[i] +
+                     weight$global * hyper$wgt_global[i])
     # To obtain standard lasso set pf_ext equal to 1.
     pf_ext[!c(include, include)] <- Inf # excluded features
     if (any(is.na(pf_ext))) {
@@ -1011,7 +1038,9 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 #'# selection performance
 #'sapply(coef, function(x) mean(sign(x[-1]) == sign(beta)))
-#'sapply(coef, function(x) sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0))
+#'sapply(coef, function(x) {
+#'  sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0)
+#'})
 #'
 #'# predictive performance
 #'if (family == "gaussian") {
@@ -1035,7 +1064,10 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'#                     include = include, family = family)
 #'}
 #'@export
-cv.corila <- function(x, y, group, include = NULL, alpha_init = 0, alpha_final = 1, family = "gaussian", nfolds = 10, cor = "spearman", tune = "both", foldid = NULL) {
+cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
+                      alpha_final = 1, family = "gaussian",
+                      nfolds = 10, cor = "spearman", tune = "both",
+                      foldid = NULL) {
   check_args(x = x, y = y, family = family)
   if (nrow(x) != length(y)) {
     stop(paste("For each observation,",
@@ -1115,7 +1147,8 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0, alpha_final =
 
   if (is.null(foldid)) {
     #foldid <- sample(rep(x = seq_len(nfolds), length.out = n))
-    foldid <- folds(y = y, family = family, nfolds = nfolds) # balanced/stratified folds
+    # balanced/stratified folds
+    foldid <- folds(y = y, family = family, nfolds = nfolds)
   }
 
   # Use foldid already for full run?
@@ -1157,27 +1190,13 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0, alpha_final =
   }
 
   cvm <- list()
-  eps <- 1e-06
+
   for (l in seq_len(nrow(hyper))) {
-    if (family == "gaussian") {
-      cvm[[l]] <- apply(X = hat[[l]],
-                        MARGIN = 2,
-                        FUN = function(x) mean((x - y)^2))
-    } else if (family == "binomial") {
-      cvm[[l]] <- apply(X = hat[[l]],
-                        MARGIN = 2,
-                        FUN = function(x) mean(-y * log(pmax(x, eps)) - (1 - y) * log(1 - pmin(x, 1 - eps))))
-    } else if (family == "cox") {
-      cvm[[l]] <- apply(X = hat[[l]],
-                        MARGIN = 2,
-                        FUN = function(x) glmnet::coxnet.deviance(pred = x, y = y))
-    } else if (family == "poisson") {
-      cvm[[l]] <- apply(X = hat[[l]],
-                        MARGIN = 2,
-                        FUN = function(x) mean(2 * (ifelse(y == 0, 0, y * log(y / x)) - y + x)))
-    } else {
-      stop(paste0("Family \"", family, "\" is not implemented."))
-    }
+    cvm[[l]] <- apply(
+      X = hat[[l]],
+      MARGIN = 2,
+      FUN = function(x) .deviance(y_hat = x, y =  y, family = family)
+    )
   }
   hyper$cvm <- cvm_min <- sapply(X = cvm, FUN = base::min)
   id_hyper <- which.min(cvm_min)
@@ -1250,12 +1269,14 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #'
 #'@return
 #'Returns an \eqn{(1 + p)}-dimensional vector of the estimated coefficients.
-#'The first entry is the estimated intercept, and the other \eqn{p} entries are the estimated slopes.
+#'The first entry is the estimated intercept,
+#'and the other \eqn{p} entries are the estimated slopes.
 #'
 #'@inherit corila-package references
 #'
 #'@seealso
-#'Fit models with \code{\link{cv.corila}()} and make predictions with \code{\link{predict.cv.corila}()}.
+#'Fit models with \code{\link{cv.corila}()}
+#'and make predictions with \code{\link{predict.cv.corila}()}.
 #'
 #'@inherit cv.corila examples
 #'@export
@@ -1276,10 +1297,13 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   if (any(beta < 0)) {
     stop("negative values")
   }
-  beta_sum <- beta[1:(length(beta) / 2)] - beta[(length(beta) / 2 + 1):(length(beta))]
-  coef <- c(alpha, beta_sum)
+  beta_positive <- beta[1:(length(beta) / 2)]
+  beta_negative <- beta[(length(beta) / 2 + 1):(length(beta))]
+  beta_combined <- beta_positive  - beta_negative
+  coef <- c(alpha, beta_combined)
   coef <- backscale(coef = coef, pars = object$scale)$coef
-  if (any(coef[c(FALSE[object$scale$family != "cox"], !object$include == 1)] != 0)) {
+  if (any(coef[c(FALSE[object$scale$family != "cox"],
+                 !object$include == 1)] != 0)) {
     stop("Excluded coefs must equal zero.")
   }
   coef <- coef[c(TRUE[object$scale$family != "cox"], object$include == 1)]
@@ -1295,7 +1319,8 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
 #'Simulates data with grouped predictor variables
 #'
 #'@param family
-#'character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}
+#'character \code{"gaussian"}, \code{"binomial"},
+#'\code{"poisson"} or \code{"cox"}
 #'@param n0
 #'number of training observations
 #'@param n1
@@ -1352,7 +1377,12 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
 #'sapply(X = data, FUN = dims)
 #'
 #'@export
-simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20, n_type = 2, size_group = c(5, 3), effect_size = c(1, 1), corfac_feature = 0.5, corfac_type = 0.5, corfac_group = 0.25, n_group_causal = 2, prop_causal = 0.5, noise_factor = 1, plot = TRUE, trial = FALSE) {
+simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
+                     n_type = 2, size_group = c(5, 3), effect_size = c(1, 1),
+                     corfac_feature = 0.5, corfac_type = 0.5,
+                     corfac_group = 0.25, n_group_causal = 2,
+                     prop_causal = 0.5, noise_factor = 1,
+                     plot = TRUE, trial = FALSE) {
   # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;size_group = c(5, 3);effect_size = c(1, 1);corfac_feature = 0.5;corfac_type = 0.5;corfac_group = 0.25;n_group_causal = 2;prop_causal = 0.5; noise_factor = 1; plot = TRUE
   n <- n0 + n1
 
@@ -1366,9 +1396,10 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20, n_
   if (!trial) {
     type <- rep(x = seq_len(n_type),
                 times = n_group * size_group) # original
-    group <- unlist(lapply(X = size_group,
-                           FUN = function(x) rep(x = seq_len(n_group),
-                                                 each = x))) # original
+    group <- unlist(lapply(
+      X = size_group,
+      FUN = function(x) rep(x = seq_len(n_group),each = x))
+    ) # original
   } else {
     group <- rep(x = seq_len(n_group),
                  each = sum(size_group)) # trial 2025-09-22
@@ -1380,7 +1411,9 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20, n_
   beta <- rep(x = 0, times = p)
   index.common <- sample(x = seq_len(n_group), size = n_group_causal)
   cond <- group %in% index.common
-  beta[cond] <- stats::rbinom(n = sum(cond), size = 1, prob = prop_causal) * abs(stats::rnorm(n = sum(cond)))
+  var_binom <- stats::rbinom(n = sum(cond), size = 1, prob = prop_causal)
+  var_norm <- abs(stats::rnorm(n = sum(cond)))
+  beta[cond] <- var_binom * var_norm
   if (!trial) {
     beta <- beta * rep(x = effect_size, times = table(type))
     # NB: original, added on 2025-06-20
@@ -1401,7 +1434,9 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20, n_
   for (i in seq_len(p)) {
     for (j in seq_len(p)) {
       if (!trial) {
-        sigma[i, j] <- corfac_feature^(i != j) * corfac_type^(type[i] != type[j]) * corfac_group^(group[i] != group[j]) # original
+        sigma[i, j] <- corfac_feature^(i != j) *
+          corfac_type^(type[i] != type[j]) *
+          corfac_group^(group[i] != group[j]) # original
       } else {
         sigma[i, j] <- ifelse(i == j, 1, ifelse(group[i] == group[j] & type[i] == type[j], 0.5, ifelse(group[i] == group[j], -0.25, ifelse(type[i] == type[j], 0.125, -0.125)))) # Consider not only + but also - (but then use + and - for effect sizes), was -0.0625
       }
@@ -1542,7 +1577,8 @@ calc_sign_prec <- function(truth, estim) {
   if (all(is.na(estim)) || all(estim == 0)) {
     return(NA)
   } else {
-    value <- sum(estim != 0 & truth != 0 & sign(estim) == sign(truth)) / sum(estim != 0)
+    value <- sum(estim != 0 & truth != 0 & sign(estim) == sign(truth)) / 
+      sum(estim != 0)
     return(value)
   }
 }
@@ -1555,14 +1591,23 @@ calc_sign_prec <- function(truth, estim) {
 #'
 #'@inheritParams cv.corila
 #'
-#'@param x_train \eqn{n_0 \times p} matrix
-#'@param y_train \eqn{n_0}-dimensional vector
-#'@param x_test \eqn{n_1 \times p} matrix
-#'@param y_test \eqn{n_1}-dimensional vector
-#'@param method character vector listing all methods to be compared
-#'@param nfolds number of internal cross-validation folds (integer scalar)
-#'@param foldid internal cross-validation fold identifiers (\eqn{p}-dimensional integer vector)
-#'@param seed random seed (integer scalar) for reproducibility, or \code{NULL}
+#'@param x_train
+#'\eqn{n_0 \times p} matrix
+#'@param y_train
+#'\eqn{n_0}-dimensional vector
+#'@param x_test
+#'\eqn{n_1 \times p} matrix
+#'@param y_test
+#'\eqn{n_1}-dimensional vector
+#'@param method
+#'character vector listing all methods to be compared
+#'@param nfolds
+#'number of internal cross-validation folds (integer scalar)
+#'@param foldid
+#'internal cross-validation fold identifiers
+#'(\eqn{p}-dimensional integer vector)
+#'@param seed
+#'random seed (integer scalar) for reproducibility, or \code{NULL}
 #'
 #'@return
 #'Returns a list with the following slots:
@@ -2240,7 +2285,8 @@ holdout <- function(x_train, y_train, group, include, family,
 #'\item \code{nzero} non-zero coefficients
 #'\item \code{metric} metric
 #'}
-#'Both slot contain a data frame with one row for each iteration (\code{iter})
+#'Both slot contain a data frame
+#'with one row for each iteration (\code{iter})
 #'and one column for each \code{method}.
 #'
 #'@examples
@@ -2383,7 +2429,9 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
     ))
   col <- ifelse(test = p_worse <= 0.05,
                 yes = "red",
-                no = ifelse(test = p_better <= 0.05, yes = "blue", no = "grey"))
+                no = ifelse(test = p_better <= 0.05,
+                            yes = "blue",
+                            no = "grey"))
   #--- boxplot ---
   graphics::boxplot(x = x,
                     main = main,
@@ -2441,14 +2489,18 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
 #Calculates the mean or the first principal component of a group of variables
 #
 #@inheritParams construct_matrices
-#@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0} is the number of observations used for model training and \eqn{p_k} is the number of variables inside a group
-#@param fuse character string \code{"mean"} for arithmetic mean  or \code{"pca"} for first principal component
+#@param x \eqn{n_0 \times p_k} matrix, where \eqn{n_0}
+# is the number of observations used for model training and
+# \eqn{p_k} is the number of variables inside a group
+#@param fuse character string \code{"mean"}
+# for arithmetic mean  or \code{"pca"} for first principal component
 #
 #@return
 #Returns an \eqn{n_0}-dimensional numeric vector.
 #
 #@seealso
-#This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
+#This function is called by \code{\link{corila}()}
+# and thereby \code{\link{cv.corila}()}.
 #
 #@examples
 #n <- 100; p <- 5
@@ -2473,9 +2525,13 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
 #Construct Matrices
 #
 #@description
-#Constructs matrices with (i) the original data concatenated with the inverted data, (ii) one meta-variable for each group, and (iii) one meta-variable for each group in each type.
+#Constructs matrices with
+# (i) the original data concatenated with the inverted data,
+# (ii) one meta-variable for each group, and
+# (iii) one meta-variable for each group in each type.
 #
-#@param group \eqn{p}-dimensional vector of group labels or indices, or list with one slot for each group containing the variable labels or indices
+#@param group \eqn{p}-dimensional vector of group labels or indices,
+# or list with one slot for each group containing the variable labels or indices
 #@param type \eqn{p}-dimensional vector
 #@inheritParams corila
 #
@@ -2488,14 +2544,17 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
 #x <- construct_matrices(x = x, group = group, type = type)
 #
 #@seealso
-#This function is called by \code{\link{corila}()} and thereby \code{\link{cv.corila}()}.
+#This function is called by \code{\link{corila}()}
+# and thereby \code{\link{cv.corila}()}.
 #
 #@return
 #See description.
 #@export
 # construct_matrices <- function(x, group, type, fuse = "mean") {
-#   if ((is.numeric(group) && ncol(x) != length(group)) | ncol(x) != length(type)) {
-#     stop("For each variable, the matrix \"x\" must have one column, and the vectors \"group\" (if applicable) and \"type\" must have one entry.")
+#   if ((is.numeric(group) && ncol(x) != length(group)) |
+# ncol(x) != length(type)) {
+#     stop("For each variable, the matrix \"x\" must have one column,
+# and the vectors \"group\" (if applicable) and \"type\" must have one entry.")
 #   }
 #   index <- seq_len(ncol(x))
 #   n <- nrow(x)
@@ -2505,22 +2564,29 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
 #     q <- length(group)
 #   }
 #   m <- length(unique(type))
-#   com <- matrix(data = NA, nrow = n, ncol = q, dimnames = list(NULL, seq_len(q)))
+#   com <- matrix(data = NA, nrow = n, ncol = q,
+# dimnames = list(NULL, seq_len(q)))
 #   sep <- replicate(n = m, expr = com, simplify = FALSE)
 #   for (i in seq_len(m)) {
 #     for (j in seq_len(q)) {
 #       if (is.numeric(group)) {
-#         sep[[i]][, j] <- combine_features(x = x[, type== i & group == j, drop = FALSE], fuse = fuse)
+#         sep[[i]][, j] <-
+# combine_features(x = x[, type== i & group == j, drop = FALSE], fuse = fuse)
 #       } else {
-#         sep[[i]][, j] <- combine_features(x = x[, type == i & index %in% group[[j]], drop = FALSE], fuse = fuse)
+#         sep[[i]][, j] <-
+# combine_features(x = x[, type == i & index %in% group[[j]], drop = FALSE],
+# fuse = fuse)
 #       }
 #     }
 #   }
 #   for (j in seq_len(q)) {
 #     if (is.numeric(group)) {
-#       com[, j] <- combine_features(x = x[, group == j, drop = FALSE], fuse = fuse)
+#       com[, j] <- combine_features(x = x[, group == j, drop = FALSE],
+# fuse = fuse)
 #     } else {
-#       com[, j] <- combine_features(x = x[, index %in% group[[j]], drop = FALSE], fuse = fuse)
+#       com[, j] <-
+# combine_features(x = x[, index %in% group[[j]], drop = FALSE],
+# fuse = fuse)
 #     }
 #   }
 #   return(list(all = cbind(x, -x), com = com, sep = sep))
