@@ -4,11 +4,31 @@ Title: A Flexible Version of the Sparse Group Lasso
 Description: Estimates sparse regression models under grouped variables.
 Depends: R (>= 3.0.0)
 Imports: glmnet, stats, mvtnorm, pROC, survival, starnet
-Suggests: knitr, testthat, remotes, rmarkdown, CBPE, MLGL, Matrix, SGL, ecpc, gglasso, grpreg, grpregOverlap, multiridge, multiview, pcLasso, scoop, sparsegl, squeezy, graper
+Suggests: 
+    knitr,
+    testthat,
+    remotes,
+    rmarkdown,
+    CBPE,
+    MLGL,
+    Matrix,
+    SGL,
+    ecpc,
+    gglasso,
+    grpreg,
+    grpregOverlap,
+    multiridge,
+    multiview,
+    pcLasso,
+    scoop,
+    sparsegl,
+    squeezy,
+    graper,
+    spelling
 Authors@R: person(given="Armin",family="Rauschenberger",email="armin.rauschenberger@lih.lu",role=c("aut","cre"),comment=c(ORCID="0000-0001-6498-4801"))
 Encoding: UTF-8
 VignetteBuilder: knitr
-Language: en_GB
+Language: en-GB
 URL: https://github.com/rauschenberger/corila, https://rauschenberger.github.io/corila/
 BugReports: https://github.com/rauschenberger/corila/issues
 License: GPL-3
