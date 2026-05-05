@@ -11,5 +11,5 @@ appveyor.yml
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
 ^LICENSE\.md$
-_development.R
+_development.Rmd
 .lintr
