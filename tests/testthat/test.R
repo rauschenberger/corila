@@ -168,7 +168,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   group$matrix <- 1 * outer(X = group$vector,
                             Y = group$vector,
                             FUN = "==")
-  model <- sapply(X = group, FUN = function(x) NULL, simplify = FALSE)
+  model <- lapply(X = group,FUN = function(x) NULL)
   for (i in seq_along(group)) {
     set.seed(1)
     model[[i]] <- cv.corila(x = data$x_train,
