@@ -13,3 +13,4 @@ appveyor.yml
 ^LICENSE\.md$
 _development.Rmd
 .lintr
+CITATION.cff
