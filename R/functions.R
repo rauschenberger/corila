@@ -1485,15 +1485,14 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                      n_type = n_type,
                      n_group = n_group,
                      family = family)
-  list <- list(x_train = x_train,
-               type = type,
-               group = group,
-               y_train = y_train,
-               x_test = x_test,
-               y_test = y_test,
-               beta = beta,
-               info = info)
-  list
+  list(x_train = x_train,
+       type = type,
+       group = group,
+       y_train = y_train,
+       x_test = x_test,
+       y_test = y_test,
+       beta = beta,
+       info = info)
 }
 
 simulate_overlap <- function() {
@@ -1723,7 +1722,7 @@ holdout <- function(x_train, y_train, group, include, family,
                                       s = "lambda.min",
                                       type = "response")
       }
-      coef$ridge <- c(if (family == "cox") NA,
+      coef$ridge <- c(NA[family == "cox"],
                       as.numeric(stats::coef(object = object,
                                              s = "lambda.min")))
     } else if (i == "multiridge") {
@@ -1753,7 +1752,7 @@ holdout <- function(x_train, y_train, group, include, family,
                                       s = "lambda.min",
                                       type = "response")
       }
-      coef$lasso <- c(if (family == "cox") NA,
+      coef$lasso <- c(NA[family == "cox"],
                       as.numeric(stats::coef(object = object,
                                              s = "lambda.min")))
     } else if (i == "gglasso") {
@@ -2247,7 +2246,9 @@ holdout <- function(x_train, y_train, group, include, family,
     }
 
     if (!is.null(x_test)) {
-      cond_range <- any(sapply(X = y_hat, FUN = function(x) any(x < 0 | x > 1, na.rm = TRUE)))
+      cond_range <- any(sapply(X = y_hat, FUN = function(x) {
+        any(x < 0 | x > 1, na.rm = TRUE)
+      }))
       if (family == "binomial" && cond_range) {
         stop("invalid y_hat range")
       }
@@ -2347,17 +2348,28 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
       }
     }
     if (family %in% c("gaussian", "poisson")) {
-      list$metric[[k]] <- apply(X = y_hat, MARGIN = 2,
-        FUN = function(x) mean((y[foldid != 0] - x[foldid != 0])^2))
+      list$metric[[k]] <- apply(
+        X = y_hat,
+        MARGIN = 2,
+        FUN = function(x) mean((y[foldid != 0] - x[foldid != 0])^2)
+      )
     } else if (family == "binomial") {
-      list$metric[[k]] <- apply(X = y_hat, MARGIN = 2,
-        FUN = function(x) pROC::auc(response = y[foldid != 0],
-                                    predictor = as.vector(x[foldid != 0]),
-                                    levels = c(0, 1), direction = "<"))
+      list$metric[[k]] <- apply(
+        X = y_hat,
+        MARGIN = 2,
+        FUN = function(x) {
+          pROC::auc(response = y[foldid != 0],
+                    predictor = as.vector(x[foldid != 0]),
+                    levels = c(0, 1), direction = "<")
+        }
+      )
     } else if (family == "cox") {
-      list$metric[[k]] <- apply(X = y_hat, MARGIN = 2,
-        FUN = function(x) survival::concordance(
-          y[foldid != 0] ~ I(-x[foldid != 0]))$concordance
+      list$metric[[k]] <- apply(
+        X = y_hat,
+        MARGIN = 2,
+        FUN = function(x) {
+          survival::concordance(y[foldid != 0] ~ I(-x[foldid != 0]))$concordance
+        }
       )
     }
     set.seed(k)
