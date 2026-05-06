@@ -896,12 +896,15 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                                   lower.limits = 0,
                                   alpha = alpha_final)
   }
-  list <- list(model = object,
-               include = include,
-               lambda_init = lambda_init,
-               scale = scale$pars)
-  class(list) <- "corila"
-  list
+  structure(
+    list(
+      model = object,
+      include = include,
+      lambda_init = lambda_init,
+      scale = scale$pars
+    ),
+    class = "corila"
+  )
 }
 
 #'@title
@@ -1197,14 +1200,17 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   id_hyper <- which.min(cvm_min)
   lambda.min <- object_ext$model[[id_hyper]]$lambda[which.min(cvm[[id_hyper]])]
 
-  list <- list(object = object_ext$model,
-               include = include,
-               hyper = hyper,
-               id_hyper = id_hyper,
-               lambda.min = lambda.min,
-               scale = object_ext$scale)
-  class(list) <- "cv.corila"
-  list
+  structure(
+    list(
+      object = object_ext$model,
+      include = include,
+      hyper = hyper,
+      id_hyper = id_hyper,
+      lambda.min = lambda.min,
+      scale = object_ext$scale
+    ),
+    class = "cv.corila"
+  )
 }
 
 #'@title
@@ -1250,8 +1256,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
                                 newx = x_all,
                                 s = s,
                                 type = "response")
-  y_hat <- backscale(y = y_hat_stand, pars = object$scale)$y
-  y_hat
+  backscale(y = y_hat_stand, pars = object$scale)$y
 }
 
 #'@title
@@ -1438,7 +1443,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
           corfac_type^(type[i] != type[j]) *
           corfac_group^(group[i] != group[j]) # original
       } else {
-        sigma[i, j] <- ifelse(i == j, 1, ifelse(group[i] == group[j] & type[i] == type[j], 0.5, ifelse(group[i] == group[j], -0.25, ifelse(type[i] == type[j], 0.125, -0.125)))) # Consider not only + but also - (but then use + and - for effect sizes), was -0.0625
+        sigma[i, j] <- ifelse(i == j, 1, ifelse(group[i] == group[j] & type[i] == type[j], 0.5, ifelse(group[i] == group[j], -0.25, ifelse(type[i] == type[j], 0.125, -0.125)))) # Consider not only + but also - (but then use + and - for effect sizes), was -0.0625 MAKE THIS LINE SHORTER USING IF ELSE STATEMENTS # nolint: line_length_linter.
       }
     }
   }
@@ -2052,15 +2057,22 @@ holdout <- function(x_train, y_train, group, include, family,
       #))
       #datablocks <- lapply(X = unique(type[include]),
       #                     FUN = function(x) which(type[include] == x))
-      #invisible(tryCatch(utils::capture.output(
-      #  object <- ecpc::ecpc(Y = y_temp,
-      #                       X = x_train[, include],
-      #                       groupsets = list(groupset),
-      #                       X2 = x_test[, include],
-      #                       model = model,
-      #                       fold = nfolds,
-      #                       datablocks = NULL
-      #)), error = function(x) NULL))
+      invisible(
+        tryCatch(
+          utils::capture.output(
+            object <- ecpc::ecpc(
+              Y = y_temp,
+              X = x_train[, include],
+              groupsets = list(groupset),
+              X2 = x_test[, include],
+              model = model,
+              fold = nfolds,
+              datablocks = NULL
+            )
+          ),
+          error = function(x) NULL
+        )
+      )
       # Currently typeset/datablocks is ignored!
       if (!is.null(object)) {
         coef$ecpc <- unlist(stats::coef(object))
@@ -2108,14 +2120,14 @@ holdout <- function(x_train, y_train, group, include, family,
       #  beta_true <- c(0.5, -1, 2, 5, rep(0, times = p - 4))
       #  y_train <- rbinom(n, 1, 1 / (1 + exp(-x_train %*% beta_true)))
       #}
-      if (family == "gaussian") {
-        cbpe <- CBPE::CBPLinearE
-      } else if (family == "binomial") {
-        cbpe <- CBPE::CBPLogisticE
-      } else {
-        next
-      }
-      lambda <- exp(seq(from = log(1e06), to = log(1e-06), length.out = 20))
+      #if (family == "gaussian") {
+      #  cbpe <- CBPE::CBPLinearE
+      #} else if (family == "binomial") {
+      #  cbpe <- CBPE::CBPLogisticE
+      #} else {
+      #  next
+      #}
+      #lambda <- exp(seq(from = log(1e06), to = log(1e-06), length.out = 20))
       # no predict function implemented
       #for (i in seq_len(nfolds)) {
       #  coef <- CBPE(X = x_train[foldid !=  i, include],
