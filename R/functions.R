@@ -855,7 +855,10 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       if (is.numeric(group) && !is.array(group)) {
         cond_temp <- group[j] == group
       } else if (is.list(group)) {
-        group_index <- sapply(group, function(x) j %in% x)
+        group_index <- vapply(X = group,
+                              FUN = function(x) j %in% x,
+                              FUN.VALUE = logical(1))
+        #names(group_index) <- group
         cond_temp <- seq_len(p) %in% unlist(group[group_index])
       } else if (is.matrix(group)) {
         cond_temp <- group[, j] == 1
@@ -1196,7 +1199,9 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
       FUN = function(x) .deviance(y_hat = x, y =  y, family = family)
     )
   }
-  hyper$cvm <- cvm_min <- sapply(X = cvm, FUN = base::min)
+  hyper$cvm <- cvm_min <- vapply(X = cvm,
+                                 FUN = base::min,
+                                 FUN.VALUE = numeric(1))
   id_hyper <- which.min(cvm_min)
   lambda.min <- object_ext$model[[id_hyper]]$lambda[which.min(cvm[[id_hyper]])]
 
@@ -1519,8 +1524,8 @@ simulate_overlap <- function() {
   # alternative:
   for (i in seq_len(p)) {
     for (j in seq_len(p)) {
-      group_i <- sapply(group, function(x) i %in% x)
-      group_j <- sapply(group, function(x) j %in% x)
+      group_i <- vapply(group, function(x) i %in% x, logical(1))
+      group_j <- vapply(group, function(x) j %in% x, logical(1))
       sigma[i, j] <- 0.5^(i != j) * 0.25^(!any(group_i & group_j) & (i != j))
     }
   }
@@ -1682,15 +1687,13 @@ holdout <- function(x_train, y_train, group, include, family,
   }
 
   if (!is.null(x_test)) {
-    y_hat <- sapply(X = method,
-                    FUN = function(x) rep(x = NA, times = n1),
-                    simplify = FALSE)
+    y_hat <- lapply(X = method, FUN = function(x) rep(x = NA, times = n1))
+    names(y_hat) <- method
   } else {
     y_hat <- NULL
   }
-  coef <- sapply(X = method,
-                 FUN = function(x) rep(x = NA, times = p + 1),
-                 simplify = FALSE)
+  coef <- lapply(X = method, FUN = function(x) rep(x = NA, times = p + 1))
+  names(coef) <- method
   #y_hat <- coef <- list()
 
   difftime <- numeric()
@@ -2175,7 +2178,9 @@ holdout <- function(x_train, y_train, group, include, family,
                                              ratio = ratio[j])
         ))
       }
-      id <- which.min(sapply(X = object, FUN = function(x) min(x$cvm)))
+      id <- which.min(vapply(X = object,
+                             FUN = function(x) min(x$cvm),
+                             FUN.VALUE = numeric(1)))
       object <- object[[id]]
       if (!is.null(x_test)) {
         y_hat$pcLasso <- pcLasso::predict.cv.pcLasso(object = object,
@@ -2213,12 +2218,10 @@ holdout <- function(x_train, y_train, group, include, family,
     method <- names(y_hat)
     if (!is.null(x_test)) {
       if (family == "binomial") {
-        if (min(sapply(X = y_hat,
-                       FUN = function(x) base::min(x, na.rm = TRUE))) < 0) {
+        if (min(unlist(y_hat), na.rm = TRUE) < 0) {
           stop("too small")
         }
-        if (max(sapply(X = y_hat,
-                       FUN = function(x) base::max(x, na.rm = TRUE))) > 1) {
+        if (max(unlist(y_hat), na.rm = TRUE) > 1) {
           stop("too large")
         }
       }
@@ -2258,17 +2261,19 @@ holdout <- function(x_train, y_train, group, include, family,
     }
 
     if (!is.null(x_test)) {
-      cond_range <- any(sapply(X = y_hat, FUN = function(x) {
-        any(x < 0 | x > 1, na.rm = TRUE)
-      }))
-      if (family == "binomial" && cond_range) {
+      range <- range(unlist(y_hat), na.rm = TRUE)
+      if (family == "binomial" && (range[1] < 0 || range[2] > 1)) {
         stop("invalid y_hat range")
       }
-      if (any(sapply(X = y_hat, FUN = base::length) != n1)) {
+      if (any(vapply(X = y_hat,
+                     FUN = base::length,
+                     FUN.VALUE = numeric(1)) != n1)) {
         stop("invalid y_hat length")
       }
     }
-    if (any(sapply(X = coef, FUN = base::length) != sum(include) + 1)) {
+    if (any(vapply(X = coef,
+                   FUN = base::length,
+                   FUN.VALUE = numeric(1)) != sum(include) + 1)) {
       stop("invalid coef length")
     }
   } else {
@@ -2386,8 +2391,9 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
     }
     set.seed(k)
     if (nfolds == 1) {
-      list$nzero[[k]] <- sapply(X = results$coef,
-                                FUN = function(x) sum(x[-1] != 0))
+      list$nzero[[k]] <- vapply(X = results$coef,
+                                FUN = function(x) sum(x[-1] != 0),
+                                FUN.VALUE = numeric(1))
     } else {
       refit <- holdout(x_train = x[foldid != 0, ],
                        y_train = y[foldid != 0],
@@ -2401,8 +2407,9 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
                        method = method,
                        seed = NULL,
                        tune = tune)
-      list$nzero[[k]] <- sapply(X = refit$coef,
-                                FUN = function(x) sum(x[-1] != 0))
+      list$nzero[[k]] <- vapply(X = refit$coef,
+                                FUN = function(x) sum(x[-1] != 0),
+                                FUN.VALUE = numeric(1))
     }
   }
   list <- lapply(X = list, FUN = function(x) do.call(what = "rbind", args = x))
