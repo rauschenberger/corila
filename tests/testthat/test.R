@@ -336,8 +336,8 @@ for (family in c("gaussian", "binomial", "cox")) {
   if (family == "cox") {
     temp <- exp(x[!cond, ] %*% stats::coef(object))
   } else {
-    temp <- starnet:::.mean.function(
-      coef(object)[1] + x[!cond, ] %*% coef(object)[-1],
+    temp <- .mean.function(
+      x = coef(object)[1] + x[!cond, ] %*% coef(object)[-1],
       family = family
     )
   }
