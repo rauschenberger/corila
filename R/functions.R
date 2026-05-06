@@ -90,8 +90,7 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   } else {
     y_scaled <- NULL
   }
-  list <- list(x = x_scaled, y = y_scaled, family = family, pars = pars)
-  return(list)
+  list(x = x_scaled, y = y_scaled, family = family, pars = pars)
 }
 
 #'@title
@@ -189,7 +188,7 @@ backscale <- function(pars, y = NULL, coef = NULL) {
     }
     list$coef <- c(alpha, beta)
   }
-  return(list)
+  list
 }
 
 
@@ -250,7 +249,7 @@ folds <- function(y, family, nfolds) {
     foldid <- sample(x = rep(x = sample(x = seq_len(nfolds)),
                              length.out = length(y)))
   }
-  return(foldid)
+  foldid
 }
 
 check_args <- function(x, y, family) {
@@ -288,18 +287,18 @@ check_args <- function(x, y, family) {
   } else {
     stop("Invalid value for argument \"family\".")
   }
-  return(NULL)
+  NULL
 }
 
 #----- group-ridge -----
 
 .mean_function <- function(x, family) {
   if (family %in% c("gaussian", "cox")) {
-    return(x)
+    x
   } else if (family == "binomial") {
-    return(1 / (1 + exp(-x)))
+    1 / (1 + exp(-x))
   } else if (family == "poisson") {
-    return(exp(x))
+    exp(x)
   } else {
     stop("Family not implemented.")
   }
@@ -519,7 +518,7 @@ multiridge <- function(x, y, z, family, penalties = NULL) {
   object$z <- z
   object$pars <- scale$pars
   class(object) <- "multiridge"
-  return(object)
+  object
 }
 
 #'@title
@@ -565,7 +564,7 @@ predict.multiridge <- function(object, newx, ...) {
     y_hat <- .mean_function(x = eta, family = object$family)
   }
   y_hat <- backscale(pars = object$pars, y = y_hat)$y
-  return(y_hat)
+  y_hat
 }
 
 #'@title
@@ -598,8 +597,7 @@ coef.multiridge <- function(object, ...) {
   #if (object$family == "cox" & is.null(coef[[1]])) {
   #  coef[[1]] <- NA # was 0
   #}
-  coef <- backscale(pars = object$pars, coef = unlist(coef))$coef
-  return(coef)
+  backscale(pars = object$pars, coef = unlist(coef))$coef
 }
 
 #----- group-lasso -----
@@ -607,21 +605,18 @@ coef.multiridge <- function(object, ...) {
 .deviance <- function(y_hat, y, family) {
   eps <- 1e-06
   if (family == "gaussian") {
-    deviance <- mean((y_hat - y)^2)
+    mean((y_hat - y)^2)
   } else if (family == "binomial") {
-    deviance <- mean(
+    mean(
       -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
     )
   } else if (family == "cox") {
-    deviance <- glmnet::coxnet.deviance(pred = y_hat, y = y)
+    glmnet::coxnet.deviance(pred = y_hat, y = y)
   } else if (family == "poisson") {
-    deviance <- mean(
-      2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat)
-    )
+    mean(2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
   } else {
     stop(paste0("Family \"", family, "\" is not implemented."))
   }
-  return(deviance)
 }
 
 
@@ -906,7 +901,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                lambda_init = lambda_init,
                scale = scale$pars)
   class(list) <- "corila"
-  return(list)
+  list
 }
 
 #'@title
@@ -947,7 +942,7 @@ predict.corila <- function(object, newx, index, s, ...) {
                                 type = "response")
   #type = ifelse(object$scale$family == "cox", "link", "response"))
   y_hat <- backscale(y = y_hat_stand, pars = object$scale)$y
-  return(y_hat)
+  y_hat
 }
 
 #'@title
@@ -1209,7 +1204,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                lambda.min = lambda.min,
                scale = object_ext$scale)
   class(list) <- "cv.corila"
-  return(list)
+  list
 }
 
 #'@title
@@ -1256,7 +1251,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
                                 s = s,
                                 type = "response")
   y_hat <- backscale(y = y_hat_stand, pars = object$scale)$y
-  return(y_hat)
+  y_hat
 }
 
 #'@title
@@ -1307,7 +1302,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
     stop("Excluded coefs must equal zero.")
   }
   coef <- coef[c(TRUE[object$scale$family != "cox"], object$include == 1)]
-  return(coef)
+  coef
 }
 
 #----- simulation -----
@@ -1383,7 +1378,10 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                      corfac_group = 0.25, n_group_causal = 2,
                      prop_causal = 0.5, noise_factor = 1,
                      plot = TRUE, trial = FALSE) {
-  # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;size_group = c(5, 3);effect_size = c(1, 1);corfac_feature = 0.5;corfac_type = 0.5;corfac_group = 0.25;n_group_causal = 2;prop_causal = 0.5; noise_factor = 1; plot = TRUE
+  # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;
+  # size_group = c(5, 3);effect_size = c(1, 1);corfac_feature = 0.5;
+  # corfac_type = 0.5;corfac_group = 0.25;n_group_causal = 2;
+  # prop_causal = 0.5; noise_factor = 1; plot = TRUE
   n <- n0 + n1
 
   if (n_type != length(size_group)) {
@@ -1396,9 +1394,11 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
   if (!trial) {
     type <- rep(x = seq_len(n_type),
                 times = n_group * size_group) # original
-    group <- unlist(lapply(
-      X = size_group,
-      FUN = function(x) rep(x = seq_len(n_group),each = x))
+    group <- unlist(
+      lapply(
+        X = size_group,
+        FUN = function(x) rep(x = seq_len(n_group), each = x)
+      )
     ) # original
   } else {
     group <- rep(x = seq_len(n_group),
@@ -1409,8 +1409,8 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 
   #- - - effect vector - - -
   beta <- rep(x = 0, times = p)
-  index.common <- sample(x = seq_len(n_group), size = n_group_causal)
-  cond <- group %in% index.common
+  index_common <- sample(x = seq_len(n_group), size = n_group_causal)
+  cond <- group %in% index_common
   var_binom <- stats::rbinom(n = sum(cond), size = 1, prob = prop_causal)
   var_norm <- abs(stats::rnorm(n = sum(cond)))
   beta[cond] <- var_binom * var_norm
@@ -1493,7 +1493,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                y_test = y_test,
                beta = beta,
                info = info)
-  return(list)
+  list
 }
 
 simulate_overlap <- function() {
@@ -1505,8 +1505,9 @@ simulate_overlap <- function() {
   size_group <- rep(x = 5, times = n_group)
   # sample(x = 2:10, size = n_group, replace = TRUE)
   group <- lapply(X = seq_len(n_group),
-                  FUN = function(i) sort(sample(x = seq_len(p),
-                                                size = size_group[i])))
+                  FUN = function(i) {
+                    sort(sample(x = seq_len(p), size = size_group[i]))
+                  })
   # Inside corila, put each feature that is in no group in a separate group?
   mean <- rep(x = 0, times = p)
   sigma <- matrix(data = NA, nrow = p, ncol = p)
@@ -1532,14 +1533,13 @@ simulate_overlap <- function() {
   x_test <- x[fold == 1, ]
   y_test <- y[fold == 1]
   info <- data.frame(n0 = n0, n1 = n1, p = p, n_group = n_group)
-  list <- list(x_train = x_train,
-               group = group,
-               y_train = y_train,
-               x_test = x_test,
-               y_test = y_test,
-               beta = beta,
-               info = info)
-  return(list)
+  list(x_train = x_train,
+       group = group,
+       y_train = y_train,
+       x_test = x_test,
+       y_test = y_test,
+       beta = beta,
+       info = info)
 }
 
 #----- comparison -----
@@ -1573,13 +1573,10 @@ simulate_overlap <- function() {
 calc_sign_prec <- function(truth, estim) {
   if (length(estim) != length(truth)) {
     stop("Arguments \"truth\" and \"estim\" must have the same length.")
-  }
-  if (all(is.na(estim)) || all(estim == 0)) {
-    return(NA)
+  } else if (all(is.na(estim)) || all(estim == 0)) {
+    NA
   } else {
-    value <- sum(estim != 0 & truth != 0 & sign(estim) == sign(truth)) / 
-      sum(estim != 0)
-    return(value)
+    sum(estim != 0 & truth != 0 & sign(estim) == sign(truth)) / sum(estim != 0)
   }
 }
 
@@ -1765,15 +1762,15 @@ holdout <- function(x_train, y_train, group, include, family,
       }
       #--- group lasso (gglasso) ---
       if (family == "binomial") {
-        temp.y_train <- 2 * y_train - 1
-        temp.loss <- "logit"
+        temp_y_train <- 2 * y_train - 1
+        temp_loss <- "logit"
       } else {
-        temp.y_train <- y_train
-        temp.loss <- "ls"
+        temp_y_train <- y_train
+        temp_loss <- "ls"
       }
       object <- gglasso::cv.gglasso(x = x_train[, include],
-                                    y = temp.y_train,
-                                    loss = temp.loss,
+                                    y = temp_y_train,
+                                    loss = temp_loss,
                                     group = group[include],
                                     foldid = foldid)
       if (!is.null(x_test)) {
@@ -1811,8 +1808,9 @@ holdout <- function(x_train, y_train, group, include, family,
                                        type = "response",
                                        lambda = object$lambda.min)
       }
-      coef$grpreg <- c(if (family == "cox") NA,
-        as.numeric(stats::coef(object = object, lambda = object$lambda.min)))
+      coef$grpreg <- c(NA[family == "cox"],
+                       as.numeric(stats::coef(object = object,
+                                              lambda = object$lambda.min)))
     } else if (i == "grplasso") {
       #--- group lasso (grplasso) ---
       ## This package requires the user to implement hyperparameter tuning.
@@ -2112,9 +2110,9 @@ holdout <- function(x_train, y_train, group, include, family,
       #  y_train <- rbinom(n, 1, 1 / (1 + exp(-x_train %*% beta_true)))
       #}
       if (family == "gaussian") {
-        CBPE <- CBPE::CBPLinearE
+        cbpe <- CBPE::CBPLinearE
       } else if (family == "binomial") {
-        CBPE <- CBPE::CBPLogisticE
+        cbpe <- CBPE::CBPLogisticE
       } else {
         next
       }
@@ -2136,8 +2134,14 @@ holdout <- function(x_train, y_train, group, include, family,
       group_temp <- lapply(X = unique(group[include]),
                            FUN = function(x) which(x == group[include]))
       # duplicating singletons:
-      group_temp <- lapply(X = group_temp,
-                           FUN = function(x) if (length(x) == 1) {rep(x, times = 2)} else {x})
+      .duplicate_singletons <- function(x) {
+        if (length(x) == 1) {
+          rep(x, times = 2)
+        } else {
+          x
+        }
+      }
+      group_temp <- lapply(X = group_temp, FUN = .duplicate_singletons)
       # combining remaining features
       indices <- seq_len(ncol(x_train[, include]))
       extra <- indices[!indices %in% unlist(group_temp)]
@@ -2243,8 +2247,7 @@ holdout <- function(x_train, y_train, group, include, family,
     }
 
     if (!is.null(x_test)) {
-      cond_range <- any(sapply(X = y_hat,
-        FUN = function(x) any(x < 0 | x > 1, na.rm = TRUE)))
+      cond_range <- any(sapply(X = y_hat, FUN = function(x) any(x < 0 | x > 1, na.rm = TRUE)))
       if (family == "binomial" && cond_range) {
         stop("invalid y_hat range")
       }
@@ -2258,8 +2261,7 @@ holdout <- function(x_train, y_train, group, include, family,
   } else {
     warning("Implement checks for Cox regression.")
   }
-  list <- list(y_hat = y_hat, coef = coef, difftime = difftime)
-  return(list)
+  list(y_hat = y_hat, coef = coef, difftime = difftime)
 }
 
 #'@title
@@ -2381,7 +2383,15 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
   }
   list <- lapply(X = list, FUN = function(x) do.call(what = "rbind", args = x))
   list$family <- family
-  return(list)
+  list
+}
+
+.wilcox_test <- function(x, y, ...) {
+  if (all(is.na(x)) || all(is.na(y))) {
+    NA
+  } else {
+    stats::wilcox.test(x = x, y = y, ...)$p.value
+  }
 }
 
 #'@title
@@ -2404,32 +2414,32 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
 #'Returns \code{NULL} (and plots a figure).
 #'
 #'@examples
-#'x <- data.frame(mean = 0, corila = rnorm(100)-1, other = rnorm(100))
+#'x <- data.frame(mean = 0, corila = rnorm(100) - 1, other = rnorm(100))
 #'plot_boxes(x)
 #'
 #'@export
 plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
                        ylim = NULL, cex.main = 1.2) {
   #--- hypothesis testing ---
-  p_worse <- apply(
-    X = x, MARGIN = 2, FUN = function(c) ifelse(test = all(is.na(c)), yes = NA,
-      no = stats::wilcox.test(x = c,
-                              y = x[, base],
-                              paired = TRUE,
-                              alternative = ifelse(decrease, "greater", "less"),
-                              exact = FALSE)$p.value
-  ))
-  p_better <- apply(
-    X = x, MARGIN = 2, FUN = function(c) ifelse(test = all(is.na(c)), yes = NA,
-      no = stats::wilcox.test(x = c,
-                              y = x[, base],
-                              paired = TRUE,
-                              alternative = ifelse(decrease, "less", "greater"),
-                              exact = FALSE)$p.value
-    ))
-  col <- ifelse(test = p_worse <= 0.05,
+  pvalue <- list()
+  for (i in c("less", "greater")){
+    label <- ifelse(decrease == (i == "less"), "better", "worse")
+    pvalue[[label]] <- apply(
+      X = x,
+      MARGIN = 2,
+      FUN = function(col) {
+        .wilcox_test(x = col,
+                     y = x[, base],
+                     paired = TRUE,
+                     alternative = i,
+                     exact = FALSE)
+      }
+    )
+  }
+
+  col <- ifelse(test = pvalue$worse <= 0.05,
                 yes = "red",
-                no = ifelse(test = p_better <= 0.05,
+                no = ifelse(test = pvalue$better <= 0.05,
                             yes = "blue",
                             no = "grey"))
   #--- boxplot ---
@@ -2443,8 +2453,8 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
                     ylim = ylim,
                     cex.main = cex.main)
   #--- horizontal axis ---
-  col <- list(grey = which(p_worse <= 0.05 | is.na(p_worse)),
-              black = which(p_worse > 0.05))
+  col <- list(grey = which(pvalue$worse <= 0.05 | is.na(pvalue$worse)),
+              black = which(pvalue$worse > 0.05))
   for (i in seq_along(col)) {
     graphics::axis(side = 1,
                    at = seq_len(ncol(x))[col[[i]]],
@@ -2479,7 +2489,7 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
     cex = 1.5,
     font = 2
   )
-  return(NULL)
+  invisible(NULL)
 }
 
 #@title
