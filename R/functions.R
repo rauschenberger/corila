@@ -641,8 +641,10 @@ coef.multiridge <- function(object, ...) {
 #'from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 #'@param include
 #'\eqn{p}-dimensional logical vector
-#'indicating whether a predictor may be included in (\code{TRUE})
-#'or must be excluded from (\code{FALSE}) the final model
+#'indicating whether a predictor may be included in the final model
+#'(\code{TRUE}, "primary predictors")
+#'or must be excluded from the final model
+#'(\code{FALSE}, "auxiliary predictors") 
 #'@param alpha_init
 #'elastic net mixing parameter
 #'(\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
