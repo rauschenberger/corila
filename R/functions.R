@@ -448,13 +448,6 @@ check_args <- function(x, y, family) {
 #'@export
 multiridge <- function(x, y, z, family, penalties = NULL) {
   check_args(x = x, y = y, family = family)
-  if (nrow(x) != length(y)) {
-    stop(paste(
-      "For each observation,",
-      "\"x\" should have one row",
-      "and \"y\" should have one entry."
-    ))
-  }
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop(paste(
       "For each variable,",
@@ -1071,11 +1064,6 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                       nfolds = 10, cor = "spearman", tune = "both",
                       foldid = NULL) {
   check_args(x = x, y = y, family = family)
-  if (nrow(x) != length(y)) {
-    stop(paste("For each observation,",
-               "the matrix \"x\" must have one row,",
-               "and the vector \"y\" must have one entry."))
-  }
   if (is.null(include)) {
     include <- rep(x = TRUE, times = ncol(x))
   }
