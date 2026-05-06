@@ -845,6 +845,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   }
   cor[is.na(cor)] <- 0
 
+  #--- regression ---
   object <- list()
   for (i in seq_len(nrow(hyper))) {
     weight <- list()
@@ -2630,5 +2631,5 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
 # fuse = fuse)
 #     }
 #   }
-#   return(list(all = cbind(x, -x), com = com, sep = sep))
+#   list(all = cbind(x, -x), com = com, sep = sep)
 # }
