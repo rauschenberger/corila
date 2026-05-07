@@ -10,7 +10,9 @@ backscale(pars, y = NULL, coef = NULL)
 \item{pars}{list as defined in section \emph{Value},
 or \code{NULL} (if \code{family} is provided)}
 
-\item{y}{\eqn{n_1}-dimensional response vector}
+\item{y}{\eqn{n_1}-dimensional response vector
+or response matrix with \eqn{n_1} rows and multiple columns
+(for multiple values of the regularisation parameter)}
 
 \item{coef}{\eqn{(1 + p)-dimensional vector}
 containing the estimated intercept
@@ -57,22 +59,30 @@ coef1 <- stats::coef(lm1)
 yhat1 <- predict(lm1, newdata = x[fold == 1, ])
 
 # regression with standardisation
-scale <- forescale(x = x[fold == 0, ], y = y[fold == 0], family = family)
+scale <- forescale(x = as.matrix(x)[fold == 0, ],
+                  y = y[fold == 0],
+                  family = family)
 if (family == "cox") {
  lm2 <- survival::coxph(scale$y~., data = data.frame(scale$x))
 } else {
  lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
 }
 coef_temp <- stats::coef(lm2)
-newx_temp <- forescale(x = x[fold == 1, ], pars = scale$pars)$x
+newx_temp <- forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
 yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
 result <- backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
 coef2 <- result$coef
 yhat2 <- result$y_original
 
 # equality
-all.equal(coef1, coef2, check.attributes = FALSE)
-all.equal(yhat1, yhat2)
+all.equal(yhat1, yhat2, check.attributes = FALSE)
+all.equal(yhat1, yhat2, check.attributes = FALSE)
+\dontshow{
+stopifnot(
+isTRUE(all.equal(coef1, coef2, check.attributes = FALSE)),
+isTRUE(all.equal(yhat1, yhat2, check.attributes = FALSE))
+)
+}
 }
 \seealso{
 \code{\link{forescale}()}
