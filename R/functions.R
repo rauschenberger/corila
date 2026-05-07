@@ -6,12 +6,15 @@
 #'Transforming variables to mean 0 and variance 1.
 #'
 #'@inheritParams corila
-#'@param y \eqn{n_0}-dimensional response vector or \code{NULL},
+#'@param y
+#'\eqn{n_0}-dimensional response vector or \code{NULL},
 #'only for Gaussian family
-#'@param family character string \code{"gaussian"}, \code{"binomial"},
+#'@param family
+#'character string \code{"gaussian"}, \code{"binomial"},
 #'\code{"poisson"}, or \code{"cox"};
 #'or \code{NULL} (if \code{pars} is provided)
-#'@param pars list as defined in section \emph{Value},
+#'@param pars
+#'list as defined in section \emph{Value},
 #'or \code{NULL} (if \code{family} is provided)
 #'
 #'@return
@@ -570,8 +573,10 @@ predict.multiridge <- function(object, newx, ...) {
 #'@description
 #'Extracts coefficients from a multi-penalty ridge regression model.
 #'
-#'@param object object of class \code{"multiridge"}
-#'@param ... (not used)
+#'@param object
+#'object of class \code{"multiridge"}
+#'@param ...
+#'(not used)
 #'
 #'@inherit multiridge references
 #'
@@ -600,6 +605,11 @@ coef.multiridge <- function(object, ...) {
 #----- group-lasso -----
 
 .deviance <- function(y_hat, y, family) {
+  stopifnot(is.vector(y_hat) && is.numeric(y_hat),
+            #(is.vector(y) && is.numeric(y)) || inherits(y, "Surv"),
+            length(y_hat) == length(y),
+            is.character(family),
+            length(family) == 1)
   eps <- 1e-06
   if (family == "gaussian") {
     mean((y_hat - y)^2)
@@ -612,8 +622,63 @@ coef.multiridge <- function(object, ...) {
   } else if (family == "poisson") {
     mean(2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
   } else {
-    stop(paste0("Family \"", family, "\" is not implemented."))
+    stop()
   }
+}
+
+
+.estim_initial_coefs <- function(x, y, family, alpha, group,
+                                 foldid, nfolds, lambda) {
+  methods <- c("pearson", "spearman", "kendall")
+  p <- ncol(x)
+  if (all(is.na(alpha))) {
+    coef <- rep(x = 1, times = p) # Remove this confusing option?
+  } else if (is.character(alpha) && alpha == "multiridge") {
+    if (is.null(lambda)) {
+      model <- multiridge(x = x,
+                          y = y,
+                          z = group,
+                          family = family,
+                          foldid = foldid,
+                          nfolds = nfolds)
+      coef <- stats::coef(object = model, s = "lambda.min")[-1]
+      lambda <- model$penalties
+    } else {
+      model <- multiridge(x = x,
+                          y = y,
+                          z = group,
+                          family = family,
+                          penalties = lambda)
+      coef <- stats::coef(object = model)[-1]
+    }
+  } else if (is.character(alpha) && alpha %in% methods) {
+    coef <- stats::cor(x = x,
+                       y = y,
+                       method = alpha,
+                       use = "pairwise.complete")
+    coef[is.na(coef)] <- 0
+  } else if (is.numeric(alpha) && alpha >= 0 && alpha <= 1) {
+    cond <- rep(c(FALSE, TRUE), times = c(family != "cox", p))
+    if (is.null(lambda)) {
+      model <- glmnet::cv.glmnet(x = x,
+                                 y = y,
+                                 family = family,
+                                 alpha = alpha,
+                                 foldid = foldid,
+                                 nfolds = nfolds)
+      coef <- stats::coef(object = model, s = "lambda.min")[cond]
+      lambda <- model$lambda.min
+    } else {
+      model <- glmnet::glmnet(x = x,
+                              y = y,
+                              family = family,
+                              alpha = alpha)
+      coef <- stats::coef(object = model, s = lambda)[cond]
+    }
+  } else {
+    stop("Invalid value for agrument \"alpha\".")
+  }
+  list(coef = coef, lambda = lambda)
 }
 
 
@@ -682,7 +747,8 @@ coef.multiridge <- function(object, ...) {
 #'\code{"spearman"} (default),
 #'or \code{"kendall"};
 #'or \eqn{p \times p} correlation matrix
-#'@param lambda_init regularisation hyperparameter(s),
+#'@param lambda_init
+#'regularisation hyperparameter(s),
 #'or \code{NULL} (cross-validation)
 #'
 #'@details
@@ -797,60 +863,14 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     foldid <- folds(y = scale$y, family = family, nfolds = nfolds)
   }
 
-  #--- initial coefficients ---
-  fit_init <- NULL
-  cor_methods <- c("pearson", "spearman", "kendall")
-  if (all(is.na(alpha_init))) {
-    coef_init <- rep(x = 1, times = p) # Remove this confusing option?
-  } else if (is.character(alpha_init) && alpha_init == "multiridge") {
-    if (is.null(lambda_init)) {
-      fit_init <- multiridge(x = scale$x,
-                             y = scale$y,
-                             z = group,
-                             family = family,
-                             foldid = foldid,
-                             nfolds = nfolds)
-      coef_init <- stats::coef(object = fit_init,
-                               s = "lambda.min")[-1]
-      lambda_init <- fit_init$penalties
-    } else {
-      fit_init <- multiridge(x = scale$x,
-                             y = scale$y,
-                             z = group,
-                             family = family,
-                             penalties = lambda_init)
-      coef_init <- stats::coef(object = fit_init)[-1]
-    }
-  } else if (is.character(alpha_init) && alpha_init %in% cor_methods) {
-    coef_init <- stats::cor(x = scale$x,
-                            y = scale$y,
-                            method = alpha_init,
-                            use = "pairwise.complete")
-    coef_init[is.na(coef_init)] <- 0
-  } else if (is.numeric(alpha_init) && alpha_init >= 0 && alpha_init <= 1) {
-    cond_coef <- rep(c(FALSE, TRUE), times = c(family != "cox", p))
-    if (is.null(lambda_init)) {
-      fit_init <- glmnet::cv.glmnet(x = scale$x,
-                                    y = scale$y,
-                                    family = family,
-                                    alpha = alpha_init,
-                                    foldid = foldid,
-                                    nfolds = nfolds)
-      coef_init <- stats::coef(object = fit_init,
-                               s = "lambda.min")[cond_coef]
-      lambda_init <- fit_init$lambda.min
-    } else {
-      fit_init <- glmnet::glmnet(x = scale$x,
-                                 y = scale$y,
-                                 family = family,
-                                 alpha = alpha_init)
-      coef_init <- stats::coef(object = fit_init,
-                               s = lambda_init)[cond_coef]
-    }
-  } else {
-    stop("Invalid value for agrument \"alpha_init\".")
-  }
-  rm(fit_init)
+  init <- .estim_initial_coefs(x = scale$x,
+                               y = scale$y,
+                               family = family,
+                               alpha = alpha_init,
+                               group = group,
+                               foldid = foldid,
+                               nfolds = nfolds,
+                               lambda = lambda_init)
 
   #--- feature correlation ---
   if (!is.matrix(cor)) {
@@ -878,7 +898,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
         cond_temp <- group[, j] == 1
       }
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
-      temp <-  cor_trans * coef_init * cond_temp
+      temp <-  cor_trans * init$coef * cond_temp
       weight$local[j] <- sum(pmax(0, temp)[cond_temp]) / sum(cond_temp)
       weight$local[p + j] <- sum(pmax(0, -temp)[cond_temp]) / sum(cond_temp)
 
@@ -886,7 +906,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       weight$local[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
 
       # all features
-      temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef_init
+      temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * init$coef
       weight$global[j] <- sum(pmax(0, temp)) / p
       weight$global[p + j] <- sum(pmax(0, -temp)) / p
     }
@@ -894,7 +914,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     # temp <- sign(cor[, j]) *
     # stats::qbeta(p = abs(cor[, j]),
     # shape1 = hyper$alpha[i],
-    # shape2 = hyper$beta[i]) * coef_init * cond_temp
+    # shape2 = hyper$beta[i]) * init$coef * cond_temp
     weight <- lapply(weight, function(x) p * ifelse(x == 0, 0, x / sum(x)))
     pf_ext <- 1 / (weight$local * hyper$wgt_local[i] +
                      weight$global * hyper$wgt_global[i])
@@ -917,7 +937,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     list(
       model = object,
       include = include,
-      lambda_init = lambda_init,
+      lambda_init = init$lambda,
       scale = scale$pars
     ),
     class = "corila"
@@ -1037,7 +1057,8 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'Optimises the parameters and the hyperparameters of the sparse group lasso.
 #'
 #'@inheritParams corila
-#'@param tune character \code{"wgt"}, \code{"exp"}, or \code{"both"}
+#'@param tune
+#'character \code{"wgt"}, \code{"exp"}, or \code{"both"}
 #'for determining the candidate values for the hyperparameters;
 #'or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
 #'and \code{exp_global} (not yet implemented)
@@ -1235,8 +1256,10 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #'to obtain fitted values,
 #'\eqn{n_1 \times p} predictor matrix (testing data)
 #'to obtain predicted values
-#'@param s character \code{"lambda.min"} or numeric value
-#'@param ... (not used)
+#'@param s
+#'character \code{"lambda.min"} or numeric value
+#'@param ...
+#'(not used)
 #'
 #'@inherit predict.corila return
 #'
@@ -1357,7 +1380,8 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
 #'@param plot
 #'Attempt to visualise effects of and correlation between variables?
 #'(\code{TRUE} or \code{FALSE})
-#'@param trial logical (groups of negatively correlated subgroups)
+#'@param trial
+#'logical (groups of negatively correlated subgroups)
 #'
 #'@return
 #'Returns a list with the following slots:
@@ -2295,9 +2319,12 @@ holdout <- function(x_train, y_train, group, include, family,
 #'@inheritParams cv.corila
 #'@inheritParams holdout
 #'
-#'@param iter number of cross-validation iterations
-#'@param nfolds number of cross-validation folds
-#'@param foldid cross-validation folds
+#'@param iter
+#'number of cross-validation iterations
+#'@param nfolds
+#'number of cross-validation folds
+#'@param foldid
+#'cross-validation folds
 #'
 #'@details
 #'This function implements repeated \eqn{k}-fold cross-validation
@@ -2436,14 +2463,20 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
 #'Creates box plots for paired/matched data,
 #'using Wilcoxon's signed-rank test to compare a group with the other groups.
 #'
-#'@param x data frame with names slots
-#'@param base character string naming the slot of interest
+#'@param x
+#'data frame with names slots
+#'@param base
+#'character string naming the slot of interest
 #'(e.g., \code{"corila"})
-#'@param main character string used as a title
-#'@param decrease \code{TRUE} for decreasing arrow,
+#'@param main
+#'character string used as a title
+#'@param decrease
+#'\code{TRUE} for decreasing arrow,
 #'\code{FALSE} for increasing arrow
-#'@param ylim limits for the vertical axis, or \code{NULL}
-#'@param cex.main numeric
+#'@param ylim
+#'limits for the vertical axis, or \code{NULL}
+#'@param cex.main
+#'numeric
 #'
 #'@return
 #'Returns \code{NULL} (and plots a figure).
