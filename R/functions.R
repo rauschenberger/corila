@@ -446,7 +446,8 @@ check_args <- function(x, y, family) {
 #'metric
 #'}
 #'@export
-multiridge <- function(x, y, z, family, penalties = NULL) {
+multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10, 
+                       penalties = NULL) {
   check_args(x = x, y = y, family = family)
   if(family == "poisson"){
     stop("Argument family=\"poisson\" is not implemented.")
@@ -476,16 +477,23 @@ multiridge <- function(x, y, z, family, penalties = NULL) {
                                 Y = scale$y,
                                 model = model)
   ))
+  # cross-validation
   if (is.null(penalties)) {
-    folds <- multiridge::CVfolds(Y = scale$y)
+    if(is.null(foldid)){
+      indices <- multiridge::CVfolds(Y = scale$y, model = model, kfold = nfold)
+    } else {
+      indices <- lapply(X = seq_len(nfolds),
+                        FUN = function(x) which(foldid == x))
+    }
     invisible(utils::capture.output(
       final <- multiridge::optLambdasWrap(penaltiesinit = init$lambdas,
                                           XXblocks = xxblocks,
                                           Y = scale$y,
-                                          folds = folds)
+                                          folds = indices)
     ))
     penalties <- final$optpen
   }
+  # refit
   xxt <- multiridge::SigmaFromBlocks(XXblocks = xxblocks,
                                      penalties = penalties)
   if (family == "cox") {
@@ -1178,7 +1186,6 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   }
 
   cvm <- list()
-
   for (l in seq_len(nrow(hyper))) {
     cvm[[l]] <- apply(
       X = hat[[l]],
