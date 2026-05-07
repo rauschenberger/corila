@@ -447,10 +447,10 @@ check_args <- function(x, y, family) {
 #'metric
 #'}
 #'@export
-multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10, 
+multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
                        penalties = NULL) {
   check_args(x = x, y = y, family = family)
-  if(family == "poisson"){
+  if (family == "poisson") {
     stop("Argument family=\"poisson\" is not implemented.")
   }
   if (is.matrix(x) && ncol(x) != length(z)) {
@@ -480,8 +480,8 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
   ))
   # cross-validation
   if (is.null(penalties)) {
-    if(is.null(foldid)){
-      indices <- multiridge::CVfolds(Y = scale$y, model = model, kfold = nfold)
+    if (is.null(foldid)) {
+      indices <- multiridge::CVfolds(Y = scale$y, model = model, kfold = nfolds)
     } else {
       indices <- lapply(X = seq_len(nfolds),
                         FUN = function(x) which(foldid == x))
@@ -648,7 +648,7 @@ coef.multiridge <- function(object, ...) {
 #'indicating whether a predictor may be included in the final model
 #'(\code{TRUE}, "primary predictors")
 #'or must be excluded from the final model
-#'(\code{FALSE}, "auxiliary predictors") 
+#'(\code{FALSE}, "auxiliary predictors")
 #'@param alpha_init
 #'elastic net mixing parameter
 #'(\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
@@ -791,9 +791,9 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 
   scale <- forescale(x = x, y = y, family = family)
   rm(x, y)
-  
+
   # fold identifiers
-  if (is.null(lambda_init) & is.null(foldid)) {
+  if (is.null(lambda_init) && is.null(foldid)) {
     foldid <- folds(y = scale$y, family = family, nfolds = nfolds)
   }
 
@@ -1146,21 +1146,16 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
                       nfolds = 10, cor = "spearman", tune = "both",
                       foldid = NULL) {
+  # set default parameters
   check_args(x = x, y = y, family = family)
   if (is.null(include)) {
     include <- rep(x = TRUE, times = ncol(x))
   }
-  # family = "gaussian"; foldid = NULL
-  n <- nrow(x) # sample size
-  #p <- ncol(x) # number of features
-  #p <- length(unique(group)) # number of groups
-  hyper <- .set_candidates(tune = tune)
-  
   if (is.null(foldid)) {
     foldid <- folds(y = y, family = family, nfolds = nfolds)
   }
-
-  # Use foldid already for full run?
+  hyper <- .set_candidates(tune = tune)
+  # fit model on all folds
   object_ext <- corila(x = x,
                        y = y,
                        group = group,
@@ -1172,14 +1167,15 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                        foldid = foldid,
                        hyper = hyper)
   lambda <- lapply(X = object_ext$model, FUN = function(x) x$lambda)
-
-  hat <- list()
+  # initialise matrices for predictions
+  pred <- list()
+  n <- nrow(x)
   for (j in seq_len(nrow(hyper))) {
-    hat[[j]] <- matrix(data = NA,
-                       nrow = n,
-                       ncol = length(object_ext$model[[j]]$lambda))
+    pred[[j]] <- matrix(data = NA,
+                        nrow = n,
+                        ncol = length(object_ext$model[[j]]$lambda))
   }
-
+  # repeatedly train without and test for held-out fold
   for (i in seq_len(nfolds)) {
     object_int <- corila(x = x[foldid !=  i, ],
                          y = y[foldid != i],
@@ -1192,17 +1188,17 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                          hyper = hyper,
                          lambda_init = object_ext$lambda_init)
     for (j in seq_len(nrow(hyper))) {
-      hat[[j]][foldid == i, ] <- stats::predict(object = object_int,
-                                                newx = x[foldid == i, ],
-                                                index = j,
-                                                s = lambda[[j]])
+      pred[[j]][foldid == i, ] <- stats::predict(object = object_int,
+                                                 newx = x[foldid == i, ],
+                                                 index = j,
+                                                 s = lambda[[j]])
     }
   }
-
+  # select the hyperparameters
   cvm <- list()
   for (l in seq_len(nrow(hyper))) {
     cvm[[l]] <- apply(
-      X = hat[[l]],
+      X = pred[[l]],
       MARGIN = 2,
       FUN = function(x) .deviance(y_hat = x, y =  y, family = family)
     )
@@ -1212,7 +1208,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                                  FUN.VALUE = numeric(1))
   id_hyper <- which.min(cvm_min)
   lambda.min <- object_ext$model[[id_hyper]]$lambda[which.min(cvm[[id_hyper]])]
-
+  # return fitted model
   structure(
     list(
       object = object_ext$model,
