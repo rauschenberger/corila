@@ -731,7 +731,8 @@ coef.multiridge <- function(object, ...) {
 #'}
 #'@export
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
-                   alpha_final = 1, cor = "spearman", lambda_init = NULL) {
+                   alpha_final = 1, cor = "spearman", foldid = NULL,
+                   nfolds = 10, lambda_init = NULL) {
   #lambda_init = NULL;mode<-"mean";cor = "spearman"
   if (is.character(alpha_init) &&
         alpha_init  == "multiridge" &&
@@ -785,6 +786,11 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 
   scale <- forescale(x = x, y = y, family = family)
   rm(x, y)
+  
+  # fold identifiers
+  if (is.null(lambda_init) & is.null(foldid)) {
+    foldid <- folds(y = scale$y, family = family, nfolds = nfolds)
+  }
 
   #--- initial coefficients ---
   fit_init <- NULL
@@ -796,7 +802,9 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       fit_init <- multiridge(x = scale$x,
                              y = scale$y,
                              z = group,
-                             family = family)
+                             family = family,
+                             foldid = foldid,
+                             nfolds = nfolds)
       coef_init <- stats::coef(object = fit_init,
                                s = "lambda.min")[-1]
       lambda_init <- fit_init$penalties
@@ -820,7 +828,9 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       fit_init <- glmnet::cv.glmnet(x = scale$x,
                                     y = scale$y,
                                     family = family,
-                                    alpha = alpha_init)
+                                    alpha = alpha_init,
+                                    foldid = foldid,
+                                    nfolds = nfolds)
       coef_init <- stats::coef(object = fit_init,
                                s = "lambda.min")[cond_coef]
       lambda_init <- fit_init$lambda.min
