@@ -942,6 +942,71 @@ predict.corila <- function(object, newx, index, s, ...) {
   y_hat
 }
 
+.set_candidates <- function(tune) {
+  #if (FALSE) {
+  #  cand <- seq(from = 0, to = 1, by = 0.1)
+  #  hyper <- data.frame(weight.local = cand,
+  #                      weight.global = 1 - cand,
+  #                      exp_local = 1,
+  #                      exp_global = 1)
+  #  cand <- seq(from = 0, to = 2, by = 0.2)
+  #  hyper <- data.frame(weight.local = 0,
+  #                      weight.global = 1,
+  #                      exp_local = 0,
+  #                      exp_global = cand)
+  #}
+  if (tune == "none") {
+    hyper <- data.frame(wgt_local = 1,
+                        exp_local = 1,
+                        wgt_global = 0,
+                        exp_global = Inf)
+  } else if (tune == "trial") {
+    wgt_cand <- seq(from = 0, to = 1, by = 0.1)
+    hyper <- data.frame(wgt_local = wgt_cand,
+                        exp_local = 0,
+                        wgt_global = 1 - wgt_cand,
+                        exp_global = 1)
+  } else if (tune == "wgt") {
+    wgt_cand <- seq(from = 0, to = 1, by = 0.1) # for weighted sums
+    hyper <- data.frame(wgt_local = wgt_cand,
+                        exp_local = 1,
+                        wgt_global = 1 - wgt_cand,
+                        exp_global = 1)
+  } else if (tune == "exp") {
+    exp_cand <- c(0, 0.1, 0.25, 1 / 3, 0.5, 1, 2, 3, 4, 10, Inf)
+    hyper <- data.frame(wgt_local = 1,
+                        exp_local = exp_cand,
+                        wgt_global = 0,
+                        exp_global = exp_cand)
+  } else if (tune == "sep") {
+    exp_cand <- c(0.1, 0.5, 1, 2, 10)
+    hyper <- expand.grid(exp_local = exp_cand,
+                         exp_global = exp_cand)
+    hyper$wgt_local <- hyper$wgt_global <- 0.5
+  } else if (tune == "both") {
+    #wgt_cand <- seq(from = 0, to = 1, by = 0.25) # original
+    wgt_cand <- seq(from = 0, to = 1, by = 0.1) # trial
+    hyper <- data.frame(wgt_local = wgt_cand,
+                        wgt_global = 1 - wgt_cand)
+    #exp_cand <- c(0.1, 0.5, 1, 2, 10) # original
+    exp_cand <- c(0.1, 0.5, 0.8, 1, 1.25, 2, 10)
+    hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
+    hyper$exp_local <- hyper$exp_global <- exp_cand
+  } else if (tune == "all") {
+    wgt_cand <- seq(from = 0, to = 1, by = 0.25)
+    exp_cand <- c(0.1, 0.5, 1, 2, 10)
+    hyper <- expand.grid(wgt_local = wgt_cand,
+                         exp_local = exp_cand,
+                         exp_global = exp_cand)
+    hyper$wgt_global <- 1 - hyper$wgt_local
+    hyper$exp_local[hyper$wgt_local == 0] <- Inf
+    hyper$exp_global[hyper$wgt_global == 0] <- Inf
+  }
+  hyper <- unique(hyper)
+  rownames(hyper) <- seq_len(nrow(hyper))
+  hyper
+}
+
 #'@title
 #'Sparse Group Lasso
 #'
@@ -1068,73 +1133,9 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   n <- nrow(x) # sample size
   #p <- ncol(x) # number of features
   #p <- length(unique(group)) # number of groups
-  # GENERAL FORMULATION
-  if (tune == "none") {
-    hyper <- data.frame(wgt_local = 1,
-                        exp_local = 1,
-                        wgt_global = 0,
-                        exp_global = Inf)
-  } else if (tune == "trial") {
-    wgt_cand <- seq(from = 0, to = 1, by = 0.1)
-    hyper <- data.frame(wgt_local = wgt_cand,
-                        exp_local = 0,
-                        wgt_global = 1 - wgt_cand,
-                        exp_global = 1)
-  } else if (tune == "wgt") {
-    wgt_cand <- seq(from = 0, to = 1, by = 0.1) # for weighted sums
-    hyper <- data.frame(wgt_local = wgt_cand,
-                        exp_local = 1,
-                        wgt_global = 1 - wgt_cand,
-                        exp_global = 1)
-  } else if (tune == "exp") {
-    exp_cand <- c(0, 0.1, 0.25, 1 / 3, 0.5, 1, 2, 3, 4, 10, Inf)
-    hyper <- data.frame(wgt_local = 1,
-                        exp_local = exp_cand,
-                        wgt_global = 0,
-                        exp_global = exp_cand)
-  } else if (tune == "sep") {
-    exp_cand <- c(0.1, 0.5, 1, 2, 10)
-    hyper <- expand.grid(exp_local = exp_cand,
-                         exp_global = exp_cand)
-    hyper$wgt_local <- hyper$wgt_global <- 0.5
-  } else if (tune == "both") {
-    #wgt_cand <- seq(from = 0, to = 1, by = 0.25) # original
-    wgt_cand <- seq(from = 0, to = 1, by = 0.1) # trial
-    hyper <- data.frame(wgt_local = wgt_cand,
-                        wgt_global = 1 - wgt_cand)
-    #exp_cand <- c(0.1, 0.5, 1, 2, 10) # original
-    exp_cand <- c(0.1, 0.5, 0.8, 1, 1.25, 2, 10)
-    hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
-    hyper$exp_local <- hyper$exp_global <- exp_cand
-  } else if (tune == "all") {
-    wgt_cand <- seq(from = 0, to = 1, by = 0.25)
-    exp_cand <- c(0.1, 0.5, 1, 2, 10)
-    hyper <- expand.grid(wgt_local = wgt_cand,
-                         exp_local = exp_cand,
-                         exp_global = exp_cand)
-    hyper$wgt_global <- 1 - hyper$wgt_local
-    hyper$exp_local[hyper$wgt_local == 0] <- Inf
-    hyper$exp_global[hyper$wgt_global == 0] <- Inf
-    hyper <- unique(hyper)
-    rownames(hyper) <- seq_len(nrow(hyper))
-  }
-
-  #if (FALSE) {
-  #  cand <- seq(from = 0, to = 1, by = 0.1)
-  #  hyper <- data.frame(weight.local = cand,
-  #                      weight.global = 1 - cand,
-  #                      exp_local = 1,
-  #                      exp_global = 1)
-  #  cand <- seq(from = 0, to = 2, by = 0.2)
-  #  hyper <- data.frame(weight.local = 0,
-  #                      weight.global = 1,
-  #                      exp_local = 0,
-  #                      exp_global = cand)
-  #}
-
+  hyper <- .set_candidates(tune = tune)
+  
   if (is.null(foldid)) {
-    #foldid <- sample(rep(x = seq_len(nfolds), length.out = n))
-    # balanced/stratified folds
     foldid <- folds(y = y, family = family, nfolds = nfolds)
   }
 
