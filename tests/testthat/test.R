@@ -182,7 +182,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
                   FUN = function(x) predict(object = x, newx = data$x_test))
   testthat::test_that(
     desc = paste0(
-      "corila returns same coefficients",
+      "corila returns same coefficients ",
       "with argument group as vector, list, or matrix"
     ),
     code = {
@@ -192,7 +192,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   )
   testthat::test_that(
     desc = paste0(
-      "corila returns same predictions",
+      "corila returns same predictions ",
       "with argument group as vector, list, or matrix"
     ),
     code = {
@@ -202,7 +202,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   )
   testthat::test_that(
     desc = paste0(
-      "function predict returns same results",
+      "function predict returns same results ",
       "as feature matrix times coef"
     ),
     code = {
@@ -266,7 +266,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
                        FUN = function(x) stats::rnorm(n = n, mean = 0, sd = x),
                        FUN.VALUE = numeric(length = n))
   beta <- stats::rbinom(n = p, size = 1, prob = 0.2) * stats::rnorm(n = p)
-  eta <- scale(x$original %*% beta)
+  eta <- as.numeric(scale(x$original %*% beta))
   if (family == "gaussian") {
     y <- eta + stats::rnorm(n = n, sd = 0.5)
   } else if (family == "binomial") {
@@ -319,7 +319,7 @@ for (family in c("gaussian", "binomial", "cox")) {
               FUN.VALUE = numeric(length = n))
   beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
     stats::rbinom(n = sum(p), size = 1, prob = 0.2)
-  eta <- x %*% beta
+  eta <- as.numeric(x %*% beta)
   if (family == "gaussian") {
     y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
   } else if (family == "binomial") {
@@ -337,7 +337,7 @@ for (family in c("gaussian", "binomial", "cox")) {
     temp <- exp(x[!cond, ] %*% stats::coef(object))
   } else {
     temp <- .mean_function(
-      x = coef(object)[1] + x[!cond, ] %*% coef(object)[-1],
+      x = drop(coef(object)[1] + x[!cond, ] %*% coef(object)[-1]),
       family = family
     )
   }

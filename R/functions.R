@@ -7,8 +7,9 @@
 #'
 #'@inheritParams corila
 #'@param y
-#'\eqn{n_0}-dimensional response vector or \code{NULL},
-#'only for Gaussian family
+#'\eqn{n_0}-dimensional response vector 
+#'(only required if \code{family="gaussian"})
+#'or \code{NULL}
 #'@param family
 #'character string \code{"gaussian"}, \code{"binomial"},
 #'\code{"poisson"}, or \code{"cox"};
@@ -40,6 +41,15 @@
 #'@inherit backscale examples
 #'@export
 forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
+  slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
+  stopifnot(
+    is.matrix(x) && is.numeric(x),
+    is.null(y) || (is.vector(y) && is.numeric(y)) || inherits(y, "Surv"),
+    is.null(y) || nrow(x) == length(y),
+    is.null(family) != is.null(pars),
+    is.null(family) || (is.character(family) && length(family) == 1),
+    is.null(pars) || (is.list(pars) && all(slots %in% names(pars)))
+  )
   if (!is.null(y)) {
     if (nrow(x) != length(y)) {
       stop(paste(
@@ -107,6 +117,8 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
 #'@inheritParams forescale
 #'@param y
 #'\eqn{n_1}-dimensional response vector
+#'or response matrix with \eqn{n_1} rows and multiple columns
+#'(for multiple values of the regularisation parameter)
 #'@param coef
 #'\eqn{(1 + p)-dimensional vector}
 #'containing the estimated intercept
@@ -150,24 +162,46 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
 #'yhat1 <- predict(lm1, newdata = x[fold == 1, ])
 #'
 #'# regression with standardisation
-#'scale <- forescale(x = x[fold == 0, ], y = y[fold == 0], family = family)
+#'scale <- forescale(x = as.matrix(x)[fold == 0, ],
+#'                   y = y[fold == 0],
+#'                   family = family)
 #'if (family == "cox") {
 #'  lm2 <- survival::coxph(scale$y~., data = data.frame(scale$x))
 #'} else {
 #'  lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
 #'}
 #'coef_temp <- stats::coef(lm2)
-#'newx_temp <- forescale(x = x[fold == 1, ], pars = scale$pars)$x
+#'newx_temp <- forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
 #'yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
 #'result <- backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
 #'coef2 <- result$coef
 #'yhat2 <- result$y_original
 #'
 #'# equality
-#'all.equal(coef1, coef2, check.attributes = FALSE)
-#'all.equal(yhat1, yhat2)
+#'all.equal(yhat1, yhat2, check.attributes = FALSE)
+#'all.equal(yhat1, yhat2, check.attributes = FALSE)
+#'\dontshow{
+#'stopifnot(
+#' isTRUE(all.equal(coef1, coef2, check.attributes = FALSE)),
+#' isTRUE(all.equal(yhat1, yhat2, check.attributes = FALSE))
+#')
+#'}
 #'@export
 backscale <- function(pars, y = NULL, coef = NULL) {
+  slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
+  stopifnot(
+    is.list(pars),
+    all(slots %in% names(pars)),
+    is.null(y) ||
+      ((is.vector(y) || is.matrix(y)) && is.numeric(y)) ||
+      inherits(y, "Surv"),
+    is.null(coef) || (is.vector(coef) && is.numeric(coef)),
+    is.null(pars) || (length(pars$mu.y) == 1 && length(pars$sd.y) == 1),
+    is.null(pars) || length(pars$sd.x) == length(pars$mu.x),
+    is.null(pars) || (pars$sd.y >= 0 && all(pars$sd.x >= 0)),
+    (is.null(coef) || is.null(pars)) ||
+      (length(pars$sd.x) == length(coef) - (pars$family != "cox"))
+  )
   list <- list()
   if (!is.null(y) && pars$family == "gaussian") {
     list$y_original <- pars$mu.y + pars$sd.y * y
@@ -193,7 +227,6 @@ backscale <- function(pars, y = NULL, coef = NULL) {
   }
   list
 }
-
 
 #'@title
 #'Fold Identifiers
@@ -234,6 +267,11 @@ backscale <- function(pars, y = NULL, coef = NULL) {
 #'
 #'@export
 folds <- function(y, family, nfolds) {
+  stopifnot(is.vector(y) && is.numeric(y) || inherits(y, "Surv"),
+            is.character(family),
+            length(family) == 1,
+            is.numeric(nfolds),
+            length(nfolds) == 1)
   if (nfolds < 2) {
     stop("There must be at least two cross-validation folds.")
   } else if (length(y) < nfolds) {
@@ -296,6 +334,9 @@ check_args <- function(x, y, family) {
 #----- group-ridge -----
 
 .mean_function <- function(x, family) {
+  stopifnot((is.vector(x) && is.numeric(x)) || inherits(x, "Surv"),
+            is.character(family),
+            length(family) == 1)
   if (family %in% c("gaussian", "cox")) {
     x
   } else if (family == "binomial") {
@@ -557,14 +598,13 @@ predict.multiridge <- function(object, newx, ...) {
                                          datablocksnew = newxx)
   sigmanew <- multiridge::SigmaFromBlocks(XXblocks = xxblocks,
                                           penalties = object$penalties)
-  eta <- multiridge::predictIWLS(IWLSfit = object, Sigmanew = sigmanew)
+  eta <- drop(multiridge::predictIWLS(IWLSfit = object, Sigmanew = sigmanew))
   if (object$family == "cox") {
     y_hat <- exp(eta)
   } else {
     y_hat <- .mean_function(x = eta, family = object$family)
   }
-  y_hat <- backscale(pars = object$pars, y = y_hat)$y
-  y_hat
+  backscale(pars = object$pars, y = y_hat)$y
 }
 
 #'@title
@@ -606,7 +646,7 @@ coef.multiridge <- function(object, ...) {
 
 .deviance <- function(y_hat, y, family) {
   stopifnot(is.vector(y_hat) && is.numeric(y_hat),
-            #(is.vector(y) && is.numeric(y)) || inherits(y, "Surv"),
+            (is.vector(y) && is.numeric(y)) || inherits(y, "Surv"),
             length(y_hat) == length(y),
             is.character(family),
             length(family) == 1)
@@ -804,7 +844,6 @@ coef.multiridge <- function(object, ...) {
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL) {
-  #lambda_init = NULL;mode<-"mean";cor = "spearman"
   if (is.character(alpha_init) &&
         alpha_init  == "multiridge" &&
         family == "poisson") {
@@ -986,6 +1025,8 @@ predict.corila <- function(object, newx, index, s, ...) {
 }
 
 .set_candidates <- function(tune) {
+  stopifnot(is.character(tune),
+            length(tune) == 1)
   #if (FALSE) {
   #  cand <- seq(from = 0, to = 1, by = 0.1)
   #  hyper <- data.frame(weight.local = cand,
@@ -1608,6 +1649,12 @@ simulate_overlap <- function() {
 #'
 #'@export
 calc_sign_prec <- function(truth, estim) {
+  if (!is.vector(truth) || !is.numeric(truth)) {
+    stop("Argument \"truth\" should be a numerical vector.")
+  }
+  if (!is.vector(estim) || !is.numeric(estim)) {
+    stop("Argument \"estim\" should be a numerical vector.")
+  }
   if (length(estim) != length(truth)) {
     stop("Arguments \"truth\" and \"estim\" must have the same length.")
   } else if (all(is.na(estim)) || all(estim == 0)) {
