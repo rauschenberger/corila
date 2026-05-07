@@ -15,7 +15,8 @@
 }
 \value{
 Returns an \eqn{(1 + p)}-dimensional vector of the estimated coefficients.
-The first entry is the estimated intercept, and the other \eqn{p} entries are the estimated slopes.
+The first entry is the estimated intercept,
+and the other \eqn{p} entries are the estimated slopes.
 }
 \description{
 Extracts coefficients from an object of class \code{"cv.corila"}.
@@ -61,7 +62,9 @@ y_hat$corila <- stats::predict(object = object, newx = x[!cond, ])
 
 # selection performance
 sapply(coef, function(x) mean(sign(x[-1]) == sign(beta)))
-sapply(coef, function(x) sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0))
+sapply(coef, function(x) {
+ sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0)
+})
 
 # predictive performance
 if (family == "gaussian") {
@@ -92,5 +95,6 @@ metric
 \emph{In preparation}.
 }
 \seealso{
-Fit models with \code{\link{cv.corila}()} and make predictions with \code{\link{predict.cv.corila}()}.
+Fit models with \code{\link{cv.corila}()}
+and make predictions with \code{\link{predict.cv.corila}()}.
 }

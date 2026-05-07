@@ -41,8 +41,10 @@ indicates whether information should be transferred
 from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
 \item{include}{\eqn{p}-dimensional logical vector
-indicating whether a predictor may be included in (\code{TRUE})
-or must be excluded from (\code{FALSE}) the final model}
+indicating whether a predictor may be included in the final model
+(\code{TRUE}, "primary predictors")
+or must be excluded from the final model
+(\code{FALSE}, "auxiliary predictors")}
 
 \item{alpha_init}{elastic net mixing parameter
 (\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
@@ -79,7 +81,8 @@ Returns a list with the following slots:
 \item \code{nzero} non-zero coefficients
 \item \code{metric} metric
 }
-Both slot contain a data frame with one row for each iteration (\code{iter})
+Both slot contain a data frame
+with one row for each iteration (\code{iter})
 and one column for each \code{method}.
 }
 \description{

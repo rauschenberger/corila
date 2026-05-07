@@ -15,7 +15,8 @@ and \eqn{p} is the number of variables}
 only for Gaussian family}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
-\code{"poisson"}, or \code{"cox"}; or \code{NULL} (if \code{pars} is provided)}
+\code{"poisson"}, or \code{"cox"};
+or \code{NULL} (if \code{pars} is provided)}
 
 \item{pars}{list as defined in section \emph{Value},
 or \code{NULL} (if \code{family} is provided)}

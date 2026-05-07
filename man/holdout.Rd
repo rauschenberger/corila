@@ -37,8 +37,10 @@ indicates whether information should be transferred
 from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
 \item{include}{\eqn{p}-dimensional logical vector
-indicating whether a predictor may be included in (\code{TRUE})
-or must be excluded from (\code{FALSE}) the final model}
+indicating whether a predictor may be included in the final model
+(\code{TRUE}, "primary predictors")
+or must be excluded from the final model
+(\code{FALSE}, "auxiliary predictors")}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
@@ -65,7 +67,8 @@ or \code{NA} to set all initial coefficients equal to 1}
 
 \item{nfolds}{number of internal cross-validation folds (integer scalar)}
 
-\item{foldid}{internal cross-validation fold identifiers (\eqn{p}-dimensional integer vector)}
+\item{foldid}{internal cross-validation fold identifiers
+(\eqn{p}-dimensional integer vector)}
 
 \item{method}{character vector listing all methods to be compared}
 

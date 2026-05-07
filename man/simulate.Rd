@@ -23,7 +23,8 @@ simulate(
 )
 }
 \arguments{
-\item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}}
+\item{family}{character \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"} or \code{"cox"}}
 
 \item{n0}{number of training observations}
 

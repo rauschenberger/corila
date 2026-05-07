@@ -4,7 +4,7 @@
 \alias{multiridge}
 \title{Multi-Penalty Ridge Regression}
 \usage{
-multiridge(x, y, z, family, penalties = NULL)
+multiridge(x, y, z, family, foldid = NULL, nfolds = 10, penalties = NULL)
 }
 \arguments{
 \item{x}{predictors:
@@ -24,6 +24,10 @@ or \code{NULL}
 \item{family}{character \code{"linear"} (or \code{"gaussian"}),
 \code{"logistic"} (or \code{"binomial"}),
 or \code{"cox"}}
+
+\item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
+
+\item{nfolds}{integer specifying the number of folds}
 
 \item{penalties}{\eqn{q}-dimensional vector of penalty parameters,
 or \code{NULL} (cross-validation)}
@@ -138,7 +142,7 @@ and
 "Fast cross-validation for multi-penalty high-dimensional ridge regression"
 \emph{Journal of Computational and Graphical Statistics}
 30(4):835-847.
-\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}.
+\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}. # nolint: line_length_linter.
 }
 \seealso{
 Extract coefficients with \code{\link[=coef.multiridge]{coef}()}

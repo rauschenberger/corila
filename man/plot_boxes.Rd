@@ -36,7 +36,7 @@ Creates box plots for paired/matched data,
 using Wilcoxon's signed-rank test to compare a group with the other groups.
 }
 \examples{
-x <- data.frame(mean = 0, corila = rnorm(100)-1, other = rnorm(100))
+x <- data.frame(mean = 0, corila = rnorm(100) - 1, other = rnorm(100))
 plot_boxes(x)
 
 }

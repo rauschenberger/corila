@@ -37,8 +37,10 @@ indicates whether information should be transferred
 from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
 \item{include}{\eqn{p}-dimensional logical vector
-indicating whether a predictor may be included in (\code{TRUE})
-or must be excluded from (\code{FALSE}) the final model}
+indicating whether a predictor may be included in the final model
+(\code{TRUE}, "primary predictors")
+or must be excluded from the final model
+(\code{FALSE}, "auxiliary predictors")}
 
 \item{alpha_init}{elastic net mixing parameter
 (\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
@@ -152,7 +154,9 @@ y_hat$corila <- stats::predict(object = object, newx = x[!cond, ])
 
 # selection performance
 sapply(coef, function(x) mean(sign(x[-1]) == sign(beta)))
-sapply(coef, function(x) sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0))
+sapply(coef, function(x) {
+ sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0)
+})
 
 # predictive performance
 if (family == "gaussian") {

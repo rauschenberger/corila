@@ -66,7 +66,9 @@ y_hat$corila <- stats::predict(object = object, newx = x[!cond, ])
 
 # selection performance
 sapply(coef, function(x) mean(sign(x[-1]) == sign(beta)))
-sapply(coef, function(x) sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0))
+sapply(coef, function(x) {
+ sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0)
+})
 
 # predictive performance
 if (family == "gaussian") {
