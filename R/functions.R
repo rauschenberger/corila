@@ -7,7 +7,7 @@
 #'
 #'@inheritParams corila
 #'@param y
-#'\eqn{n_0}-dimensional response vector 
+#'\eqn{n_0}-dimensional response vector
 #'(only required if \code{family="gaussian"})
 #'or \code{NULL}
 #'@param family
@@ -41,34 +41,19 @@
 #'@inherit backscale examples
 #'@export
 forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
+  families <- c("gaussian", "binomial", "poisson", "cox")
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
   stopifnot(
     is.matrix(x) && is.numeric(x),
+    #all(!is.na(x)),
     is.null(y) || (is.vector(y) && is.numeric(y)) || inherits(y, "Surv"),
     is.null(y) || nrow(x) == length(y),
+    #is.null(y) || all(!is.na(y))
     is.null(family) != is.null(pars),
-    is.null(family) || (is.character(family) && length(family) == 1),
+    is.null(family) || (is.character(family) && length(family) == 1 &&
+                          family %in% families),
     is.null(pars) || (is.list(pars) && all(slots %in% names(pars)))
   )
-  if (!is.null(y)) {
-    if (nrow(x) != length(y)) {
-      stop(paste(
-        "For each observation,",
-        "\"x\" should have one row and \"y\" should have one entry."
-      ))
-    }
-  }
-  if (is.null(family) == is.null(pars)) {
-    stop("Provide either family or pars.")
-  } else {
-    families <- c("gaussian", "binomial", "poisson", "cox")
-    if (!c(family, pars$family) %in% families) {
-      stop(paste(
-        "Argument \"family\" must equal",
-        "\"gaussian\", \"binomial\", \"poisson\", or \"cox\"."
-      ))
-    }
-  }
   if (is.null(family)) {
     family <- pars$family
   }
@@ -188,19 +173,20 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
 #'}
 #'@export
 backscale <- function(pars, y = NULL, coef = NULL) {
+  families <- c("gaussian", "binomial", "poisson", "cox")
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
   stopifnot(
     is.list(pars),
     all(slots %in% names(pars)),
-    is.null(y) ||
-      ((is.vector(y) || is.matrix(y)) && is.numeric(y)) ||
+    pars$family %in% families,
+    length(pars$mu.y) == 1 && length(pars$sd.y) == 1,
+    length(pars$sd.x) == length(pars$mu.x),
+    pars$sd.y >= 0 && all(pars$sd.x >= 0),
+    is.null(y) || ((is.vector(y) || is.matrix(y)) && is.numeric(y)) ||
       inherits(y, "Surv"),
     is.null(coef) || (is.vector(coef) && is.numeric(coef)),
-    is.null(pars) || (length(pars$mu.y) == 1 && length(pars$sd.y) == 1),
-    is.null(pars) || length(pars$sd.x) == length(pars$mu.x),
-    is.null(pars) || (pars$sd.y >= 0 && all(pars$sd.x >= 0)),
     (is.null(coef) || is.null(pars)) ||
-      (length(pars$sd.x) == length(coef) - (pars$family != "cox"))
+      length(pars$sd.x) == length(coef) - (pars$family != "cox")
   )
   list <- list()
   if (!is.null(y) && pars$family == "gaussian") {
@@ -267,16 +253,16 @@ backscale <- function(pars, y = NULL, coef = NULL) {
 #'
 #'@export
 folds <- function(y, family, nfolds) {
+  families <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
   stopifnot(is.vector(y) && is.numeric(y) || inherits(y, "Surv"),
             is.character(family),
             length(family) == 1,
+            family %in% families,
             is.numeric(nfolds),
-            length(nfolds) == 1)
-  if (nfolds < 2) {
-    stop("There must be at least two cross-validation folds.")
-  } else if (length(y) < nfolds) {
-    stop("There must be more observations than cross-validation folds.")
-  }
+            length(nfolds) == 1,
+            floor(nfolds) == ceiling(nfolds),
+            nfolds >= 2,
+            nfolds <= length(y))
   if (family %in% c("binomial", "logistic", "cox")) {
     if (family == "cox") {
       y <- y[, "status"]
@@ -334,9 +320,11 @@ check_args <- function(x, y, family) {
 #----- group-ridge -----
 
 .mean_function <- function(x, family) {
+  families <- c("gaussian", "binomial", "poisson", "cox")
   stopifnot((is.vector(x) && is.numeric(x)) || inherits(x, "Surv"),
             is.character(family),
-            length(family) == 1)
+            length(family) == 1,
+            family %in% families)
   if (family %in% c("gaussian", "cox")) {
     x
   } else if (family == "binomial") {
@@ -669,6 +657,23 @@ coef.multiridge <- function(object, ...) {
 
 .estim_initial_coefs <- function(x, y, family, alpha, group,
                                  foldid, nfolds, lambda) {
+  families <- c("gaussian", "binomial", "poisson", "cox")
+  stopifnot(is.matrix(x),
+            (is.vector(y) && is.numeric(y)) || inherits(y, "Surv"),
+            nrow(x) == length(y),
+            is.character(family),
+            length(family) == 1,
+            family %in% families,
+            is.character(alpha) ||
+              (is.numeric(alpha) &&
+                 (is.na(alpha) || (alpha >= 0 && alpha <= 1))),
+            length(alpha) == 1,
+            is.null(foldid) ||
+              (is.numeric(foldid) &&
+                 length(foldid) == length(y) &&
+                 all(floor(foldid) == ceiling(foldid))),
+            is.null(nfolds) || (is.numeric(nfolds) && length(nfolds) == 1),
+            is.null(lambda) || (is.numeric(lambda) && all(lambda >= 0)))
   methods <- c("pearson", "spearman", "kendall")
   p <- ncol(x)
   if (all(is.na(alpha))) {
