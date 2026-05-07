@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r,eval=FALSE}
 rm(list=ls(all.names=TRUE))
-#install.packages(c("roxygen2","pkgdown","rcmdcheck","usethis","remotes","testthat","devtools","goodpractice","checkglobals","roxylint"))
+#install.packages(c("roxygen2","pkgdown","rcmdcheck","usethis","remotes","testthat","devtools","goodpractice","checkglobals","roxylint", "cyclocomp"))
 setwd("C:/Users/arauschenberger/Desktop/corila/package")
 ```
 
@@ -40,6 +40,7 @@ checkglobals::checkglobals(pkg=".")
 
 pkgdown::check_pkgdown()
 lintr::lint_package()
+cyclocomp::cyclocomp_package_dir()
 
 #devtools::build()
 #devtools::submit_cran()
