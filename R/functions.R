@@ -448,19 +448,14 @@ check_args <- function(x, y, family) {
 #'@export
 multiridge <- function(x, y, z, family, penalties = NULL) {
   check_args(x = x, y = y, family = family)
+  if(family == "poisson"){
+    stop("Argument family=\"poisson\" is not implemented.")
+  }
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop(paste(
       "For each variable,",
       "\"x\" should have one column",
       "and \"z\" should have one entry."
-    ))
-  }
-  if (!family %in% c("gaussian", "linear", "binomial", "logistic", "cox")) {
-    stop(paste(
-      "Argument \"family\" must equal",
-      "\"gaussian\" (or \"linear\"),",
-      "\"binomial\" (or \"logistic\"),",
-      "or \"cox\"."
     ))
   }
   cond <- !is.null(penalties) && !is.null(z) &&
