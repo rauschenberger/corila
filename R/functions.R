@@ -333,6 +333,7 @@ check_args <- function(x, y, family) {
 #'@param penalties
 #'\eqn{q}-dimensional vector of penalty parameters,
 #'or \code{NULL} (cross-validation)
+#'@inheritParams corila
 #'
 #'@inherit corila details
 #'
@@ -667,6 +668,10 @@ coef.multiridge <- function(object, ...) {
 #'@param family
 #'character string \code{"gaussian"}, \code{"binomial"},
 #'\code{"poisson"}, or \code{"cox"}
+#'@param foldid
+#'\eqn{n}-dimensional vector containing the fold identifiers
+#'@param nfolds
+#'integer specifying the number of folds
 #'@param hyper
 #'list of of \eqn{m}-dimensional vectors
 #'or a data frame with \eqn{m} rows
@@ -1032,8 +1037,6 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'Optimises the parameters and the hyperparameters of the sparse group lasso.
 #'
 #'@inheritParams corila
-#'@param foldid \eqn{n}-dimensional vector containing the fold identifiers
-#'@param nfolds integer specifying the number of folds
 #'@param tune character \code{"wgt"}, \code{"exp"}, or \code{"both"}
 #'for determining the candidate values for the hyperparameters;
 #'or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
@@ -1166,6 +1169,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                        alpha_final = alpha_final,
                        family = family,
                        cor = cor,
+                       foldid = foldid,
                        hyper = hyper)
   lambda <- lapply(X = object_ext$model, FUN = function(x) x$lambda)
 
