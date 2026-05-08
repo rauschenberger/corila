@@ -4,7 +4,7 @@
 set.seed(1)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#----- functions "forescale" and "backscale" -----
+#----- functions ".forescale" and ".backscale" -----
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 for (glmnet in c(FALSE, TRUE)) {
@@ -68,8 +68,8 @@ for (glmnet in c(FALSE, TRUE)) {
       }
       coef1 <- as.numeric(stats::coef(object = lm1, s = 0))
       #--- regression with standardisation ---
-      scale <- forescale(x = x[fold == 0, ], y = y[fold == 0], family = family)
-      newx <- forescale(x = x[fold == 1, ], pars = scale$pars)$x
+      scale <- .forescale(x = x[fold == 0, ], y = y[fold == 0], family = family)
+      newx <- .forescale(x = x[fold == 1, ], pars = scale$pars)$x
       if (glmnet) {
         lm2 <- glmnet::cv.glmnet(x = scale$x,
                                  y = scale$y,
@@ -98,7 +98,7 @@ for (glmnet in c(FALSE, TRUE)) {
         )
       }
       coef.temp <- as.numeric(stats::coef(object = lm2, s = 0))
-      result <- backscale(pars = scale$pars, y = y_hat_temp, coef = coef.temp)
+      result <- .backscale(pars = scale$pars, y = y_hat_temp, coef = coef.temp)
       y_hat2 <- result$y_original
       coef2 <- result$coef
       #--- equality ---
@@ -367,7 +367,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     y <- survival::Surv(time = time, event = status)
     index <- y[, "status"]
   }
-  foldid <- folds(y = y, family = family, nfolds = 10)
+  foldid <- .folds(y = y, family = family, nfolds = 10)
   diff <- tapply(X = foldid,
                  INDEX = index,
                  FUN = function(x) diff(range(table(x))))
