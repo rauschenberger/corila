@@ -992,7 +992,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   # --- check arguments ---
   .check(x = x, type = "numeric", dim = c(Inf, Inf))
   .check(x = y, type = "numeric", dim = nrow(x))
-  # add checks for group
+  # add checks for group!
   .check(x = include, type = "logical", dim = ncol(x))
   .check(x = family, type = "nominal",
          support = c("gaussian", "binomial", "poisson", "cox"))
@@ -1654,6 +1654,8 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
 #'    }
 #' }
 #' sapply(X = data, FUN = dims)
+#' 
+#' @keywords distribution
 #'
 #' @export
 simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
@@ -1862,6 +1864,8 @@ simulate_overlap <- function() {
 #' calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
 #'
 #' @keywords internal
+#' 
+#' @keywords utilities
 #'
 #' @export
 calc_sign_prec <- function(truth, estim) {
@@ -1939,6 +1943,8 @@ calc_sign_prec <- function(truth, estim) {
 #'                    method = c("mean", "ridge", "lasso", "corila"))
 #' # Why does holdout require y_test? Try to remove this
 #' }
+#'
+#' @keywords iteration
 #'
 #' @export
 holdout <- function(x_train, y_train, group, include, family,
@@ -2626,6 +2632,9 @@ holdout <- function(x_train, y_train, group, include, family,
 #' results <- crossval(x, y, family = "gaussian",
 #'                     method = c("mean", "corila"), foldid = foldid)
 #' }
+#' 
+#' @keywords iteration
+#' 
 #' @export
 crossval <- function(x, y, family, group = NULL, include = NULL,
                      alpha_init = 0, alpha_final = 1, iter = 5, foldid = NULL,
@@ -2765,6 +2774,8 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
 #' @examples
 #' x <- data.frame(mean = 0, corila = rnorm(100) - 1, other = rnorm(100))
 #' plot_boxes(x)
+#' 
+#' @keywords graphs
 #'
 #' @export
 plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
