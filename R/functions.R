@@ -1,3 +1,6 @@
+# This file contains the functions of the R package "corila".
+
+#----- helpers -----
 
 #' @title
 #' Assertions
@@ -36,6 +39,9 @@
 #' @examples
 #' .check(x = NULL)
 #'
+#' @keywords internal
+#'
+#' @export
 .check <- function(x, type, dim = 1, na.rm = FALSE,
                    support = NULL, min = -Inf, max = Inf) {
   if (is.null(x)) {
@@ -79,6 +85,46 @@
   )
 }
 
+# add check on groups!
+.validate <- function(x, y, family) {
+  if (!is.character(family) || length(family) != 1) {
+    stop("Argument \"family\" must be a character string.")
+  }
+  if (!is.matrix(x)) {
+    stop("Argument \"x\" must be a matrix.")
+  }
+  cond_vector <- is.vector(y) && is.numeric(y)
+  cond_matrix <- is.matrix(y) && ncol(y) == 1
+  if (!(family == "cox" || cond_vector || cond_matrix)) {
+    stop("Argument \"y\" must be a vector.")
+  }
+  if (nrow(x) != length(y)) {
+    stop("For each observation, matrix \"x\" must have one row,
+         and vector \"y\" must have one entry.")
+  }
+  if (family %in% c("gaussian", "linear")) {
+    if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
+      stop("Gaussian family requires a numeric outcome.")
+    }
+  } else if (family %in% c("binomial", "logistic")) {
+    if (!all(y %in% c(0, 1))) {
+      stop("Binomial family requires a binary outcome.")
+    }
+  } else if (family == "poisson") {
+    if (any(y %% 1 != 0)) {
+      stop("Poisson family requires a count outcome.")
+    }
+  } else if (family == "cox") {
+    if (!inherits(x = y, what = "Surv")) {
+      stop("Cox model requires a survival outcome.")
+    }
+  } else {
+    stop("Invalid value for argument \"family\".")
+  }
+  NULL
+}
+
+
 #' @title
 #' Standardisation
 #'
@@ -118,13 +164,16 @@
 #' 0 and 1 for other families)
 #' }
 #'
-#' @seealso Use function \code{\link{backscale}()}
+#' @seealso Use function \code{\link{.backscale}()}
 #' to bring coefficients and predictions back to original scale.
 #'
-#' @inherit backscale examples
+#' @inherit .backscale examples
+#'
+#' @keywords internal
+#'
 #' @export
-forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
-  # check arguments
+.forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
+  # --- check arguments ---
   families <- c("gaussian", "binomial", "poisson", "cox")
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
   .check(x = x, type = "numeric", dim = c(Inf, Inf))
@@ -140,7 +189,7 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   .check(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0)
   .check(x = pars$mu.y, type = "numeric")
   .check(x = pars$sd.y, type = "numeric", min = 0)
-  # 
+  # --- estimate parameters ---
   if (is.null(family)) {
     family <- pars$family
   } else {
@@ -165,7 +214,7 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
       pars$sd.y <- 1
     }
   }
-
+  # --- standardise variables ---
   x_scaled <- t((t(x) - pars$mu.x) / pars$sd.x)
   x_scaled[, pars$sd.x == 0] <- 0
   if (!is.null(y) && family == "gaussian") {
@@ -186,7 +235,7 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
 #' or transforms coefficients for predictor variables and response variable
 #' on original scales.
 #'
-#' @inheritParams forescale
+#' @inheritParams .forescale
 #'
 #' @param y
 #' \eqn{n_1}-dimensional response vector
@@ -201,7 +250,7 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
 #' @return
 #' Returns a list with slots \code{y_original} or \code{coef}.
 #'
-#' @seealso \code{\link{forescale}()}
+#' @seealso \code{\link{.forescale}()}
 #'
 #' @examples
 #' # simulate data
@@ -236,7 +285,7 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
 #' yhat1 <- predict(lm1, newdata = x[fold == 1, ])
 #'
 #' # regression with standardisation
-#' scale <- forescale(x = as.matrix(x)[fold == 0, ],
+#' scale <- .forescale(x = as.matrix(x)[fold == 0, ],
 #'                    y = y[fold == 0],
 #'                    family = family)
 #' if (family == "cox") {
@@ -245,9 +294,9 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
 #'   lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
 #' }
 #' coef_temp <- stats::coef(lm2)
-#' newx_temp <- forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
+#' newx_temp <- .forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
 #' yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
-#' result <- backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
+#' result <- .backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
 #' coef2 <- result$coef
 #' yhat2 <- result$y_original
 #'
@@ -260,8 +309,12 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
 #'  isTRUE(all.equal(yhat1, yhat2, check.attributes = FALSE))
 #' )
 #' }
+#'
+#' @keywords internal
+#'
 #' @export
-backscale <- function(pars, y = NULL, coef = NULL) {
+.backscale <- function(pars, y = NULL, coef = NULL) {
+  # --- check arguments ---
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
   .check(x = names(pars), type = "nominal", dim = length(slots),
          support = slots)
@@ -275,12 +328,14 @@ backscale <- function(pars, y = NULL, coef = NULL) {
   .check(x = y, type = "numeric", dim = dim)
   dim <- length(pars$mu.x) + (pars$family != "cox")
   .check(x = coef, type = "numeric", dim = dim)
+  # --- transform target ---
   list <- list()
   if (!is.null(y) && pars$family == "gaussian") {
     list$y_original <- pars$mu.y + pars$sd.y * y
   } else if (!is.null(y)) {
     list$y_original <- y
   }
+  # --- transform coefficients ---
   if (!is.null(coef)) {
     if (pars$family == "cox") {
       alpha <- NULL
@@ -323,26 +378,31 @@ backscale <- function(pars, y = NULL, coef = NULL) {
 #' @examples
 #' # Gaussian and Poisson families
 #' y <- stats::rnorm(n = 100)
-#' foldid <- folds(y = y, family = "gaussian", nfolds = 10)
+#' foldid <- .folds(y = y, family = "gaussian", nfolds = 10)
 #' table(foldid)
 #'
 #' # binomial families
 #' y <- stats::rbinom(n = 100, prob = 0.2, size = 1)
-#' foldid <- folds(y = y, family = "binomial", nfolds = 10)
+#' foldid <- .folds(y = y, family = "binomial", nfolds = 10)
 #' table(y, foldid)
 #'
 #' # Cox model
 #' time <- stats::rexp(n = 100, rate = 5)
 #' status <- stats::rbinom(n = 100, prob = 0.2, size = 1)
 #' y <- survival::Surv(time = time, event = status)
-#' foldid <- folds(y = y, family = "cox", nfolds = 10)
+#' foldid <- .folds(y = y, family = "cox", nfolds = 10)
 #' table(y[, "status"], foldid)
-#'@export
-folds <- function(y, family, nfolds) {
+#'
+#' @keywords internal
+#'
+#' @export
+.folds <- function(y, family, nfolds) {
+  # --- check arguments ---
   .check(x = y, type = "numeric", dim = Inf)
   support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
   .check(x = family, type = "nominal", support = support)
   .check(x = nfolds, type = "integer", min = 2, max = length(y))
+  # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
     if (family == "cox") {
       y <- y[, "status"]
@@ -359,50 +419,12 @@ folds <- function(y, family, nfolds) {
   foldid
 }
 
-check_args <- function(x, y, family) {
-  if (!is.character(family) || length(family) != 1) {
-    stop("Argument \"family\" must be a character string.")
-  }
-  if (!is.matrix(x)) {
-    stop("Argument \"x\" must be a matrix.")
-  }
-  cond_vector <- is.vector(y) && is.numeric(y)
-  cond_matrix <- is.matrix(y) && ncol(y) == 1
-  if (!(family == "cox" || cond_vector || cond_matrix)) {
-    stop("Argument \"y\" must be a vector.")
-  }
-  if (nrow(x) != length(y)) {
-    stop("For each observation, matrix \"x\" must have one row,
-         and vector \"y\" must have one entry.")
-  }
-  if (family %in% c("gaussian", "linear")) {
-    if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-      stop("Gaussian family requires a numeric outcome.")
-    }
-  } else if (family %in% c("binomial", "logistic")) {
-    if (!all(y %in% c(0, 1))) {
-      stop("Binomial family requires a binary outcome.")
-    }
-  } else if (family == "poisson") {
-    if (any(y %% 1 != 0)) {
-      stop("Poisson family requires a count outcome.")
-    }
-  } else if (family == "cox") {
-    if (!inherits(x = y, what = "Surv")) {
-      stop("Cox model requires a survival outcome.")
-    }
-  } else {
-    stop("Invalid value for argument \"family\".")
-  }
-  NULL
-}
-
-#----- group-ridge -----
-
 .mean_function <- function(x, family) {
+  # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")
   .check(x = x, type = "numeric", dim = Inf)
   .check(x = family, type = "nominal", support = support)
+  # --- transform target ---
   if (family %in% c("gaussian", "cox")) {
     x
   } else if (family == "binomial") {
@@ -413,6 +435,31 @@ check_args <- function(x, y, family) {
     stop("Family not implemented.")
   }
 }
+
+.deviance <- function(y, y_hat, family) {
+  # --- check arguments ---
+  .check(x = y, type = "numeric", dim = Inf)
+  .check(x = y_hat, type = "numeric", dim = length(y))
+  support <- c("gaussian", "binomial", "poisson", "cox")
+  .check(x = family, type = "nominal", support = support)
+  # --- calculate deviance ---
+  eps <- 1e-06
+  if (family == "gaussian") {
+    mean((y - y_hat)^2)
+  } else if (family == "binomial") {
+    mean(
+      -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
+    )
+  } else if (family == "cox") {
+    glmnet::coxnet.deviance(pred = y_hat, y = y)
+  } else if (family == "poisson") {
+    mean(2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
+  } else {
+    stop()
+  }
+}
+
+#----- group-ridge -----
 
 #' @title
 #' Multi-Penalty Ridge Regression
@@ -564,6 +611,7 @@ check_args <- function(x, y, family) {
 #'@export
 multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
                        penalties = NULL) {
+  # --- check arguments ---
   .check(x = x, type = "numeric", dim = c(Inf, Inf))
   .check(x = y, type = "numeric", dim = nrow(x))
   .check(x = z, type = "integer", dim = ncol(x),
@@ -573,8 +621,7 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
   .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
   .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
   .check(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
-
-  check_args(x = x, y = y, family = family)
+  .validate(x = x, y = y, family = family)
   if (family == "poisson") {
     stop("Argument family=\"poisson\" is not implemented.")
   }
@@ -590,7 +637,8 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
   if (cond) {
     stop("Argument \"penalties\" must have one entry for each group.")
   }
-  scale <- forescale(x = x, y = y, family = family)
+  # --- initial regression ---
+  scale <- .forescale(x = x, y = y, family = family)
   model <- ifelse(family == "gaussian",
                   yes = "linear",
                   no = ifelse(family == "binomial",
@@ -603,7 +651,7 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
                                 Y = scale$y,
                                 model = model)
   ))
-  # cross-validation
+  # --- cross-validation ---
   if (is.null(penalties)) {
     if (is.null(foldid)) {
       indices <- multiridge::CVfolds(Y = scale$y, model = model, kfold = nfolds)
@@ -619,7 +667,7 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
     ))
     penalties <- final$optpen
   }
-  # refit
+  # --- refit ---
   xxt <- multiridge::SigmaFromBlocks(XXblocks = xxblocks,
                                      penalties = penalties)
   if (family == "cox") {
@@ -666,6 +714,7 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
 #'
 #' @export
 predict.multiridge <- function(object, newx, ...) {
+  # --- check arguments ---
   .check(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
   if (length(object$z) != ncol(newx)) {
     stop(paste(
@@ -673,7 +722,8 @@ predict.multiridge <- function(object, newx, ...) {
       "for each variable used in model fitting."
     ))
   }
-  scale <- forescale(x = newx, pars = object$pars)
+  # --- make prediction s---
+  scale <- .forescale(x = newx, pars = object$pars)
   newxx <- lapply(X = unique(object$z),
                   FUN = function(x) scale$x[, object$z == x])
   xxblocks <- multiridge::createXXblocks(datablocks = object$datablocks,
@@ -686,7 +736,7 @@ predict.multiridge <- function(object, newx, ...) {
   } else {
     y_hat <- .mean_function(x = eta, family = object$family)
   }
-  backscale(pars = object$pars, y = y_hat)$y
+  .backscale(pars = object$pars, y = y_hat)$y
 }
 
 #' @title
@@ -722,35 +772,14 @@ coef.multiridge <- function(object, ...) {
   #if (object$family == "cox" & is.null(coef[[1]])) {
   #  coef[[1]] <- NA # was 0
   #}
-  backscale(pars = object$pars, coef = unlist(coef))$coef
+  .backscale(pars = object$pars, coef = unlist(coef))$coef
 }
 
 #----- group-lasso -----
 
-.deviance <- function(y, y_hat, family) {
-  .check(x = y, type = "numeric", dim = Inf)
-  .check(x = y_hat, type = "numeric", dim = length(y))
-  support <- c("gaussian", "binomial", "poisson", "cox")
-  .check(x = family, type = "nominal", support = support)
-  eps <- 1e-06
-  if (family == "gaussian") {
-    mean((y - y_hat)^2)
-  } else if (family == "binomial") {
-    mean(
-      -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
-    )
-  } else if (family == "cox") {
-    glmnet::coxnet.deviance(pred = y_hat, y = y)
-  } else if (family == "poisson") {
-    mean(2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
-  } else {
-    stop()
-  }
-}
-
-
 .estim_initial_coefs <- function(x, y, family, alpha, group,
                                  foldid, nfolds, lambda) {
+  # --- check arguments ---
   methods <- c("pearson", "spearman", "kendall")
   .check(x = x, type = "numeric", dim = c(Inf, Inf))
   .check(x = y, type = "numeric", dim = nrow(x))
@@ -765,7 +794,7 @@ coef.multiridge <- function(object, ...) {
   .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
   .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
   .check(x = lambda, type = "numeric", min = 0)
-
+  # --- estimate initial coefficients ---
   p <- ncol(x)
   if (all(is.na(alpha))) {
     coef <- rep(x = 1, times = p) # Remove this confusing option?
@@ -816,7 +845,6 @@ coef.multiridge <- function(object, ...) {
   }
   list(coef = coef, lambda = lambda)
 }
-
 
 #' @title
 #' Group lasso
@@ -923,7 +951,7 @@ coef.multiridge <- function(object, ...) {
 #' with \code{\link{predict.corila}()}.
 #'
 #' This function calls
-#' \code{\link{forescale}()} and \code{\link{backscale}()}
+#' \code{\link{.forescale}()} and \code{\link{.backscale}()}
 #' for standardising data and bringing results back to the original scale,
 #' respectively,
 #' \code{\link{multiridge}()} for obtaining initial group penalties,
@@ -951,6 +979,7 @@ coef.multiridge <- function(object, ...) {
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL) {
+  # --- check arguments ---
   .check(x = x, type = "numeric", dim = c(Inf, Inf))
   .check(x = y, type = "numeric", dim = nrow(x))
   # add checks for group
@@ -980,10 +1009,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     warning("Setting alpha_init=0 due to family=\"poisson\".")
     alpha_init <- 0
   }
-
   #n <- nrow(x) # sample size
   p <- ncol(x) # number of features
-
   if (is.null(group)) {
     group <- seq_len(p)
   }
@@ -1024,14 +1051,13 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     }
   }
 
-  scale <- forescale(x = x, y = y, family = family)
+  scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
-
-  # fold identifiers
+  # --- fold identifiers ---
   if (is.null(lambda_init) && is.null(foldid)) {
-    foldid <- folds(y = scale$y, family = family, nfolds = nfolds)
+    foldid <- .folds(y = scale$y, family = family, nfolds = nfolds)
   }
-
+  # --- initial coefficients ---
   init <- .estim_initial_coefs(x = scale$x,
                                y = scale$y,
                                family = family,
@@ -1040,13 +1066,11 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                                foldid = foldid,
                                nfolds = nfolds,
                                lambda = lambda_init)
-
   #--- feature correlation ---
   if (!is.matrix(cor)) {
     cor <- stats::cor(x = scale$x, method = cor, use = "pairwise.complete")
   }
   cor[is.na(cor)] <- 0
-
   #--- regression ---
   object <- list()
   for (i in seq_len(nrow(hyper))) {
@@ -1147,16 +1171,18 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #'
 #' @export
 predict.corila <- function(object, newx, index, s, ...) {
+  # --- check arguments ---
   .check(x = newx, type = "numeric", dim = c(Inf, length(object$scale$mu.x)))
   .check(x = index, type = "integer", min = 1, max = length(object$model))
   .check(x = s, type = "numeric", dim = Inf, min = 0)
-  newx_stand <- forescale(x = newx, pars = object$scale)$x
+  # --- make predictions ---
+  newx_stand <- .forescale(x = newx, pars = object$scale)$x
   y_hat_stand <- stats::predict(object = object$model[[index]],
                                 newx = cbind(newx_stand, -newx_stand),
                                 s = s,
                                 type = "response")
   #type = ifelse(object$scale$family == "cox", "link", "response"))
-  y_hat <- backscale(y = y_hat_stand, pars = object$scale)$y
+  y_hat <- .backscale(y = y_hat_stand, pars = object$scale)$y
   y_hat
 }
 
@@ -1263,7 +1289,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' \item \code{lambda.min}
 #' optimised regularisation hyperparameter
 #' \item \code{scale}:
-#' output from \code{\link{forescale}()}
+#' output from \code{\link{.forescale}()}
 #' }
 #'
 #' @inherit corila-package references
@@ -1347,12 +1373,12 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                       nfolds = 10, cor = "spearman", tune = "both",
                       foldid = NULL) {
   # set default parameters
-  check_args(x = x, y = y, family = family)
+  .validate(x = x, y = y, family = family)
   if (is.null(include)) {
     include <- rep(x = TRUE, times = ncol(x))
   }
   if (is.null(foldid)) {
-    foldid <- folds(y = y, family = family, nfolds = nfolds)
+    foldid <- .folds(y = y, family = family, nfolds = nfolds)
   }
   hyper <- .set_candidates(tune = tune)
   # fit model on all folds
@@ -1454,23 +1480,26 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #' @inherit cv.corila examples
 #' @export
 predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
+  # --- check arguments ---
   if (s == "lambda.min") {
     s <- object$lambda.min
   } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
     stop("Set s=\"lambda.min\" or provide non-negative value.")
   }
+  # --- handle auxiliary predictors ---
   if (any(object$include == 0) && sum(object$include) == ncol(newx)) {
     full <- matrix(data = 0, nrow = nrow(newx), ncol = length(object$include))
     full[, object$include] <- newx
     newx <- full
   }
-  newx_stand <- forescale(x = newx, pars = object$scale)$x
+  # --- make predictions ---
+  newx_stand <- .forescale(x = newx, pars = object$scale)$x
   x_all <- cbind(newx_stand, -newx_stand)
   y_hat_stand <- stats::predict(object = object$object[[object$id_hyper]],
                                 newx = x_all,
                                 s = s,
                                 type = "response")
-  backscale(y = y_hat_stand, pars = object$scale)$y
+  .backscale(y = y_hat_stand, pars = object$scale)$y
 }
 
 #' @title
@@ -1515,7 +1544,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   beta_negative <- beta[(length(beta) / 2 + 1):(length(beta))]
   beta_combined <- beta_positive  - beta_negative
   coef <- c(alpha, beta_combined)
-  coef <- backscale(coef = coef, pars = object$scale)$coef
+  coef <- .backscale(coef = coef, pars = object$scale)$coef
   if (any(coef[c(FALSE[object$scale$family != "cox"],
                  !object$include == 1)] != 0)) {
     stop("Excluded coefs must equal zero.")
@@ -1612,6 +1641,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                      corfac_group = 0.25, n_group_causal = 2,
                      prop_causal = 0.5, noise_factor = 1,
                      plot = TRUE, trial = FALSE) {
+  # --- check arguments ---
   .check(x = family, type = "nominal",
          support = c("gaussian", "binomial", "poisson", "cox"))
   .check(x = n0, type = "integer", min = 2)
@@ -1810,6 +1840,8 @@ simulate_overlap <- function() {
 #' calc_sign_prec(truth = truth, estim = truth) # upper limit 1
 #' calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
 #'
+#' @keywords internal
+#'
 #' @export
 calc_sign_prec <- function(truth, estim) {
   .check(x = truth, type = "integer", dim = Inf, na.rm = TRUE)
@@ -1886,7 +1918,8 @@ calc_sign_prec <- function(truth, estim) {
 #'                    method = c("mean", "ridge", "lasso", "corila"))
 #' # Why does holdout require y_test? Try to remove this
 #' }
-#'@export
+#'
+#' @export
 holdout <- function(x_train, y_train, group, include, family,
                     alpha_init = 0, alpha_final = 1,
                     x_test = NULL, y_test = NULL,
@@ -1914,7 +1947,7 @@ holdout <- function(x_train, y_train, group, include, family,
   if (is.null(foldid)) {
     #foldid <- sample(rep(x = seq_len(nfolds), length.out = n0))
     # balanced/stratified folds:
-    foldid <- folds(y = y_train, family = family, nfolds = nfolds)
+    foldid <- .folds(y = y_train, family = family, nfolds = nfolds)
   }
 
   if (is.null(method)) {
@@ -2588,9 +2621,9 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
     cat("iter", k, "\n")
     if (is.null(foldid)) {
       #foldid <- sample(rep(x = seq_len(nfolds), length.out = n))
-      foldid <- folds(y = y,
-                      family = family,
-                      nfolds = nfolds) # balanced/stratified folds
+      foldid <- .folds(y = y,
+                       family = family,
+                       nfolds = nfolds) # balanced/stratified folds
     } else {
       nfolds <- max(foldid)
     }
