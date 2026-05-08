@@ -124,7 +124,6 @@
   NULL
 }
 
-
 #' @title
 #' Standardisation
 #'
@@ -419,6 +418,25 @@
   foldid
 }
 
+#' @title Mean function
+#'
+#' @description
+#' Transform the linear predictor to predicted values/probabilities.
+#'
+#' @param x
+#' numeric vector
+#'
+#' @param family
+#' character
+#'
+#' @examples
+#' x <- rnorm(10)
+#' .mean_function(x, family = "binomial")
+#' .mean_function(x, family = "poisson")
+#'
+#' @keywords internal
+#'
+#' @export
 .mean_function <- function(x, family) {
   # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")
@@ -436,6 +454,36 @@
   }
 }
 
+#' @title Deviance
+#'
+#' @description
+#' Calculate the deviance
+#'
+#' @param y
+#' response:
+#' numeric vector of length \code{n}
+#'
+#' @param y_hat
+#' predicted response:
+#' numeric vector of length \code{n}
+#'
+#' @param family
+#' character
+#'
+#' @examples
+#' # move these examples to unit tests (adding cox):
+#' y <- rnorm(10)
+#' .deviance(y = y , y_hat = y, family = "gaussian")
+#'
+#' y <- rbinom(n = 10, size = 1, prob = 0.5)
+#' .deviance(y = y , y_hat = y, family = "binomial")
+#'
+#' y <- rpois(n = 10, lambda = 4)
+#' .deviance(y = y , y_hat = y, family = "poisson")
+#'
+#' @keywords internal
+#'
+#' @export
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---
   .check(x = y, type = "numeric", dim = Inf)
@@ -608,9 +656,9 @@
 #' }
 #' metric
 #' }
-#' 
+#'
 #' @keywords models, regression, classif
-#' 
+#'
 #' @export
 multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
                        penalties = NULL) {
@@ -714,7 +762,7 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
 #' and extract coefficients with \code{\link{coef.multiridge}()}.
 #'
 #' @inherit multiridge examples
-#' 
+#'
 #' @keywords methods
 #'
 #' @export
@@ -784,6 +832,31 @@ coef.multiridge <- function(object, ...) {
 
 #----- group-lasso -----
 
+#' @title Initial coefficients
+#'
+#' @description
+#' Estimate initial coefficients.
+#'
+#' @inheritParams corila
+#'
+#' @examples
+#' n <- 20
+#' p <- 10
+#' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
+#' beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
+#' y <- drop(x %*% beta)
+#' .estim_initial_coefs(x = x,
+#'                      y = y,
+#'                      family = "gaussian",
+#'                      alpha = "spearman",
+#'                      group = NULL,
+#'                      foldid = NULL,
+#'                      nfolds = 10,
+#'                      lambda = NULL)
+#'
+#' @keywords internal
+#'
+#' @export
 .estim_initial_coefs <- function(x, y, family, alpha, group,
                                  foldid, nfolds, lambda) {
   # --- check arguments ---
@@ -850,7 +923,7 @@ coef.multiridge <- function(object, ...) {
   } else {
     stop("Invalid value for agrument 'alpha'.")
   }
-  list(coef = coef, lambda = lambda)
+  list(coef = drop(coef), lambda = lambda)
 }
 
 #' @title
@@ -982,9 +1055,9 @@ coef.multiridge <- function(object, ...) {
 #'
 #' y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 #' }
-#' 
+#'
 #' @keywords models, regression, classif
-#' 
+#'
 #' @export
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
@@ -1379,9 +1452,9 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' #object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
 #' #                     include = include, family = family)
 #' }
-#' 
+#'
 #' @keywords models, regression, classif
-#' 
+#'
 #' @export
 cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
@@ -1493,9 +1566,9 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #' and extract coefficients with \code{\link{coef.cv.corila}()}.
 #'
 #' @inherit cv.corila examples
-#' 
+#'
 #' @keywords methods
-#' 
+#'
 #' @export
 predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   # --- check arguments ---
@@ -1540,9 +1613,9 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' and make predictions with \code{\link{predict.cv.corila}()}.
 #'
 #' @inherit cv.corila examples
-#' 
+#'
 #' @keywords methods
-#' 
+#'
 #' @export
 coef.cv.corila <- function(object, s = "lambda.min", ...) {
   if (s == "lambda.min") {
@@ -1654,7 +1727,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
 #'    }
 #' }
 #' sapply(X = data, FUN = dims)
-#' 
+#'
 #' @keywords distribution
 #'
 #' @export
@@ -1864,7 +1937,7 @@ simulate_overlap <- function() {
 #' calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
 #'
 #' @keywords internal
-#' 
+#'
 #' @keywords utilities
 #'
 #' @export
@@ -2632,9 +2705,9 @@ holdout <- function(x_train, y_train, group, include, family,
 #' results <- crossval(x, y, family = "gaussian",
 #'                     method = c("mean", "corila"), foldid = foldid)
 #' }
-#' 
+#'
 #' @keywords iteration
-#' 
+#'
 #' @export
 crossval <- function(x, y, family, group = NULL, include = NULL,
                      alpha_init = 0, alpha_final = 1, iter = 5, foldid = NULL,
@@ -2774,7 +2847,7 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
 #' @examples
 #' x <- data.frame(mean = 0, corila = rnorm(100) - 1, other = rnorm(100))
 #' plot_boxes(x)
-#' 
+#'
 #' @keywords graphs
 #'
 #' @export
