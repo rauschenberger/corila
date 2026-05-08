@@ -113,7 +113,7 @@ y <- rnorm(n = n)
 
 # model fitting
 hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
-                   exp_global = 1, wgt_global = 0.5)
+                    exp_global = 1, wgt_global = 0.5)
 object <- corila(x, y, group, include, family = "gaussian", hyper = hyper)
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
@@ -132,7 +132,7 @@ Make predictions for a range of hyperparameters
 with \code{\link{predict.corila}()}.
 
 This function calls
-\code{\link{forescale}()} and \code{\link{backscale}()}
+\code{\link{.forescale}()} and \code{\link{.backscale}()}
 for standardising data and bringing results back to the original scale,
 respectively,
 \code{\link{multiridge}()} for obtaining initial group penalties,

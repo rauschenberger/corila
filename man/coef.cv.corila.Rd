@@ -32,17 +32,17 @@ p <- c(100, 50)
 z <- rep(x = seq_along(p), times = p)
 x <- sapply(X = z, FUN = function(x) stats::rnorm(n = n, sd = x))
 beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
-       stats::rbinom(n = sum(p), size = 1, prob = 0.2)
+        stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 eta <- x \%*\% beta
 family <- "gaussian"
 if (family == "gaussian") {
- y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
+  y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
 } else if (family == "binomial") {
- y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+  y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
 } else if (family == "cox") {
- time <- stats::rexp(n = n, rate = exp(eta))
- status <- stats::rbinom(n = n, prob = 0.5, size = 1)
- y <- survival::Surv(time = time, event = status)
+  time <- stats::rexp(n = n, rate = exp(eta))
+  status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+  y <- survival::Surv(time = time, event = status)
 }
 cond <- rep(x = c(TRUE, FALSE), times = c(n0, n1))
 
@@ -50,10 +50,10 @@ y_hat <- coef <- list()
 
 # standard lasso regression
 object <- glmnet::cv.glmnet(x = x[cond, ], y = y[cond],
-                           family = family, alpha = 1)
+                            family = family, alpha = 1)
 coef$glmnet <- stats::coef(object = object, s = "lambda.min")
 y_hat$glmnet <- stats::predict(object = object, newx = x[!cond, ],
-                              type = "response", s = "lambda.min")
+                               type = "response", s = "lambda.min")
 
 # flexible group lasso regression
 object <- cv.corila(x = x[cond, ], y = y[cond], group = z, family = family)
@@ -63,22 +63,22 @@ y_hat$corila <- stats::predict(object = object, newx = x[!cond, ])
 # selection performance
 sapply(coef, function(x) mean(sign(x[-1]) == sign(beta)))
 sapply(coef, function(x) {
- sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0)
+  sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0)
 })
 
 # predictive performance
 if (family == "gaussian") {
- metric <- sapply(X = y_hat, FUN = function(x)
-   mean((x-y[!cond])^2))
+  metric <- sapply(X = y_hat, FUN = function(x)
+    mean((x-y[!cond])^2))
 } else if (family == "binomial") {
- metric <- sapply(X = y_hat, FUN = function(x)
-   pROC::auc(response = y[!cond],
-             predictor = as.vector(x),
-             levels = c(0, 1),
-             direction = "<"))
+  metric <- sapply(X = y_hat, FUN = function(x)
+    pROC::auc(response = y[!cond],
+              predictor = as.vector(x),
+              levels = c(0, 1),
+              direction = "<"))
 } else if (family == "cox") {
- metric <- sapply(X = y_hat, FUN = function(x)
-   survival::concordance(y[!cond]~I(-x))$concordance)
+  metric <- sapply(X = y_hat, FUN = function(x)
+    survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
 

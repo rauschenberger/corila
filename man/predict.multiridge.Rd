@@ -34,17 +34,17 @@ p <- c(100, 50)
 z <- rep(x = seq_along(p), times = p)
 x <- sapply(X = z, FUN = function(x) stats::rnorm(n = n, sd = x))
 beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
-       stats::rbinom(n = sum(p), size = 1, prob = 0.2)
+        stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 eta <- x \%*\% beta
 family <- "gaussian"
 if (family == "gaussian") {
- y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
+  y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
 } else if (family == "binomial") {
- y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+  y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
 } else if (family == "cox") {
- time <- stats::rexp(n = n, rate = exp(eta))
- status <- stats::rbinom(n = n, prob = 0.5, size = 1)
- y <- survival::Surv(time = time, event = status)
+  time <- stats::rexp(n = n, rate = exp(eta))
+  status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+  y <- survival::Surv(time = time, event = status)
 }
 cond <- rep(x = c(TRUE, FALSE), times = c(n0, n1))
 
@@ -68,17 +68,17 @@ sapply(coef, function(x) mean((beta-x[-1])^2))
 
 # predictive performance
 if (family == "gaussian") {
- metric <- sapply(X = y_hat, FUN = function(x)
-   mean((x-y[!cond])^2))
+  metric <- sapply(X = y_hat, FUN = function(x)
+    mean((x-y[!cond])^2))
 } else if (family == "binomial") {
- metric <- sapply(X = y_hat, FUN = function(x)
-   pROC::auc(response = y[!cond],
-             predictor = as.vector(x),
-             levels = c(0, 1),
-             direction = "<"))
+  metric <- sapply(X = y_hat, FUN = function(x)
+    pROC::auc(response = y[!cond],
+              predictor = as.vector(x),
+              levels = c(0, 1),
+              direction = "<"))
 } else if (family == "cox") {
- metric <- sapply(X = y_hat, FUN = function(x)
-   survival::concordance(y[!cond]~I(-x))$concordance)
+  metric <- sapply(X = y_hat, FUN = function(x)
+    survival::concordance(y[!cond]~I(-x))$concordance)
 }
 metric
 }

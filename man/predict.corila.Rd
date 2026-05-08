@@ -16,7 +16,7 @@ to obtain predicted values}
 
 \item{index}{integer scalar specifying the index of the mixing hyperparameter(s)}
 
-\item{s}{numeric scalar specifying the value of the regularisation hyperparameter}
+\item{s}{numeric vector specifying the values of the regularisation hyperparameter}
 
 \item{...}{(not used)}
 }
@@ -39,7 +39,7 @@ y <- rnorm(n = n)
 
 # model fitting
 hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
-                   exp_global = 1, wgt_global = 0.5)
+                    exp_global = 1, wgt_global = 0.5)
 object <- corila(x, y, group, include, family = "gaussian", hyper = hyper)
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)

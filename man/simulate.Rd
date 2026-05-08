@@ -76,11 +76,11 @@ Simulates data with grouped predictor variables
 \examples{
 data <- simulate()
 dims <- function(x) {
-  if (is.matrix(x)||is.data.frame(x)) {
-    paste(base::dim(x), collapse = " x ")
-  } else {
-    paste0(base::length(x))
-  }
+   if (is.matrix(x)||is.data.frame(x)) {
+     paste(base::dim(x), collapse = " x ")
+   } else {
+     paste0(base::length(x))
+   }
 }
 sapply(X = data, FUN = dims)
 

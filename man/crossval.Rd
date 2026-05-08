@@ -100,6 +100,6 @@ x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 y <- stats::rnorm(n)
 foldid <- rep(c(0, 1), times = c(50, 50))
 results <- crossval(x, y, family = "gaussian",
-                   method = c("mean", "corila"), foldid = foldid)
+                    method = c("mean", "corila"), foldid = foldid)
 }
 }

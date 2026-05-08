@@ -29,3 +29,4 @@ calc_sign_prec(truth = truth, estim = truth) # upper limit 1
 calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
 
 }
+\keyword{internal}

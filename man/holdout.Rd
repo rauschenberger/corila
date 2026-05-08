@@ -68,7 +68,7 @@ or \code{NA} to set all initial coefficients equal to 1}
 \item{nfolds}{number of internal cross-validation folds (integer scalar)}
 
 \item{foldid}{internal cross-validation fold identifiers
-(\eqn{p}-dimensional integer vector)}
+(\eqn{n_0}-dimensional integer vector)}
 
 \item{method}{character vector listing all methods to be compared}
 
@@ -97,13 +97,14 @@ Compares methods using hold-out method
 \donttest{
 data <- simulate()
 results <- holdout(x_train = data$x_train,
-                  y_train = data$y_train,
-                  group = data$group,
-                  include = rep(c(TRUE, FALSE), each = 80),
-                  x_test = data$x_test,
-                  y_test = data$y_test,
-                  family = data$info$family,
-                  method = c("mean", "ridge", "lasso", "corila"))
+                   y_train = data$y_train,
+                   group = data$group,
+                   include = rep(c(TRUE, FALSE), each = 80),
+                   x_test = data$x_test,
+                   y_test = data$y_test,
+                   family = data$info$family,
+                   method = c("mean", "ridge", "lasso", "corila"))
 # Why does holdout require y_test? Try to remove this
 }
+
 }
