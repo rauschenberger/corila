@@ -48,11 +48,11 @@
     return(invisible(NULL))
   }
   stopifnot(
-    "invalid argument \"type\"" =
+    "invalid argument 'type'" =
       type %in% c("numeric", "integer", "nominal", "logical"),
-    "invalid argument \"support\"" =
+    "invalid argument 'support'" =
       is.null(support) || is.character(support),
-    "invalid argument \"support\"" =
+    "invalid argument 'support'" =
       type == "nominal" || is.null(support),
     "expected vector"  =
       length(dim) != 1 || is.vector(x) || inherits(x = x, what = "Surv"),
@@ -88,19 +88,19 @@
 # add check on groups!
 .validate <- function(x, y, family) {
   if (!is.character(family) || length(family) != 1) {
-    stop("Argument \"family\" must be a character string.")
+    stop("Argument 'family' must be a character string.")
   }
   if (!is.matrix(x)) {
-    stop("Argument \"x\" must be a matrix.")
+    stop("Argument 'x' must be a matrix.")
   }
   cond_vector <- is.vector(y) && is.numeric(y)
   cond_matrix <- is.matrix(y) && ncol(y) == 1
   if (!(family == "cox" || cond_vector || cond_matrix)) {
-    stop("Argument \"y\" must be a vector.")
+    stop("Argument 'y' must be a vector.")
   }
   if (nrow(x) != length(y)) {
-    stop("For each observation, matrix \"x\" must have one row,
-         and vector \"y\" must have one entry.")
+    stop("For each observation, matrix 'x' must have one row,
+         and vector 'y' must have one entry.")
   }
   if (family %in% c("gaussian", "linear")) {
     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
@@ -119,7 +119,7 @@
       stop("Cox model requires a survival outcome.")
     }
   } else {
-    stop("Invalid value for argument \"family\".")
+    stop("Invalid value for argument 'family'.")
   }
   NULL
 }
@@ -608,7 +608,10 @@
 #' }
 #' metric
 #' }
-#'@export
+#' 
+#' @keywords models, regression, classif
+#' 
+#' @export
 multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
                        penalties = NULL) {
   # --- check arguments ---
@@ -623,19 +626,19 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
   .check(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
   .validate(x = x, y = y, family = family)
   if (family == "poisson") {
-    stop("Argument family=\"poisson\" is not implemented.")
+    stop("Argument family='poisson' is not implemented.")
   }
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop(paste(
       "For each variable,",
-      "\"x\" should have one column",
-      "and \"z\" should have one entry."
+      "'x' should have one column",
+      "and 'z' should have one entry."
     ))
   }
   cond <- !is.null(penalties) && !is.null(z) &&
     length(unique(z)) != length(penalties)
   if (cond) {
-    stop("Argument \"penalties\" must have one entry for each group.")
+    stop("Argument 'penalties' must have one entry for each group.")
   }
   # --- initial regression ---
   scale <- .forescale(x = x, y = y, family = family)
@@ -711,6 +714,8 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
 #' and extract coefficients with \code{\link{coef.multiridge}()}.
 #'
 #' @inherit multiridge examples
+#' 
+#' @keywords methods
 #'
 #' @export
 predict.multiridge <- function(object, newx, ...) {
@@ -718,7 +723,7 @@ predict.multiridge <- function(object, newx, ...) {
   .check(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
   if (length(object$z) != ncol(newx)) {
     stop(paste(
-      "Argument \"newx\" must have one column",
+      "Argument 'newx' must have one column",
       "for each variable used in model fitting."
     ))
   }
@@ -762,6 +767,8 @@ predict.multiridge <- function(object, newx, ...) {
 #' and make predictions with \code{\link{predict.multiridge}()}.
 #'
 #' @inherit multiridge examples
+#'
+#' @keywords methods
 #'
 #' @export
 coef.multiridge <- function(object, ...) {
@@ -841,7 +848,7 @@ coef.multiridge <- function(object, ...) {
       coef <- stats::coef(object = model, s = lambda)[cond]
     }
   } else {
-    stop("Invalid value for agrument \"alpha\".")
+    stop("Invalid value for agrument 'alpha'.")
   }
   list(coef = coef, lambda = lambda)
 }
@@ -896,7 +903,7 @@ coef.multiridge <- function(object, ...) {
 #' (not implemented for \code{family="poisson"} or overlapping groups),
 #' or \code{NA} to set all initial coefficients equal to 1
 #'
-#'@param alpha_final
+#' @param alpha_final
 #' elastic net mixing parameter for final regression
 #' (default: lasso penalisation with \code{alpha_final}=1)
 #'
@@ -904,7 +911,7 @@ coef.multiridge <- function(object, ...) {
 #' character string \code{"gaussian"}, \code{"binomial"},
 #' \code{"poisson"}, or \code{"cox"}
 #'
-#'@param foldid
+#' @param foldid
 #' \eqn{n}-dimensional vector containing the fold identifiers
 #'
 #' @param nfolds
@@ -975,7 +982,10 @@ coef.multiridge <- function(object, ...) {
 #'
 #' y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 #' }
-#'@export
+#' 
+#' @keywords models, regression, classif
+#' 
+#' @export
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL) {
@@ -1006,7 +1016,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   if (is.character(alpha_init) &&
         alpha_init  == "multiridge" &&
         family == "poisson") {
-    warning("Setting alpha_init=0 due to family=\"poisson\".")
+    warning("Setting alpha_init=0 due to family='poisson'.")
     alpha_init <- 0
   }
   #n <- nrow(x) # sample size
@@ -1018,18 +1028,18 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     include <- rep(x = TRUE, times = p)
   } else {
     if (!is.logical(include)) {
-      stop("Argument \"include\" should be a logical vector (or NULL).")
+      stop("Argument 'include' should be a logical vector (or NULL).")
     }
   }
   if (!is.character(family) || length(family) != 1) {
-    stop("Argument \"family\" must be a character vector of length 1.")
+    stop("Argument 'family' must be a character vector of length 1.")
   }
   if (!family %in% c("gaussian", "binomial", "poisson", "cox")) {
-    stop(paste("Argument \"family\" must equal",
-               "\"gaussian\", \"binomial\", \"poisson\", or \"cox\"."))
+    stop(paste("Argument 'family' must equal",
+               "'gaussian', 'binomial', 'poisson', or 'cox'."))
   }
   #if (length(group) != p) {
-  # stop("Argument \"group\" must be a vector of length p.")
+  # stop("Argument 'group' must be a vector of length p.")
   #}
   if (is.numeric(group) && !is.array(group)) {
     q <- length(unique(group)) # number of groups = number of unique values
@@ -1040,7 +1050,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     if (length(group) != p ||
           max(group) != q ||
           any(sort(unique(group)) != seq(from = 1, to = max(group), by = 1))) {
-      stop(paste("Argument \"group\" should be of length p,",
+      stop(paste("Argument 'group' should be of length p,",
                  "with all entries in {1, ..., q}."))
     }
   } else {
@@ -1168,6 +1178,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #' with \code{\link{cv.corila}()}.
 #'
 #' @inherit corila examples
+#'
+#' @keywords methods
 #'
 #' @export
 predict.corila <- function(object, newx, index, s, ...) {
@@ -1367,6 +1379,9 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' #object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
 #' #                     include = include, family = family)
 #' }
+#' 
+#' @keywords models, regression, classif
+#' 
 #' @export
 cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
@@ -1478,13 +1493,16 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #' and extract coefficients with \code{\link{coef.cv.corila}()}.
 #'
 #' @inherit cv.corila examples
+#' 
+#' @keywords methods
+#' 
 #' @export
 predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   # --- check arguments ---
   if (s == "lambda.min") {
     s <- object$lambda.min
   } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
-    stop("Set s=\"lambda.min\" or provide non-negative value.")
+    stop("Set s='lambda.min' or provide non-negative value.")
   }
   # --- handle auxiliary predictors ---
   if (any(object$include == 0) && sum(object$include) == ncol(newx)) {
@@ -1522,12 +1540,15 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' and make predictions with \code{\link{predict.cv.corila}()}.
 #'
 #' @inherit cv.corila examples
+#' 
+#' @keywords methods
+#' 
 #' @export
 coef.cv.corila <- function(object, s = "lambda.min", ...) {
   if (s == "lambda.min") {
     s <- object$lambda.min
   } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
-    stop("Set s=\"lambda.min\" or provide numeric value.")
+    stop("Set s='lambda.min' or provide numeric value.")
   }
   coef_stand <- stats::coef(object = object$object[[object$id_hyper]], s = s)
   if (object$scale$family == "cox") {
@@ -1847,13 +1868,13 @@ calc_sign_prec <- function(truth, estim) {
   .check(x = truth, type = "integer", dim = Inf, na.rm = TRUE)
   .check(x = estim, type = "integer", dim = length(truth), na.rm = TRUE)
   if (!is.vector(truth) || !is.numeric(truth)) {
-    stop("Argument \"truth\" should be a numerical vector.")
+    stop("Argument 'truth' should be a numerical vector.")
   }
   if (!is.vector(estim) || !is.numeric(estim)) {
-    stop("Argument \"estim\" should be a numerical vector.")
+    stop("Argument 'estim' should be a numerical vector.")
   }
   if (length(estim) != length(truth)) {
-    stop("Arguments \"truth\" and \"estim\" must have the same length.")
+    stop("Arguments 'truth' and 'estim' must have the same length.")
   } else if (all(is.na(estim)) || all(estim == 0)) {
     NA
   } else {
@@ -2745,7 +2766,7 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
 #' x <- data.frame(mean = 0, corila = rnorm(100) - 1, other = rnorm(100))
 #' plot_boxes(x)
 #'
-#'@export
+#' @export
 plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
                        ylim = NULL, cex.main = 1.2) {
   #--- hypothesis testing ---
@@ -2850,7 +2871,7 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
 #@export
 # combine_features <- function(x, fuse = "mean") {
 #   if (!fuse %in% c("mean", "pca")) {
-#     stop("Argument \"fuse\" must equal \"mean\" or \"pca\".")
+#     stop("Argument 'fuse' must equal 'mean' or 'pca'.")
 #   }
 #   if (fuse == "mean") {
 #     rowMeans(x)
@@ -2891,8 +2912,8 @@ plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
 # construct_matrices <- function(x, group, type, fuse = "mean") {
 #   if ((is.numeric(group) && ncol(x) != length(group)) |
 # ncol(x) != length(type)) {
-#     stop("For each variable, the matrix \"x\" must have one column,
-# and the vectors \"group\" (if applicable) and \"type\" must have one entry.")
+#     stop("For each variable, the matrix 'x' must have one column,
+# and the vectors 'group' (if applicable) and 'type' must have one entry.")
 #   }
 #   index <- seq_len(ncol(x))
 #   n <- nrow(x)
