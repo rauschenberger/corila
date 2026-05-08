@@ -18,7 +18,8 @@
 #' \code{dim = c(Inf, 100)} for a matrix with \eqn{100} columns, etc.
 #'
 #' @param type
-#' character "numeric", "integer", or "nominal"
+#' character \code{"numeric"}, \code{"integer"},
+#' \code{"nominal"}, or \code{"logical"}
 #'
 #' @param na.rm
 #' logical
@@ -45,6 +46,7 @@
       type %in% c("numeric", "integer", "nominal", "logical"),
     "invalid argument \"support\"" =
       is.null(support) || is.character(support),
+    ""
     "expected vector"  =
       length(dim) != 1 || is.vector(x) || inherits(x = x, what = "Surv"),
     "expected matrix" =
@@ -65,10 +67,10 @@
       type != "integer" || all(x %% 1 == 0, na.rm = TRUE),
     "expected nominal values" =
       type != "nominal" || is.character(x),
-    "expected logical values" = 
+    "expected logical values" =
       type != "logical" || is.logical(x),
     "expected values inside support" =
-      type != "nominal" || is.null(support) || all(x[!is.na(x)] %in% support),
+      is.null(support) || all(x[!is.na(x)] %in% support),
     "expected values above minimum" =
       type == "nominal" || min == -Inf || all(x >= min, na.rm = TRUE),
     "expected values below maximum" =
@@ -76,24 +78,25 @@
   )
 }
 
-#'@title
-#'Standardisation
+#' @title
+#' Standardisation
 #'
-#'@description
-#'Transforming variables to mean 0 and variance 1.
+#' @description
+#' Transforming variables to mean 0 and variance 1.
 #'
-#'@inheritParams corila
-#'@param y
-#'\eqn{n_0}-dimensional response vector
-#'(only required if \code{family="gaussian"})
-#'or \code{NULL}
-#'@param family
-#'character string \code{"gaussian"}, \code{"binomial"},
-#'\code{"poisson"}, or \code{"cox"};
-#'or \code{NULL} (if \code{pars} is provided)
-#'@param pars
-#'list as defined in section \emph{Value},
-#'or \code{NULL} (if \code{family} is provided)
+#' @inheritParams corila
+#' 
+#' @param y
+#' \eqn{n_0}-dimensional response vector
+#' (only required if \code{family="gaussian"})
+#' or \code{NULL}
+#' @param family
+#' character string \code{"gaussian"}, \code{"binomial"},
+#' \code{"poisson"}, or \code{"cox"};
+#' or \code{NULL} (if \code{pars} is provided)
+#' @param pars
+#' list as defined in section \emph{Value},
+#' or \code{NULL} (if \code{family} is provided)
 #'
 #'@return
 #'\itemize{
@@ -265,7 +268,6 @@ backscale <- function(pars, y = NULL, coef = NULL) {
   .check(x = y, type = "numeric", dim = dim)
   dim <- length(pars$mu.x) + (pars$family != "cox")
   .check(x = coef, type = "numeric", dim = dim)
-
   list <- list()
   if (!is.null(y) && pars$family == "gaussian") {
     list$y_original <- pars$mu.y + pars$sd.y * y
@@ -394,8 +396,8 @@ check_args <- function(x, y, family) {
 
 .mean_function <- function(x, family) {
   support <- c("gaussian", "binomial", "poisson", "cox")
-  .check(x = x, type = "numeric", dim = Inf, support = support)
-  .check(x = family, type = "nominal")
+  .check(x = x, type = "numeric", dim = Inf)
+  .check(x = family, type = "nominal", support = support)
   if (family %in% c("gaussian", "cox")) {
     x
   } else if (family == "binomial") {
@@ -552,6 +554,16 @@ check_args <- function(x, y, family) {
 #'@export
 multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
                        penalties = NULL) {
+  .check(x = x, type = "numeric", dim = c(Inf, Inf))
+  .check(x = y, type = "numeric", dim = nrow(x))
+  .check(x = z, type = "integer", dim = ncol(x),
+         min = 1, max = length(unique(z)))
+  .check(x = family, type = "nominal",
+         support = c("gaussian", "binomial", "cox"))
+  .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
+  .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
+  .check(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
+
   check_args(x = x, y = y, family = family)
   if (family == "poisson") {
     stop("Argument family=\"poisson\" is not implemented.")
@@ -644,6 +656,7 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
 #'
 #'@export
 predict.multiridge <- function(object, newx, ...) {
+  .check(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
   if (length(object$z) != ncol(newx)) {
     stop(paste(
       "Argument \"newx\" must have one column",
@@ -920,13 +933,22 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   .check(x = y, type = "numeric", dim = nrow(x))
   # add checks for group
   .check(x = include, type = "logical", dim = ncol(x))
-  .check(x = family, type = "nominal", support = c("gaussian", "binomial", "poisson", "cox"))
+  .check(x = family, type = "nominal",
+         support = c("gaussian", "binomial", "poisson", "cox"))
   slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
-  .check(x = names(hyper), type = "nominal", dim = length(slots), support = slots)
-  .check(x = as.matrix(hyper), type = "numeric", dim = c(Inf, length(slots)), min = 0)
-  .check(x = alpha_init, type = "numeric", min = 0, max = 1)
+  .check(x = names(hyper), type = "nominal", dim = length(slots),
+         support = slots)
+  .check(x = as.matrix(hyper), type = "numeric",
+         dim = c(Inf, length(slots)), min = 0)
+  if (is.character(alpha_init)) {
+    .check(x = alpha_init, type = "nominal",
+           support = c("pearson", "spearman", "kendall"))
+  } else {
+    .check(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
+  }
   .check(x = alpha_final, type = "numeric", min = 0, max = 1)
-  .check(x = cor, type = "nominal", support = c("pearson", "spearman", "kendall"))
+  .check(x = cor, type = "nominal",
+         support = c("pearson", "spearman", "kendall"))
   .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
   .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
   .check(x = lambda_init, type = "numeric", min = 0)
@@ -1405,8 +1427,8 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   if (s == "lambda.min") {
     s <- object$lambda.min
-  } else if (!is.numeric(s) || length(s) != 1) {
-    stop("Set s=\"lambda.min\" or provide numeric value.")
+  } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
+    stop("Set s=\"lambda.min\" or provide non-negative value.")
   }
   if (any(object$include == 0) && sum(object$include) == ncol(newx)) {
     full <- matrix(data = 0, nrow = nrow(newx), ncol = length(object$include))
@@ -1446,7 +1468,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 coef.cv.corila <- function(object, s = "lambda.min", ...) {
   if (s == "lambda.min") {
     s <- object$lambda.min
-  } else if (!is.numeric(s) || length(s) != 1) {
+  } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
     stop("Set s=\"lambda.min\" or provide numeric value.")
   }
   coef_stand <- stats::coef(object = object$object[[object$id_hyper]], s = s)
@@ -1547,7 +1569,8 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                      corfac_group = 0.25, n_group_causal = 2,
                      prop_causal = 0.5, noise_factor = 1,
                      plot = TRUE, trial = FALSE) {
-  .check(x = family, type = "nominal")
+  .check(x = family, type = "nominal",
+         support = c("gaussian", "binomial", "poisson", "cox"))
   .check(x = n0, type = "integer", min = 2)
   .check(x = n1, type = "integer", min = 2)
   .check(x = n_group, type = "integer", min = 2)
@@ -1745,6 +1768,8 @@ simulate_overlap <- function() {
 #'
 #'@export
 calc_sign_prec <- function(truth, estim) {
+  .check(x = truth, type = "integer", dim = Inf, na.rm = TRUE)
+  .check(x = estim, type = "integer", dim = length(truth), na.rm = TRUE)
   if (!is.vector(truth) || !is.numeric(truth)) {
     stop("Argument \"truth\" should be a numerical vector.")
   }
@@ -1782,7 +1807,7 @@ calc_sign_prec <- function(truth, estim) {
 #'number of internal cross-validation folds (integer scalar)
 #'@param foldid
 #'internal cross-validation fold identifiers
-#'(\eqn{p}-dimensional integer vector)
+#'(\eqn{n_0}-dimensional integer vector)
 #'@param seed
 #'random seed (integer scalar) for reproducibility, or \code{NULL}
 #'
