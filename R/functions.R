@@ -1,4 +1,57 @@
 
+#' @title
+#' Assertions
+#'
+#' @description
+#' Check whether provided arguments satisfy expectations.
+#'
+#' @param x
+#' scalar, vector, matrix, or array to be checked
+#'
+#' @param dim
+#' dimensionality:
+#' \code{dim = 1} for scalar,
+#' \code{dim = Inf} for vector of arbitrary length,
+#' \code{dim = c(Inf, Inf)} for matrix of arbitrary dimensions,
+#' \code{dim = c(Inf, Inf, Inf)} for array of arbitrary dimensions,
+#' \code{dim = 3} for vector of length \code{3},
+#' \code{dim = c(2, 3)} for matrix with \eqn{2} rows and \eqn{3} columns, etc.
+#'
+#' @param type
+#' character "numeric", "integer", or "nominal"
+#'
+#' @param na.ok
+#' logical
+#'
+#' @param support
+#' character vector (only used for \code{type = "nominal"})
+#'
+#' @param min
+#' numerical value (not used for \code{type = "nominal"})
+#'
+#' @param max
+#' numerical value (not used for \code{type = "nominal"})
+#'
+.check <- function(x, dim = 1, type = "numeric", na_ok = FALSE,
+                   support = NULL, min = -Inf, max = Inf) {
+  stopifnot(
+    type %in% c("numeric", "integer", "nominal"),
+    length(dim) != 1 || is.vector(x),
+    length(dim) != 2 || is.matrix(x),
+    length(dim) <= 2 || is.array(x),
+    length(dim) != 1 || dim == Inf || length(x) == dim,
+    length(dim) == 1 || length(dim) == length(dim(x)),
+    length(dim) == 1 || all((dim == Inf | dim(x) == dim)),
+    na_ok || !anyNA(x),
+    !type %in% c("numeric", "integer") || is.numeric(x),
+    type != "integer" || all(x %% 1 == 0, na.rm = TRUE),
+    type != "nominal" || is.character(x),
+    type != "nominal" || is.null(support) || all(x[!is.na(x)] %in% support),
+    type == "nominal" || min == -Inf || all(x >= min, na.rm = TRUE),
+    type == "nominal" || max == Inf || all(x <= max, na.rm = TRUE)
+  )
+}
+
 #'@title
 #'Standardisation
 #'
@@ -318,6 +371,7 @@ check_args <- function(x, y, family) {
 }
 
 #----- group-ridge -----
+
 
 .mean_function <- function(x, family) {
   families <- c("gaussian", "binomial", "poisson", "cox")
