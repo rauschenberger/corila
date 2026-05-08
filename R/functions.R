@@ -10,17 +10,17 @@
 #'
 #' @param dim
 #' dimensionality:
-#' \code{dim = 1} for scalar,
-#' \code{dim = Inf} for vector of arbitrary length,
-#' \code{dim = c(Inf, Inf)} for matrix of arbitrary dimensions,
-#' \code{dim = c(Inf, Inf, Inf)} for array of arbitrary dimensions,
-#' \code{dim = 3} for vector of length \code{3},
-#' \code{dim = c(2, 3)} for matrix with \eqn{2} rows and \eqn{3} columns, etc.
+#' \code{dim = 1} for a scalar,
+#' \code{dim = Inf} for a vector of arbitrary length,
+#' \code{dim = c(Inf, Inf)} for a matrix of arbitrary dimensions,
+#' \code{dim = c(Inf, Inf, Inf)} for an array of arbitrary dimensions,
+#' \code{dim = 100} for a vector of length \code{100},
+#' \code{dim = c(Inf, 100)} for a matrix with \eqn{100} columns, etc.
 #'
 #' @param type
 #' character "numeric", "integer", or "nominal"
 #'
-#' @param na.ok
+#' @param na.rm
 #' logical
 #'
 #' @param support
@@ -32,23 +32,47 @@
 #' @param max
 #' numerical value (not used for \code{type = "nominal"})
 #'
-.check <- function(x, dim = 1, type = "numeric", na_ok = FALSE,
+#' @examples
+#' .check(x = NULL)
+#'
+.check <- function(x, type, dim = 1, na.rm = FALSE,
                    support = NULL, min = -Inf, max = Inf) {
+  if (is.null(x)) {
+    return(invisible(NULL))
+  }
   stopifnot(
-    type %in% c("numeric", "integer", "nominal"),
-    length(dim) != 1 || is.vector(x),
-    length(dim) != 2 || is.matrix(x),
-    length(dim) <= 2 || is.array(x),
-    length(dim) != 1 || dim == Inf || length(x) == dim,
-    length(dim) == 1 || length(dim) == length(dim(x)),
-    length(dim) == 1 || all((dim == Inf | dim(x) == dim)),
-    na_ok || !anyNA(x),
-    !type %in% c("numeric", "integer") || is.numeric(x),
-    type != "integer" || all(x %% 1 == 0, na.rm = TRUE),
-    type != "nominal" || is.character(x),
-    type != "nominal" || is.null(support) || all(x[!is.na(x)] %in% support),
-    type == "nominal" || min == -Inf || all(x >= min, na.rm = TRUE),
-    type == "nominal" || max == Inf || all(x <= max, na.rm = TRUE)
+    "invalid argument \"type\"" =
+      type %in% c("numeric", "integer", "nominal", "logical"),
+    "invalid argument \"support\"" =
+      is.null(support) || is.character(support),
+    "expected vector"  =
+      length(dim) != 1 || is.vector(x) || inherits(x = x, what = "Surv"),
+    "expected matrix" =
+      length(dim) != 2 || is.matrix(x),
+    "expepcted array" =
+      length(dim) <= 2 || is.array(x),
+    "expected vector with other length" =
+      length(dim) != 1 || dim == Inf || length(x) == dim,
+    "expected matrix/array with other dimensions" =
+      length(dim) == 1 || length(dim) == length(dim(x)),
+    "expected matrix/array with other dimensions" =
+      length(dim) == 1 || all((dim == Inf | dim(x) == dim)),
+    "expected no missing values" =
+      na.rm || !anyNA(x),
+    "expected numeric values" =
+      !type %in% c("numeric", "integer") || is.numeric(x),
+    "expected integer values" =
+      type != "integer" || all(x %% 1 == 0, na.rm = TRUE),
+    "expected nominal values" =
+      type != "nominal" || is.character(x),
+    "expected logical values" = 
+      type != "logical" || is.logical(x),
+    "expected values inside support" =
+      type != "nominal" || is.null(support) || all(x[!is.na(x)] %in% support),
+    "expected values above minimum" =
+      type == "nominal" || min == -Inf || all(x >= min, na.rm = TRUE),
+    "expected values below maximum" =
+      type == "nominal" || max == Inf || all(x <= max, na.rm = TRUE)
   )
 }
 
@@ -96,21 +120,22 @@
 forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   families <- c("gaussian", "binomial", "poisson", "cox")
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
-  stopifnot(
-    is.matrix(x) && is.numeric(x),
-    #all(!is.na(x)),
-    is.null(y) || (is.vector(y) && is.numeric(y)) || inherits(y, "Surv"),
-    is.null(y) || nrow(x) == length(y),
-    #is.null(y) || all(!is.na(y))
-    is.null(family) != is.null(pars),
-    is.null(family) || (is.character(family) && length(family) == 1 &&
-                          family %in% families),
-    is.null(pars) || (is.list(pars) && all(slots %in% names(pars)))
-  )
+  .check(x = x, type = "numeric", dim = c(Inf, Inf))
+  .check(x = y, type = "numeric", dim = nrow(x))
+  if (is.null(family) == is.null(pars)) {
+    stop('Expect either "family" or "pars".')
+  }
+  .check(x = family, type = "nominal", support = families)
+  .check(x = names(pars), type = "nominal", dim = length(slots),
+         support = slots)
+  .check(x = pars$family, type = "nominal", support = families)
+  .check(x = pars$mu.x, type = "numeric", dim = ncol(x))
+  .check(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0)
+  .check(x = pars$mu.y, type = "numeric")
+  .check(x = pars$sd.y, type = "numeric", min = 0)
   if (is.null(family)) {
     family <- pars$family
-  }
-  if (is.null(pars)) {
+  } else {
     pars <- list()
     pars$family <- family
     #if (family == "cox") {
@@ -132,6 +157,7 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
       pars$sd.y <- 1
     }
   }
+
   x_scaled <- t((t(x) - pars$mu.x) / pars$sd.x)
   x_scaled[, pars$sd.x == 0] <- 0
   if (!is.null(y) && family == "gaussian") {
@@ -226,21 +252,20 @@ forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
 #'}
 #'@export
 backscale <- function(pars, y = NULL, coef = NULL) {
-  families <- c("gaussian", "binomial", "poisson", "cox")
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
-  stopifnot(
-    is.list(pars),
-    all(slots %in% names(pars)),
-    pars$family %in% families,
-    length(pars$mu.y) == 1 && length(pars$sd.y) == 1,
-    length(pars$sd.x) == length(pars$mu.x),
-    pars$sd.y >= 0 && all(pars$sd.x >= 0),
-    is.null(y) || ((is.vector(y) || is.matrix(y)) && is.numeric(y)) ||
-      inherits(y, "Surv"),
-    is.null(coef) || (is.vector(coef) && is.numeric(coef)),
-    (is.null(coef) || is.null(pars)) ||
-      length(pars$sd.x) == length(coef) - (pars$family != "cox")
-  )
+  .check(x = names(pars), type = "nominal", dim = length(slots),
+         support = slots)
+  families <- c("gaussian", "binomial", "poisson", "cox")
+  .check(x = pars$family, type = "nominal", support = families)
+  .check(x = pars$mu.x, type = "numeric", dim = Inf)
+  .check(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0)
+  .check(x = pars$mu.y, type = "numeric")
+  .check(x = pars$sd.y, type = "numeric", min = 0)
+  dim <- rep(x = Inf, times = 1 + is.matrix(y))
+  .check(x = y, type = "numeric", dim = dim)
+  dim <- length(pars$mu.x) + (pars$family != "cox")
+  .check(x = coef, type = "numeric", dim = dim)
+
   list <- list()
   if (!is.null(y) && pars$family == "gaussian") {
     list$y_original <- pars$mu.y + pars$sd.y * y
@@ -306,16 +331,10 @@ backscale <- function(pars, y = NULL, coef = NULL) {
 #'
 #'@export
 folds <- function(y, family, nfolds) {
-  families <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
-  stopifnot(is.vector(y) && is.numeric(y) || inherits(y, "Surv"),
-            is.character(family),
-            length(family) == 1,
-            family %in% families,
-            is.numeric(nfolds),
-            length(nfolds) == 1,
-            floor(nfolds) == ceiling(nfolds),
-            nfolds >= 2,
-            nfolds <= length(y))
+  .check(x = y, type = "numeric", dim = Inf)
+  support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
+  .check(x = family, type = "nominal", support = support)
+  .check(x = nfolds, type = "integer", min = 2, max = length(y))
   if (family %in% c("binomial", "logistic", "cox")) {
     if (family == "cox") {
       y <- y[, "status"]
@@ -374,11 +393,9 @@ check_args <- function(x, y, family) {
 
 
 .mean_function <- function(x, family) {
-  families <- c("gaussian", "binomial", "poisson", "cox")
-  stopifnot((is.vector(x) && is.numeric(x)) || inherits(x, "Surv"),
-            is.character(family),
-            length(family) == 1,
-            family %in% families)
+  support <- c("gaussian", "binomial", "poisson", "cox")
+  .check(x = x, type = "numeric", dim = Inf, support = support)
+  .check(x = family, type = "nominal")
   if (family %in% c("gaussian", "cox")) {
     x
   } else if (family == "binomial") {
@@ -686,15 +703,14 @@ coef.multiridge <- function(object, ...) {
 
 #----- group-lasso -----
 
-.deviance <- function(y_hat, y, family) {
-  stopifnot(is.vector(y_hat) && is.numeric(y_hat),
-            (is.vector(y) && is.numeric(y)) || inherits(y, "Surv"),
-            length(y_hat) == length(y),
-            is.character(family),
-            length(family) == 1)
+.deviance <- function(y, y_hat, family) {
+  .check(x = y, type = "numeric", dim = Inf)
+  .check(x = y_hat, type = "numeric", dim = length(y))
+  support <- c("gaussian", "binomial", "poisson", "cox")
+  .check(x = family, type = "nominal", support = support)
   eps <- 1e-06
   if (family == "gaussian") {
-    mean((y_hat - y)^2)
+    mean((y - y_hat)^2)
   } else if (family == "binomial") {
     mean(
       -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
@@ -711,24 +727,21 @@ coef.multiridge <- function(object, ...) {
 
 .estim_initial_coefs <- function(x, y, family, alpha, group,
                                  foldid, nfolds, lambda) {
-  families <- c("gaussian", "binomial", "poisson", "cox")
-  stopifnot(is.matrix(x),
-            (is.vector(y) && is.numeric(y)) || inherits(y, "Surv"),
-            nrow(x) == length(y),
-            is.character(family),
-            length(family) == 1,
-            family %in% families,
-            is.character(alpha) ||
-              (is.numeric(alpha) &&
-                 (is.na(alpha) || (alpha >= 0 && alpha <= 1))),
-            length(alpha) == 1,
-            is.null(foldid) ||
-              (is.numeric(foldid) &&
-                 length(foldid) == length(y) &&
-                 all(floor(foldid) == ceiling(foldid))),
-            is.null(nfolds) || (is.numeric(nfolds) && length(nfolds) == 1),
-            is.null(lambda) || (is.numeric(lambda) && all(lambda >= 0)))
   methods <- c("pearson", "spearman", "kendall")
+  .check(x = x, type = "numeric", dim = c(Inf, Inf))
+  .check(x = y, type = "numeric", dim = nrow(x))
+  .check(x = family, type = "nominal",
+         support = c("gaussian", "binomial", "poisson", "cox"))
+  if (is.character(alpha)) {
+    .check(x = alpha, type = "nominal",
+           support = methods)
+  } else {
+    .check(x = alpha, type = "numeric", min = 0, max = 1, na.rm = TRUE)
+  }
+  .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
+  .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
+  .check(x = lambda, type = "numeric", min = 0)
+
   p <- ncol(x)
   if (all(is.na(alpha))) {
     coef <- rep(x = 1, times = p) # Remove this confusing option?
@@ -903,6 +916,20 @@ coef.multiridge <- function(object, ...) {
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL) {
+  .check(x = x, type = "numeric", dim = c(Inf, Inf))
+  .check(x = y, type = "numeric", dim = nrow(x))
+  # add checks for group
+  .check(x = include, type = "logical", dim = ncol(x))
+  .check(x = family, type = "nominal", support = c("gaussian", "binomial", "poisson", "cox"))
+  slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
+  .check(x = names(hyper), type = "nominal", dim = length(slots), support = slots)
+  .check(x = as.matrix(hyper), type = "numeric", dim = c(Inf, length(slots)), min = 0)
+  .check(x = alpha_init, type = "numeric", min = 0, max = 1)
+  .check(x = alpha_final, type = "numeric", min = 0, max = 1)
+  .check(x = cor, type = "nominal", support = c("pearson", "spearman", "kendall"))
+  .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
+  .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
+  .check(x = lambda_init, type = "numeric", min = 0)
   if (is.character(alpha_init) &&
         alpha_init  == "multiridge" &&
         family == "poisson") {
@@ -1055,7 +1082,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #'@param index
 #'integer scalar specifying the index of the mixing hyperparameter(s)
 #'@param s
-#'numeric scalar specifying the value of the regularisation hyperparameter
+#'numeric vector specifying the values of the regularisation hyperparameter
 #'@param ... (not used)
 #'
 #'@return
@@ -1073,6 +1100,9 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #'
 #'@export
 predict.corila <- function(object, newx, index, s, ...) {
+  .check(x = newx, type = "numeric", dim = c(Inf, length(object$scale$mu.x)))
+  .check(x = index, type = "integer", min = 1, max = length(object$model))
+  .check(x = s, type = "numeric", dim = Inf, min = 0)
   newx_stand <- forescale(x = newx, pars = object$scale)$x
   y_hat_stand <- stats::predict(object = object$model[[index]],
                                 newx = cbind(newx_stand, -newx_stand),
@@ -1084,8 +1114,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 }
 
 .set_candidates <- function(tune) {
-  stopifnot(is.character(tune),
-            length(tune) == 1)
+  .check(x = tune, type = "nominal")
   #if (FALSE) {
   #  cand <- seq(from = 0, to = 1, by = 0.1)
   #  hyper <- data.frame(weight.local = cand,
@@ -1144,6 +1173,8 @@ predict.corila <- function(object, newx, index, s, ...) {
     hyper$wgt_global <- 1 - hyper$wgt_local
     hyper$exp_local[hyper$wgt_local == 0] <- Inf
     hyper$exp_global[hyper$wgt_global == 0] <- Inf
+  } else {
+    stop()
   }
   hyper <- unique(hyper)
   rownames(hyper) <- seq_len(nrow(hyper))
@@ -1516,6 +1547,12 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                      corfac_group = 0.25, n_group_causal = 2,
                      prop_causal = 0.5, noise_factor = 1,
                      plot = TRUE, trial = FALSE) {
+  .check(x = family, type = "nominal")
+  .check(x = n0, type = "integer", min = 2)
+  .check(x = n1, type = "integer", min = 2)
+  .check(x = n_group, type = "integer", min = 2)
+  .check(x = n_type, type = "integer", min = 2)
+
   # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;
   # size_group = c(5, 3);effect_size = c(1, 1);corfac_feature = 0.5;
   # corfac_type = 0.5;corfac_group = 0.25;n_group_causal = 2;
