@@ -1536,6 +1536,23 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   )
 }
 
+# 
+print.cv.corila <- function(object, ...) {
+  print(paste("object of class",dQuote("cv.corila")))
+}
+
+object
+
+# 
+summary.cv.corila <- function(object, ...) {
+  NULL
+}
+
+# 
+plot.cv.corila <- function(object, ...) {
+  NULL
+}
+
 #' @title
 #' predict (S3 method)
 #'
