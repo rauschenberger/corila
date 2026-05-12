@@ -44,6 +44,7 @@ object <- corila(x, y, group, include, family = "gaussian", hyper = hyper)
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 }
+
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
@@ -56,3 +57,4 @@ Estimate parameters with \code{\link{corila}()},
 or estimate parameters and tune hyperparameters
 with \code{\link{cv.corila}()}.
 }
+\keyword{methods}

@@ -132,6 +132,7 @@ if (family == "gaussian") {
 }
 metric
 }
+
 }
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
@@ -160,3 +161,6 @@ namely
 \code{\link[multiridge]{IWLSridge}()}, and
 \code{\link[multiridge]{IWLSCoxridge}()}.
 }
+\keyword{classif}
+\keyword{models,}
+\keyword{regression,}

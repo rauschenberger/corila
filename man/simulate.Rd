@@ -85,3 +85,4 @@ dims <- function(x) {
 sapply(X = data, FUN = dims)
 
 }
+\keyword{distribution}

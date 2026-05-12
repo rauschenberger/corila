@@ -102,4 +102,6 @@ foldid <- rep(c(0, 1), times = c(50, 50))
 results <- crossval(x, y, family = "gaussian",
                     method = c("mean", "corila"), foldid = foldid)
 }
+
 }
+\keyword{iteration}

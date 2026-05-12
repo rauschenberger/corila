@@ -179,6 +179,7 @@ metric
 #object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
 #                     include = include, family = family)
 }
+
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
@@ -193,3 +194,6 @@ and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
 This user function repeatedly calls \code{\link{corila}()}
 with different values for the regularisation and mixing hyperparameters.
 }
+\keyword{classif}
+\keyword{models,}
+\keyword{regression,}

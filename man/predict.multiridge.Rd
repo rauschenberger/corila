@@ -82,6 +82,7 @@ if (family == "gaussian") {
 }
 metric
 }
+
 }
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
@@ -98,3 +99,4 @@ and
 Fit models with \code{\link{multiridge}()}
 and extract coefficients with \code{\link{coef.multiridge}()}.
 }
+\keyword{methods}

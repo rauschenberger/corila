@@ -87,6 +87,7 @@ metric
 #object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
 #                     include = include, family = family)
 }
+
 }
 \references{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
@@ -98,3 +99,4 @@ metric
 Fit models with \code{\link{cv.corila}()}
 and make predictions with \code{\link{predict.cv.corila}()}.
 }
+\keyword{methods}

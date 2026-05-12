@@ -40,3 +40,4 @@ x <- data.frame(mean = 0, corila = rnorm(100) - 1, other = rnorm(100))
 plot_boxes(x)
 
 }
+\keyword{graphs}

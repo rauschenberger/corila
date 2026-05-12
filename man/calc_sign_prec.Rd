@@ -30,3 +30,4 @@ calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
 
 }
 \keyword{internal}
+\keyword{utilities}
