@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{object of class \code{"cv.corila"}}
+
+\item{...}{(not used)}
 }
 \description{
 Print method for class \code{"cv.corila"}.

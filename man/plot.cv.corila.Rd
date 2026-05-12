@@ -4,12 +4,12 @@
 \alias{plot.cv.corila}
 \title{Plot Sparse Group Lasso (S3 method)}
 \usage{
-\method{plot}{cv.corila}(object, ...)
+\method{plot}{cv.corila}(x, ...)
 }
 \arguments{
-\item{object}{object of class \code{"cv.corila"}}
-
 \item{...}{(not used)}
+
+\item{object}{object of class \code{"cv.corila"}}
 }
 \value{
 Returns NULL (invisible).

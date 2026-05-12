@@ -1541,6 +1541,9 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #' @param x
 #' object of class \code{"cv.corila"}
 #'
+#' @param ...
+#' (not used)
+#'
 #' @seealso summary.cv.corila
 #'
 #' @export
@@ -1569,7 +1572,7 @@ print.cv.corila <- function(x, ...) {
 #' @return
 #' The function \code{summary.cv.corila} returns
 #' an invisible list with multiple slots.
-#' 
+#'
 #' @seealso print.corila
 #'
 #' @export
@@ -1651,10 +1654,10 @@ print.summary.cv.corila <- function(x, ...) {
 #'
 #' @return
 #' Returns NULL (invisible).
-#' 
+#'
 #' @export
 #'
-plot.cv.corila <- function(object, ...) {
+plot.cv.corila <- function(x, ...) {
   # observed vs fitted values
   # estimated coefficient per group (if vector)
   # cvm as a functions of weights and exponents
