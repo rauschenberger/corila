@@ -1637,6 +1637,23 @@ print.summary.cv.corila <- function(x, ...) {
 }
 
 
+#' @title
+#' Plot Sparse Group Lasso (S3 method)
+#'
+#' @description
+#' Plot method for class \code{"cv.corila"}.
+#'
+#' @param object
+#' object of class \code{"cv.corila"}
+#'
+#' @param ...
+#' (not used)
+#'
+#' @return
+#' Returns NULL (invisible).
+#' 
+#' @export
+#'
 plot.cv.corila <- function(object, ...) {
   # observed vs fitted values
   # estimated coefficient per group (if vector)
