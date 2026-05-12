@@ -1064,9 +1064,11 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    nfolds = 10, lambda_init = NULL) {
   # --- check arguments ---
   .check(x = x, type = "numeric", dim = c(Inf, Inf))
-  .check(x = y, type = "numeric", dim = nrow(x))
+  n <- nrow(x) # sample size
+  p <- ncol(x) # number of features
+  .check(x = y, type = "numeric", dim = n)
   # add checks for group!
-  .check(x = include, type = "logical", dim = ncol(x))
+  .check(x = include, type = "logical", dim = p)
   .check(x = family, type = "nominal",
          support = c("gaussian", "binomial", "poisson", "cox"))
   slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
@@ -1083,8 +1085,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   .check(x = alpha_final, type = "numeric", min = 0, max = 1)
   .check(x = cor, type = "nominal",
          support = c("pearson", "spearman", "kendall"))
-  .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
-  .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
+  .check(x = foldid, type = "integer", dim = n, min = 1, max = n)
+  .check(x = nfolds, type = "integer", min = 1, max = n)
   .check(x = lambda_init, type = "numeric", min = 0)
   if (is.character(alpha_init) &&
         alpha_init  == "multiridge" &&
@@ -1092,8 +1094,6 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     warning("Setting alpha_init=0 due to family='poisson'.")
     alpha_init <- 0
   }
-  #n <- nrow(x) # sample size
-  p <- ncol(x) # number of features
   if (is.null(group)) {
     group <- seq_len(p)
   }
@@ -1133,7 +1133,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       warning("Implement this.")
     }
   }
-
+  args <- mget(setdiff(names(formals(corila)), c("x", "y")))
+  #args$info <- data.frame(n = n, p = p, q = q)
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
   # --- fold identifiers ---
@@ -1212,9 +1213,10 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   structure(
     list(
       model = object,
-      include = include,
+      #include = include, # remove this (already included in args)
       lambda_init = init$lambda,
-      scale = scale$pars
+      scale = scale$pars,
+      args = args
     ),
     class = "corila"
   )
@@ -1536,21 +1538,90 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   )
 }
 
-# 
-print.cv.corila <- function(object, ...) {
-  print(paste("object of class",dQuote("cv.corila")))
+#' @title
+#' print (S3 method)
+#'
+#' @description
+#'
+#'
+print.cv.corila <- function(x, ...) {
+  cat("object of class", sQuote("cv.corila"), "\n")
+  content <- ifelse(length(x$object) == 1, "an object", "multiple objects")
+  cat("(contains ", content, " of class ", sQuote("cv.glmnet"), ")", sep = "")
+  invisible(x)
 }
 
-object
-
-# 
+#' @title
+#' Summarising Sparse Group Lasso (S3 method)
+#'
+#' @description
+#' Summary method for class \code{"cv.corila"}.
+#'
+#' @param object
+#' an object of class \code{"cv.corila"}
+#'
+#' @param x
+#' an object of class \code{"summary.cv.corila"}
+#'
+#' @param ...
+#' (not used)
+#'
+#' @return
+#' The function \code{summary.cv.corila} returns
+#' an invisible list with multiple slots.
+#'
 summary.cv.corila <- function(object, ...) {
-  NULL
+  list <- list()
+  list$family <- object$scale$family
+  list$n <- Inf # replace by object$n
+  list$p <- length(object$pars$include)
+  list$p_primary <- sum(object$pars$include)
+  list$p_auxiliary <- sum(!object$pars$include)
+  list$alpha <- Inf # replace by object$family
+  list$lambda.min <- object$lambda.min
+  list$wgt_local <- object$hyper$wgt_local[object$id_hyper]
+  list$wgt_global <- object$hyper$wgt_global[object$id_hyper]
+  list$exp_local <- object$hyper$exp_local[object$id_hyper]
+  list$exp_global <- object$hyper$exp_global[object$id_hyper]
+  list$nzero <- sum(stats::coef(object, s = "lambda.min") != 0)
+  class(list) <- "summary.cv.corila"
+  list
 }
 
-# 
+#' @rdname summary.cv.corila
+#' @export
+print.summary.cv.corila <- function(x, ...) {
+  cat("--- object of class", dQuote("cv.corila"), "---", "\n")
+  if (x$family == "cox") {
+    cat("Cox proportional hazards model", "\n")
+  } else {
+    cat("generalised linear model with", x$family, "family", "\n")
+  }
+  cat(x$p, " features (", x$p_primary, " primary and ",
+      x$p_auxiliary, " auxiliary features)", "\n", sep = "")
+  penalty <- ifelse(test = x$alpha == 0,
+                    yes = "ridge",
+                    no = ifelse(test = x$alpha == 1,
+                                yes = "lasso",
+                                no = "elastic net"))
+  cat(penalty, "regularisation", "\n")
+  cat("optimised regularisation parameter: lambda.min =",
+      signif(x$lambda.min, digits = 4), "\n")
+  cat("selected weights: local = ", x$wgt_local,
+      ", global = ", x$wgt_global, "\n")
+  cat("selected exponents: local =", x$exp_local,
+      ", global =", x$exp_global, "\n")
+  cat(x$nzero, "non-zero coefficients",
+      "(including intercept)"[x$family != "cox"])
+  invisible(NULL)
+}
+
+
 plot.cv.corila <- function(object, ...) {
-  NULL
+  # observed vs fitted values
+  # estimated coefficient per group
+  # cvm as a functions of weights and exponents
+  invisible(NULL)
 }
 
 #' @title
@@ -1595,9 +1666,11 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
     stop("Set s='lambda.min' or provide non-negative value.")
   }
   # --- handle auxiliary predictors ---
-  if (any(object$include == 0) && sum(object$include) == ncol(newx)) {
-    full <- matrix(data = 0, nrow = nrow(newx), ncol = length(object$include))
-    full[, object$include] <- newx
+  if (any(object$pars$include == 0) && sum(object$pars$include) == ncol(newx)) {
+    full <- matrix(data = 0,
+                   nrow = nrow(newx),
+                   ncol = length(object$pars$include))
+    full[, object$pars$include] <- newx
     newx <- full
   }
   # --- make predictions ---
@@ -1657,10 +1730,10 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef <- c(alpha, beta_combined)
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   if (any(coef[c(FALSE[object$scale$family != "cox"],
-                 !object$include == 1)] != 0)) {
+                 !object$pars$include == 1)] != 0)) {
     stop("Excluded coefs must equal zero.")
   }
-  coef <- coef[c(TRUE[object$scale$family != "cox"], object$include == 1)]
+  coef <- coef[c(TRUE[object$scale$family != "cox"], object$pars$include == 1)]
   coef
 }
 
