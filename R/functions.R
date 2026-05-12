@@ -1067,7 +1067,30 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
   .check(x = y, type = "numeric", dim = n)
-  # add checks for group!
+  if (is.vector(group) && is.atomic(group)) {
+    if (is.numeric(group)) {
+      .check(x = group, type = "integer", dim = p, min = 1, max = p)
+    } else if (is.character(group)) {
+      .check(x = group, type = "nominal", dim = p, support = colnames(x))
+    } else {
+      stop()
+    }
+  } else if (is.list(group)) {
+    for (i in seq_along(group)) {
+      if (is.numeric(group[[i]])) {
+        .check(x = group[[i]], type = "integer", dim = Inf, min = 1, max = p)
+      } else if (is.character(group[[i]])) {
+        .check(x = group[[i]], type = "nominal", dim = Inf,
+               support = colnames(x))
+      } else {
+        stop()
+      }
+    }
+  } else if (is.matrix(group)) {
+    .check(x = group, type = "integer", dim = c(p, p), min = -1, max = 1)
+  } else {
+    stop()
+  }
   .check(x = include, type = "logical", dim = p)
   .check(x = family, type = "nominal",
          support = c("gaussian", "binomial", "poisson", "cox"))
@@ -1088,6 +1111,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   .check(x = foldid, type = "integer", dim = n, min = 1, max = n)
   .check(x = nfolds, type = "integer", min = 1, max = n)
   .check(x = lambda_init, type = "numeric", min = 0)
+  .validate(x = x, y = y, family = family)
+
   if (is.character(alpha_init) &&
         alpha_init  == "multiridge" &&
         family == "poisson") {
@@ -1099,18 +1124,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   }
   if (is.null(include)) {
     include <- rep(x = TRUE, times = p)
-  } else {
-    if (!is.logical(include)) {
-      stop("Argument 'include' should be a logical vector (or NULL).")
-    }
   }
-  if (!is.character(family) || length(family) != 1) {
-    stop("Argument 'family' must be a character vector of length 1.")
-  }
-  if (!family %in% c("gaussian", "binomial", "poisson", "cox")) {
-    stop(paste("Argument 'family' must equal",
-               "'gaussian', 'binomial', 'poisson', or 'cox'."))
-  }
+
   #if (length(group) != p) {
   # stop("Argument 'group' must be a vector of length p.")
   #}
@@ -1164,16 +1179,25 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     # rename to weight$local and weight$global
     for (j in seq_len(p)) {
       # features in same group
-      if (is.numeric(group) && !is.array(group)) {
+      #if (is.numeric(group) && !is.array(group)) {
+      if (is.vector(group) && is.atomic(group)) {
         cond_temp <- group[j] == group
       } else if (is.list(group)) {
-        group_index <- vapply(X = group,
-                              FUN = function(x) j %in% x,
-                              FUN.VALUE = logical(1))
+        if (is.numeric(unlist(group))) {
+          group_index <- vapply(X = group,
+                                FUN = function(slot) j %in% slot,
+                                FUN.VALUE = logical(1))
+        } else {
+          group_index <- vapply(X = group,
+                                FUN = function(slot) colnames(x)[j] %in% slot,
+                                FUN.VALUE = logical(1))
+        }
         #names(group_index) <- group
         cond_temp <- seq_len(p) %in% unlist(group[group_index])
       } else if (is.matrix(group)) {
         cond_temp <- group[, j] == 1
+      } else {
+        stop()
       }
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
       temp <-  cor_trans * init$coef * cond_temp
@@ -1609,9 +1633,15 @@ summary.cv.corila <- function(object, ...) {
       stop()
     }
   } else {
-    paste0(toupper(substr(x = x, start = 1, stop = 1)),
-           tolower(substr(x = x, start = 2, stop = nchar(x))),
-           "correlation")
+    if (x == "multiridge") {
+      "multi-penalty ridge regression"
+    } else if (x %in% c("pearson", "spearman", "kendall")) {
+      paste0(toupper(substr(x = x, start = 1, stop = 1)),
+             tolower(substr(x = x, start = 2, stop = nchar(x))),
+             "correlation")
+    } else {
+      x
+    }
   }
 }
 
@@ -1646,7 +1676,7 @@ print.summary.cv.corila <- function(x, ...) {
 #' @description
 #' Plot method for class \code{"cv.corila"}.
 #'
-#' @param object
+#' @param x
 #' object of class \code{"cv.corila"}
 #'
 #' @param ...
