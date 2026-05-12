@@ -1525,17 +1525,22 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   id_hyper <- which.min(cvm_min)
   lambda.min <- object_ext$model[[id_hyper]]$lambda[which.min(cvm[[id_hyper]])]
   # return fitted model
-  structure(
-    list(
-      object = object_ext$model,
-      include = include,
-      hyper = hyper,
-      id_hyper = id_hyper,
-      lambda.min = lambda.min,
-      scale = object_ext$scale
-    ),
-    class = "cv.corila"
-  )
+  object <- object_ext
+  object$id_hyper <- id_hyper
+  object$lambda.min <- lambda.min
+  class(object) <- "cv.corila"
+  #structure(
+  #  list(
+  #    object = object_ext$model,
+  #    include = include,
+  #    hyper = hyper,
+  #    id_hyper = id_hyper,
+  #    lambda.min = lambda.min,
+  #    scale = object_ext$scale
+  #  ),
+  #  class = "cv.corila"
+  #)
+  object
 }
 
 #' @title
@@ -1572,17 +1577,18 @@ print.cv.corila <- function(x, ...) {
 #'
 summary.cv.corila <- function(object, ...) {
   list <- list()
-  list$family <- object$scale$family
+  list$family <- object$args$family
   list$n <- Inf # replace by object$n
-  list$p <- length(object$pars$include)
-  list$p_primary <- sum(object$pars$include)
-  list$p_auxiliary <- sum(!object$pars$include)
-  list$alpha <- Inf # replace by object$family
-  list$lambda.min <- object$lambda.min
-  list$wgt_local <- object$hyper$wgt_local[object$id_hyper]
-  list$wgt_global <- object$hyper$wgt_global[object$id_hyper]
-  list$exp_local <- object$hyper$exp_local[object$id_hyper]
-  list$exp_global <- object$hyper$exp_global[object$id_hyper]
+  list$p <- length(object$args$include)
+  list$p_primary <- sum(object$args$include)
+  list$p_auxiliary <- sum(!object$args$include)
+  list$alpha_init <- object$args$alpha_init
+  list$alpha_final <- object$args$alpha_final
+  list$lambda.min <- object$args$lambda.min
+  list$wgt_local <- object$args$hyper$wgt_local[object$id_hyper]
+  list$wgt_global <- object$args$hyper$wgt_global[object$id_hyper]
+  list$exp_local <- object$args$hyper$exp_local[object$id_hyper]
+  list$exp_global <- object$args$hyper$exp_global[object$id_hyper]
   list$nzero <- sum(stats::coef(object, s = "lambda.min") != 0)
   class(list) <- "summary.cv.corila"
   list
@@ -1666,17 +1672,17 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
     stop("Set s='lambda.min' or provide non-negative value.")
   }
   # --- handle auxiliary predictors ---
-  if (any(object$pars$include == 0) && sum(object$pars$include) == ncol(newx)) {
+  if (any(object$args$include == 0) && sum(object$args$include) == ncol(newx)) {
     full <- matrix(data = 0,
                    nrow = nrow(newx),
-                   ncol = length(object$pars$include))
-    full[, object$pars$include] <- newx
+                   ncol = length(object$args$include))
+    full[, object$args$include] <- newx
     newx <- full
   }
   # --- make predictions ---
   newx_stand <- .forescale(x = newx, pars = object$scale)$x
   x_all <- cbind(newx_stand, -newx_stand)
-  y_hat_stand <- stats::predict(object = object$object[[object$id_hyper]],
+  y_hat_stand <- stats::predict(object = object$model[[object$id_hyper]],
                                 newx = x_all,
                                 s = s,
                                 type = "response")
@@ -1713,7 +1719,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
     stop("Set s='lambda.min' or provide numeric value.")
   }
-  coef_stand <- stats::coef(object = object$object[[object$id_hyper]], s = s)
+  coef_stand <- stats::coef(object = object$model[[object$id_hyper]], s = s)
   if (object$scale$family == "cox") {
     alpha <- NULL
     beta <- coef_stand
@@ -1730,10 +1736,10 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef <- c(alpha, beta_combined)
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   if (any(coef[c(FALSE[object$scale$family != "cox"],
-                 !object$pars$include == 1)] != 0)) {
+                 !object$args$include == 1)] != 0)) {
     stop("Excluded coefs must equal zero.")
   }
-  coef <- coef[c(TRUE[object$scale$family != "cox"], object$pars$include == 1)]
+  coef <- coef[c(TRUE[object$scale$family != "cox"], object$args$include == 1)]
   coef
 }
 
