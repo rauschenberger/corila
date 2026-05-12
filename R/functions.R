@@ -1213,7 +1213,6 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   structure(
     list(
       model = object,
-      #include = include, # remove this (already included in args)
       lambda_init = init$lambda,
       scale = scale$pars,
       args = args
@@ -1529,17 +1528,6 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   object$id_hyper <- id_hyper
   object$lambda.min <- lambda.min
   class(object) <- "cv.corila"
-  #structure(
-  #  list(
-  #    object = object_ext$model,
-  #    include = include,
-  #    hyper = hyper,
-  #    id_hyper = id_hyper,
-  #    lambda.min = lambda.min,
-  #    scale = object_ext$scale
-  #  ),
-  #  class = "cv.corila"
-  #)
   object
 }
 
