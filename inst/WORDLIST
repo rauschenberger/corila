@@ -16,3 +16,6 @@ multiridge
 CMD
 Codecov
 AR
+etc
+nolint
+linter
