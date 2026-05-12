@@ -1118,6 +1118,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     q <- length(unique(group)) # number of groups = number of unique values
   } else if (is.list(group)) {
     q <- length(group) # number of groups = number of slots
+  } else {
+    q <- NA
   }
   if (is.numeric(group) && !is.array(group)) {
     if (length(group) != p ||
@@ -1133,8 +1135,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       warning("Implement this.")
     }
   }
-  args <- mget(setdiff(names(formals(corila)), c("x", "y")))
-  #args$info <- data.frame(n = n, p = p, q = q)
+  args <- mget(setdiff(c("n", "p", "q", names(formals(corila))), c("x", "y")))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
   # --- fold identifiers ---
@@ -1535,8 +1536,14 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #' print (S3 method)
 #'
 #' @description
+#' Print method for class \code{"cv.corila"}.
 #'
+#' @param x
+#' object of class \code{"cv.corila"}
 #'
+#' @seealso summary.cv.corila
+#'
+#' @export
 print.cv.corila <- function(x, ...) {
   cat("object of class", sQuote("cv.corila"), "\n")
   content <- ifelse(length(x$object) == 1, "an object", "multiple objects")
@@ -1551,10 +1558,10 @@ print.cv.corila <- function(x, ...) {
 #' Summary method for class \code{"cv.corila"}.
 #'
 #' @param object
-#' an object of class \code{"cv.corila"}
+#' object of class \code{"cv.corila"}
 #'
 #' @param x
-#' an object of class \code{"summary.cv.corila"}
+#' object of class \code{"summary.cv.corila"}
 #'
 #' @param ...
 #' (not used)
@@ -1562,17 +1569,20 @@ print.cv.corila <- function(x, ...) {
 #' @return
 #' The function \code{summary.cv.corila} returns
 #' an invisible list with multiple slots.
+#' 
+#' @seealso print.corila
 #'
+#' @export
 summary.cv.corila <- function(object, ...) {
   list <- list()
   list$family <- object$args$family
   list$n <- Inf # replace by object$n
-  list$p <- length(object$args$include)
+  list$p <- object$args$p
   list$p_primary <- sum(object$args$include)
   list$p_auxiliary <- sum(!object$args$include)
   list$alpha_init <- object$args$alpha_init
   list$alpha_final <- object$args$alpha_final
-  list$lambda.min <- object$args$lambda.min
+  list$lambda.min <- object$lambda.min
   list$wgt_local <- object$args$hyper$wgt_local[object$id_hyper]
   list$wgt_global <- object$args$hyper$wgt_global[object$id_hyper]
   list$exp_local <- object$args$hyper$exp_local[object$id_hyper]
@@ -1580,6 +1590,26 @@ summary.cv.corila <- function(object, ...) {
   list$nzero <- sum(stats::coef(object, s = "lambda.min") != 0)
   class(list) <- "summary.cv.corila"
   list
+}
+
+.type <- function(x) {
+  if (is.numeric(x)) {
+    if (is.na(x)) {
+      "none"
+    } else if (x == 0) {
+      "ridge regression"
+    } else if (x == 1) {
+      "lasso regression"
+    } else if (x > 0 && x < 1) {
+      "elastic net regression"
+    } else {
+      stop()
+    }
+  } else {
+    paste0(toupper(substr(x = x, start = 1, stop = 1)),
+           tolower(substr(x = x, start = 2, stop = nchar(x))),
+           "correlation")
+  }
 }
 
 #' @rdname summary.cv.corila
@@ -1593,18 +1623,14 @@ print.summary.cv.corila <- function(x, ...) {
   }
   cat(x$p, " features (", x$p_primary, " primary and ",
       x$p_auxiliary, " auxiliary features)", "\n", sep = "")
-  penalty <- ifelse(test = x$alpha == 0,
-                    yes = "ridge",
-                    no = ifelse(test = x$alpha == 1,
-                                yes = "lasso",
-                                no = "elastic net"))
-  cat(penalty, "regularisation", "\n")
+  cat("initial coefficients:", .type(x = x$alpha_init), "\n")
+  cat("final coefficients: adaptive", .type(x = x$alpha_final), "\n")
   cat("optimised regularisation parameter: lambda.min =",
       signif(x$lambda.min, digits = 4), "\n")
   cat("selected weights: local = ", x$wgt_local,
-      ", global = ", x$wgt_global, "\n")
-  cat("selected exponents: local =", x$exp_local,
-      ", global =", x$exp_global, "\n")
+      ", global = ", x$wgt_global, "\n", sep = "")
+  cat("selected exponents: local = ", x$exp_local,
+      ", global = ", x$exp_global, "\n", sep = "")
   cat(x$nzero, "non-zero coefficients",
       "(including intercept)"[x$family != "cox"])
   invisible(NULL)
@@ -1613,7 +1639,7 @@ print.summary.cv.corila <- function(x, ...) {
 
 plot.cv.corila <- function(object, ...) {
   # observed vs fitted values
-  # estimated coefficient per group
+  # estimated coefficient per group (if vector)
   # cvm as a functions of weights and exponents
   invisible(NULL)
 }
