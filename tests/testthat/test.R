@@ -161,10 +161,14 @@ if (FALSE) {
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   message(paste0("family=\"", family, "\""))
   data <- simulate(family = family, n1 = 50, n_group = 3, size_group = c(3, 2))
+  colnames(data$x_train) <- LETTERS[seq_len(ncol(data$x_train))]
   group <- list()
   group$vector <- data$group
+  group$vector_char <- LETTERS[data$group]
   group$list <- lapply(X = unique(group$vector),
                        FUN = function(x) which(group$vector == x))
+  group$list_char <- lapply(X = unique(group$vector),
+                            FUN = function(x) LETTERS[which(group$vector == x)])
   group$matrix <- 1 * outer(X = group$vector,
                             Y = group$vector,
                             FUN = "==")
@@ -188,6 +192,8 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     code = {
       testthat::expect_equal(coef[[1]], coef[[2]])
       testthat::expect_equal(coef[[2]], coef[[3]])
+      testthat::expect_equal(coef[[3]], coef[[4]])
+      testthat::expect_equal(coef[[4]], coef[[5]])
     }
   )
   testthat::test_that(
@@ -198,6 +204,8 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     code = {
       testthat::expect_equal(y_hat[[1]], y_hat[[2]])
       testthat::expect_equal(y_hat[[2]], y_hat[[3]])
+      testthat::expect_equal(coef[[3]], coef[[4]])
+      testthat::expect_equal(coef[[4]], coef[[5]])
     }
   )
   testthat::test_that(

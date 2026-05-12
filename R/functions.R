@@ -1184,16 +1184,19 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
         cond_temp <- group[j] == group
       } else if (is.list(group)) {
         if (is.numeric(unlist(group))) {
-          group_index <- vapply(X = group,
-                                FUN = function(slot) j %in% slot,
-                                FUN.VALUE = logical(1))
+          group_cond <- vapply(X = group,
+                               FUN = function(slot) j %in% slot,
+                               FUN.VALUE = logical(1))
+          cond_temp <- seq_len(p) %in% unlist(group[group_cond])
         } else {
-          group_index <- vapply(X = group,
-                                FUN = function(slot) colnames(x)[j] %in% slot,
-                                FUN.VALUE = logical(1))
+          group_cond <- vapply(
+            X = group,
+            FUN = function(slot) colnames(scale$x)[j] %in% slot,
+            FUN.VALUE = logical(1)
+          )
+          cond_temp <- colnames(scale$x) %in% unlist(group[group_cond])
         }
         #names(group_index) <- group
-        cond_temp <- seq_len(p) %in% unlist(group[group_index])
       } else if (is.matrix(group)) {
         cond_temp <- group[, j] == 1
       } else {

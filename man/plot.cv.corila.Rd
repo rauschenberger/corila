@@ -7,9 +7,9 @@
 \method{plot}{cv.corila}(x, ...)
 }
 \arguments{
-\item{...}{(not used)}
+\item{x}{object of class \code{"cv.corila"}}
 
-\item{object}{object of class \code{"cv.corila"}}
+\item{...}{(not used)}
 }
 \value{
 Returns NULL (invisible).
