@@ -1707,6 +1707,49 @@ plot.cv.corila <- function(x, ...) {
   invisible(NULL)
 }
 
+
+#' @title
+#' Expand auxiliary features
+#'
+#' @description
+#' Add empty columns for auxiliary features.
+#'
+#' @param newx
+#' matrix with \code{n} rows
+#'
+#' @param include
+#' logical vector of length \code{p}
+#'
+#' @return
+#' matrix with \code{n} rows and \code{p} columns
+#'
+#' @examples
+#' n <- 5
+#' p <- 10
+#' x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
+#' include <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
+#' x_primary <- x[,include]
+#' x_expanded <- expand_auxiliary(x = x_primary, include = include)
+#' all(x_expanded[,include]==x[,include]) # move to unit tests
+#' all(x_expanded[,!include]==0) # move to unit tests
+#'
+#' @export
+#'
+expand_auxiliary <- function(x, include) {
+  .check(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
+  .check(x = include, type = "logical", dim = Inf)
+  if (ncol(x) != sum(include) && ncol(x) != length(include)) {
+    stop("incompatible number of (primary) features")
+  } else if (all(include)) {
+    x
+  } else {
+    full <- matrix(data = 0, nrow = nrow(x), ncol = length(include))
+    full[, include] <- x
+    full
+  }
+}
+
+
 #' @title
 #' predict (S3 method)
 #'
@@ -1749,15 +1792,16 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
     stop("Set s='lambda.min' or provide non-negative value.")
   }
   # --- handle auxiliary predictors ---
-  if (any(object$args$include == 0) && sum(object$args$include) == ncol(newx)) {
-    full <- matrix(data = 0,
-                   nrow = nrow(newx),
-                   ncol = length(object$args$include))
-    full[, object$args$include] <- newx
-    newx <- full
-  }
+  #if(any(object$args$include == 0) && sum(object$args$include) == ncol(newx)){
+  #  full <- matrix(data = 0,
+  #                 nrow = nrow(newx),
+  #                 ncol = length(object$args$include))
+  #  full[, object$args$include] <- newx
+  #  newx <- full
+  #}
+  newx_full <- expand_auxiliary(x = newx, include = object$args$include)
   # --- make predictions ---
-  newx_stand <- .forescale(x = newx, pars = object$scale)$x
+  newx_stand <- .forescale(x = newx_full, pars = object$scale)$x
   x_all <- cbind(newx_stand, -newx_stand)
   y_hat_stand <- stats::predict(object = object$model[[object$id_hyper]],
                                 newx = x_all,
@@ -2117,7 +2161,7 @@ simulate_overlap <- function() {
 calc_sign_prec <- function(truth, estim) {
   .check(x = truth, type = "integer", dim = Inf, na.rm = TRUE)
   .check(x = estim, type = "integer", dim = length(truth), na.rm = TRUE)
-  if (all(is.na(estim) || estim == 0)) {
+  if (all(is.na(estim) | estim == 0)) {
     NA
   } else {
     sum(estim != 0 & truth != 0 & sign(estim) == sign(truth)) / sum(estim != 0)
