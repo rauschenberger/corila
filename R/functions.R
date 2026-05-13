@@ -2117,15 +2117,7 @@ simulate_overlap <- function() {
 calc_sign_prec <- function(truth, estim) {
   .check(x = truth, type = "integer", dim = Inf, na.rm = TRUE)
   .check(x = estim, type = "integer", dim = length(truth), na.rm = TRUE)
-  if (!is.vector(truth) || !is.numeric(truth)) {
-    stop("Argument 'truth' should be a numerical vector.")
-  }
-  if (!is.vector(estim) || !is.numeric(estim)) {
-    stop("Argument 'estim' should be a numerical vector.")
-  }
-  if (length(estim) != length(truth)) {
-    stop("Arguments 'truth' and 'estim' must have the same length.")
-  } else if (all(is.na(estim)) || all(estim == 0)) {
+  if (all(is.na(estim) || estim == 0)) {
     NA
   } else {
     sum(estim != 0 & truth != 0 & sign(estim) == sign(truth)) / sum(estim != 0)
