@@ -90,13 +90,15 @@
   if (!is.character(family) || length(family) != 1) {
     stop("Argument 'family' must be a character string.")
   }
-  if (!is.matrix(x)) {
-    stop("Argument 'x' must be a matrix.")
+  if (!is.matrix(x) || !is.numeric(x)) {
+    stop("Argument 'x' must be a numeric matrix.")
   }
-  cond_vector <- is.vector(y) && is.numeric(y)
-  cond_matrix <- is.matrix(y) && ncol(y) == 1
+  #cond_vector <- is.vector(y) && is.numeric(y)
+  #cond_matrix <- is.matrix(y) && ncol(y) == 1
+  cond_vector <- (is.vector(y) && is.atomic(y)) || inherits(y, "Surv")
+  cond_matrix <- is.matrix(y) && ncol(y)==1 & is.numeric(y)
   if (!(family == "cox" || cond_vector || cond_matrix)) {
-    stop("Argument 'y' must be a vector.")
+    stop("Argument 'y' must be a numeric vector.")
   }
   if (nrow(x) != length(y)) {
     stop("For each observation, matrix 'x' must have one row,
@@ -104,7 +106,7 @@
   }
   if (family %in% c("gaussian", "linear")) {
     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-      stop("Gaussian family requires a numeric outcome.")
+      stop("Gaussian family requires a numerical outcome.")
     }
   } else if (family %in% c("binomial", "logistic")) {
     if (!all(y %in% c(0, 1))) {
@@ -1181,31 +1183,31 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       # features in same group
       #if (is.numeric(group) && !is.array(group)) {
       if (is.vector(group) && is.atomic(group)) {
-        cond_temp <- group[j] == group
+        adjacent <- group[j] == group
       } else if (is.list(group)) {
         if (is.numeric(unlist(group))) {
           group_cond <- vapply(X = group,
                                FUN = function(slot) j %in% slot,
                                FUN.VALUE = logical(1))
-          cond_temp <- seq_len(p) %in% unlist(group[group_cond])
+          adjacent <- seq_len(p) %in% unlist(group[group_cond])
         } else {
           group_cond <- vapply(
             X = group,
             FUN = function(slot) colnames(scale$x)[j] %in% slot,
             FUN.VALUE = logical(1)
           )
-          cond_temp <- colnames(scale$x) %in% unlist(group[group_cond])
+          adjacent <- colnames(scale$x) %in% unlist(group[group_cond])
         }
         #names(group_index) <- group
       } else if (is.matrix(group)) {
-        cond_temp <- group[, j] == 1
+        adjacent <- group[, j] == 1
       } else {
         stop()
       }
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
-      temp <-  cor_trans * init$coef * cond_temp
-      weight$local[j] <- sum(pmax(0, temp)[cond_temp]) / sum(cond_temp)
-      weight$local[p + j] <- sum(pmax(0, -temp)[cond_temp]) / sum(cond_temp)
+      temp <-  cor_trans * init$coef * adjacent
+      weight$local[j] <- sum(pmax(0, temp)[adjacent]) / sum(adjacent)
+      weight$local[p + j] <- sum(pmax(0, -temp)[adjacent]) / sum(adjacent)
 
       # ad-hoc solution for features that are in no group:
       weight$local[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
@@ -1219,7 +1221,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     # temp <- sign(cor[, j]) *
     # stats::qbeta(p = abs(cor[, j]),
     # shape1 = hyper$alpha[i],
-    # shape2 = hyper$beta[i]) * init$coef * cond_temp
+    # shape2 = hyper$beta[i]) * init$coef * adjacent
     weight <- lapply(weight, function(x) p * ifelse(x == 0, 0, x / sum(x)))
     pf_ext <- 1 / (weight$local * hyper$wgt_local[i] +
                      weight$global * hyper$wgt_global[i])
