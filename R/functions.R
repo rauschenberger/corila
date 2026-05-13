@@ -58,7 +58,7 @@
       length(dim) != 1 || is.vector(x) || inherits(x = x, what = "Surv"),
     "expected matrix" =
       length(dim) != 2 || is.matrix(x),
-    "expepcted array" =
+    "expected array" =
       length(dim) <= 2 || is.array(x),
     "expected vector with other length" =
       length(dim) != 1 || dim == Inf || length(x) == dim,
@@ -93,10 +93,16 @@
   if (!is.matrix(x) || !is.numeric(x)) {
     stop("Argument 'x' must be a numeric matrix.")
   }
+  if (any(is.na(x))) {
+    stop("Argument 'x' must not contain any missing values.")
+  }
+  if (any(is.na(y))) {
+    stop("Argument 'y' must not contain any missing values.")
+  }
   #cond_vector <- is.vector(y) && is.numeric(y)
   #cond_matrix <- is.matrix(y) && ncol(y) == 1
-  cond_vector <- (is.vector(y) && is.atomic(y)) || inherits(y, "Surv")
-  cond_matrix <- is.matrix(y) && ncol(y)==1 & is.numeric(y)
+  cond_vector <- (is.vector(y) && is.atomic(y)) # || inherits(y, "Surv")
+  cond_matrix <- is.matrix(y) && ncol(y) == 1 && is.numeric(y)
   if (!(family == "cox" || cond_vector || cond_matrix)) {
     stop("Argument 'y' must be a numeric vector.")
   }
@@ -104,6 +110,7 @@
     stop("For each observation, matrix 'x' must have one row,
          and vector 'y' must have one entry.")
   }
+  # --- outcome vector ---
   if (family %in% c("gaussian", "linear")) {
     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
       stop("Gaussian family requires a numerical outcome.")
@@ -123,7 +130,8 @@
   } else {
     stop("Invalid value for argument 'family'.")
   }
-  NULL
+  # add tests for argument group
+  invisible(NULL)
 }
 
 #' @title
