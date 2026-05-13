@@ -155,6 +155,18 @@ if (FALSE) {
 }
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#----- function "summary" -----
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+data <- simulate(family = "gaussian", n1 = 50, n_group = 3,
+                 size_group = c(3, 2))
+object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group)
+list <- summary(object)
+cond <- vapply(X = list, FUN = is.null, FUN.VALUE = logical(1))
+testthat::test_that("summary does not contain NULL",
+                    {testthat::expect_all_false(cond)})
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #----- function "corila" -----
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
