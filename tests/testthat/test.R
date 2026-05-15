@@ -3,6 +3,56 @@
 
 set.seed(1)
 
+
+# function .deviance
+
+for (family in c("gaussian", "binomial", "poisson", "cox")) {
+  n <- 10
+  set.seed(1)
+  if (family == "gaussian") {
+    y <- stats::rnorm(n = n)
+    y_hat <- stats::rnorm(n = n)
+  } else if (family == "binomial") {
+    y <- stats::rbinom(n = n, size = 1, prob = 0.5)
+    y_hat <- stats::rbinom(n = n, size = 1, prob = 0.5)
+  } else if (family == "poisson") {
+    y <- stats::rpois(n = n, lambda = 4)
+    y_hat <- stats::rpois(n = n, lambda = 4)
+  } else if (family == "cox") {
+    time_survival <- stats::rexp(n = n, rate = 1)
+    time_censoring <- stats::rexp(n = n, rate = 1)
+    time <- pmin(time_survival, time_censoring)
+    event <- 1 * (time_survival <= time_censoring)
+    y <- survival::Surv(time = time, event = event)
+  }
+  if (family != "cox") {
+    testthat::test_that("perfect predictions lead to deviance zero", {
+      deviance <- .deviance(y = y, y_hat = y, family = family)
+      testthat::expect_identical(object = deviance, expected = 0)
+    })
+  } else {
+    # NB: inversion due to "higher risk = shorter time"
+    testthat::test_that("worse predictions increase deviance", {
+      dev_best <- .deviance(y = y,
+                            y_hat = -log(time.survival),
+                            family = family)
+      dev_random <- .deviance(y = y,
+                              y_hat = sample(-log(time.survival)),
+                              family = family)
+      dev_worst <- .deviance(y = y,
+                             y_hat = +log(time.survival),
+                             family = family)
+      testthat::expect_gt(object = dev_random, expected = dev_best)
+      testthat::expect_gt(object = dev_worst, expected = dev_random)
+    })
+  }
+  testthat::test_that("imperfect predictions lead to positive deviance", {
+    deviance <- .deviance(y = y, y_hat = y_hat, family = family)
+    testthat::expect_gt(object = deviance, expected = 0)
+  })
+}
+
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #----- functions ".forescale" and ".backscale" -----
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -168,6 +218,13 @@ list <- summary(object)
 cond <- vapply(X = list, FUN = is.null, FUN.VALUE = logical(1))
 testthat::test_that("summary does not contain NULL",
                     {testthat::expect_all_false(cond)})
+out <- print(summary(object))
+testthat::test_that("print.summary.cv.corila returns NULL",
+                    {testthat::expect_identical(out, NULL)})
+out <- plot(object)
+testthat::test_that("plot.cv.corila returns NULL",
+                    {testthat::expect_identical(out, NULL)})
+
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #----- function "corila" -----
