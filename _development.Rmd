@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r,eval=FALSE}
 rm(list=ls(all.names=TRUE))
 #install.packages(c("roxygen2","pkgdown","rcmdcheck","usethis","remotes","testthat","devtools","goodpractice","checkglobals","roxylint", "cyclocomp"))
+#remotes::install_github(c("ropensci-review-tools/pkgcheck","ropensci-review-tools/autotest","ropensci-review-tools/srr"))
 setwd("C:/Users/arauschenberger/Desktop/corila/package")
 ```
 
@@ -33,7 +34,6 @@ setwd("C:/Users/arauschenberger/Desktop/corila/package")
 devtools::check()
 roxygen2::roxygenise()
 rcmdcheck::rcmdcheck()
-goodpractice::gp()
 
 devtools::spell_check()
 checkglobals::checkglobals(pkg=".")
@@ -45,6 +45,13 @@ cyclocomp::cyclocomp_package_dir()
 #devtools::build()
 #devtools::submit_cran()
 #pkgdown::build_site()
+
+# checks for rOpenSci
+goodpractice::gp()
+pkgcheck::pkgcheck()
+notes <- autotest::autotest_package(exclude=c(".backscale",".forescale",".folds"),test=TRUE)
+notes <- autotest::autotest_package(functions=".folds",test=TRUE)
+srr::srr_stats_roxygen(category = c("ml", "regression"))
 ```
 
 # Setting up a private GitLab mirror of a private GitHub repository:
