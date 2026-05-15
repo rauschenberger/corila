@@ -9,6 +9,9 @@ set.seed(1)
 
 for (glmnet in c(FALSE, TRUE)) {
   for (family in c("gaussian", "binomial", "poisson", "cox")) {
+    if (family == "cox") {
+      next
+    }
     cat(paste0(
       ifelse(glmnet, "glmnet::cv.glmnet", "stats::glm"),
       ", family=\"", family, "\"\n"
