@@ -50,7 +50,7 @@ cyclocomp::cyclocomp_package_dir()
 goodpractice::gp()
 pkgcheck::pkgcheck()
 notes <- autotest::autotest_package(exclude=c(".backscale",".forescale",".folds"),test=TRUE)
-notes <- autotest::autotest_package(functions=".folds",test=TRUE)
+notes <- autotest::autotest_package(functions=".backscale",test=TRUE)
 srr::srr_stats_roxygen(category = c("ml", "regression"))
 ```
 
