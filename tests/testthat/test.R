@@ -34,13 +34,13 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     # NB: inversion due to "higher risk = shorter time"
     testthat::test_that("worse predictions increase deviance", {
       dev_best <- .deviance(y = y,
-                            y_hat = -log(time.survival),
+                            y_hat = -log(time_survival),
                             family = family)
       dev_random <- .deviance(y = y,
-                              y_hat = sample(-log(time.survival)),
+                              y_hat = sample(-log(time_survival)),
                               family = family)
       dev_worst <- .deviance(y = y,
-                             y_hat = +log(time.survival),
+                             y_hat = +log(time_survival),
                              family = family)
       testthat::expect_gt(object = dev_random, expected = dev_best)
       testthat::expect_gt(object = dev_worst, expected = dev_random)
