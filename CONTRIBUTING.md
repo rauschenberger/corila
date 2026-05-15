@@ -1,3 +1,5 @@
 # Contributing guidelines
 
-If you encounter a bug in the R package `corila`, please report it on [GitHub Issues](https://github.com/rauschenberger/corila/issues). Ideally, provide a minimal reproducible example (i.e., some lines of code that we can copy-and-paste into the R console to obtain the same error)
+Contributions to this repository are welcome. You can open an issue or submit a pull request on GitHub.
+
+If you encounter a bug, please try to provide a minimal reproducible example (i.e., some lines of code that we can copy-and-paste into the R console to obtain the same error).
