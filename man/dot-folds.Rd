@@ -41,7 +41,7 @@ y <- stats::rbinom(n = 100, prob = 0.2, size = 1)
 foldid <- .folds(y = y, family = "binomial", nfolds = 10)
 table(y, foldid)
 
-## Cox model
+# Cox model (autotest fails!)
 time <- stats::rexp(n = 100, rate = 5)
 status <- stats::rbinom(n = 100, prob = 0.2, size = 1)
 y <- survival::Surv(time = time, event = status)
