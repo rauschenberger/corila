@@ -38,6 +38,8 @@
 #'
 #' @examples
 #' .check(x = NULL)
+#' .check(x = rnorm(1), type = "numeric")
+#' .check(x = "A", type = "nominal", support = LETTERS)
 #'
 #' @keywords internal
 #'
@@ -78,9 +80,9 @@
       type != "logical" || is.logical(x),
     "expected values inside support" =
       type != "nominal" || is.null(support) || all(x[!is.na(x)] %in% support),
-    "expected values above minimum" =
+    "expected values greater than or equal to minimum" =
       type == "nominal" || min == -Inf || all(x >= min, na.rm = TRUE),
-    "expected values below maximum" =
+    "expected values less than or equal to maximum" =
       type == "nominal" || max == Inf || all(x <= max, na.rm = TRUE)
   )
 }
@@ -387,15 +389,16 @@
 #' @examples
 #' # Gaussian and Poisson families
 #' y <- stats::rnorm(n = 100)
+#' y <- stats::rpois(n = 100, lambda = 4)
 #' foldid <- .folds(y = y, family = "gaussian", nfolds = 10)
 #' table(foldid)
 #'
-#' # binomial families
+#' # binomial family
 #' y <- stats::rbinom(n = 100, prob = 0.2, size = 1)
 #' foldid <- .folds(y = y, family = "binomial", nfolds = 10)
 #' table(y, foldid)
 #'
-#' # Cox model
+#' ## Cox model
 #' time <- stats::rexp(n = 100, rate = 5)
 #' status <- stats::rbinom(n = 100, prob = 0.2, size = 1)
 #' y <- survival::Surv(time = time, event = status)
@@ -410,6 +413,9 @@
   .check(x = y, type = "numeric", dim = Inf)
   support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
   .check(x = family, type = "nominal", support = support)
+  #if(family == "cox" && !inherits(y, "Surv")){
+  #  stop("Require object of class 'Surv'.")
+  #}
   .check(x = nfolds, type = "integer", min = 2, max = length(y))
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
@@ -1541,10 +1547,12 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                          hyper = hyper,
                          lambda_init = object_ext$lambda_init)
     for (j in seq_len(nrow(hyper))) {
-      pred[[j]][foldid == i, ] <- stats::predict(object = object_int,
-                                                 newx = x[foldid == i, ],
-                                                 index = j,
-                                                 s = lambda[[j]])
+      pred[[j]][foldid == i, ] <- stats::predict(
+        object = object_int,
+        newx = x[foldid == i, , drop = FALSE],
+        index = j,
+        s = lambda[[j]]
+      )
     }
   }
   # select the hyperparameters
@@ -1581,7 +1589,12 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #' @param ...
 #' (not used)
 #'
+#' @return
+#' Prints "object of class 'cv.corila'" to the console.
+#'
 #' @seealso summary.cv.corila
+#'
+#' @inherit summary.cv.corila examples
 #'
 #' @export
 print.cv.corila <- function(x, ...) {
@@ -1609,6 +1622,19 @@ print.cv.corila <- function(x, ...) {
 #' @return
 #' The function \code{summary.cv.corila} returns
 #' an invisible list with multiple slots.
+#'
+#' @examples
+#' n <- 12 # decrease to 10 to check LOOCV
+#' p <- 20
+#' q <- 5
+#' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
+#' y <- rnorm(n)
+#' group <- rep(seq_len(q), length.out = p)
+#' include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+#' object <- cv.corila(x = x, y = y, group = group, include = include)
+#' print(object)
+#' summary(object)
+#' plot(object)
 #'
 #' @seealso print.corila
 #'
@@ -1697,6 +1723,8 @@ print.summary.cv.corila <- function(x, ...) {
 #'
 #' @return
 #' Returns NULL (invisible).
+#'
+#' @inherit summary.cv.corila examples
 #'
 #' @export
 #'
