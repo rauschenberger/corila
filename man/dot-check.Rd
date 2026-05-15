@@ -33,6 +33,8 @@ Check whether provided arguments satisfy expectations.
 }
 \examples{
 .check(x = NULL)
+.check(x = rnorm(1), type = "numeric")
+.check(x = "A", type = "nominal", support = LETTERS)
 
 }
 \keyword{internal}
