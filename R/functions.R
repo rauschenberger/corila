@@ -1714,38 +1714,41 @@ plot.cv.corila <- function(x, ...) {
 #' @description
 #' Add empty columns for auxiliary features.
 #'
-#' @param newx
-#' matrix with \code{n} rows
+#' @param x
+#' matrix with \eqn{n} rows and either
+#' \eqn{p_0} or \eqn{p_0 + p_1} features
 #'
 #' @param include
-#' logical vector of length \code{p}
+#' logical vector of length \eqn{p_0 + p_1}
+#' with \eqn{p_0} entries equal to \code{TRUE} (primary features)
+#' and \eqn{p_1} entries equal to \code{FALSE} (auxiliary features)
 #'
 #' @return
-#' matrix with \code{n} rows and \code{p} columns
+#' matrix with \eqn{n} rows and \eqn{p_0 + p_1} columns
 #'
 #' @examples
 #' n <- 5
 #' p <- 10
 #' x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
-#' include <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
+#' include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 #' x_primary <- x[,include]
 #' x_expanded <- expand_auxiliary(x = x_primary, include = include)
-#' all(x_expanded[,include]==x[,include]) # move to unit tests
-#' all(x_expanded[,!include]==0) # move to unit tests
+#' all(x_expanded[, include] == x[, include]) # move to unit tests
+#' all(x_expanded[, !include] == 0) # move to unit tests
 #'
 #' @export
 #'
 expand_auxiliary <- function(x, include) {
   .check(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
   .check(x = include, type = "logical", dim = Inf)
-  if (ncol(x) != sum(include) && ncol(x) != length(include)) {
-    stop("incompatible number of (primary) features")
-  } else if (all(include)) {
+  if (ncol(x) == length(include)) {
     x
-  } else {
+  } else if (ncol(x) == sum(include)) {
     full <- matrix(data = 0, nrow = nrow(x), ncol = length(include))
     full[, include] <- x
     full
+  } else {
+    stop("incompatible number of (primary) features")
   }
 }
 
