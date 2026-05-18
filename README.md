@@ -2,6 +2,7 @@
 [![R-CMD-check](https://github.com/rauschenberger/corila/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/R-CMD-check.yaml)
 [![lint](https://github.com/rauschenberger/corila/actions/workflows/lint.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/lint.yaml)
 [![cyclocomp](https://github.com/rauschenberger/corila/actions/workflows/cyclocomp.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/cyclocomp.yaml)
+[![autotest](https://github.com/rauschenberger/corila/actions/workflows/autotest.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/autotest.yaml)
 [![pkgcheck](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml)
 [![Codecov test coverage](https://codecov.io/gh/rauschenberger/corila/graph/badge.svg)](https://app.codecov.io/gh/rauschenberger/corila)
 
