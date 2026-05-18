@@ -22,5 +22,10 @@ jobs:
     steps:
       - uses: ropensci-review-tools/pkgcheck-action@main
         with:
-          extra-packages: ecpc=?ignore, grpregOverlap=?ignore, scoop=?ignore, squeezy=?ignore
+          extra-packages: |
+            any::rcmdcheck
+            ecpc=?ignore
+            grpregOverlap=?ignore
+            scoop=?ignore
+            squeezy=?ignore
           post-to-issue: false
