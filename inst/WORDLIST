@@ -17,5 +17,8 @@ CMD
 Codecov
 AR
 etc
+cv
 nolint
 linter
+cyclocomp
+pkgcheck
