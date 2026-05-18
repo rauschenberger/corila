@@ -52,7 +52,7 @@ checks <- setdiff(goodpractice::all_checks(), c("covr", "cyclocomp"))
 checks <- checks[!grepl(pattern="rcmdcheck_", x = checks)]
 x <- goodpractice::gp(checks = checks)
 
-pkgcheck::pkgcheck(goodpractice=FALSE)
+x <- pkgcheck::pkgcheck(goodpractice=FALSE)
 notes <- autotest::autotest_package(exclude=c(".backscale",".forescale",".folds"),test=TRUE)
 notes <- autotest::autotest_package(test=TRUE)
 srr::srr_stats_roxygen(category = c("ml", "regression"))
