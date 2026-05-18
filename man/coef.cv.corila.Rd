@@ -28,7 +28,7 @@ x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
 group <- rep(seq_len(q), length.out = p)
 include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-cv.corila(x = x, y = y, group = group, include = include)
+cv.corila(x = x, y = y, group = group, include = include, tune = "none")
 
 \donttest{
 # simulation

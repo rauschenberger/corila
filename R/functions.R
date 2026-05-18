@@ -93,8 +93,8 @@
     stop("Argument 'family' must be a character string.")
   }
   #family <- match.arg(
-  #  arg = tolower(family),
-  #  choices = c("gaussian", "linear", "binomial", "logistic", "poisson", "cox"))
+  #arg = tolower(family),
+  #choices = c("gaussian", "linear", "binomial", "logistic", "poisson", "cox"))
   #)
   family <- switch(family, linear = "gaussian", logistic = "binomial", family)
   if (!is.matrix(x) || !is.numeric(x)) {
@@ -641,7 +641,7 @@
 #' y <- rnorm(n)
 #' z <- rep(seq_len(q), length.out = p)
 #' multiridge(x = x, y = y, z = z)
-#' 
+#'
 #' \donttest{
 #' # simulation
 #' set.seed(1)
@@ -700,7 +700,7 @@
 #' }
 #' metric
 #' }
-#' 
+#'
 #' @keywords models, regression, classif
 #'
 #' @export
@@ -1153,8 +1153,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   }
   .check(x = alpha_final, type = "numeric", min = 0, max = 1)
   if (is.character(cor)) {
-      .check(x = cor, type = "nominal",
-         support = c("pearson", "spearman", "kendall"))
+    .check(x = cor, type = "nominal",
+           support = c("pearson", "spearman", "kendall"))
   } else {
     .check(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
   }
@@ -1470,8 +1470,8 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' y <- rnorm(n)
 #' group <- rep(seq_len(q), length.out = p)
 #' include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-#' cv.corila(x = x, y = y, group = group, include = include)
-#' 
+#' cv.corila(x = x, y = y, group = group, include = include, tune = "none")
+#'
 #' \donttest{
 #' # simulation
 #' set.seed(1)
@@ -1548,7 +1548,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   # match arguments
   family <- match.arg(arg = tolower(family),
                       choices = c("gaussian", "binomial", "poisson", "cox"))
-  if (is.character(cor)){
+  if (is.character(cor)) {
     cor <- match.arg(arg = tolower(cor),
                      choices = c("pearson", "spearman", "kendall"))
   }
