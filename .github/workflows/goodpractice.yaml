@@ -3,7 +3,7 @@ name: goodpractice
 on: [push, pull_request]
 
 jobs:
-  autotest:
+  goodpractice:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
             scoop=?ignore
             squeezy=?ignore
 
-      - name: autotest
+      - name: goodpractice
         run: |
           x <- goodpractice::gp(".")
           goodpractice::results(x)
