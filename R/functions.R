@@ -92,6 +92,11 @@
   if (!is.character(family) || length(family) != 1) {
     stop("Argument 'family' must be a character string.")
   }
+  #family <- match.arg(
+  #  arg = tolower(family),
+  #  choices = c("gaussian", "linear", "binomial", "logistic", "poisson", "cox"))
+  #)
+  family <- switch(family, linear = "gaussian", logistic = "binomial", family)
   if (!is.matrix(x) || !is.numeric(x)) {
     stop("Argument 'x' must be a numeric matrix.")
   }
@@ -113,11 +118,11 @@
          and vector 'y' must have one entry.")
   }
   # --- outcome vector ---
-  if (family %in% c("gaussian", "linear")) {
+  if (identical(family, "gaussian")) {
     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
       stop("Gaussian family requires a numerical outcome.")
     }
-  } else if (family %in% c("binomial", "logistic")) {
+  } else if (identical(family, "binomial")) {
     if (!all(y %in% c(0, 1))) {
       stop("Binomial family requires a binary outcome.")
     }
@@ -531,7 +536,7 @@
   } else if (identical(family, "cox")) {
     glmnet::coxnet.deviance(pred = y_hat, y = y)
   } else {
-    stop()
+    stop(paste("Family", family, "not implemented."))
   }
 }
 
@@ -1101,7 +1106,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     } else if (is.character(group)) {
       .check(x = group, type = "nominal", dim = p, support = colnames(x))
     } else {
-      stop()
+      stop("If argument 'group' is a vector, ",
+           "it should be a numeric or character vector.")
     }
   } else if (is.list(group)) {
     for (i in seq_along(group)) {
@@ -1111,13 +1117,14 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
         .check(x = group[[i]], type = "nominal", dim = Inf,
                support = colnames(x))
       } else {
-        stop()
+        stop("If argument 'group' is a list, ",
+             "it should be a list of numeric or character vectors.")
       }
     }
   } else if (is.matrix(group)) {
     .check(x = group, type = "integer", dim = c(p, p), min = -1, max = 1)
   } else {
-    stop()
+    stop("Argument 'group' should be a vector, a list, or a matrix.")
   }
   .check(x = include, type = "logical", dim = p)
   .check(x = family, type = "nominal",
@@ -1134,8 +1141,12 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     .check(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
   .check(x = alpha_final, type = "numeric", min = 0, max = 1)
-  .check(x = cor, type = "nominal",
+  if (is.character(cor)) {
+      .check(x = cor, type = "nominal",
          support = c("pearson", "spearman", "kendall"))
+  } else {
+    .check(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
+  }
   .check(x = foldid, type = "integer", dim = n, min = 1, max = n)
   .check(x = nfolds, type = "integer", min = 1, max = n)
   .check(x = lambda_init, type = "numeric", min = 0)
@@ -1226,7 +1237,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       } else if (is.matrix(group)) {
         adjacent <- group[, j] == 1
       } else {
-        stop()
+        stop("Argument 'group' should be a vector, a list, or a matrix.")
       }
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
       temp <-  cor_trans * init$coef * adjacent
@@ -1234,7 +1245,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
       weight$local[p + j] <- sum(pmax(0, -temp)[adjacent]) / sum(adjacent)
 
       # ad-hoc solution for features that are in no group:
-      weight$local[is.na(weight$com)] <- 0 # Consider 0 and weight$ind
+      weight$local[is.na(weight$local)] <- 0 # Consider 0 and weight$ind
 
       # all features
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * init$coef
@@ -1252,7 +1263,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     # To obtain standard lasso set pf_ext equal to 1.
     pf_ext[!c(include, include)] <- Inf # excluded features
     if (any(is.na(pf_ext))) {
-      stop("missing pf:", sum(is.na(pf_ext)))
+      stop("missing pf: ", sum(is.na(pf_ext)))
     }
     if (any(pf_ext < 0)) {
       stop(paste0("negative pf:", min(pf_ext)))
@@ -1515,6 +1526,13 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
                       nfolds = 10, cor = "spearman", tune = "both",
                       foldid = NULL) {
+  # match arguments
+  family <- match.arg(arg = tolower(family),
+                      choices = c("gaussian", "binomial", "poisson", "cox"))
+  if (is.character(cor)){
+    cor <- match.arg(arg = tolower(cor),
+                     choices = c("pearson", "spearman", "kendall"))
+  }
   # set default parameters
   .validate(x = x, y = y, family = family)
   if (is.null(include)) {
@@ -1679,7 +1697,8 @@ summary.cv.corila <- function(object, ...) {
     } else if (x > 0 && x < 1) {
       "elastic net regression"
     } else {
-      stop()
+      stop("If argument 'x' is numeric, ",
+           "it should be in the unit interval.")
     }
   } else {
     if (identical(x, "multiridge")) {
