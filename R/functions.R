@@ -487,25 +487,37 @@
 #' character
 #'
 #' @examples
-#' # move these examples to unit tests (adding cox):
-#' y <- rnorm(10)
-#' .deviance(y = y , y_hat = y, family = "gaussian")
+#' n <- 10
 #'
-#' y <- rbinom(n = 10, size = 1, prob = 0.5)
-#' .deviance(y = y , y_hat = y, family = "binomial")
+#' y <- rnorm(n)
+#' y_hat <- rnorm(n)
+#' .deviance(y = y , y_hat = y_hat, family = "gaussian")
 #'
-#' y <- rpois(n = 10, lambda = 4)
-#' .deviance(y = y , y_hat = y, family = "poisson")
+#' y <- rbinom(n = n, size = 1, prob = 0.5)
+#' y_hat <- runif(n)
+#' .deviance(y = y , y_hat = y_hat, family = "binomial")
+#'
+#' y <- rpois(n = n, lambda = 4)
+#' y_hat <- rexp(n)
+#' .deviance(y = y , y_hat = y_hat, family = "poisson")
 #'
 #' @keywords internal
 #'
 #' @export
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---
-  .check(x = y, type = "numeric", dim = Inf)
-  .check(x = y_hat, type = "numeric", dim = length(y))
   support <- c("gaussian", "binomial", "poisson", "cox")
   .check(x = family, type = "nominal", support = support)
+  if (family == "binomial") {
+    .check(x = y, type = "integer", dim = Inf, min = 0, max = 1)
+    .check(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
+  } else if (family == "poisson") {
+    .check(x = y, type = "integer", dim = Inf, min = 0)
+    .check(x = y_hat, type = "numeric", dim = length(y), min = 0)
+  } else {
+    .check(x = y, type = "numeric", dim = Inf)
+    .check(x = y_hat, type = "numeric", dim = length(y))
+  }
   # --- calculate deviance ---
   eps <- 1e-06
   if (family == "gaussian") {
@@ -514,10 +526,10 @@
     mean(
       -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
     )
-  } else if (family == "cox") {
-    glmnet::coxnet.deviance(pred = y_hat, y = y)
   } else if (family == "poisson") {
     mean(2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
+  } else if (family == "cox") {
+    glmnet::coxnet.deviance(pred = y_hat, y = y)
   } else {
     stop()
   }
@@ -1869,14 +1881,13 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' .combine(alpha = alpha, beta = beta)
 #'
 #' @export
-#'
 .combine <- function(alpha, beta) {
   .check(x = alpha, type = "numeric")
   .check(x = beta, type = "numeric", dim = Inf, min = 0)
   beta_positive <- beta[1:(length(beta) / 2)]
   beta_negative <- beta[(length(beta) / 2 + 1):(length(beta))]
   eps <- 1e-06
-  if ( any(beta_positive > eps & beta_negative > eps)) {
+  if (any(beta_positive > eps & beta_negative > eps)) {
     stop("The coefficient for a predictor cannot be positive and negative.")
   }
   beta_combined <- beta_positive  - beta_negative
