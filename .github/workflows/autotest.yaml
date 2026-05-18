@@ -14,7 +14,12 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: autotest, ecpc=?ignore, grpregOverlap=?ignore, scoop=?ignore, squeezy=?ignore
+          extra-packages: |
+            ropensci-review-tools/autotest
+            ecpc=?ignore
+            grpregOverlap=?ignore
+            scoop=?ignore
+            squeezy=?ignore
 
       - name: autotest
         run: |
