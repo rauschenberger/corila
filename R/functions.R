@@ -49,9 +49,9 @@
   if (is.null(x)) {
     return(invisible(NULL))
   }
+  type <- match.arg(arg = type,
+                    choices = c("numeric", "integer", "nominal", "logical"))
   stopifnot(
-    "invalid argument 'type'" =
-      type %in% c("numeric", "integer", "nominal", "logical"),
     "invalid argument 'support'" =
       is.null(support) || is.character(support),
     "invalid argument 'support'" =
@@ -105,7 +105,7 @@
   #cond_matrix <- is.matrix(y) && ncol(y) == 1
   cond_vector <- (is.vector(y) && is.atomic(y)) # || inherits(y, "Surv")
   cond_matrix <- is.matrix(y) && ncol(y) == 1 && is.numeric(y)
-  if (!(family == "cox" || cond_vector || cond_matrix)) {
+  if (!(identical(family, "cox") || cond_vector || cond_matrix)) {
     stop("Argument 'y' must be a numeric vector.")
   }
   if (nrow(x) != length(y)) {
@@ -121,11 +121,11 @@
     if (!all(y %in% c(0, 1))) {
       stop("Binomial family requires a binary outcome.")
     }
-  } else if (family == "poisson") {
+  } else if (identical(family, "poisson")) {
     if (any(y %% 1 != 0)) {
       stop("Poisson family requires a count outcome.")
     }
-  } else if (family == "cox") {
+  } else if (identical(family, "cox")) {
     if (!inherits(x = y, what = "Surv")) {
       stop("Cox model requires a survival outcome.")
     }
@@ -206,7 +206,7 @@
   } else {
     pars <- list()
     pars$family <- family
-    #if (family == "cox") {
+    #if (identical(family, "cox")) {
     #  cond <- y[, 2] == 1
     #} else {
     cond <- rep(x = TRUE, times = length(y))
@@ -217,7 +217,7 @@
     pars$sd.x <- apply(X = x[cond, ],
                        MARGIN = 2,
                        FUN = stats::sd, na.rm = TRUE)
-    if (!is.null(y) && family == "gaussian") {
+    if (!is.null(y) && identical(family, "gaussian")) {
       pars$mu.y <- mean(y, na.rm = TRUE)
       pars$sd.y <- stats::sd(y, na.rm = TRUE)
     } else if (!is.null(y)) {
@@ -228,7 +228,7 @@
   # --- standardise variables ---
   x_scaled <- t((t(x) - pars$mu.x) / pars$sd.x)
   x_scaled[, pars$sd.x == 0] <- 0
-  if (!is.null(y) && family == "gaussian") {
+  if (!is.null(y) && identical(family, "gaussian")) {
     y_scaled <- (y - pars$mu.y) / pars$sd.y
   } else if (!is.null(y)) {
     y_scaled <- y
@@ -274,20 +274,20 @@
 #'                            FUN = function(x) stats::rnorm(n = n, sd = x)))
 #' beta <- stats::rnorm(n = p)
 #' eta <- as.matrix(x) %*% beta
-#' if (family == "gaussian") {
+#' if (identical(family, "gaussian")) {
 #'   y <- stats::rnorm(n = n, mean = eta)
-#' } else if (family == "binomial") {
+#' } else if (identical(family, "binomial")) {
 #'   y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
-#' } else if (family == "poisson") {
+#' } else if (identical(family, "poisson")) {
 #'   y <- stats::rpois(n = n, lambda = exp(eta))
-#' } else if (family == "cox") {
+#' } else if (identical(family, "cox")) {
 #'   time <- stats::rexp(n = n, rate = exp(eta))
 #'   status <- stats::rbinom(n = n, prob = 0.5, size = 1)
 #'   y <- survival::Surv(time = time, event = status)
 #' }
 #'
 #' # regression without standardisation
-#' if (family == "cox") {
+#' if (identical(family, "cox")) {
 #'   lm1 <- survival::coxph(y[fold == 0]~., data=x[fold == 0, ])
 #' } else {
 #'   lm1 <- stats::glm(y[fold == 0]~., data=x[fold == 0, ], family=family)
@@ -299,7 +299,7 @@
 #' scale <- .forescale(x = as.matrix(x)[fold == 0, ],
 #'                    y = y[fold == 0],
 #'                    family = family)
-#' if (family == "cox") {
+#' if (identical(family, "cox")) {
 #'   lm2 <- survival::coxph(scale$y~., data = data.frame(scale$x))
 #' } else {
 #'   lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
@@ -337,18 +337,18 @@
   .check(x = pars$sd.y, type = "numeric", min = 0)
   dim <- rep(x = Inf, times = 1 + is.matrix(y))
   .check(x = y, type = "numeric", dim = dim)
-  dim <- length(pars$mu.x) + (pars$family != "cox")
+  dim <- length(pars$mu.x) + !identical(pars$family, "cox")
   .check(x = coef, type = "numeric", dim = dim)
   # --- transform target ---
   list <- list()
-  if (!is.null(y) && pars$family == "gaussian") {
+  if (!is.null(y) && identical(pars$family, "gaussian")) {
     list$y_original <- pars$mu.y + pars$sd.y * y
   } else if (!is.null(y)) {
     list$y_original <- y
   }
   # --- transform coefficients ---
   if (!is.null(coef)) {
-    if (pars$family == "cox") {
+    if (identical(pars$family, "cox")) {
       alpha <- NULL
       beta <- coef * ifelse(test = pars$sd.x == 0,
                             yes = 0,
@@ -413,13 +413,13 @@
   .check(x = y, type = "numeric", dim = Inf)
   support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
   .check(x = family, type = "nominal", support = support)
-  #if(family == "cox" && !inherits(y, "Surv")){
+  #if(identical(family, "cox") && !inherits(y, "Surv")){
   #  stop("Require object of class 'Surv'.")
   #}
   .check(x = nfolds, type = "integer", min = 2, max = length(y))
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
-    if (family == "cox") {
+    if (identical(family, "cox")) {
       y <- y[, "status"]
     }
     foldid <- rep(x = NA, times = length(y))
@@ -461,9 +461,9 @@
   # --- transform target ---
   if (family %in% c("gaussian", "cox")) {
     x
-  } else if (family == "binomial") {
+  } else if (identical(family, "binomial")) {
     1 / (1 + exp(-x))
-  } else if (family == "poisson") {
+  } else if (identical(family, "poisson")) {
     exp(x)
   } else {
     stop("Family not implemented.")
@@ -508,10 +508,10 @@
   # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")
   .check(x = family, type = "nominal", support = support)
-  if (family == "binomial") {
+  if (identical(family, "binomial")) {
     .check(x = y, type = "integer", dim = Inf, min = 0, max = 1)
     .check(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
-  } else if (family == "poisson") {
+  } else if (identical(family, "poisson")) {
     .check(x = y, type = "integer", dim = Inf, min = 0)
     .check(x = y_hat, type = "numeric", dim = length(y), min = 0)
   } else {
@@ -520,15 +520,15 @@
   }
   # --- calculate deviance ---
   eps <- 1e-06
-  if (family == "gaussian") {
+  if (identical(family, "gaussian")) {
     mean((y - y_hat)^2)
-  } else if (family == "binomial") {
+  } else if (identical(family, "binomial")) {
     mean(
       -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
     )
-  } else if (family == "poisson") {
+  } else if (identical(family, "poisson")) {
     mean(2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
-  } else if (family == "cox") {
+  } else if (identical(family, "cox")) {
     glmnet::coxnet.deviance(pred = y_hat, y = y)
   } else {
     stop()
@@ -639,11 +639,11 @@
 #'         stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 #' eta <- x %*% beta
 #' family <- "gaussian"
-#' if (family == "gaussian") {
+#' if (identical(family, "gaussian")) {
 #'   y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
-#' } else if (family == "binomial") {
+#' } else if (identical(family, "binomial")) {
 #'   y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
-#' } else if (family == "cox") {
+#' } else if (identical(family, "cox")) {
 #'   time <- stats::rexp(n = n, rate = exp(eta))
 #'   status <- stats::rbinom(n = n, prob = 0.5, size = 1)
 #'   y <- survival::Surv(time = time, event = status)
@@ -669,16 +669,16 @@
 #' sapply(coef, function(x) mean((beta-x[-1])^2))
 #'
 #' # predictive performance
-#' if (family == "gaussian") {
+#' if (identical(family, "gaussian")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
 #'     mean((x-y[!cond])^2))
-#' } else if (family == "binomial") {
+#' } else if (identical(family, "binomial")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
 #'     pROC::auc(response = y[!cond],
 #'               predictor = as.vector(x),
 #'               levels = c(0, 1),
 #'               direction = "<"))
-#' } else if (family == "cox") {
+#' } else if (identical(family, "cox")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
 #'     survival::concordance(y[!cond]~I(-x))$concordance)
 #' }
@@ -701,7 +701,7 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
   .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
   .check(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
   .validate(x = x, y = y, family = family)
-  if (family == "poisson") {
+  if (identical(family, "poisson")) {
     stop("Argument family='poisson' is not implemented.")
   }
   if (is.matrix(x) && ncol(x) != length(z)) {
@@ -718,9 +718,9 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
   }
   # --- initial regression ---
   scale <- .forescale(x = x, y = y, family = family)
-  model <- ifelse(family == "gaussian",
+  model <- ifelse(identical(family, "gaussian"),
                   yes = "linear",
-                  no = ifelse(family == "binomial",
+                  no = ifelse(identical(family, "binomial"),
                               yes = "logistic",
                               no = family))
   xx <- lapply(X = unique(z), FUN = function(i) scale$x[, z == i])
@@ -749,7 +749,7 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
   # --- refit ---
   xxt <- multiridge::SigmaFromBlocks(XXblocks = xxblocks,
                                      penalties = penalties)
-  if (family == "cox") {
+  if (identical(family, "cox")) {
     object <- multiridge::IWLSCoxridge(XXT = xxt,
                                        Y = scale$y)
   } else {
@@ -757,9 +757,9 @@ multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
                                     Y = scale$y,
                                     model = model)
   }
-  object$family <- ifelse(family == "linear",
+  object$family <- ifelse(identical(family, "linear"),
                           yes = "gaussian",
-                          no = ifelse(family == "logistic",
+                          no = ifelse(identical(family, "logistic"),
                                       yes = "binomial",
                                       no = family))
   object$penalties <- penalties
@@ -812,7 +812,7 @@ predict.multiridge <- function(object, newx, ...) {
   sigmanew <- multiridge::SigmaFromBlocks(XXblocks = xxblocks,
                                           penalties = object$penalties)
   eta <- drop(multiridge::predictIWLS(IWLSfit = object, Sigmanew = sigmanew))
-  if (object$family == "cox") {
+  if (identical(object$family, "cox")) {
     y_hat <- exp(eta)
   } else {
     y_hat <- .mean_function(x = eta, family = object$family)
@@ -852,7 +852,7 @@ coef.multiridge <- function(object, ...) {
   coef <- multiridge::betasout(object,
                                Xblocks = xblocks,
                                penalties = object$penalties)
-  #if (object$family == "cox" & is.null(coef[[1]])) {
+  #if (identical(object$family, "cox") & is.null(coef[[1]])) {
   #  coef[[1]] <- NA # was 0
   #}
   .backscale(pars = object$pars, coef = unlist(coef))$coef
@@ -906,7 +906,7 @@ coef.multiridge <- function(object, ...) {
   p <- ncol(x)
   if (all(is.na(alpha))) {
     coef <- rep(x = 1, times = p) # Remove this confusing option?
-  } else if (is.character(alpha) && alpha == "multiridge") {
+  } else if (is.character(alpha) && identical(alpha, "multiridge")) {
     if (is.null(lambda)) {
       model <- multiridge(x = x,
                           y = y,
@@ -1141,9 +1141,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   .check(x = lambda_init, type = "numeric", min = 0)
   .validate(x = x, y = y, family = family)
 
-  if (is.character(alpha_init) &&
-        alpha_init  == "multiridge" &&
-        family == "poisson") {
+  if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
     warning("Setting alpha_init=0 due to family='poisson'.")
     alpha_init <- 0
   }
@@ -1342,35 +1340,35 @@ predict.corila <- function(object, newx, index, s, ...) {
   #                      exp_local = 0,
   #                      exp_global = cand)
   #}
-  if (tune == "none") {
+  if (identical(tune, "none")) {
     hyper <- data.frame(wgt_local = 1,
                         exp_local = 1,
                         wgt_global = 0,
                         exp_global = Inf)
-  } else if (tune == "trial") {
+  } else if (identical(tune, "trial")) {
     wgt_cand <- seq(from = 0, to = 1, by = 0.1)
     hyper <- data.frame(wgt_local = wgt_cand,
                         exp_local = 0,
                         wgt_global = 1 - wgt_cand,
                         exp_global = 1)
-  } else if (tune == "wgt") {
+  } else if (identical(tune, "wgt")) {
     wgt_cand <- seq(from = 0, to = 1, by = 0.1) # for weighted sums
     hyper <- data.frame(wgt_local = wgt_cand,
                         exp_local = 1,
                         wgt_global = 1 - wgt_cand,
                         exp_global = 1)
-  } else if (tune == "exp") {
+  } else if (identical(tune, "exp")) {
     exp_cand <- c(0, 0.1, 0.25, 1 / 3, 0.5, 1, 2, 3, 4, 10, Inf)
     hyper <- data.frame(wgt_local = 1,
                         exp_local = exp_cand,
                         wgt_global = 0,
                         exp_global = exp_cand)
-  } else if (tune == "sep") {
+  } else if (identical(tune, "sep")) {
     exp_cand <- c(0.1, 0.5, 1, 2, 10)
     hyper <- expand.grid(exp_local = exp_cand,
                          exp_global = exp_cand)
     hyper$wgt_local <- hyper$wgt_global <- 0.5
-  } else if (tune == "both") {
+  } else if (identical(tune, "both")) {
     #wgt_cand <- seq(from = 0, to = 1, by = 0.25) # original
     wgt_cand <- seq(from = 0, to = 1, by = 0.1) # trial
     hyper <- data.frame(wgt_local = wgt_cand,
@@ -1379,7 +1377,7 @@ predict.corila <- function(object, newx, index, s, ...) {
     exp_cand <- c(0.1, 0.5, 0.8, 1, 1.25, 2, 10)
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
     hyper$exp_local <- hyper$exp_global <- exp_cand
-  } else if (tune == "all") {
+  } else if (identical(tune, "all")) {
     wgt_cand <- seq(from = 0, to = 1, by = 0.25)
     exp_cand <- c(0.1, 0.5, 1, 2, 10)
     hyper <- expand.grid(wgt_local = wgt_cand,
@@ -1457,11 +1455,11 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'         stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 #' eta <- x %*% beta
 #' family <- "gaussian"
-#' if (family == "gaussian") {
+#' if (identical(family, "gaussian")) {
 #'   y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
-#' } else if (family == "binomial") {
+#' } else if (identical(family, "binomial")) {
 #'   y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
-#' } else if (family == "cox") {
+#' } else if (identical(family, "cox")) {
 #'   time <- stats::rexp(n = n, rate = exp(eta))
 #'   status <- stats::rbinom(n = n, prob = 0.5, size = 1)
 #'   y <- survival::Surv(time = time, event = status)
@@ -1489,16 +1487,16 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' })
 #'
 #' # predictive performance
-#' if (family == "gaussian") {
+#' if (identical(family, "gaussian")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
 #'     mean((x-y[!cond])^2))
-#' } else if (family == "binomial") {
+#' } else if (identical(family, "binomial")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
 #'     pROC::auc(response = y[!cond],
 #'               predictor = as.vector(x),
 #'               levels = c(0, 1),
 #'               direction = "<"))
-#' } else if (family == "cox") {
+#' } else if (identical(family, "cox")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
 #'     survival::concordance(y[!cond]~I(-x))$concordance)
 #' }
@@ -1684,7 +1682,7 @@ summary.cv.corila <- function(object, ...) {
       stop()
     }
   } else {
-    if (x == "multiridge") {
+    if (identical(x, "multiridge")) {
       "multi-penalty ridge regression"
     } else if (x %in% c("pearson", "spearman", "kendall")) {
       paste0(toupper(substr(x = x, start = 1, stop = 1)),
@@ -1700,7 +1698,7 @@ summary.cv.corila <- function(object, ...) {
 #' @export
 print.summary.cv.corila <- function(x, ...) {
   cat("--- object of class", dQuote("cv.corila"), "---", "\n")
-  if (x$family == "cox") {
+  if (identical(x$family, "cox")) {
     cat("Cox proportional hazards model", "\n")
   } else {
     cat("generalised linear model with", x$family, "family", "\n")
@@ -1829,7 +1827,7 @@ expand_auxiliary <- function(x, include) {
 #' @export
 predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   # --- check arguments ---
-  if (s == "lambda.min") {
+  if (identical(s, "lambda.min")) {
     s <- object$lambda.min
   } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
     stop("Set s='lambda.min' or provide non-negative value.")
@@ -1919,7 +1917,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #'
 #' @export
 coef.cv.corila <- function(object, s = "lambda.min", ...) {
-  if (s == "lambda.min") {
+  if (identical(s, "lambda.min")) {
     s <- object$lambda.min
   } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
     stop("Set s='lambda.min' or provide numeric value.")
@@ -1927,7 +1925,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef_stand <- as.numeric(
     stats::coef(object = object$model[[object$id_hyper]], s = s)
   )
-  if (object$scale$family == "cox") {
+  if (identical(object$scale$family, "cox")) {
     alpha <- NULL
     beta <- coef_stand
   } else {
@@ -2115,22 +2113,22 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 
   #- - - target vector - - -
   eta <- scale(x %*% as.vector(beta)) # was without scale
-  if (family == "gaussian") {
+  if (identical(family, "gaussian")) {
     y <- eta + noise_factor * stats::rnorm(n = n, sd = stats::sd(eta))
     # NB: decrease/increase noise?
     if (stats::sd(y) == 0) {
       warning("Replacing constant y by random noise.")
       y <- stats::rnorm(n = n)
     }
-  } else if (family == "binomial") {
+  } else if (identical(family, "binomial")) {
     y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-2 * eta)))
     # NB: was without 2*
-  } else if (family == "cox") {
+  } else if (identical(family, "cox")) {
     time <- stats::rexp(n = n, rate = exp(eta))
     status <- stats::rbinom(n = n, prob = 0.5, size = 1)
     #y <- cbind(time = time, status = status)
     y <- survival::Surv(time = time, event = status)
-  } else if (family == "poisson") {
+  } else if (identical(family, "poisson")) {
     y <- stats::rpois(n = n, lambda = exp(eta))
   } else {
     stop(paste("Family", family, "not implemented."))
