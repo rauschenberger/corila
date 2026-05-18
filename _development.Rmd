@@ -40,17 +40,21 @@ checkglobals::checkglobals(pkg=".")
 
 pkgdown::check_pkgdown()
 lintr::lint_package()
-cyclocomp::cyclocomp_package_dir()
+x <- cyclocomp::cyclocomp_package_dir()
 
 #devtools::build()
 #devtools::submit_cran()
 #pkgdown::build_site()
 
 # checks for rOpenSci
-goodpractice::gp()
-pkgcheck::pkgcheck()
+
+checks <- setdiff(goodpractice::all_checks(), c("covr", "cyclocomp"))
+checks <- checks[!grepl(pattern="rcmdcheck_", x = checks)]
+x <- goodpractice::gp(checks = checks)
+
+pkgcheck::pkgcheck(goodpractice=FALSE)
 notes <- autotest::autotest_package(exclude=c(".backscale",".forescale",".folds"),test=TRUE)
-notes <- autotest::autotest_package(functions=".backscale",test=TRUE)
+notes <- autotest::autotest_package(test=TRUE)
 srr::srr_stats_roxygen(category = c("ml", "regression"))
 ```
 
