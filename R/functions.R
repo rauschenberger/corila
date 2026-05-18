@@ -1842,6 +1842,48 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 }
 
 #' @title
+#' Combine coefficients
+#'
+#' @description
+#' Combine estimated coefficients for positive effects
+#' and estimated coefficients for negative effects.
+#'
+#' @param alpha
+#' estimated intercept:
+#' scalar
+#'
+#' @param beta
+#' estimated slopes:
+#' numeric vector of length \eqn{2 * p} with non-negative entries,
+#' namely of \eqn{p} estimated coefficients for positive effects
+#' and \eqn{p} estimated coefficients for negative effects
+#'
+#' @return
+#' numeric vector of length \eqn{1 + p}
+#'
+#' @examples
+#' p <- 10
+#' alpha <- rnorm(1)
+#' temp <- rnorm(p)
+#' beta <- pmax(c(temp, -temp), 0)
+#' .combine(alpha = alpha, beta = beta)
+#'
+#' @export
+#'
+.combine <- function(alpha, beta) {
+  .check(x = alpha, type = "numeric")
+  .check(x = beta, type = "numeric", dim = Inf, min = 0)
+  beta_positive <- beta[1:(length(beta) / 2)]
+  beta_negative <- beta[(length(beta) / 2 + 1):(length(beta))]
+  eps <- 1e-06
+  if ( any(beta_positive > eps & beta_negative > eps)) {
+    stop("The coefficient for a predictor cannot be positive and negative.")
+  }
+  beta_combined <- beta_positive  - beta_negative
+  c(alpha, beta_combined)
+}
+
+#' @title
 #' Extract coefficients
 #'
 #' @description
@@ -1871,7 +1913,9 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
     stop("Set s='lambda.min' or provide numeric value.")
   }
-  coef_stand <- stats::coef(object = object$model[[object$id_hyper]], s = s)
+  coef_stand <- as.numeric(
+    stats::coef(object = object$model[[object$id_hyper]], s = s)
+  )
   if (object$scale$family == "cox") {
     alpha <- NULL
     beta <- coef_stand
@@ -1879,20 +1923,13 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
     alpha <- coef_stand[1]
     beta <- coef_stand[-1]
   }
-  if (any(beta < 0)) {
-    stop("negative values")
-  }
-  beta_positive <- beta[1:(length(beta) / 2)]
-  beta_negative <- beta[(length(beta) / 2 + 1):(length(beta))]
-  beta_combined <- beta_positive  - beta_negative
-  coef <- c(alpha, beta_combined)
+  coef <- .combine(alpha = alpha, beta = beta)
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   if (any(coef[c(FALSE[object$scale$family != "cox"],
                  !object$args$include == 1)] != 0)) {
     stop("Excluded coefs must equal zero.")
   }
-  coef <- coef[c(TRUE[object$scale$family != "cox"], object$args$include == 1)]
-  coef
+  coef[c(TRUE[object$scale$family != "cox"], object$args$include == 1)]
 }
 
 #----- simulation -----
