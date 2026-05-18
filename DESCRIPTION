@@ -33,4 +33,4 @@ URL: https://github.com/rauschenberger/corila, https://rauschenberger.github.io/
 BugReports: https://github.com/rauschenberger/corila/issues
 License: GPL-3
 Config/roxygen2/version: 8.0.0
-Roxygen:list (markdown = TRUE, roclets = c ("namespace", "rd", "srr::srr_stats_roclet"))
+Roxygen: list(markdown = TRUE, roclets = c ("namespace", "rd", "srr::srr_stats_roclet"))
