@@ -3,6 +3,19 @@
 
 set.seed(1)
 
+# function .combine
+
+alpha <- stats::rnorm(1)
+temp <- stats::rnorm(10)
+beta <- pmax(c(temp, -temp), 0)
+coef <- .combine(alpha = alpha, beta = beta)
+testthat::test_that("intercept does not change", {
+  testthat::expect_identical(object = coef[1], expected = alpha)
+})
+testthat::test_that("slopes do not change", {
+  testthat::expect_identical(object = coef[-1], expected = temp)
+})
+
 
 # function .deviance
 
