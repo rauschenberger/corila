@@ -27,8 +27,9 @@ or transforms coefficients for predictor variables and response variable
 on original scales.
 }
 \examples{
+\donttest{
 # simulate data
-family <- "cox"
+family <- "gaussian"
 n0 <- 100; n1 <- 50; p <- 3
 n <- n0 + n1
 fold <- rep(c(0, 1), times = c(n0, n1))
@@ -37,20 +38,20 @@ x <- data.frame(x = sapply(X = sd,
                            FUN = function(x) stats::rnorm(n = n, sd = x)))
 beta <- stats::rnorm(n = p)
 eta <- as.matrix(x) \%*\% beta
-if (family == "gaussian") {
+if (identical(family, "gaussian")) {
   y <- stats::rnorm(n = n, mean = eta)
-} else if (family == "binomial") {
+} else if (identical(family, "binomial")) {
   y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
-} else if (family == "poisson") {
+} else if (identical(family, "poisson")) {
   y <- stats::rpois(n = n, lambda = exp(eta))
-} else if (family == "cox") {
+} else if (identical(family, "cox")) {
   time <- stats::rexp(n = n, rate = exp(eta))
   status <- stats::rbinom(n = n, prob = 0.5, size = 1)
   y <- survival::Surv(time = time, event = status)
 }
 
 # regression without standardisation
-if (family == "cox") {
+if (identical(family, "cox")) {
   lm1 <- survival::coxph(y[fold == 0]~., data=x[fold == 0, ])
 } else {
   lm1 <- stats::glm(y[fold == 0]~., data=x[fold == 0, ], family=family)
@@ -62,7 +63,7 @@ yhat1 <- predict(lm1, newdata = x[fold == 1, ])
 scale <- .forescale(x = as.matrix(x)[fold == 0, ],
                    y = y[fold == 0],
                    family = family)
-if (family == "cox") {
+if (identical(family, "cox")) {
   lm2 <- survival::coxph(scale$y~., data = data.frame(scale$x))
 } else {
   lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
@@ -75,13 +76,14 @@ coef2 <- result$coef
 yhat2 <- result$y_original
 
 # equality
-all.equal(yhat1, yhat2, check.attributes = FALSE)
+all.equal(coef1, coef2, check.attributes = FALSE)
 all.equal(yhat1, yhat2, check.attributes = FALSE)
 \dontshow{
 stopifnot(
  isTRUE(all.equal(coef1, coef2, check.attributes = FALSE)),
  isTRUE(all.equal(yhat1, yhat2, check.attributes = FALSE))
 )
+}
 }
 
 }

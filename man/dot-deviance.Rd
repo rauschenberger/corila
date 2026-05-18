@@ -19,15 +19,19 @@ numeric vector of length \code{n}}
 Calculate the deviance
 }
 \examples{
-# move these examples to unit tests (adding cox):
-y <- rnorm(10)
-.deviance(y = y , y_hat = y, family = "gaussian")
+n <- 10
 
-y <- rbinom(n = 10, size = 1, prob = 0.5)
-.deviance(y = y , y_hat = y, family = "binomial")
+y <- rnorm(n)
+y_hat <- rnorm(n)
+.deviance(y = y , y_hat = y_hat, family = "gaussian")
 
-y <- rpois(n = 10, lambda = 4)
-.deviance(y = y , y_hat = y, family = "poisson")
+y <- rbinom(n = n, size = 1, prob = 0.5)
+y_hat <- runif(n)
+.deviance(y = y , y_hat = y_hat, family = "binomial")
+
+y <- rpois(n = n, lambda = 4)
+y_hat <- rexp(n)
+.deviance(y = y , y_hat = y_hat, family = "poisson")
 
 }
 \keyword{internal}

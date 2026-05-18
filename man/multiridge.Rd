@@ -4,7 +4,15 @@
 \alias{multiridge}
 \title{Multi-Penalty Ridge Regression}
 \usage{
-multiridge(x, y, z, family, foldid = NULL, nfolds = 10, penalties = NULL)
+multiridge(
+  x,
+  y,
+  z,
+  family = "gaussian",
+  foldid = NULL,
+  nfolds = 10,
+  penalties = NULL
+)
 }
 \arguments{
 \item{x}{predictors:
@@ -74,6 +82,13 @@ The number of variables in the \eqn{k^{\text{th}}} group
 is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 }
 \examples{
+# minimal example
+n <- 50; p <- 20; q <- 5
+x <- matrix(rnorm(n * p), nrow = n , ncol = p)
+y <- rnorm(n)
+z <- rep(seq_len(q), length.out = p)
+multiridge(x = x, y = y, z = z)
+
 \donttest{
 # simulation
 set.seed(1)
@@ -87,11 +102,11 @@ beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
         stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 eta <- x \%*\% beta
 family <- "gaussian"
-if (family == "gaussian") {
+if (identical(family, "gaussian")) {
   y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
-} else if (family == "binomial") {
+} else if (identical(family, "binomial")) {
   y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
-} else if (family == "cox") {
+} else if (identical(family, "cox")) {
   time <- stats::rexp(n = n, rate = exp(eta))
   status <- stats::rbinom(n = n, prob = 0.5, size = 1)
   y <- survival::Surv(time = time, event = status)
@@ -117,16 +132,16 @@ sapply(coef, function(x) stats::cor(beta, x[-1]))
 sapply(coef, function(x) mean((beta-x[-1])^2))
 
 # predictive performance
-if (family == "gaussian") {
+if (identical(family, "gaussian")) {
   metric <- sapply(X = y_hat, FUN = function(x)
     mean((x-y[!cond])^2))
-} else if (family == "binomial") {
+} else if (identical(family, "binomial")) {
   metric <- sapply(X = y_hat, FUN = function(x)
     pROC::auc(response = y[!cond],
               predictor = as.vector(x),
               levels = c(0, 1),
               direction = "<"))
-} else if (family == "cox") {
+} else if (identical(family, "cox")) {
   metric <- sapply(X = y_hat, FUN = function(x)
     survival::concordance(y[!cond]~I(-x))$concordance)
 }

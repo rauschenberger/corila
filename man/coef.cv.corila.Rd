@@ -22,6 +22,14 @@ and the other \eqn{p} entries are the estimated slopes.
 Extracts coefficients from an object of class \code{"cv.corila"}.
 }
 \examples{
+# minimal example
+n <- 50; p <- 20; q <- 5
+x <- matrix(rnorm(n * p), nrow = n , ncol = p)
+y <- rnorm(n)
+group <- rep(seq_len(q), length.out = p)
+include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+cv.corila(x = x, y = y, group = group, include = include)
+
 \donttest{
 # simulation
 set.seed(1)
@@ -35,11 +43,11 @@ beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
         stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 eta <- x \%*\% beta
 family <- "gaussian"
-if (family == "gaussian") {
+if (identical(family, "gaussian")) {
   y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
-} else if (family == "binomial") {
+} else if (identical(family, "binomial")) {
   y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
-} else if (family == "cox") {
+} else if (identical(family, "cox")) {
   time <- stats::rexp(n = n, rate = exp(eta))
   status <- stats::rbinom(n = n, prob = 0.5, size = 1)
   y <- survival::Surv(time = time, event = status)
@@ -67,16 +75,16 @@ sapply(coef, function(x) {
 })
 
 # predictive performance
-if (family == "gaussian") {
+if (identical(family, "gaussian")) {
   metric <- sapply(X = y_hat, FUN = function(x)
     mean((x-y[!cond])^2))
-} else if (family == "binomial") {
+} else if (identical(family, "binomial")) {
   metric <- sapply(X = y_hat, FUN = function(x)
     pROC::auc(response = y[!cond],
               predictor = as.vector(x),
               levels = c(0, 1),
               direction = "<"))
-} else if (family == "cox") {
+} else if (identical(family, "cox")) {
   metric <- sapply(X = y_hat, FUN = function(x)
     survival::concordance(y[!cond]~I(-x))$concordance)
 }
