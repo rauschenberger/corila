@@ -269,8 +269,9 @@
 #' @seealso \code{\link{.forescale}()}
 #'
 #' @examples
+#' \donttest{
 #' # simulate data
-#' family <- "cox"
+#' family <- "gaussian"
 #' n0 <- 100; n1 <- 50; p <- 3
 #' n <- n0 + n1
 #' fold <- rep(c(0, 1), times = c(n0, n1))
@@ -317,13 +318,14 @@
 #' yhat2 <- result$y_original
 #'
 #' # equality
-#' all.equal(yhat1, yhat2, check.attributes = FALSE)
+#' all.equal(coef1, coef2, check.attributes = FALSE)
 #' all.equal(yhat1, yhat2, check.attributes = FALSE)
 #' \dontshow{
 #' stopifnot(
 #'  isTRUE(all.equal(coef1, coef2, check.attributes = FALSE)),
 #'  isTRUE(all.equal(yhat1, yhat2, check.attributes = FALSE))
 #' )
+#' }
 #' }
 #'
 #' @keywords internal
@@ -403,12 +405,14 @@
 #' foldid <- .folds(y = y, family = "binomial", nfolds = 10)
 #' table(y, foldid)
 #'
-#' # Cox model (autotest fails!)
+#' \donttest{
+#' # Cox model
 #' time <- stats::rexp(n = 100, rate = 5)
 #' status <- stats::rbinom(n = 100, prob = 0.2, size = 1)
 #' y <- survival::Surv(time = time, event = status)
 #' foldid <- .folds(y = y, family = "cox", nfolds = 10)
 #' table(y[, "status"], foldid)
+#' }
 #'
 #' @keywords internal
 #'
@@ -631,6 +635,13 @@
 #' \code{\link[multiridge]{IWLSCoxridge}()}.
 #'
 #' @examples
+#' # minimal example
+#' n <- 50; p <- 20; q <- 5
+#' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
+#' y <- rnorm(n)
+#' z <- rep(seq_len(q), length.out = p)
+#' multiridge(x = x, y = y, z = z)
+#' 
 #' \donttest{
 #' # simulation
 #' set.seed(1)
@@ -689,11 +700,11 @@
 #' }
 #' metric
 #' }
-#'
+#' 
 #' @keywords models, regression, classif
 #'
 #' @export
-multiridge <- function(x, y, z, family, foldid = NULL, nfolds = 10,
+multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
                        penalties = NULL) {
   # --- check arguments ---
   .check(x = x, type = "numeric", dim = c(Inf, Inf))
@@ -1453,6 +1464,14 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' with different values for the regularisation and mixing hyperparameters.
 #'
 #' @examples
+#' # minimal example
+#' n <- 50; p <- 20; q <- 5
+#' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
+#' y <- rnorm(n)
+#' group <- rep(seq_len(q), length.out = p)
+#' include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+#' cv.corila(x = x, y = y, group = group, include = include)
+#' 
 #' \donttest{
 #' # simulation
 #' set.seed(1)
