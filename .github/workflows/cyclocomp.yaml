@@ -3,7 +3,7 @@ name: cyclocomp
 on: [push, pull_request]
 
 jobs:
-  extra-checks:
+  cyclocomp:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
