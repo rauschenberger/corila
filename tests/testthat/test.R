@@ -3,6 +3,22 @@
 
 set.seed(1)
 
+# function expand_auxiliary
+
+n <- 5
+p <- 10
+x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
+include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+x_primary <- x[,include]
+x_expanded <- expand_auxiliary(x = x_primary, include = include)
+testthat::test_that("primary predictors are equal", {
+  testthat::expect_identical(object = x_expanded[, include],
+                             expected = x[, include])
+})
+testthat::test_that("auxiliary features are zero", {
+  testthat::expect_true(all(x_expanded[, !include]==0))
+})
+
 # function .combine
 
 alpha <- stats::rnorm(1)

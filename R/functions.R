@@ -1809,8 +1809,8 @@ plot.cv.corila <- function(x, ...) {
 #' include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 #' x_primary <- x[,include]
 #' x_expanded <- expand_auxiliary(x = x_primary, include = include)
-#' all(x_expanded[, include] == x[, include]) # move to unit tests
-#' all(x_expanded[, !include] == 0) # move to unit tests
+#' all(x_expanded[, include] == x[, include])
+#' all(x_expanded[, !include] == 0)
 #'
 #' @export
 #'
