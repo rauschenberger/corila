@@ -3,6 +3,24 @@
 
 set.seed(1)
 
+# function type
+
+expect <- list("ridge" = 0,
+            "lasso" = 1,
+            "elastic" = 0.5,
+            "none" = NA,
+            "pearson" = "pearson",
+            "spearman" = "spearman",
+            "kendall" = "kendall",
+            "multi-penalty" = "multiridge")
+testthat::test_that("initial coefficients are named correctly", {
+  for(i in seq_along(expect)) {
+    object <- tolower(strsplit(x=.type(x = expect[[i]]), split=" ")[[1]])
+    testthat::expect_contains(object = object,
+                              expected = names(expect)[i])
+  }
+})
+
 # function expand_auxiliary
 
 n <- 5

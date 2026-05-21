@@ -1708,10 +1708,10 @@ summary.cv.corila <- function(object, ...) {
 }
 
 .type <- function(x) {
-  if (is.numeric(x)) {
-    if (is.na(x)) {
+  if (is.na(x)) {
       "none"
-    } else if (x == 0) {
+  } else if (is.numeric(x)) {
+    if (x == 0) {
       "ridge regression"
     } else if (x == 1) {
       "lasso regression"
@@ -1727,7 +1727,7 @@ summary.cv.corila <- function(object, ...) {
     } else if (x %in% c("pearson", "spearman", "kendall")) {
       paste0(toupper(substr(x = x, start = 1, stop = 1)),
              tolower(substr(x = x, start = 2, stop = nchar(x))),
-             "correlation")
+             " correlation")
     } else {
       x
     }
