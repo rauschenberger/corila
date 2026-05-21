@@ -3,7 +3,20 @@
 
 set.seed(1)
 
-# function type
+# function .forescale
+
+n <- 5
+p <- 10
+testthat::test_that("",{
+  x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
+  y <- stats::rnorm(n)
+  scale <- .forescale(x = x, y = y, family = "gaussian", pars = NULL)
+  y_back <- .backscale(pars = scale$pars, y = scale$y)
+  testthat::expect_equal(object = y_back$y_original, expected = y)
+  # CONTINUE HERE: add tests for other families (i.e., forescale has no effect) and for coefficients (i.e., no effect if x is already standardised).
+})
+
+# function .type
 
 expect <- list("ridge" = 0,
             "lasso" = 1,
