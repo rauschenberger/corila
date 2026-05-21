@@ -81,6 +81,33 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   })
 }
 
+# function .set_candidates
+
+for(tune in c("none", "trial", "wgt", "exp", "sep", "both", "all")) {
+  hyper <- .set_candidates(tune = "both")
+  testthat::test_that("candidate values",{
+    labels <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
+    testthat::expect_equal(object = names(hyper), expected = labels)
+    testthat::expect_gte(object = min(hyper), expected = 0)
+    testthat::expect_identical(object = hyper, expected = unique(hyper))
+    testthat::expect_identical(object = rownames(hyper),
+                               expected = as.character(seq_len(nrow(hyper))))
+  })
+}
+
+# function .mean_function
+testthat::test_that("mean function works",{
+  n <- 10
+  eta <- stats::rnorm(n = n)
+  for(family in c("gaussian", "binomial", "poisson", "cox")) {
+    mean <- .mean_function(x = eta, family = family)
+    testthat::expect_length(object = mean, n = n)
+  }
+  # CONTINUE HERE
+})
+
+
+
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #----- functions ".forescale" and ".backscale" -----

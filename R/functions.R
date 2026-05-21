@@ -1394,7 +1394,9 @@ predict.corila <- function(object, newx, index, s, ...) {
     #wgt_cand <- seq(from = 0, to = 1, by = 0.25) # original
     wgt_cand <- seq(from = 0, to = 1, by = 0.1) # trial
     hyper <- data.frame(wgt_local = wgt_cand,
-                        wgt_global = 1 - wgt_cand)
+                        exp_local = NA,
+                        wgt_global = 1 - wgt_cand,
+                        exp_global = NA)
     #exp_cand <- c(0.1, 0.5, 1, 2, 10) # original
     exp_cand <- c(0.1, 0.5, 0.8, 1, 1.25, 2, 10)
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
