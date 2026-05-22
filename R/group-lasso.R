@@ -1,9 +1,5 @@
 # This file contains the functions of the R package "corila".
 
-
-
-
-
 #----- group-lasso -----
 
 #' @title Initial coefficients
@@ -517,9 +513,10 @@ predict.corila <- function(object, newx, index, s, ...) {
                         exp_global = exp_cand)
   } else if (identical(tune, "sep")) {
     exp_cand <- c(0.1, 0.5, 1, 2, 10)
-    hyper <- expand.grid(exp_local = exp_cand,
+    hyper <- expand.grid(wgt_local = 0.5,
+                         exp_local = exp_cand,
+                         wgt_global = 0.5,
                          exp_global = exp_cand)
-    hyper$wgt_local <- hyper$wgt_global <- 0.5
   } else if (identical(tune, "both")) {
     #wgt_cand <- seq(from = 0, to = 1, by = 0.25) # original
     wgt_cand <- seq(from = 0, to = 1, by = 0.1) # trial
@@ -536,6 +533,7 @@ predict.corila <- function(object, newx, index, s, ...) {
     exp_cand <- c(0.1, 0.5, 1, 2, 10)
     hyper <- expand.grid(wgt_local = wgt_cand,
                          exp_local = exp_cand,
+                         wgt_global = NA,
                          exp_global = exp_cand)
     hyper$wgt_global <- 1 - hyper$wgt_local
     hyper$exp_local[hyper$wgt_local == 0] <- Inf

@@ -117,7 +117,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 # function .set_candidates
 
 for (tune in c("none", "trial", "wgt", "exp", "sep", "both", "all")) {
-  hyper <- .set_candidates(tune = "both")
+  hyper <- .set_candidates(tune = tune)
   testthat::test_that("candidate values", {
     labels <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
     testthat::expect_equal(object = names(hyper), expected = labels)
