@@ -52,12 +52,12 @@ testthat::test_that("auxiliary features are zero", {
   testthat::expect_true(all(x_expanded[, !include] == 0))
 })
 
-# function .combine
+# function .combine_slopes
 
 alpha <- stats::rnorm(1)
 temp <- stats::rnorm(10)
 beta <- pmax(c(temp, -temp), 0)
-coef <- .combine(alpha = alpha, beta = beta)
+coef <- .combine_slopes(alpha = alpha, beta = beta)
 testthat::test_that("intercept does not change", {
   testthat::expect_identical(object = coef[1], expected = alpha)
 })
