@@ -1709,7 +1709,7 @@ summary.cv.corila <- function(object, ...) {
 
 .type <- function(x) {
   if (is.na(x)) {
-      "none"
+    "none"
   } else if (is.numeric(x)) {
     if (x == 0) {
       "ridge regression"

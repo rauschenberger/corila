@@ -7,28 +7,30 @@ set.seed(1)
 
 n <- 5
 p <- 10
-testthat::test_that("",{
+testthat::test_that("", {
   x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
   y <- stats::rnorm(n)
   scale <- .forescale(x = x, y = y, family = "gaussian", pars = NULL)
   y_back <- .backscale(pars = scale$pars, y = scale$y)
   testthat::expect_equal(object = y_back$y_original, expected = y)
-  # CONTINUE HERE: add tests for other families (i.e., forescale has no effect) and for coefficients (i.e., no effect if x is already standardised).
+  # CONTINUE HERE:
+  # add tests for other families (i.e., forescale has no effect)
+  # and for coefficients (i.e., no effect if x is already standardised).
 })
 
 # function .type
 
 expect <- list("ridge" = 0,
-            "lasso" = 1,
-            "elastic" = 0.5,
-            "none" = NA,
-            "pearson" = "pearson",
-            "spearman" = "spearman",
-            "kendall" = "kendall",
-            "multi-penalty" = "multiridge")
+               "lasso" = 1,
+               "elastic" = 0.5,
+               "none" = NA,
+               "pearson" = "pearson",
+               "spearman" = "spearman",
+               "kendall" = "kendall",
+               "multi-penalty" = "multiridge")
 testthat::test_that("initial coefficients are named correctly", {
-  for(i in seq_along(expect)) {
-    object <- tolower(strsplit(x=.type(x = expect[[i]]), split=" ")[[1]])
+  for (i in seq_along(expect)) {
+    object <- tolower(strsplit(x = .type(x = expect[[i]]), split = " ")[[1]])
     testthat::expect_contains(object = object,
                               expected = names(expect)[i])
   }
@@ -40,14 +42,14 @@ n <- 5
 p <- 10
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-x_primary <- x[,include]
+x_primary <- x[, include]
 x_expanded <- expand_auxiliary(x = x_primary, include = include)
 testthat::test_that("primary predictors are equal", {
   testthat::expect_identical(object = x_expanded[, include],
                              expected = x[, include])
 })
 testthat::test_that("auxiliary features are zero", {
-  testthat::expect_true(all(x_expanded[, !include]==0))
+  testthat::expect_true(all(x_expanded[, !include] == 0))
 })
 
 # function .combine
@@ -114,9 +116,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 # function .set_candidates
 
-for(tune in c("none", "trial", "wgt", "exp", "sep", "both", "all")) {
+for (tune in c("none", "trial", "wgt", "exp", "sep", "both", "all")) {
   hyper <- .set_candidates(tune = "both")
-  testthat::test_that("candidate values",{
+  testthat::test_that("candidate values", {
     labels <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
     testthat::expect_equal(object = names(hyper), expected = labels)
     testthat::expect_gte(object = min(hyper), expected = 0)
@@ -127,10 +129,10 @@ for(tune in c("none", "trial", "wgt", "exp", "sep", "both", "all")) {
 }
 
 # function .mean_function
-testthat::test_that("mean function works",{
+testthat::test_that("mean function works", {
   n <- 10
   eta <- stats::rnorm(n = n)
-  for(family in c("gaussian", "binomial", "poisson", "cox")) {
+  for (family in c("gaussian", "binomial", "poisson", "cox")) {
     mean <- .mean_function(x = eta, family = family)
     testthat::expect_length(object = mean, n = n)
   }
