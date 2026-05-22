@@ -91,7 +91,7 @@
       coef <- stats::coef(object = model, s = lambda)[cond]
     }
   } else {
-    stop("Invalid value for agrument 'alpha'.")
+    stop("Invalid value for argument 'alpha'.")
   }
   list(coef = drop(coef), lambda = lambda)
 }
