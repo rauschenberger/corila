@@ -539,7 +539,7 @@ predict.corila <- function(object, newx, index, s, ...) {
     hyper$exp_local[hyper$wgt_local == 0] <- Inf
     hyper$exp_global[hyper$wgt_global == 0] <- Inf
   } else {
-    stop()
+    stop("Invalid value for argument 'tune'.")
   }
   hyper <- unique(hyper)
   rownames(hyper) <- seq_len(nrow(hyper))
