@@ -9,6 +9,8 @@
 
 # Sparse group lasso
 
+## Scope
+
 The R package `corila` (under development) implements the sparse group lasso. 
 
 ##  Installation
@@ -21,6 +23,17 @@ remotes::install_github("rauschenberger/corila")
 ```
 
 This private repository is on a personal GitHub account, but it has private pull mirrors on two institutional GitLab instances (see [LIH](https://git.lih.lu/arauschenberger/corila) and [LCSB](https://gitlab.com/uniluxembourg/Personalfolders/armin.rauschenberger/corila)). 
+
+## Usage
+
+Use the function `cv.corila` to model an outcome (`n`-dimensional vector _y_) based on many predictors (`n x p` matrix _X_) that are structured by groups (e.g., `p`-dimensional integer vector `group`) and potentially split into primary and auxiliary predictors (`p`-dimensional vector `include`).
+
+``` r
+library(corila)
+object <- cv.corila(x = x_train, y = y_train, group = group, type = type)
+coef(object)
+predict(object, newx = x_test)
+```
 
 ## Reference
 
