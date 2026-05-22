@@ -857,7 +857,9 @@ summary.cv.corila <- function(object, ...) {
              tolower(substr(x = x, start = 2, stop = nchar(x))),
              " correlation")
     } else {
-      x
+      stop("If argument 'x' is of type 'character', ",
+           "it should equal ",
+           "'pearson', 'spearman', 'kendall', or 'multiridge'.")
     }
   }
 }

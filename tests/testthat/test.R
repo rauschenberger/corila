@@ -34,6 +34,9 @@ testthat::test_that("initial coefficients are named correctly", {
     testthat::expect_contains(object = object,
                               expected = names(expect)[i])
   }
+  testthat::expect_error(object = .type(x = -0.1))
+  testthat::expect_error(object = .type(x = 1.1))
+  testthat::expect_error(object = .type(x = "blabla"))
 })
 
 # function expand_auxiliary
