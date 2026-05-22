@@ -26,11 +26,11 @@ This private repository is on a personal GitHub account, but it has private pull
 
 ## Usage
 
-Use the function `cv.corila` to model an outcome (`n`-dimensional vector _y_) based on many predictors (`n x p` matrix _X_) that are structured by groups (e.g., `p`-dimensional integer vector `group`) and potentially split into primary and auxiliary predictors (`p`-dimensional vector `include`).
+Use the function `cv.corila` to model an outcome (`n`-dimensional vector _y_) based on many predictors (`n x p` matrix _X_) that are structured by groups (e.g., `p`-dimensional vector `group`) and potentially split into primary and auxiliary predictors (`p`-dimensional vector `include`). See the vignette for detailed examples.
 
 ``` r
 library(corila)
-object <- cv.corila(x = x_train, y = y_train, group = group, type = type)
+object <- cv.corila(x = x_train, y = y_train, group = group, include = include)
 coef(object)
 predict(object, newx = x_test)
 ```
