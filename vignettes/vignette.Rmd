@@ -1,0 +1,133 @@
+---
+title: "Vignette"
+author: "Armin Rauschenberger"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+## Implementation
+
+The R package \texttt{corila} provides the functions \texttt{corila} and \texttt{cv.corila} for model fitting without and with hyperparameter tuning, respectively. These functions require the arguments \texttt{x} (predictor matrix), \texttt{y} (response vector), \texttt{z} (group object), and \texttt{family} (character "gaussian", "binomial", "poisson", or "cox"). They return objects of classes \texttt{"corila"} and \texttt{"cv.corila"}, respectively, for which standard S3 methods like \texttt{coef} (for extracting coefficients) and \texttt{predict} (for making predictions) are available. The R package \texttt{corila} is an extension of the R package \texttt{glmnet} (\textit{Friedman et al., 2010}), using a similar user interface.
+
+To exploit known groups of predictors or known relationships between predictors, the R package \texttt{corila} can exploit three different types of inputs for the argument \texttt{z}: (i) If each predictor is in a single group, the simplest choice is a vector of group labels. (ii) If some groups are overlapping, however, a list of predictor labels or a list of predictor indices becomes necessary. (iii) If predictors have asymmetric relationships (e.g., the $i^{\text{th}}$ predictor should share information with with the $j^{\text{th}}$ predictor but not vice versa), this requires an adjacency matrix (with a unit diagonal).
+
+<!--While it is possible to transform a vector of group labels to a list of feature labels or indices, and such a list to an adjacency matrix, this only works in the other direction if the groups are non-overlapping or the relationships symmetric, respectively.-->
+
+$$
+\begin{array}{ccc}
+\text{vector of group labels} & \text{list of predictor labels or indices} & \text{adjacency matrix} \\
+\begin{array}{ccccc}
+{\color{gray}{x_1}} & {\color{gray}{x_2}} & {\color{gray}{x_3}} & {\color{gray}{x_4}} & {\color{gray}{x_5}} \\ \hline
+\text{A}  & \text{A} & \text{B} & \text{B} & \text{C}
+\end{array}
+&
+\begin{array}{ccl}
+{\color{gray}{\text{A}}} & | & \begin{array}{cc} x_1 & x_2 \end{array} \\
+{\color{gray}{\text{B}}} & | & \begin{array}{cc} x_3 & x_4 \end{array} \\
+{\color{gray}{\text{C}}} & | & \begin{array}{c} x_5 \end{array} \\
+\end{array}
+&
+\begin{array}{c|ccccc}
+~ & {\color{gray}{x_1}} & {\color{gray}{x_2}} & {\color{gray}{x_3}} & {\color{gray}{x_4}} & {\color{gray}{x_5}} \\ \hline
+{\color{gray}{x_1}} & 1 & 1 & 0 & 0 & 0 \\
+{\color{gray}{x_2}} & 1 & 1 & 0 & 0 & 0 \\
+{\color{gray}{x_3}} & 0 & 0 & 1 & 1 & 0 \\
+{\color{gray}{x_4}} & 0 & 0 & 1 & 1 & 0 \\
+{\color{gray}{x_5}} & 0 & 0 & 0 & 0 & 1 \\
+\end{array}
+\end{array}
+$$
+
+```{r example-groups,echo=TRUE,eval=FALSE}
+z <- list()
+z$vector <- c(x1 = "A", x2 = "A", x3 = "B", x4 = "B", x5 = "C")
+z$list <- sapply(X = unique(z$vector),
+                 FUN = function(x) which(z$vector == x),
+                 simplify = FALSE)
+z$matrix <- 1 * outer(X = z$vector, Y = z$vector, FUN = "==")
+```
+
+The R package \texttt{corila} can be installed from \textsc{cran} (stable release) or GitHub (development version).
+
+```{r example-install,echo=TRUE,eval=FALSE}
+utils::install.packages(pkgs = "corila")
+#remotes::install_github(repo = "rauschenberger/corila")
+```
+
+We will simulate some toy data for $n_0$ training observations, $n_1$ test observations, and $p$ predictor variables arranged in $q$ groups. The logical vector \texttt{holdout} indicates which observations will be held out for model testing.
+
+```{r example-pars,echo=TRUE,eval=FALSE}
+set.seed(1)
+n0 <- 100; n1 <- 10000; p <- 200; q <- 20
+holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
+```
+
+Here we simulate equally sized and non-overlapping groups of predictor variables. The $p$-dimensional character vector $\boldsymbol{z}$ indicates the predictor group. We set the correlation between two predictors to $0.5$ if they are in the same group, and otherwise to $0$. Simulation from a multivariate Gaussian distribution leads to the $(n_0+n_1) \times p$ numerical matrix $\boldsymbol{X}$.
+
+```{r example-simulate,echo=TRUE,eval=FALSE}
+z <- rep(x = seq_len(q), each = p / q)
+mu <- rep(x = 0, times = p)
+Sigma <- 0.5 * outer(X = z, Y = z, FUN = "==")
+diag(Sigma) <- 1
+x <- MASS::mvrnorm(n = n0 + n1, mu = mu, Sigma = Sigma)
+```
+
+Here we simulate the $p$-dimensional effect vector $\boldsymbol{\beta}$, and the $n$-dimensional response vector $\boldsymbol{y}$. For each group, all coefficients either equal zero (with probability $90\%$) or are drawn from the folded standard Gaussian distribution (with probability $10\%$).
+
+```{r example-response,echo=TRUE,eval=FALSE}
+beta <- rep(x = stats::rbinom(n = q, size = 1, prob = 0.1), each = p / q) *
+        abs(stats::rnorm(n = p))
+y <- stats::rnorm(n = 1) + x %*% beta + stats::rnorm(n = n0 + n1)
+```
+
+Model fitting is done as in the R package \texttt{glmnet}. But next to the $n_0 \times p$ predictor matrix $\boldsymbol{X}_{\text{train}}$ and the $n_0$-dimensional response vector $\boldsymbol{y}_{\text{train}}$, it also requires the $p$-dimensional group vector $\boldsymbol{z}$. If this argument is set to \texttt{NULL}, information exchange is only based on the correlation (not on the grouping). This is for the Gaussian family, but the proposed method also allows for the binomial and Poisson families as well as the Cox model.
+
+```{r example-estimate,echo=TRUE,eval=FALSE}
+object <- list()
+object$glmnet <- glmnet::cv.glmnet(x = x[!holdout,], 
+                                 y = y[!holdout], 
+                                 family = "gaussian")
+object$corila <- cv.corila(x = x[!holdout, ], 
+                         y = y[!holdout],
+                         group = z, 
+                         family = "gaussian")
+```
+
+The S3 methods \texttt{coef} and \texttt{predict} can be used for extracting coefficients and making predictions.
+
+```{r example-extract,echo=TRUE,eval=FALSE}
+coef <- lapply(X = object, 
+               FUN = function(y) coef(object = y, s = "lambda.min"))
+y_hat <- lapply(X = object, 
+                FUN = function(y) predict(object = y,
+                                          newx = x[holdout, ],
+                                          s = "lambda.min"))
+```
+
+In this example, the proposed method improves the selection performance (higher precision) and the predictive performance (lower mean-squared error) as compared to standard lasso regression.
+
+```{r example-compare,echo=TRUE,eval=FALSE}
+sapply(X = coef, FUN = function(x) sum(x[-1]!=0 & beta!=0)/sum(x[-1]!=0))
+sapply(X = y_hat, FUN = function(x) mean((x - y[holdout])^2))
+```
+
+\textit{Privileged information}: The optional argument \texttt{include} ($p$-dimensional logical vector) can be used to specify which predictors may be selected by the final model. Coefficients of excluded predictors always equal zero. Predictions can be made providing the included and excluded predictors, the latter being ignored, or providing the included predictors only.
+
+```{r example-privileged,echo=TRUE,eval=FALSE}
+include <- stats::rbinom(n = p, size = 1, prob = 0.5) == 1
+object <- cv.corila(x = x[!holdout, ], 
+                        y = y[!holdout],
+                        group = z,
+                        include = include, 
+                        family = "gaussian")
+
+coef <- coef(object)
+all(coef[-1][!include]==0)
+
+y_hat <- list()
+y_hat$all <- predict(object = object, newx = x[holdout, ])
+y_hat$sub <- predict(object = object, newx = x[holdout, include])
+all(y_hat$all == y_hat$sub)
+```
+
+
