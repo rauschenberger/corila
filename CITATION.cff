@@ -6,8 +6,8 @@ authors:
     given-names: Armin
     orcid: "https://orcid.org/0000-0001-6498-4801"
 abstract: Sparse modelling with grouped and correlated features allowing for privileged information
-repository-code: "https://github.com/rauschenberger/collasso"
-url: "https://rauschenberger.github.io/collasso/"
+repository-code: "https://github.com/rauschenberger/corila"
+url: "https://rauschenberger.github.io/corila/"
 preferred-citation:
   type: unpublished
   authors:
