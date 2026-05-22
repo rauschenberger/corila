@@ -1,7 +1,7 @@
 Package: corila
 Version: 0.1.0
-Title: A Flexible Version of the Sparse Group Lasso
-Description: Estimates sparse regression models under grouped variables.
+Title: Sparse modelling with grouped and correlated features
+Description: Implements sparse modelling with grouped and correlated features allowing for privileged information (Rauschenberger, 2026). This high-dimensional regression method allows for heterogeneous groups, overlapping groups, and misspecified groups of features. It also allows for features that can provide information on other features but must not themselves be selected (i.e., privileged information).
 Depends: R (>= 4.0.0)
 Imports: stats, glmnet, multiridge
 Suggests:
