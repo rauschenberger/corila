@@ -58,7 +58,10 @@ We will simulate some toy data for $n_0$ training observations, $n_1$ test obser
 
 ```{r example-pars,echo=TRUE,eval=FALSE}
 set.seed(1)
-n0 <- 100; n1 <- 10000; p <- 200; q <- 20
+n0 <- 100
+n1 <- 10000
+p <- 200
+q <- 20
 holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
 ```
 
@@ -67,16 +70,16 @@ Here we simulate equally sized and non-overlapping groups of predictor variables
 ```{r example-simulate,echo=TRUE,eval=FALSE}
 z <- rep(x = seq_len(q), each = p / q)
 mu <- rep(x = 0, times = p)
-Sigma <- 0.5 * outer(X = z, Y = z, FUN = "==")
-diag(Sigma) <- 1
-x <- MASS::mvrnorm(n = n0 + n1, mu = mu, Sigma = Sigma)
+sigma <- 0.5 * outer(X = z, Y = z, FUN = "==")
+diag(sigma) <- 1
+x <- MASS::mvrnorm(n = n0 + n1, mu = mu, Sigma = sigma)
 ```
 
 Here we simulate the $p$-dimensional effect vector $\boldsymbol{\beta}$, and the $n$-dimensional response vector $\boldsymbol{y}$. For each group, all coefficients either equal zero (with probability $90\%$) or are drawn from the folded standard Gaussian distribution (with probability $10\%$).
 
 ```{r example-response,echo=TRUE,eval=FALSE}
 beta <- rep(x = stats::rbinom(n = q, size = 1, prob = 0.1), each = p / q) *
-        abs(stats::rnorm(n = p))
+  abs(stats::rnorm(n = p))
 y <- stats::rnorm(n = 1) + x %*% beta + stats::rnorm(n = n0 + n1)
 ```
 
@@ -84,30 +87,35 @@ Model fitting is done as in the R package \texttt{glmnet}. But next to the $n_0 
 
 ```{r example-estimate,echo=TRUE,eval=FALSE}
 object <- list()
-object$glmnet <- glmnet::cv.glmnet(x = x[!holdout,], 
-                                 y = y[!holdout], 
-                                 family = "gaussian")
-object$corila <- cv.corila(x = x[!holdout, ], 
-                         y = y[!holdout],
-                         group = z, 
-                         family = "gaussian")
+object$glmnet <- glmnet::cv.glmnet(x = x[!holdout, ],
+                                   y = y[!holdout],
+                                   family = "gaussian")
+object$corila <- cv.corila(x = x[!holdout, ],
+                           y = y[!holdout],
+                           group = z,
+                           family = "gaussian")
 ```
 
 The S3 methods \texttt{coef} and \texttt{predict} can be used for extracting coefficients and making predictions.
 
 ```{r example-extract,echo=TRUE,eval=FALSE}
-coef <- lapply(X = object, 
-               FUN = function(y) coef(object = y, s = "lambda.min"))
-y_hat <- lapply(X = object, 
-                FUN = function(y) predict(object = y,
-                                          newx = x[holdout, ],
-                                          s = "lambda.min"))
+coef <- lapply(
+  X = object,
+  FUN = function(y) coef(object = y, s = "lambda.min")
+)
+y_hat <- lapply(
+  X = object,
+  FUN = function(y) predict(object = y, newx = x[holdout, ], s = "lambda.min")
+)
 ```
 
 In this example, the proposed method improves the selection performance (higher precision) and the predictive performance (lower mean-squared error) as compared to standard lasso regression.
 
 ```{r example-compare,echo=TRUE,eval=FALSE}
-sapply(X = coef, FUN = function(x) sum(x[-1]!=0 & beta!=0)/sum(x[-1]!=0))
+sapply(
+  X = coef,
+  FUN = function(x) sum(x[-1] != 0 & beta != 0) / sum(x[-1] != 0)
+)
 sapply(X = y_hat, FUN = function(x) mean((x - y[holdout])^2))
 ```
 
@@ -115,19 +123,17 @@ sapply(X = y_hat, FUN = function(x) mean((x - y[holdout])^2))
 
 ```{r example-privileged,echo=TRUE,eval=FALSE}
 include <- stats::rbinom(n = p, size = 1, prob = 0.5) == 1
-object <- cv.corila(x = x[!holdout, ], 
-                        y = y[!holdout],
-                        group = z,
-                        include = include, 
-                        family = "gaussian")
+object <- cv.corila(x = x[!holdout, ],
+                    y = y[!holdout],
+                    group = z,
+                    include = include,
+                    family = "gaussian")
 
 coef <- coef(object)
-all(coef[-1][!include]==0)
+all(coef[-1][!include] == 0)
 
 y_hat <- list()
 y_hat$all <- predict(object = object, newx = x[holdout, ])
 y_hat$sub <- predict(object = object, newx = x[holdout, include])
 all(y_hat$all == y_hat$sub)
 ```
-
-
