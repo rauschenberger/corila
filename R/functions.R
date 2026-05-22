@@ -2123,20 +2123,20 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
   .check(x = n1, type = "integer", min = 2)
   .check(x = n_group, type = "integer", min = 2)
   .check(x = n_type, type = "integer", min = 2)
-  
+
   # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;
   # size_group = c(5, 3);effect_size = c(1, 1);corfac_feature = 0.5;
   # corfac_type = 0.5;corfac_group = 0.25;n_group_causal = 2;
   # prop_causal = 0.5; noise_factor = 1; plot = TRUE
   n <- n0 + n1
-  
+
   if (n_type != length(size_group)) {
     stop("Wrong length.")
   }
-  
+
   #- - - feature modalities and groups - - -
   p <- sum(n_group * size_group)
-  
+
   if (!trial) {
     type <- rep(x = seq_len(n_type),
                 times = n_group * size_group) # original
@@ -2152,7 +2152,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
     type <- rep(x = rep(x = seq_len(n_type), times = size_group),
                 times = n_group) # trial 2025-09-22
   }
-  
+
   #- - - effect vector - - -
   beta <- rep(x = 0, times = p)
   index_common <- sample(x = seq_len(n_group), size = n_group_causal)
@@ -2168,12 +2168,12 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
       beta[type == i] <- beta[type == i] * effect_size[i] # trial 2025-09-22
     } # trial 2025-09-22
   }
-  
+
   if (plot) {
     tryCatch(expr = graphics::plot(x = beta, col = group, pch = type),
              error = function(x) NULL)
   }
-  
+
   #- - - feature matrix - - -
   mean <- rep(x = 0, times = p)
   sigma <- matrix(data = NA, nrow = p, ncol = p)
@@ -2195,7 +2195,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
     tryCatch(graphics::image(x = sigma[, p:1]), error = function(x) NULL)
   }
   x <- mvtnorm::rmvnorm(n = n, mean = mean, sigma = sigma)
-  
+
   #- - - target vector - - -
   eta <- scale(x %*% as.vector(beta)) # was without scale
   if (identical(family, "gaussian")) {
@@ -2218,7 +2218,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
   } else {
     stop(paste("Family", family, "not implemented."))
   }
-  
+
   #- - - outputs - - -
   fold <- rep(x = c(0, 1), times = c(n0, n1))
   x_train <- x[fold == 0, ]
