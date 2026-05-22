@@ -3,7 +3,7 @@ Version: 0.0.1
 Title: A Flexible Version of the Sparse Group Lasso
 Description: Estimates sparse regression models under grouped variables.
 Depends: R (>= 3.0.0)
-Imports: stats, glmnet, stats
+Imports: stats, glmnet
 Suggests:
     mvtnorm,
     pROC,
