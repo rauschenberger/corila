@@ -27,6 +27,7 @@ setwd("/Users/armin.rauschenberger/Desktop/corila_clone")
 #usethis::use_github_action("check-standard")
 #usethis::use_github_action("lint")
 #usethis::use_spell_check(lang = "en-GB")
+#usethis::use_gpl3_license()
 ```
 
 # Checks
