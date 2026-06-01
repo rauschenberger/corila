@@ -50,11 +50,11 @@ z$list <- lapply(X = setNames(nm = unique(z$vector)),
 z$matrix <- 1 * outer(X = z$vector, Y = z$vector, FUN = "==")
 ```
 
-The R package \texttt{corila} can be installed from \textsc{cran} (stable release) or GitHub (development version).
+The R package \texttt{corila} can be installed from GitHub (development version) or \textsc{cran} (stable release, \textit{not yet available}):
 
 ```{r example-install,echo=TRUE,eval=FALSE}
-utils::install.packages(pkgs = "corila")
-#remotes::install_github(repo = "rauschenberger/corila")
+remotes::install_github(repo = "rauschenberger/corila")
+#utils::install.packages(pkgs = "corila")
 ```
 
 We will simulate some toy data for $n_0$ training observations, $n_1$ test observations, and $p$ predictor variables arranged in $q$ groups. The logical vector \texttt{holdout} indicates which observations will be held out for model testing.
