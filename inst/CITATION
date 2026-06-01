@@ -2,14 +2,14 @@ citHeader("To cite corila in publications use:")
 
 bibentry(
   bibtype  = "Article",
-  title    = "A flexible version of the sparse group lasso",
+  title    = "Sparse modelling with grouped and correlated features allowing for privileged information",
   author   = c(person("Armin","Rauschenberger")),
   journal  = "In preparation.",
-  year     = 2025,
+  year     = 2026,
   volume   = "-",
   pages    = "-",
   doi      = "-",
-  textVersion = paste("Armin Rauschenberger (2025).",
-		"\"A flexible version of the sparse group lasso\".",
+  textVersion = paste("Armin Rauschenberger (2026).",
+		"\"Sparse modelling with grouped and correlated features allowing for privileged information\".",
 		"In preparation.")
 )
