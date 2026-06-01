@@ -6,6 +6,7 @@
 [![goodpractice](https://github.com/rauschenberger/corila/actions/workflows/goodpractice.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/goodpractice.yaml)
 [![pkgcheck](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml)
 [![Codecov test coverage](https://codecov.io/gh/rauschenberger/corila/graph/badge.svg)](https://app.codecov.io/gh/rauschenberger/corila)
+[![CRAN status](https://www.r-pkg.org/badges/version/corila)](https://CRAN.R-project.org/package=corila)
 
 # Sparse modelling with grouped and correlated features
 
