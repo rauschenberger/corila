@@ -288,7 +288,7 @@ predict.multiridge <- function(object, newx, ...) {
   } else {
     y_hat <- .mean_function(x = eta, family = object$family)
   }
-  .backscale(pars = object$pars, y = y_hat)$y
+  .backscale(pars = object$pars, y = y_hat)$y_original
 }
 
 #' @title
