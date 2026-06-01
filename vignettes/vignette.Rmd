@@ -1,5 +1,5 @@
 ---
-title: "Vignette"
+title: "Getting started with the R package `corila`"
 author: "Armin Rauschenberger"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
