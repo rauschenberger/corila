@@ -945,8 +945,6 @@ print.summary.cv.corila <- function(x, ...) {
 #'
 #' @inherit summary.cv.corila examples
 #'
-#' @export
-#'
 plot.cv.corila <- function(x, ...) {
   # observed vs fitted values
   # estimated coefficient per group (if vector)
