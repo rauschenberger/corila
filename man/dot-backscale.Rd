@@ -69,7 +69,7 @@ if (identical(family, "cox")) {
   lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
 }
 coef_temp <- stats::coef(lm2)
-newx_temp <- .forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
+newx_temp <- corila:::.forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
 yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
 result <- corila:::.backscale(pars = scale$pars,
                               y = yhat_temp,
