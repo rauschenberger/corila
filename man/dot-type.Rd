@@ -16,7 +16,7 @@ or "Pearson/Spearman/Kendall correlation")
 Names the method used for obtaining initial or final coefficients.
 }
 \examples{
-.type(alpha = 0)
+corila:::.type(alpha = 0)
 
 }
 \seealso{

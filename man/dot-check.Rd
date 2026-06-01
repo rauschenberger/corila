@@ -32,9 +32,9 @@
 Check whether provided arguments satisfy expectations.
 }
 \examples{
-.check(x = NULL)
-.check(x = rnorm(1), type = "numeric")
-.check(x = "A", type = "nominal", support = LETTERS)
+corila:::.check(x = NULL)
+corila:::.check(x = rnorm(1), type = "numeric")
+corila:::.check(x = "A", type = "nominal", support = LETTERS)
 
 }
 \seealso{

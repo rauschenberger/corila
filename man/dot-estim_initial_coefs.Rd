@@ -40,14 +40,14 @@ p <- 10
 x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
 y <- drop(x \%*\% beta)
-.estim_initial_coefs(x = x,
-                     y = y,
-                     family = "gaussian",
-                     alpha = "spearman",
-                     group = NULL,
-                     foldid = NULL,
-                     nfolds = 10,
-                     lambda = NULL)
+corila:::.estim_initial_coefs(x = x,
+                              y = y,
+                              family = "gaussian",
+                              alpha = "spearman",
+                              group = NULL,
+                              foldid = NULL,
+                              nfolds = 10,
+                              lambda = NULL)
 
 }
 \keyword{internal}

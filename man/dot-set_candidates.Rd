@@ -15,7 +15,7 @@ and the slots "wgt_global" and "exp_global" for the global prior information.
 Set candidate values for hyperparameters.
 }
 \examples{
-.set_candidates(tune = "none")
+corila:::.set_candidates(tune = "none")
 
 }
 \keyword{internal}

@@ -37,9 +37,9 @@
 #' @seealso \code{\link{.validate}()}
 #'
 #' @examples
-#' .check(x = NULL)
-#' .check(x = rnorm(1), type = "numeric")
-#' .check(x = "A", type = "nominal", support = LETTERS)
+#' corila:::.check(x = NULL)
+#' corila:::.check(x = rnorm(1), type = "numeric")
+#' corila:::.check(x = "A", type = "nominal", support = LETTERS)
 #'
 #' @keywords internal
 #'
@@ -106,7 +106,7 @@
 #' p <- 5
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- rnorm(n)
-#' .validate(x = x, y = y, family = "gaussian")
+#' corila:::.validate(x = x, y = y, family = "gaussian")
 #'
 #' @keywords internal
 #'
@@ -323,7 +323,7 @@
 #' yhat1 <- predict(lm1, newdata = x[fold == 1, ])
 #'
 #' # regression with standardisation
-#' scale <- .forescale(x = as.matrix(x)[fold == 0, ],
+#' scale <- corila:::.forescale(x = as.matrix(x)[fold == 0, ],
 #'                    y = y[fold == 0],
 #'                    family = family)
 #' if (identical(family, "cox")) {
@@ -334,7 +334,7 @@
 #' coef_temp <- stats::coef(lm2)
 #' newx_temp <- .forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
 #' yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
-#' result <- .backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
+#' result <- corila:::.backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
 #' coef2 <- result$coef
 #' yhat2 <- result$y_original
 #'
@@ -417,12 +417,12 @@
 #' # Gaussian and Poisson families
 #' y <- stats::rnorm(n = 100)
 #' y <- stats::rpois(n = 100, lambda = 4)
-#' foldid <- .folds(y = y, family = "gaussian", nfolds = 10)
+#' foldid <- corila:::.folds(y = y, family = "gaussian", nfolds = 10)
 #' table(foldid)
 #'
 #' # binomial family
 #' y <- stats::rbinom(n = 100, prob = 0.2, size = 1)
-#' foldid <- .folds(y = y, family = "binomial", nfolds = 10)
+#' foldid <- corila:::.folds(y = y, family = "binomial", nfolds = 10)
 #' table(y, foldid)
 #'
 #' \donttest{
@@ -430,7 +430,7 @@
 #' time <- stats::rexp(n = 100, rate = 5)
 #' status <- stats::rbinom(n = 100, prob = 0.2, size = 1)
 #' y <- survival::Surv(time = time, event = status)
-#' foldid <- .folds(y = y, family = "cox", nfolds = 10)
+#' foldid <- corila:::.folds(y = y, family = "cox", nfolds = 10)
 #' table(y[, "status"], foldid)
 #' }
 #'
@@ -475,8 +475,8 @@
 #'
 #' @examples
 #' x <- rnorm(10)
-#' .mean_function(x, family = "binomial")
-#' .mean_function(x, family = "poisson")
+#' corila:::.mean_function(x, family = "binomial")
+#' corila:::.mean_function(x, family = "poisson")
 #'
 #' @keywords internal
 #'
@@ -518,15 +518,15 @@
 #'
 #' y <- rnorm(n)
 #' y_hat <- rnorm(n)
-#' .deviance(y = y , y_hat = y_hat, family = "gaussian")
+#' corila:::.deviance(y = y , y_hat = y_hat, family = "gaussian")
 #'
 #' y <- rbinom(n = n, size = 1, prob = 0.5)
 #' y_hat <- runif(n)
-#' .deviance(y = y , y_hat = y_hat, family = "binomial")
+#' corila:::.deviance(y = y , y_hat = y_hat, family = "binomial")
 #'
 #' y <- rpois(n = n, lambda = 4)
 #' y_hat <- rexp(n)
-#' .deviance(y = y , y_hat = y_hat, family = "poisson")
+#' corila:::.deviance(y = y , y_hat = y_hat, family = "poisson")
 #'
 #' @keywords internal
 #'

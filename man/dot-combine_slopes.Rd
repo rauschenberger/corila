@@ -27,6 +27,7 @@ p <- 10
 alpha <- rnorm(1)
 temp <- rnorm(p)
 beta <- pmax(c(temp, -temp), 0)
-.combine_slopes(alpha = alpha, beta = beta)
+corila:::.combine_slopes(alpha = alpha, beta = beta)
 
 }
+\keyword{internal}

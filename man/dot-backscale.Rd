@@ -60,7 +60,7 @@ coef1 <- stats::coef(lm1)
 yhat1 <- predict(lm1, newdata = x[fold == 1, ])
 
 # regression with standardisation
-scale <- .forescale(x = as.matrix(x)[fold == 0, ],
+scale <- corila:::.forescale(x = as.matrix(x)[fold == 0, ],
                    y = y[fold == 0],
                    family = family)
 if (identical(family, "cox")) {
@@ -71,7 +71,7 @@ if (identical(family, "cox")) {
 coef_temp <- stats::coef(lm2)
 newx_temp <- .forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
 yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
-result <- .backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
+result <- corila:::.backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
 coef2 <- result$coef
 yhat2 <- result$y_original
 

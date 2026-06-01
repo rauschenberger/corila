@@ -15,14 +15,14 @@
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
 #' y <- drop(x %*% beta)
-#' .estim_initial_coefs(x = x,
-#'                      y = y,
-#'                      family = "gaussian",
-#'                      alpha = "spearman",
-#'                      group = NULL,
-#'                      foldid = NULL,
-#'                      nfolds = 10,
-#'                      lambda = NULL)
+#' corila:::.estim_initial_coefs(x = x,
+#'                               y = y,
+#'                               family = "gaussian",
+#'                               alpha = "spearman",
+#'                               group = NULL,
+#'                               foldid = NULL,
+#'                               nfolds = 10,
+#'                               lambda = NULL)
 #'
 #' @keywords internal
 #'
@@ -487,7 +487,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' and the slots "wgt_global" and "exp_global" for the global prior information.
 #' 
 #' @examples
-#' .set_candidates(tune = "none")
+#' corila:::.set_candidates(tune = "none")
 #' 
 #' @keywords internal
 #' 
@@ -870,7 +870,7 @@ summary.cv.corila <- function(object, ...) {
 #' This function is called by \code{\link{print.summary.cv.corila}()}.
 #'
 #' @examples
-#' .type(alpha = 0)
+#' corila:::.type(alpha = 0)
 #' 
 #' @keywords internal
 #' 
@@ -1083,7 +1083,9 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' alpha <- rnorm(1)
 #' temp <- rnorm(p)
 #' beta <- pmax(c(temp, -temp), 0)
-#' .combine_slopes(alpha = alpha, beta = beta)
+#' corila:::.combine_slopes(alpha = alpha, beta = beta)
+#'
+#' @keywords internal
 #'
 .combine_slopes <- function(alpha, beta) {
   .check(x = alpha, type = "numeric")

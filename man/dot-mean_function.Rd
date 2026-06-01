@@ -16,8 +16,8 @@ Transform the linear predictor to predicted values/probabilities.
 }
 \examples{
 x <- rnorm(10)
-.mean_function(x, family = "binomial")
-.mean_function(x, family = "poisson")
+corila:::.mean_function(x, family = "binomial")
+corila:::.mean_function(x, family = "poisson")
 
 }
 \keyword{internal}

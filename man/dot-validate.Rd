@@ -28,7 +28,7 @@ n <- 10
 p <- 5
 x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n)
-.validate(x = x, y = y, family = "gaussian")
+corila:::.validate(x = x, y = y, family = "gaussian")
 
 }
 \seealso{
