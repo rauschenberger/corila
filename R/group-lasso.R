@@ -473,6 +473,24 @@ predict.corila <- function(object, newx, index, s, ...) {
   y_hat
 }
 
+#' @title
+#' Candidate Values
+#' 
+#' @description
+#' Set candidate values for hyperparameters.
+#' 
+#' @inheritParams corila
+#' 
+#' @return
+#' Returns a data frame with
+#' the slots "wgt_local" and "exp_local" for the local prior information
+#' and the slots "wgt_global" and "exp_global" for the global prior information.
+#' 
+#' @examples
+#' .set_candidates(tune = "none")
+#' 
+#' @keywords internal
+#' 
 .set_candidates <- function(tune) {
   .check(x = tune, type = "nominal")
   #if (FALSE) {
@@ -834,29 +852,51 @@ summary.cv.corila <- function(object, ...) {
   list
 }
 
-.type <- function(x) {
-  if (is.na(x)) {
+#' @title
+#' Name (helper function)
+#' 
+#' @description
+#' Names the method used for obtaining initial or final coefficients.
+#'
+#' @inheritParams corila
+#' 
+#' @return
+#' Returns a character string
+#' ("ridge regression", "lasso regression", "elastic net regression",
+#' "multi-penalty ridge regression",
+#' or "Pearson/Spearman/Kendall correlation")
+#' 
+#' @seealso
+#' This function is called by \code{\link{print.summary.cv.corila}()}.
+#'
+#' @examples
+#' .type(alpha = 0)
+#' 
+#' @keywords internal
+#' 
+.type <- function(alpha) {
+  if (is.na(alpha)) {
     "none"
-  } else if (is.numeric(x)) {
-    if (x == 0) {
+  } else if (is.numeric(alpha)) {
+    if (alpha == 0) {
       "ridge regression"
-    } else if (x == 1) {
+    } else if (alpha == 1) {
       "lasso regression"
-    } else if (x > 0 && x < 1) {
+    } else if (alpha > 0 && alpha < 1) {
       "elastic net regression"
     } else {
-      stop("If argument 'x' is numeric, ",
+      stop("If argument 'alpha' is numeric, ",
            "it should be in the unit interval.")
     }
   } else {
-    if (identical(x, "multiridge")) {
+    if (identical(alpha, "multiridge")) {
       "multi-penalty ridge regression"
-    } else if (x %in% c("pearson", "spearman", "kendall")) {
-      paste0(toupper(substr(x = x, start = 1, stop = 1)),
-             tolower(substr(x = x, start = 2, stop = nchar(x))),
+    } else if (alpha %in% c("pearson", "spearman", "kendall")) {
+      paste0(toupper(substr(x = alpha, start = 1, stop = 1)),
+             tolower(substr(x = alpha, start = 2, stop = nchar(x))),
              " correlation")
     } else {
-      stop("If argument 'x' is of type 'character', ",
+      stop("If argument 'alpha' is of type 'character', ",
            "it should equal ",
            "'pearson', 'spearman', 'kendall', or 'multiridge'.")
     }
@@ -874,8 +914,8 @@ print.summary.cv.corila <- function(x, ...) {
   }
   cat(x$p, " features (", x$p_primary, " primary and ",
       x$p_auxiliary, " auxiliary features)", "\n", sep = "")
-  cat("initial coefficients:", .type(x = x$alpha_init), "\n")
-  cat("final coefficients: adaptive", .type(x = x$alpha_final), "\n")
+  cat("initial coefficients:", .type(alpha = x$alpha_init), "\n")
+  cat("final coefficients: adaptive", .type(alpha = x$alpha_final), "\n")
   cat("optimised regularisation parameter: lambda.min =",
       signif(x$lambda.min, digits = 4), "\n")
   cat("selected weights: local = ", x$wgt_local,

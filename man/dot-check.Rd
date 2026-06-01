@@ -37,4 +37,7 @@ Check whether provided arguments satisfy expectations.
 .check(x = "A", type = "nominal", support = LETTERS)
 
 }
+\seealso{
+\code{\link{.validate}()}
+}
 \keyword{internal}

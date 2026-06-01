@@ -33,6 +33,8 @@
 #'
 #' @param max
 #' numerical value (not used for \code{type = "nominal"})
+#' 
+#' @seealso \code{\link{.validate}()}
 #'
 #' @examples
 #' .check(x = NULL)
@@ -84,7 +86,30 @@
   )
 }
 
-# add check on groups!
+# function .validate: add check on groups!
+
+#' @title
+#' Validate data
+#'
+#' @description
+#' Validates the predictor matrix x and the outcome vector y.
+#'
+#' @inheritParams corila
+#'
+#' @return
+#' Returns \code{NULL} or an error message.
+#'
+#' @seealso \code{\link{.check}()}
+#' 
+#' @examples
+#' n <- 10
+#' p <- 5
+#' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
+#' y <- rnorm(n)
+#' .validate(x = x, y = y, family = "gaussian")
+#'
+#' @keywords internal
+#'
 .validate <- function(x, y, family) {
   if (!is.character(family) || length(family) != 1) {
     stop("Argument 'family' must be a character string.")
