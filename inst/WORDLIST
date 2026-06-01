@@ -22,3 +22,4 @@ nolint
 linter
 cyclocomp
 pkgcheck
+goodpractice
