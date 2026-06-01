@@ -475,22 +475,22 @@ predict.corila <- function(object, newx, index, s, ...) {
 
 #' @title
 #' Candidate Values
-#' 
+#'
 #' @description
 #' Set candidate values for hyperparameters.
-#' 
+#'
 #' @inheritParams corila
-#' 
+#'
 #' @return
 #' Returns a data frame with
 #' the slots "wgt_local" and "exp_local" for the local prior information
 #' and the slots "wgt_global" and "exp_global" for the global prior information.
-#' 
+#'
 #' @examples
 #' corila:::.set_candidates(tune = "none")
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 .set_candidates <- function(tune) {
   .check(x = tune, type = "nominal")
   #if (FALSE) {
@@ -853,26 +853,26 @@ summary.cv.corila <- function(object, ...) {
 
 #' @title
 #' Name (helper function)
-#' 
+#'
 #' @description
 #' Names the method used for obtaining initial or final coefficients.
 #'
 #' @inheritParams corila
-#' 
+#'
 #' @return
 #' Returns a character string
 #' ("ridge regression", "lasso regression", "elastic net regression",
 #' "multi-penalty ridge regression",
 #' or "Pearson/Spearman/Kendall correlation")
-#' 
+#'
 #' @seealso
 #' This function is called by \code{\link{print.summary.cv.corila}()}.
 #'
 #' @examples
 #' corila:::.type(alpha = 0)
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 .type <- function(alpha) {
   if (is.na(alpha)) {
     "none"

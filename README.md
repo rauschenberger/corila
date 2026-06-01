@@ -7,7 +7,7 @@
 [![goodpractice](https://github.com/rauschenberger/corila/actions/workflows/goodpractice.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/goodpractice.yaml)
 [![pkgcheck](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml)
 [![Codecov test coverage](https://codecov.io/gh/rauschenberger/corila/graph/badge.svg)](https://app.codecov.io/gh/rauschenberger/corila)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![life cycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/corila)](https://CRAN.R-project.org/package=corila)
 <!-- badges: end -->
 

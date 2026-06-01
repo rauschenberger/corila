@@ -2,17 +2,22 @@ doi
 pearson
 spearman
 kendall
+Poisson
+poisson
 Wilcoxon's
 Mark A. van de Wiel
 Mirrelijn M. van Nee
 GitLab
 GitHub
+CRAN
+cran
 LCSB
 LIH
 BDS
 BioAI
 DMI
 multiridge
+glmnet
 CMD
 Codecov
 AR
@@ -23,3 +28,18 @@ linter
 cyclocomp
 pkgcheck
 goodpractice
+wgt
+wgt
+color
+gray
+texttt
+textsc
+boldsymbol
+textit
+color
+hline
+coef
+th
+ccc
+ccccc
+ccl

@@ -30,7 +30,8 @@ expect <- list("ridge" = 0,
                "multi-penalty" = "multiridge")
 testthat::test_that("initial coefficients are named correctly", {
   for (i in seq_along(expect)) {
-    object <- tolower(strsplit(x = .type(alpha = expect[[i]]), split = " ")[[1]])
+    object <- tolower(strsplit(x = .type(alpha = expect[[i]]),
+                               split = " ")[[1]])
     testthat::expect_contains(object = object,
                               expected = names(expect)[i])
   }

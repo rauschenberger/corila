@@ -34,7 +34,7 @@
 #' @keywords utilities
 #'
 #' @export
-#' 
+#'
 calc_sign_prec <- function(truth, estim) {
   .check(x = truth, type = "integer", dim = Inf, na.rm = TRUE)
   .check(x = estim, type = "integer", dim = length(truth), na.rm = TRUE)

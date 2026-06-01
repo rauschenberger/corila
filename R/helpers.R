@@ -33,7 +33,7 @@
 #'
 #' @param max
 #' numerical value (not used for \code{type = "nominal"})
-#' 
+#'
 #' @seealso \code{\link{.validate}()}
 #'
 #' @examples
@@ -100,7 +100,7 @@
 #' Returns \code{NULL} or an error message.
 #'
 #' @seealso \code{\link{.check}()}
-#' 
+#'
 #' @examples
 #' n <- 10
 #' p <- 5
@@ -334,7 +334,9 @@
 #' coef_temp <- stats::coef(lm2)
 #' newx_temp <- .forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
 #' yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
-#' result <- corila:::.backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
+#' result <- corila:::.backscale(pars = scale$pars,
+#'                               y = yhat_temp,
+#'                               coef = coef_temp)
 #' coef2 <- result$coef
 #' yhat2 <- result$y_original
 #'
