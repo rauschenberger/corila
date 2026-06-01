@@ -96,6 +96,138 @@
   list(coef = drop(coef), lambda = lambda)
 }
 
+
+# --- check arguments ---
+#' @title
+#' Argument Check
+#' 
+#' @description
+#' Checks arguments of functions \code{corila} and \code{cv.corila}.
+#' 
+#' @inheritParams cv.corila
+#' 
+#' @return
+#' Returns \code{NULL} or an error message.
+#'
+#' @seealso [.check()], [.validate()]
+#' 
+#' @examples
+#' NA
+#' 
+#' @keywords internal
+#' 
+.check_args <- function(x, y, group, include, family, hyper, alpha_init,
+                alpha_final, cor, foldid, nfolds, lambda_init) {
+  .check(x = x, type = "numeric", dim = c(Inf, Inf))
+  n <- nrow(x) # sample size
+  p <- ncol(x) # number of features
+  .check(x = y, type = "numeric", dim = n)
+  if (is.vector(group) && is.atomic(group)) {
+    if (is.numeric(group)) {
+      .check(x = group, type = "integer", dim = p, min = 1, max = p)
+    } else if (is.character(group)) {
+      .check(x = group, type = "nominal", dim = p, support = colnames(x))
+    } else {
+      stop("If argument 'group' is a vector, ",
+           "it should be a numeric or character vector.")
+    }
+  } else if (is.list(group)) {
+    for (i in seq_along(group)) {
+      if (is.numeric(group[[i]])) {
+        .check(x = group[[i]], type = "integer", dim = Inf, min = 1, max = p)
+      } else if (is.character(group[[i]])) {
+        .check(x = group[[i]], type = "nominal", dim = Inf,
+               support = colnames(x))
+      } else {
+        stop("If argument 'group' is a list, ",
+             "it should be a list of numeric or character vectors.")
+      }
+    }
+  } else if (is.matrix(group)) {
+    .check(x = group, type = "integer", dim = c(p, p), min = -1, max = 1)
+  } else {
+    stop("Argument 'group' should be a vector, a list, or a matrix.")
+  }
+  .check(x = include, type = "logical", dim = p)
+  .check(x = family, type = "nominal",
+         support = c("gaussian", "binomial", "poisson", "cox"))
+  slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
+  .check(x = names(hyper), type = "nominal", dim = length(slots),
+         support = slots)
+  .check(x = as.matrix(hyper), type = "numeric",
+         dim = c(Inf, length(slots)), min = 0)
+  if (is.character(alpha_init)) {
+    .check(x = alpha_init, type = "nominal",
+           support = c("pearson", "spearman", "kendall"))
+  } else {
+    .check(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
+  }
+  .check(x = alpha_final, type = "numeric", min = 0, max = 1)
+  if (is.character(cor)) {
+    .check(x = cor, type = "nominal",
+           support = c("pearson", "spearman", "kendall"))
+  } else {
+    .check(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
+  }
+  .check(x = foldid, type = "integer", dim = n, min = 1, max = n)
+  .check(x = nfolds, type = "integer", min = 1, max = n)
+  .check(x = lambda_init, type = "numeric", min = 0)
+  return(NULL)
+}
+
+#' @title
+#' Adjacency
+#' 
+#' @description
+#' Identifies adjacent predictors.
+#' 
+#' @inheritParams corila
+#' 
+#' @param j
+#' index of predictor
+#' 
+#' @param p
+#' number of predictors
+#' 
+#' @param names
+#' names of predictors
+#' 
+#' @returns
+#' Returns a logical vector of length \eqn{p}.
+#' 
+#' @examples
+#' NA
+#' 
+#' @keywords internal
+#' 
+.is_adjacent <- function(group, j, p, names){
+  .check(x = j, type = "integer", min = 1)
+  .check(x = p, type = "integer", min = j)
+  .check(x = names, type = "nominal", dim = p)
+  if (is.vector(group) && is.atomic(group)) {
+    group[j] == group
+  } else if (is.list(group)) {
+    if (is.numeric(unlist(group))) {
+      group_cond <- vapply(X = group,
+                           FUN = function(slot) j %in% slot,
+                           FUN.VALUE = logical(1))
+      seq_len(p) %in% unlist(group[group_cond])
+    } else {
+      group_cond <- vapply(
+        X = group,
+        FUN = function(slot) names[j] %in% slot,
+        FUN.VALUE = logical(1)
+      )
+      names %in% unlist(group[group_cond])
+    }
+  } else if (is.matrix(group)) {
+    group[, j] == 1
+  } else {
+    stop("Argument 'group' should be a vector, a list, or a matrix.")
+  }
+}
+
+
 #' @title
 #' Group lasso
 #'
@@ -232,63 +364,23 @@
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL) {
-  # --- check arguments ---
-  .check(x = x, type = "numeric", dim = c(Inf, Inf))
-  n <- nrow(x) # sample size
-  p <- ncol(x) # number of features
-  .check(x = y, type = "numeric", dim = n)
-  if (is.vector(group) && is.atomic(group)) {
-    if (is.numeric(group)) {
-      .check(x = group, type = "integer", dim = p, min = 1, max = p)
-    } else if (is.character(group)) {
-      .check(x = group, type = "nominal", dim = p, support = colnames(x))
-    } else {
-      stop("If argument 'group' is a vector, ",
-           "it should be a numeric or character vector.")
-    }
-  } else if (is.list(group)) {
-    for (i in seq_along(group)) {
-      if (is.numeric(group[[i]])) {
-        .check(x = group[[i]], type = "integer", dim = Inf, min = 1, max = p)
-      } else if (is.character(group[[i]])) {
-        .check(x = group[[i]], type = "nominal", dim = Inf,
-               support = colnames(x))
-      } else {
-        stop("If argument 'group' is a list, ",
-             "it should be a list of numeric or character vectors.")
-      }
-    }
-  } else if (is.matrix(group)) {
-    .check(x = group, type = "integer", dim = c(p, p), min = -1, max = 1)
-  } else {
-    stop("Argument 'group' should be a vector, a list, or a matrix.")
-  }
-  .check(x = include, type = "logical", dim = p)
-  .check(x = family, type = "nominal",
-         support = c("gaussian", "binomial", "poisson", "cox"))
-  slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
-  .check(x = names(hyper), type = "nominal", dim = length(slots),
-         support = slots)
-  .check(x = as.matrix(hyper), type = "numeric",
-         dim = c(Inf, length(slots)), min = 0)
-  if (is.character(alpha_init)) {
-    .check(x = alpha_init, type = "nominal",
-           support = c("pearson", "spearman", "kendall"))
-  } else {
-    .check(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
-  }
-  .check(x = alpha_final, type = "numeric", min = 0, max = 1)
-  if (is.character(cor)) {
-    .check(x = cor, type = "nominal",
-           support = c("pearson", "spearman", "kendall"))
-  } else {
-    .check(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
-  }
-  .check(x = foldid, type = "integer", dim = n, min = 1, max = n)
-  .check(x = nfolds, type = "integer", min = 1, max = n)
-  .check(x = lambda_init, type = "numeric", min = 0)
+  .check_args(x = x,
+              y = y,
+              group = group,
+              include = include,
+              family = family,
+              hyper = hyper,
+              alpha_init = alpha_init,
+              alpha_final = alpha_final,
+              cor = cor,
+              foldid = foldid,
+              nfolds = nfolds,
+              lambda_init = lambda_init)
+  #args <- as.list(match.call())[-1]
+  #do.call(what = .check_args, args = args)
   .validate(x = x, y = y, family = family)
-
+  n <- nrow(x)
+  p <- ncol(x)
   if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
     warning("Setting alpha_init=0 due to family='poisson'.")
     alpha_init <- 0
@@ -299,7 +391,6 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   if (is.null(include)) {
     include <- rep(x = TRUE, times = p)
   }
-
   #if (length(group) != p) {
   # stop("Argument 'group' must be a vector of length p.")
   #}
@@ -352,30 +443,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     weight$global <- weight$local <- rep(x = NA, times = p)
     # rename to weight$local and weight$global
     for (j in seq_len(p)) {
-      # features in same group
-      #if (is.numeric(group) && !is.array(group)) {
-      if (is.vector(group) && is.atomic(group)) {
-        adjacent <- group[j] == group
-      } else if (is.list(group)) {
-        if (is.numeric(unlist(group))) {
-          group_cond <- vapply(X = group,
-                               FUN = function(slot) j %in% slot,
-                               FUN.VALUE = logical(1))
-          adjacent <- seq_len(p) %in% unlist(group[group_cond])
-        } else {
-          group_cond <- vapply(
-            X = group,
-            FUN = function(slot) colnames(scale$x)[j] %in% slot,
-            FUN.VALUE = logical(1)
-          )
-          adjacent <- colnames(scale$x) %in% unlist(group[group_cond])
-        }
-        #names(group_index) <- group
-      } else if (is.matrix(group)) {
-        adjacent <- group[, j] == 1
-      } else {
-        stop("Argument 'group' should be a vector, a list, or a matrix.")
-      }
+      adjacent <- .is_adjacent(group = group, j = j, p = p,
+                               names = colnames(scale$x))
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
       temp <-  cor_trans * init$coef * adjacent
       weight$local[j] <- sum(pmax(0, temp)[adjacent]) / sum(adjacent)
@@ -399,12 +468,13 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                      weight$global * hyper$wgt_global[i])
     # To obtain standard lasso set pf_ext equal to 1.
     pf_ext[!c(include, include)] <- Inf # excluded features
-    if (any(is.na(pf_ext))) {
-      stop("missing pf: ", sum(is.na(pf_ext)))
-    }
-    if (any(pf_ext < 0)) {
-      stop(paste0("negative pf:", min(pf_ext)))
-    }
+    #if (any(is.na(pf_ext))) {
+    #  stop("missing pf: ", sum(is.na(pf_ext)))
+    #}
+    #if (any(pf_ext < 0)) {
+    #  stop(paste0("negative pf:", min(pf_ext)))
+    #}
+    .check(x = pf_ext, type = "numeric", dim = 2 * p, min = 0)
     object[[i]] <- glmnet::glmnet(x = cbind(scale$x, -scale$x),
                                   y = scale$y,
                                   family = family,

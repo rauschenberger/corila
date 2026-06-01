@@ -172,9 +172,6 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
   .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
   .check(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
   .validate(x = x, y = y, family = family)
-  if (identical(family, "poisson")) {
-    stop("Argument family='poisson' is not implemented.")
-  }
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop(paste(
       "For each variable,",
