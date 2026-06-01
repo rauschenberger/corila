@@ -892,7 +892,7 @@ summary.cv.corila <- function(object, ...) {
       "multi-penalty ridge regression"
     } else if (alpha %in% c("pearson", "spearman", "kendall")) {
       paste0(toupper(substr(x = alpha, start = 1, stop = 1)),
-             tolower(substr(x = alpha, start = 2, stop = nchar(x))),
+             tolower(substr(x = alpha, start = 2, stop = nchar(alpha))),
              " correlation")
     } else {
       stop("If argument 'alpha' is of type 'character', ",
