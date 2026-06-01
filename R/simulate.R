@@ -34,6 +34,7 @@
 #' @keywords utilities
 #'
 #' @export
+#' 
 calc_sign_prec <- function(truth, estim) {
   .check(x = truth, type = "integer", dim = Inf, na.rm = TRUE)
   .check(x = estim, type = "integer", dim = length(truth), na.rm = TRUE)
@@ -128,6 +129,7 @@ calc_sign_prec <- function(truth, estim) {
 #' @keywords distribution
 #'
 #' @export
+#'
 simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                      n_type = 2, size_group = c(5, 3), effect_size = c(1, 1),
                      corfac_feature = 0.5, corfac_type = 0.5,
