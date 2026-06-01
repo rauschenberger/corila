@@ -932,29 +932,29 @@ print.summary.cv.corila <- function(x, ...) {
 }
 
 
-# #' @title
-# #' Plot Sparse Group Lasso (S3 method)
-# #'
-# #' @description
-# #' Plot method for class \code{"cv.corila"}.
-# #'
-# #' @param x
-# #' object of class \code{"cv.corila"}
-# #'
-# #' @param ...
-# #' (not used)
-# #'
-# #' @return
-# #' Returns NULL (invisible).
-# #'
-# #' @inherit summary.cv.corila examples
-# #'
+# @title
+# Plot Sparse Group Lasso (S3 method)
+#
+# @description
+# Plot method for class \code{"cv.corila"}.
+#
+# @param x
+# object of class \code{"cv.corila"}
+#
+# @param ...
+# (not used)
+#
+# @return
+# Returns \code{NULL} (invisible).
+#
+# @inherit summary.cv.corila examples
+#
 # plot.cv.corila <- function(x, ...) {
-#   # observed vs fitted values
-#   # estimated coefficient per group (if vector)
-#   # cvm as a functions of weights and exponents
-#   invisible(NULL)
-# }
+#  # observed vs fitted values
+#  # estimated coefficient per group (if vector)
+#  # cvm as a functions of weights and exponents
+#  invisible(NULL)
+#}
 
 #' @title
 #' Expand auxiliary features

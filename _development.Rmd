@@ -55,7 +55,7 @@ checks <- checks[!grepl(pattern="rcmdcheck_", x = checks)]
 x <- goodpractice::gp(checks = checks)
 
 x <- pkgcheck::pkgcheck(goodpractice=FALSE)
-notes <- autotest::autotest_package(exclude=c(".mean_function",".folds",".estim_initial_coefs"),test=TRUE)
+notes <- autotest::autotest_package(exclude=c("F1","F2"),test=TRUE)
 notes <- autotest::autotest_package(test=TRUE)
 srr::srr_stats_roxygen(category = c("ml", "regression"))
 ```

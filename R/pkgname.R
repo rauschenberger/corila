@@ -9,7 +9,9 @@
 #' Sparse group lasso
 #'
 #' @description
-#' The R package \code{corila} implements the sparse group lasso.
+#' The R package \code{corila} implements
+#' "Sparse modelling with grouped and correlated features
+#' allowing for privileged information" (\emph{Rauschenberger, 2026}).
 #'
 #' @details
 #' Use function \code{\link[=cv.corila]{cv.corila}()} for model fitting.
