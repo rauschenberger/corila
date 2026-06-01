@@ -39,3 +39,4 @@ summary(object)
 \seealso{
 print.corila
 }
+\keyword{internal}

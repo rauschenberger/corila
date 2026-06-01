@@ -6,6 +6,12 @@
 \usage{
 .set_candidates(tune)
 }
+\arguments{
+\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"}
+for determining the candidate values for the hyperparameters;
+or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
+and \code{exp_global} (not yet implemented)}
+}
 \value{
 Returns a data frame with
 the slots "wgt_local" and "exp_local" for the local prior information

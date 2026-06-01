@@ -71,7 +71,9 @@ if (identical(family, "cox")) {
 coef_temp <- stats::coef(lm2)
 newx_temp <- .forescale(x = as.matrix(x)[fold == 1, ], pars = scale$pars)$x
 yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
-result <- corila:::.backscale(pars = scale$pars, y = yhat_temp, coef = coef_temp)
+result <- corila:::.backscale(pars = scale$pars,
+                              y = yhat_temp,
+                              coef = coef_temp)
 coef2 <- result$coef
 yhat2 <- result$y_original
 

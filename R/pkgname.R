@@ -34,8 +34,9 @@
 #'
 #' @references
 #' \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
-#' (2025).
-#' "A flexible version of the sparse group lasso".
+#' (2026).
+#' "Sparse modelling with grouped and correlated features
+#' allowing for privileged information".
 #' \emph{In preparation}.
 #'
 #' @examples

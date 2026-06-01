@@ -6,6 +6,11 @@
 \usage{
 .type(alpha)
 }
+\arguments{
+\item{alpha}{elastic net mixing parameter or character string
+(see \code{alpha_init} and \code{alpha_final}
+in \code{\link{cv.corila}()})}
+}
 \value{
 Returns a character string
 ("ridge regression", "lasso regression", "elastic net regression",

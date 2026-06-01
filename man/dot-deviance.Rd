@@ -16,7 +16,7 @@ numeric vector of length \code{n}}
 \item{family}{character}
 }
 \description{
-Calculate the deviance
+Calculates the deviance.
 }
 \examples{
 n <- 10

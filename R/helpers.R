@@ -464,7 +464,8 @@
   foldid
 }
 
-#' @title Mean function
+#' @title
+#' Mean function
 #'
 #' @description
 #' Transform the linear predictor to predicted values/probabilities.
@@ -499,10 +500,11 @@
   }
 }
 
-#' @title Deviance
+#' @title
+#' Deviance
 #'
 #' @description
-#' Calculate the deviance
+#' Calculates the deviance.
 #'
 #' @param y
 #' response:

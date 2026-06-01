@@ -2,7 +2,8 @@
 
 #----- group-lasso -----
 
-#' @title Initial coefficients
+#' @title
+#' Initial coefficients
 #'
 #' @description
 #' Estimate initial coefficients.
@@ -479,7 +480,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' @description
 #' Set candidate values for hyperparameters.
 #'
-#' @inheritParams corila
+#' @inheritParams cv.corila
 #'
 #' @return
 #' Returns a data frame with
@@ -857,7 +858,10 @@ summary.cv.corila <- function(object, ...) {
 #' @description
 #' Names the method used for obtaining initial or final coefficients.
 #'
-#' @inheritParams corila
+#' @param alpha
+#' elastic net mixing parameter or character string
+#' (see \code{alpha_init} and \code{alpha_final}
+#' in \code{\link{cv.corila}()})
 #'
 #' @return
 #' Returns a character string
@@ -903,6 +907,7 @@ summary.cv.corila <- function(object, ...) {
 }
 
 #' @rdname summary.cv.corila
+#' @keywords internal
 #' @export
 print.summary.cv.corila <- function(x, ...) {
   cat("--- object of class", dQuote("cv.corila"), "---", "\n")
@@ -927,30 +932,29 @@ print.summary.cv.corila <- function(x, ...) {
 }
 
 
-#' @title
-#' Plot Sparse Group Lasso (S3 method)
-#'
-#' @description
-#' Plot method for class \code{"cv.corila"}.
-#'
-#' @param x
-#' object of class \code{"cv.corila"}
-#'
-#' @param ...
-#' (not used)
-#'
-#' @return
-#' Returns NULL (invisible).
-#'
-#' @inherit summary.cv.corila examples
-#'
-plot.cv.corila <- function(x, ...) {
-  # observed vs fitted values
-  # estimated coefficient per group (if vector)
-  # cvm as a functions of weights and exponents
-  invisible(NULL)
-}
-
+# #' @title
+# #' Plot Sparse Group Lasso (S3 method)
+# #'
+# #' @description
+# #' Plot method for class \code{"cv.corila"}.
+# #'
+# #' @param x
+# #' object of class \code{"cv.corila"}
+# #'
+# #' @param ...
+# #' (not used)
+# #'
+# #' @return
+# #' Returns NULL (invisible).
+# #'
+# #' @inherit summary.cv.corila examples
+# #'
+# plot.cv.corila <- function(x, ...) {
+#   # observed vs fitted values
+#   # estimated coefficient per group (if vector)
+#   # cvm as a functions of weights and exponents
+#   invisible(NULL)
+# }
 
 #' @title
 #' Expand auxiliary features
