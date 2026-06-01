@@ -41,7 +41,6 @@
 #'
 #' @keywords internal
 #'
-#' @export
 .check <- function(x, type, dim = 1, na.rm = FALSE,
                    support = NULL, min = -Inf, max = Inf) {
   if (is.null(x)) {
@@ -185,7 +184,6 @@
 #'
 #' @keywords internal
 #'
-#' @export
 .forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   # --- check arguments ---
   families <- c("gaussian", "binomial", "poisson", "cox")
@@ -328,7 +326,6 @@
 #'
 #' @keywords internal
 #'
-#' @export
 .backscale <- function(pars, y = NULL, coef = NULL) {
   # --- check arguments ---
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
@@ -414,7 +411,6 @@
 #'
 #' @keywords internal
 #'
-#' @export
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
   .check(x = y, type = "numeric", dim = Inf)
@@ -459,7 +455,6 @@
 #'
 #' @keywords internal
 #'
-#' @export
 .mean_function <- function(x, family) {
   # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")
@@ -510,7 +505,6 @@
 #'
 #' @keywords internal
 #'
-#' @export
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")

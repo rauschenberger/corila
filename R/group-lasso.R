@@ -26,7 +26,6 @@
 #'
 #' @keywords internal
 #'
-#' @export
 .estim_initial_coefs <- function(x, y, family, alpha, group,
                                  foldid, nfolds, lambda) {
   # --- check arguments ---
@@ -1048,7 +1047,6 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' beta <- pmax(c(temp, -temp), 0)
 #' .combine_slopes(alpha = alpha, beta = beta)
 #'
-#' @export
 .combine_slopes <- function(alpha, beta) {
   .check(x = alpha, type = "numeric")
   .check(x = beta, type = "numeric", dim = Inf, min = 0)
