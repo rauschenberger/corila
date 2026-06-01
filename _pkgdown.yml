@@ -13,10 +13,8 @@ navbar:
   left:
     - text: "functions"
       href: reference/index.html
-    - text: "article"
-      href: articles/article.html
-    - text: "analysis"
-      href: articles/analysis.html
+    - text: "vignette"
+      href: vignettes/vignette.html
     - text: "news"
       href: news/index.html
 
