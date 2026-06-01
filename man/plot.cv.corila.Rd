@@ -28,6 +28,5 @@ include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 object <- cv.corila(x = x, y = y, group = group, include = include)
 print(object)
 summary(object)
-plot(object)
 
 }

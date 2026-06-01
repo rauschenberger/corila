@@ -828,7 +828,6 @@ print.cv.corila <- function(x, ...) {
 #' object <- cv.corila(x = x, y = y, group = group, include = include)
 #' print(object)
 #' summary(object)
-#' plot(object)
 #'
 #' @seealso print.corila
 #'
