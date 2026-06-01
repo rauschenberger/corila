@@ -1,4 +1,5 @@
 
+<!-- badges: start -->
 [![R-CMD-check](https://github.com/rauschenberger/corila/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/R-CMD-check.yaml)
 [![lint](https://github.com/rauschenberger/corila/actions/workflows/lint.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/lint.yaml)
 [![cyclocomp](https://github.com/rauschenberger/corila/actions/workflows/cyclocomp.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/cyclocomp.yaml)
@@ -6,7 +7,9 @@
 [![goodpractice](https://github.com/rauschenberger/corila/actions/workflows/goodpractice.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/goodpractice.yaml)
 [![pkgcheck](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml)
 [![Codecov test coverage](https://codecov.io/gh/rauschenberger/corila/graph/badge.svg)](https://app.codecov.io/gh/rauschenberger/corila)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/corila)](https://CRAN.R-project.org/package=corila)
+<!-- badges: end -->
 
 # Sparse modelling with grouped and correlated features
 
