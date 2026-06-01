@@ -836,7 +836,7 @@ print.cv.corila <- function(x, ...) {
 summary.cv.corila <- function(object, ...) {
   list <- list()
   list$family <- object$args$family
-  list$n <- Inf # replace by object$n
+  #list$n <- object$n
   list$p <- object$args$p
   list$p_primary <- sum(object$args$include)
   list$p_auxiliary <- sum(!object$args$include)
