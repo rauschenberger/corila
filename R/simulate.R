@@ -24,16 +24,12 @@
 #' @examples
 #' truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 #' estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
-#' calc_sign_prec(truth = truth, estim = estim) # observed value
-#' calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
-#' calc_sign_prec(truth = truth, estim = truth) # upper limit 1
-#' calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
+#' corila:::calc_sign_prec(truth = truth, estim = estim) # observed value
+#' corila:::calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
+#' corila:::calc_sign_prec(truth = truth, estim = truth) # upper limit 1
+#' corila:::calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
 #'
 #' @keywords internal
-#'
-#' @keywords utilities
-#'
-#' @export
 #'
 calc_sign_prec <- function(truth, estim) {
   .assert(x = truth, type = "integer", dim = Inf, na.rm = TRUE)
@@ -116,7 +112,7 @@ calc_sign_prec <- function(truth, estim) {
 #' }
 #'
 #' @examples
-#' data <- simulate()
+#' data <- corila:::simulate()
 #' dims <- function(x) {
 #'    if (is.matrix(x)||is.data.frame(x)) {
 #'      paste(base::dim(x), collapse = " x ")
@@ -126,9 +122,7 @@ calc_sign_prec <- function(truth, estim) {
 #' }
 #' sapply(X = data, FUN = dims)
 #'
-#' @keywords distribution
-#'
-#' @export
+#' @keywords internal
 #'
 simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                      n_type = 2, size_group = c(5, 3), effect_size = c(1, 1),
@@ -237,8 +231,6 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
     y <- survival::Surv(time = time, event = status)
   } else if (identical(family, "poisson")) {
     y <- stats::rpois(n = n, lambda = exp(eta))
-  } else {
-    stop(paste("Family", family, "not implemented."))
   }
   #- - - outputs - - -
   fold <- rep(x = c(0, 1), times = c(n0, n1))

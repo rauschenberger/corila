@@ -74,7 +74,7 @@ Returns a list with the following slots:
 Simulates data with grouped predictor variables
 }
 \examples{
-data <- simulate()
+data <- corila:::simulate()
 dims <- function(x) {
    if (is.matrix(x)||is.data.frame(x)) {
      paste(base::dim(x), collapse = " x ")
@@ -85,4 +85,4 @@ dims <- function(x) {
 sapply(X = data, FUN = dims)
 
 }
-\keyword{distribution}
+\keyword{internal}

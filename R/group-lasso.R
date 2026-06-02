@@ -1059,13 +1059,13 @@ print.summary.cv.corila <- function(x, ...) {
 #' x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 #' include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 #' x_primary <- x[,include]
-#' x_expanded <- expand_auxiliary(x = x_primary, include = include)
+#' x_expanded <- corila:::.expand_auxiliary(x = x_primary, include = include)
 #' all(x_expanded[, include] == x[, include])
 #' all(x_expanded[, !include] == 0)
 #'
-#' @export
+#' @keywords internal
 #'
-expand_auxiliary <- function(x, include) {
+.expand_auxiliary <- function(x, include) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
   .assert(x = include, type = "logical", dim = Inf)
   if (ncol(x) == length(include)) {
@@ -1078,7 +1078,6 @@ expand_auxiliary <- function(x, include) {
     stop("incompatible number of (primary) features")
   }
 }
-
 
 #' @title
 #' predict (S3 method)
@@ -1129,7 +1128,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   #  full[, object$args$include] <- newx
   #  newx <- full
   #}
-  newx_full <- expand_auxiliary(x = newx, include = object$args$include)
+  newx_full <- .expand_auxiliary(x = newx, include = object$args$include)
   # --- make predictions ---
   newx_stand <- .forescale(x = newx_full, pars = object$scale)$x
   x_all <- cbind(newx_stand, -newx_stand)

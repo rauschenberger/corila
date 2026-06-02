@@ -419,8 +419,6 @@
     1 / (1 + exp(-x))
   } else if (identical(family, "poisson")) {
     exp(x)
-  } else {
-    stop("Family not implemented.")
   }
 }
 
@@ -484,7 +482,5 @@
     mean(2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
   } else if (identical(family, "cox")) {
     glmnet::coxnet.deviance(pred = y_hat, y = y)
-  } else {
-    stop(paste("Family", family, "not implemented."))
   }
 }

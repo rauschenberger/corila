@@ -49,7 +49,7 @@ p <- 10
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 x_primary <- x[, include]
-x_expanded <- expand_auxiliary(x = x_primary, include = include)
+x_expanded <- .expand_auxiliary(x = x_primary, include = include)
 testthat::test_that("primary predictors are equal", {
   testthat::expect_identical(object = x_expanded[, include],
                              expected = x[, include])
@@ -380,7 +380,8 @@ testthat::test_that("print.summary.cv.corila returns NULL",
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   message(paste0("family=\"", family, "\""))
-  data <- simulate(family = family, n1 = 50, n_group = 3, size_group = c(3, 2))
+  data <- simulate(family = family, n1 = 50, n_group = 3,
+                   size_group = c(3, 2))
   colnames(data$x_train) <- LETTERS[seq_len(ncol(data$x_train))]
   group <- list()
   group$vector <- data$group
@@ -461,7 +462,8 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 if (FALSE) {
   set.seed(1)
-  data <- simulate(family = "cox", n1 = 50, n_group = 3, size_group = c(3, 2))
+  data <- simulate(family = "cox", n1 = 50, n_group = 3,
+                   size_group = c(3, 2))
   #foldid <- sample(rep(x = seq_len(10), length.out = data$info$n0))
   #object <- glmnet::cv.glmnet(x = data$x_train,
   #                            y = data$y_train,
