@@ -30,7 +30,19 @@ Returns a logical vector of length \eqn{p}.
 Identifies adjacent predictors.
 }
 \examples{
-NA
+p <- 5
+names <- paste0("x", seq_len(p))
+group <- list()
+group$index_vector <- setNames(object = c(1, 1, 2, 2, 3), nm = names)
+group$label_vector <- setNames(object = LETTERS[group$index_vector],
+                                 nm = names(group$index_vector))
+group$index_list <- lapply(X = setNames(nm = unique(group$label_vector)),
+                     FUN = function(x) which(group$label_vector == x))
+group$label_list <- lapply(group$index_list, names)
+group$matrix <- 1 * outer(X = group$index_vector,
+                          Y = group$index_vector,
+                          FUN = "==")
+corila:::.is_adjacent(group = group[[1]], j = 3, p = p, names = names)
 
 }
 \keyword{internal}

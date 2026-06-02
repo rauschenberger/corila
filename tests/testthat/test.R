@@ -206,6 +206,35 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   })
 }
 
+## function ".is_adjacent" -----------------------------------------------------
+
+testthat::test_that("adjacency is detected", {
+  p <- 5
+  names <- paste0("x", seq_len(p))
+  group <- list()
+  group$index_vector <- setNames(object = c(1, 1, 2, 2, 3), nm = names)
+  group$label_vector <- setNames(object = LETTERS[group$index_vector],
+                                 nm = names(group$index_vector))
+  group$index_list <- lapply(X = setNames(nm = unique(group$label_vector)),
+                             FUN = function(x) which(group$label_vector == x))
+  group$label_list <- lapply(group$index_list, names)
+  group$matrix <- 1 * outer(X = group$index_vector,
+                            Y = group$index_vector,
+                            FUN = "==")
+  p <- length(group$index_vector)
+  cond <- list()
+  for (i in seq_along(group)) {
+    cond[[i]] <- corila:::.is_adjacent(group = group[[i]],
+                                       j = 1,
+                                       p = p,
+                                       names = names(group$index_vector))
+  }
+  lapply(X = cond[-1],
+         FUN = testthat::expect_equal, 
+         expected = cond[[1]],
+         check.attributes = FALSE)
+})
+
 # Integration tests ------------------------------------------------------------
 
 ## functions ".forescale" and ".backscale" -------------------------------------
@@ -433,8 +462,8 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     code = {
       testthat::expect_equal(y_hat[[1]], y_hat[[2]])
       testthat::expect_equal(y_hat[[2]], y_hat[[3]])
-      testthat::expect_equal(coef[[3]], coef[[4]])
-      testthat::expect_equal(coef[[4]], coef[[5]])
+      testthat::expect_equal(y_hat[[3]], y_hat[[4]])
+      testthat::expect_equal(y_hat[[4]], y_hat[[5]])
     }
   )
   testthat::test_that(

@@ -222,7 +222,19 @@
 #' Returns a logical vector of length \eqn{p}.
 #'
 #' @examples
-#' NA
+#' p <- 5
+#' names <- paste0("x", seq_len(p))
+#' group <- list()
+#' group$index_vector <- setNames(object = c(1, 1, 2, 2, 3), nm = names)
+#' group$label_vector <- setNames(object = LETTERS[group$index_vector],
+#'                                  nm = names(group$index_vector))
+#' group$index_list <- lapply(X = setNames(nm = unique(group$label_vector)),
+#'                      FUN = function(x) which(group$label_vector == x))
+#' group$label_list <- lapply(group$index_list, names)
+#' group$matrix <- 1 * outer(X = group$index_vector,
+#'                           Y = group$index_vector,
+#'                           FUN = "==")
+#' corila:::.is_adjacent(group = group[[1]], j = 3, p = p, names = names)
 #'
 #' @keywords internal
 #'
@@ -254,7 +266,6 @@
     stop("Argument 'group' should be a vector, a list, or a matrix.")
   }
 }
-
 
 #' @title
 #' Group lasso
@@ -389,6 +400,7 @@
 #' @keywords models, regression, classif
 #'
 #' @export
+#' 
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL) {
@@ -768,6 +780,10 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' @keywords models, regression, classif
 #'
 #' @export
+#' 
+#' @srrstats {G2.3b} *uses tolower() for arguments family and cor*
+#' @srrstats {RE4.0} *returns a "model" object (see @return)*
+#' 
 cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
                       nfolds = 10, cor = "spearman", tune = "both",
@@ -1205,6 +1221,9 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' @keywords methods
 #'
 #' @export
+#' 
+#' @srrstats {RE4.2} *extracts model coefficients via S3 method*
+#' 
 coef.cv.corila <- function(object, s = "lambda.min", ...) {
   if (identical(s, "lambda.min")) {
     s <- object$lambda.min

@@ -8,6 +8,9 @@
 The R package \code{corila} implements
 "Sparse modelling with grouped and correlated features
 allowing for privileged information" (\emph{Rauschenberger, 2026}).
+This is the first implementation of a novel algorithm,
+which is based on adaptive lasso regression using the
+\code{\link[glmnet]{glmnet-package}}.
 }
 \details{
 Use function \code{\link[=cv.corila]{cv.corila}()} for model fitting.

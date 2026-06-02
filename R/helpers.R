@@ -42,6 +42,12 @@
 #' corila:::.assert(x = "A", type = "nominal", support = LETTERS)
 #'
 #' @keywords internal
+#' 
+#' @srrstats {G2.0} *implements assertions on lengths of inputs*
+#' @srrstats {G2.1} *rejects unexpected input types*
+#' @srrstats {G2.2} *rejects multivariate input if expecting univariate input*
+#' @srrstats {G2.15} *rejects missing values by default*
+#' @srrstats {G2.3a} *rejects unexpected values*
 #'
 .assert <- function(x, type, dim = 1, na.rm = FALSE,
                     support = NULL, min = -Inf, max = Inf) {
@@ -131,6 +137,8 @@
 #' @inherit .backscale examples
 #'
 #' @keywords internal
+#' 
+#' @srrstats {RE2.3} *data are centred internally*
 #'
 .forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   # --- check arguments ---

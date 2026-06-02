@@ -8,6 +8,7 @@
 #' Fits multi-penalty ridge regression
 #' (tuning regularisation hyperparameters
 #' and estimating regression coefficients).
+#' @srrstats {G1.1} *improved API of a previously implemented algorithm*
 #'
 #' @param x
 #' predictors:
@@ -43,6 +44,7 @@
 #' \emph{Journal of Computational and Graphical Statistics}
 #' 30(4):835-847.
 #' \href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}. # nolint: line_length_linter.
+#' @srrstats {G1.0} *primary reference*
 #'
 #' @return
 #' Returns an object of class \code{"multiridge"},
