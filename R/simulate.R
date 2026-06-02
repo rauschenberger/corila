@@ -135,7 +135,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                      corfac_feature = 0.5, corfac_type = 0.5,
                      corfac_group = 0.25, n_group_causal = 2,
                      prop_causal = 0.5, noise_factor = 1,
-                     plot = TRUE, trial = FALSE) {
+                     plot = FALSE, trial = FALSE) {
   # --- check arguments ---
   .check(x = family, type = "nominal",
          support = c("gaussian", "binomial", "poisson", "cox"))
@@ -143,14 +143,24 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
   .check(x = n1, type = "integer", min = 2)
   .check(x = n_group, type = "integer", min = 2)
   .check(x = n_type, type = "integer", min = 2)
+  .check(x = size_group, type = "integer", dim = n_type, min = 1)
+  .check(x = effect_size, type = "integer", dim = n_type, min = 0)
+  .check(x = corfac_feature, type = "numeric", min = 0, max = 1)
+  .check(x = corfac_type, type = "numeric", min = 0, max = 1)
+  .check(x = corfac_group, type = "numeric", min = 0, max = 1)
+  .check(x = n_group_causal, type = "integer", min = 0, max = n_group)
+  .check(x = prop_causal, type = "numeric", min = 0, max = 1)
+  .check(x = noise_factor, type = "numeric", min = 0)
+  .check(x = plot, type = "logical")
+  .check(x = trial, type = "logical")
   # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;
   # size_group = c(5, 3);effect_size = c(1, 1);corfac_feature = 0.5;
   # corfac_type = 0.5;corfac_group = 0.25;n_group_causal = 2;
   # prop_causal = 0.5; noise_factor = 1; plot = TRUE
   n <- n0 + n1
-  if (n_type != length(size_group)) {
-    stop("Wrong length.")
-  }
+  #if (n_type != length(size_group)) {
+  #  stop("Wrong length.")
+  #}
   #- - - feature modalities and groups - - -
   p <- sum(n_group * size_group)
   if (!trial) {

@@ -171,7 +171,7 @@
       }
       if (is.numeric(group)) {
         NULL
-      } else if(is.character(group)) {
+      } else if (is.character(group)) {
         NULL
       } else {
         stop("If argument 'group' is a vector, ",

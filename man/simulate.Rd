@@ -18,7 +18,7 @@ simulate(
   n_group_causal = 2,
   prop_causal = 0.5,
   noise_factor = 1,
-  plot = TRUE,
+  plot = FALSE,
   trial = FALSE
 )
 }
