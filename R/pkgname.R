@@ -15,7 +15,7 @@
 #' This is the first implementation of a novel algorithm,
 #' which is based on adaptive lasso regression using the
 #' \code{\link[glmnet]{glmnet-package}}.
-#' 
+#'
 #' @details
 #' Use function \code{\link[=cv.corila]{cv.corila}()} for model fitting.
 #' Type \code{library(corila)} and then \code{?cv.corila} or
@@ -43,12 +43,12 @@
 #' "Sparse modelling with grouped and correlated features
 #' allowing for privileged information".
 #' \emph{In preparation}.
-#' 
+#'
 #' @examples
 #' ?cv.corila
 #' ?coef.cv.corila
 #' ?predict.cv.corila
-#' 
+#'
 #' @srrstats {G1.0} *@references mentions the primary reference*
 #' @srrstats {G1.1} *@description specifies novelty*
 #'

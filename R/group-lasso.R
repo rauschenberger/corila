@@ -400,7 +400,7 @@
 #' @keywords models, regression, classif
 #'
 #' @export
-#' 
+#'
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL) {
@@ -780,10 +780,10 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' @keywords models, regression, classif
 #'
 #' @export
-#' 
+#'
 #' @srrstats {G2.3b} *uses tolower() for arguments family and cor*
 #' @srrstats {RE4.0} *returns a "model" object (see @return)*
-#' 
+#'
 cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
                       nfolds = 10, cor = "spearman", tune = "both",
@@ -1221,9 +1221,9 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' @keywords methods
 #'
 #' @export
-#' 
+#'
 #' @srrstats {RE4.2} *extracts model coefficients via S3 method*
-#' 
+#'
 coef.cv.corila <- function(object, s = "lambda.min", ...) {
   if (identical(s, "lambda.min")) {
     s <- object$lambda.min
