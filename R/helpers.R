@@ -44,7 +44,7 @@
 #' @keywords internal
 #'
 .check_arg <- function(x, type, dim = 1, na.rm = FALSE,
-                   support = NULL, min = -Inf, max = Inf) {
+                       support = NULL, min = -Inf, max = Inf) {
   if (is.null(x)) {
     return(invisible(NULL))
   }
@@ -268,7 +268,7 @@
   }
   .check_arg(x = family, type = "nominal", support = families)
   .check_arg(x = names(pars), type = "nominal", dim = length(slots),
-         support = slots)
+             support = slots)
   .check_arg(x = pars$family, type = "nominal", support = families)
   .check_arg(x = pars$mu.x, type = "numeric", dim = ncol(x))
   .check_arg(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0)
@@ -406,7 +406,7 @@
   # --- check arguments ---
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
   .check_arg(x = names(pars), type = "nominal", dim = length(slots),
-         support = slots)
+             support = slots)
   families <- c("gaussian", "binomial", "poisson", "cox")
   .check_arg(x = pars$family, type = "nominal", support = families)
   .check_arg(x = pars$mu.x, type = "numeric", dim = Inf)

@@ -138,7 +138,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
                      plot = FALSE, trial = FALSE) {
   # --- check arguments ---
   .check_arg(x = family, type = "nominal",
-         support = c("gaussian", "binomial", "poisson", "cox"))
+             support = c("gaussian", "binomial", "poisson", "cox"))
   .check_arg(x = n0, type = "integer", min = 2)
   .check_arg(x = n1, type = "integer", min = 2)
   .check_arg(x = n_group, type = "integer", min = 2)

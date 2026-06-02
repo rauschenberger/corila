@@ -34,14 +34,15 @@
   .check_arg(x = x, type = "numeric", dim = c(Inf, Inf))
   .check_arg(x = y, type = "numeric", dim = nrow(x))
   .check_arg(x = family, type = "nominal",
-         support = c("gaussian", "binomial", "poisson", "cox"))
+             support = c("gaussian", "binomial", "poisson", "cox"))
   if (is.character(alpha)) {
     .check_arg(x = alpha, type = "nominal",
-           support = methods)
+               support = methods)
   } else {
     .check_arg(x = alpha, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
-  .check_arg(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
+  .check_arg(x = foldid, type = "integer", dim = nrow(x),
+             min = 1, max = nrow(x))
   .check_arg(x = nfolds, type = "integer", min = 1, max = nrow(x))
   .check_arg(x = lambda, type = "numeric", min = 0)
   # --- estimate initial coefficients ---
@@ -178,19 +179,19 @@
   .check_arg(x = include, type = "logical", dim = p)
   slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
   .check_arg(x = names(hyper), type = "nominal", dim = length(slots),
-         support = slots)
+             support = slots)
   .check_arg(x = as.matrix(hyper), type = "numeric",
-         dim = c(Inf, length(slots)), min = 0)
+             dim = c(Inf, length(slots)), min = 0)
   if (is.character(alpha_init)) {
     .check_arg(x = alpha_init, type = "nominal",
-           support = c("pearson", "spearman", "kendall"))
+               support = c("pearson", "spearman", "kendall"))
   } else {
     .check_arg(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
   .check_arg(x = alpha_final, type = "numeric", min = 0, max = 1)
   if (is.character(cor)) {
     .check_arg(x = cor, type = "nominal",
-           support = c("pearson", "spearman", "kendall"))
+               support = c("pearson", "spearman", "kendall"))
   } else {
     .check_arg(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
   }
@@ -391,7 +392,7 @@
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL) {
-  dims <- .check_args(x = x,
+  args <- .check_args(x = x,
                       y = y,
                       group = group,
                       include = include,
@@ -406,9 +407,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   #args <- as.list(match.call())[-1]
   #do.call(what = .check_args, args = args)
   #dims <- .validate(x = x, y = y, group = group, family = family)
-  n <- dims$n
-  p <- dims$p
-  q <- dims$q
+  p <- args$p
+  #q <- args$q
   #n <- nrow(x)
   #p <- ncol(x)
   if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
@@ -421,31 +421,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   if (is.null(include)) {
     include <- rep(x = TRUE, times = p)
   }
-  #if (length(group) != p) {
-  # stop("Argument 'group' must be a vector of length p.")
-  #}
-  # if (is.numeric(group) && !is.array(group)) {
-  #   q <- length(unique(group)) # number of groups = number of unique values
-  # } else if (is.list(group)) {
-  #   q <- length(group) # number of groups = number of slots
-  # } else {
-  #   q <- NA
-  # }
-  # if (is.numeric(group) && !is.array(group)) {
-  #   if (length(group) != p ||
-  #         max(group) != q ||
-  #         any(sort(unique(group)) != seq(from = 1, to = max(group), by = 1))) {
-  #     stop(paste("Argument 'group' should be of length p,",
-  #                "with all entries in {1, ..., q}."))
-  #   }
-  # } else {
-  #   if (is.character(group[[1]])) {
-  #     #test <- lapply(group, function(slot)
-  #     # sapply(slot, function(entry) which(colnames(x) == entry)))
-  #     warning("Implement this.")
-  #   }
-  # }
-  args <- mget(setdiff(c("n", "p", "q", names(formals(corila))), c("x", "y")))
+  args <- c(args, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
   # --- fold identifiers ---
@@ -560,7 +536,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #' @export
 predict.corila <- function(object, newx, index, s, ...) {
   # --- check arguments ---
-  .check_arg(x = newx, type = "numeric", dim = c(Inf, length(object$scale$mu.x)))
+  .check_arg(x = newx, type = "numeric",
+             dim = c(Inf, length(object$scale$mu.x)))
   .check_arg(x = index, type = "integer", min = 1, max = length(object$model))
   .check_arg(x = s, type = "numeric", dim = Inf, min = 0)
   # --- make predictions ---

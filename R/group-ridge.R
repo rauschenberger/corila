@@ -164,10 +164,11 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
   .check_arg(x = x, type = "numeric", dim = c(Inf, Inf))
   .check_arg(x = y, type = "numeric", dim = nrow(x))
   .check_arg(x = z, type = "integer", dim = ncol(x),
-         min = 1, max = length(unique(z)))
+             min = 1, max = length(unique(z)))
   .check_arg(x = family, type = "nominal",
-         support = c("gaussian", "binomial", "cox"))
-  .check_arg(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
+             support = c("gaussian", "binomial", "cox"))
+  .check_arg(x = foldid, type = "integer", dim = nrow(x),
+             min = 1, max = nrow(x))
   .check_arg(x = nfolds, type = "integer", min = 1, max = nrow(x))
   .check_arg(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
   #.validate(x = x, y = y, group = NULL, family = family)
