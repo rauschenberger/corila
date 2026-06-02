@@ -33,7 +33,7 @@ setwd("C:/Users/arauschenberger/Desktop/corila/package")
 # Checks
 
 ```{r}
-devtools::check()
+#devtools::check()
 roxygen2::roxygenise()
 rcmdcheck::rcmdcheck()
 

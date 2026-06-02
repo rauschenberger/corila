@@ -4,7 +4,7 @@
 \alias{.validate}
 \title{Validate data}
 \usage{
-.validate(x, y, family)
+.validate(x, y, group, family)
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix,
@@ -13,6 +13,16 @@ and \eqn{p} is the number of variables}
 
 \item{y}{\eqn{n_0}-dimensional response vector,
 where \eqn{n_0} is the number of observations used for model training}
+
+\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+(in \eqn{\{1, \ldots, q\}}) or labels,
+\emph{(ii)} list with \eqn{q} slots containing the variable indices
+(in \eqn{\{1, \ldots, p\}}) or labels,
+or \emph{(iii)} \eqn{p \times p} matrix,
+where the entry in the \eqn{j^{\text{th}}} row
+and the \eqn{k^{\text{th}}} column
+indicates whether information should be transferred
+from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
@@ -28,7 +38,7 @@ n <- 10
 p <- 5
 x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n)
-corila:::.validate(x = x, y = y, family = "gaussian")
+corila:::.validate(x = x, y = y, group = NULL, family = "gaussian")
 
 }
 \seealso{

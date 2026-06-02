@@ -106,7 +106,7 @@
 #' p <- 5
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- rnorm(n)
-#' corila:::.validate(x = x, y = y, family = "gaussian")
+#' corila:::.validate(x = x, y = y, group = NULL, family = "gaussian")
 #'
 #' @keywords internal
 #'
@@ -159,7 +159,7 @@
   } else {
     stop("Invalid value for argument 'family'.")
   }
-  if(!is.null(group)){
+  if (!is.null(group)) {
     NULL
   }
   # add tests for argument group

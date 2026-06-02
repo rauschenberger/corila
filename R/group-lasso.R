@@ -379,7 +379,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   #args <- as.list(match.call())[-1]
   #do.call(what = .check_args, args = args)
   .validate(x = x, y = y, group = group, family = family)
-  #n <- nrow(x)
+  n <- nrow(x)
   p <- ncol(x)
   if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
     warning("Setting alpha_init=0 due to family='poisson'.")
