@@ -365,13 +365,21 @@ if (FALSE) {
 data <- simulate(family = "gaussian", n1 = 50, n_group = 3,
                  size_group = c(3, 2))
 object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group)
+print <- print(object)
+testthat::test_that("print returns object",
+                    {testthat::expect_equal(object, print)})
+string <- capture.output(print)
+testthat::test_that("corila prints a string", {
+  testthat::expect_type(object = string, type = "character")
+})
 list <- summary(object)
 cond <- vapply(X = list, FUN = is.null, FUN.VALUE = logical(1))
 testthat::test_that("summary does not contain NULL",
                     {testthat::expect_all_false(cond)})
-out <- print(summary(object))
-testthat::test_that("print.summary.cv.corila returns NULL",
-                    {testthat::expect_identical(out, NULL)})
+testthat::test_that("print.summary.cv.corila returns NULL invisibly", {
+  testthat::expect_invisible(call = print(summary(object)))
+  testthat::expect_identical(object = print(summary(object)), expected = NULL)
+})
 #out <- plot(object)
 #testthat::test_that("plot.cv.corila returns NULL",
 #                    {testthat::expect_identical(out, NULL)})
@@ -458,7 +466,6 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     }
   )
 }
-
 
 if (FALSE) {
   set.seed(1)
