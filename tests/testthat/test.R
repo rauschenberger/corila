@@ -72,7 +72,7 @@ testthat::test_that("slopes do not change", {
 
 # function .deviance
 
-for (family in c("gaussian", "binomial", "poisson", "cox")) {
+for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
   n <- 10
   set.seed(1)
   if (family == "gaussian") {
@@ -90,33 +90,42 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     time <- pmin(time_survival, time_censoring)
     event <- 1 * (time_survival <= time_censoring)
     y <- survival::Surv(time = time, event = event)
-  }
-  if (family != "cox") {
-    testthat::test_that("perfect predictions lead to deviance zero", {
-      deviance <- .deviance(y = y, y_hat = y, family = family)
-      testthat::expect_identical(object = deviance, expected = 0)
-    })
-  } else {
-    # NB: inversion due to "higher risk = shorter time"
-    testthat::test_that("worse predictions increase deviance", {
-      dev_best <- .deviance(y = y,
-                            y_hat = -log(time_survival),
-                            family = family)
-      dev_random <- .deviance(y = y,
-                              y_hat = sample(-log(time_survival)),
-                              family = family)
-      dev_worst <- .deviance(y = y,
-                             y_hat = +log(time_survival),
-                             family = family)
-      testthat::expect_gt(object = dev_random, expected = dev_best)
-      testthat::expect_gt(object = dev_worst, expected = dev_random)
-    })
+  } else if (family == "gamma") {
+    y <- stats::rgamma(n = n, shape = 0.5)
+    y_hat <- stats::rgamma(n = n, shape = 0.5)
   }
   testthat::test_that("imperfect predictions lead to positive deviance", {
+    testthat::skip_if(family == "gamma")
     deviance <- .deviance(y = y, y_hat = y_hat, family = family)
     testthat::expect_gt(object = deviance, expected = 0)
   })
+  testthat::test_that("perfect predictions lead to deviance zero", {
+    testthat::skip_if(family %in% c("cox", "gamma"))
+    deviance <- .deviance(y = y, y_hat = y, family = family)
+    testthat::expect_identical(object = deviance, expected = 0)
+  })
+  testthat::test_that("worse predictions increase deviance", {
+    testthat::skip_if(family != "cox")
+    # NB: inversion due to "higher risk = shorter time"
+    dev_best <- .deviance(y = y,
+                          y_hat = -log(time_survival),
+                          family = family)
+    dev_random <- .deviance(y = y,
+                             y_hat = sample(-log(time_survival)),
+                            family = family)
+    dev_worst <- .deviance(y = y,
+                           y_hat = +log(time_survival),
+                           family = family)
+    testthat::expect_gt(object = dev_random, expected = dev_best)
+    testthat::expect_gt(object = dev_worst, expected = dev_random)
+  })
+  testthat::test_that("gamma deviance is not implemented", {
+    testthat::skip_if(family != "gamma")
+    testthat::expect_error(.deviance(y = y, y_hat = y_hat, family = family))  
+  })
 }
+
+
 
 # function .set_candidates
 
