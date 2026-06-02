@@ -82,6 +82,6 @@ NA
 
 }
 \seealso{
-\code{\link[=.check]{.check()}}, \code{\link[=.validate]{.validate()}}
+\code{\link[=.check_arg]{.check_arg()}}, \code{\link[=.validate]{.validate()}}
 }
 \keyword{internal}

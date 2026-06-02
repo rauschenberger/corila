@@ -31,19 +31,19 @@
                                  foldid, nfolds, lambda) {
   # --- check arguments ---
   methods <- c("pearson", "spearman", "kendall")
-  .check(x = x, type = "numeric", dim = c(Inf, Inf))
-  .check(x = y, type = "numeric", dim = nrow(x))
-  .check(x = family, type = "nominal",
+  .check_arg(x = x, type = "numeric", dim = c(Inf, Inf))
+  .check_arg(x = y, type = "numeric", dim = nrow(x))
+  .check_arg(x = family, type = "nominal",
          support = c("gaussian", "binomial", "poisson", "cox"))
   if (is.character(alpha)) {
-    .check(x = alpha, type = "nominal",
+    .check_arg(x = alpha, type = "nominal",
            support = methods)
   } else {
-    .check(x = alpha, type = "numeric", min = 0, max = 1, na.rm = TRUE)
+    .check_arg(x = alpha, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
-  .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
-  .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
-  .check(x = lambda, type = "numeric", min = 0)
+  .check_arg(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
+  .check_arg(x = nfolds, type = "integer", min = 1, max = nrow(x))
+  .check_arg(x = lambda, type = "numeric", min = 0)
   # --- estimate initial coefficients ---
   p <- ncol(x)
   if (all(is.na(alpha))) {
@@ -109,7 +109,7 @@
 #' @return
 #' Returns \code{NULL} or an error message.
 #'
-#' @seealso [.check()], [.validate()]
+#' @seealso [.check_arg()], [.validate()]
 #'
 #' @examples
 #' NA
@@ -118,61 +118,86 @@
 #'
 .check_args <- function(x, y, group, include, family, hyper, alpha_init,
                         alpha_final, cor, foldid, nfolds, lambda_init) {
-  .check(x = x, type = "numeric", dim = c(Inf, Inf))
+  # --- feature matrix ---
+  .check_arg(x = x, type = "numeric", dim = c(Inf, Inf))
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
-  .check(x = y, type = "numeric", dim = n)
+  # --- target vector ---
+  .check_arg(x = y, type = "numeric", dim = n)
+  .check_arg(x = family, type = "nominal",
+             support = c("gaussian", "binomial", "poisson", "cox"))
+  if (identical(family, "gaussian")) {
+    if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
+      stop("Gaussian family requires a numerical outcome.")
+    }
+  } else if (identical(family, "binomial")) {
+    if (!all(y %in% c(0, 1))) {
+      stop("Binomial family requires a binary outcome.")
+    }
+  } else if (identical(family, "poisson")) {
+    if (any(y %% 1 != 0)) {
+      stop("Poisson family requires a count outcome.")
+    }
+  } else if (identical(family, "cox")) {
+    if (!inherits(x = y, what = "Surv")) {
+      stop("Cox model requires a survival outcome.")
+    }
+  }
+  # --- group indicator ---
   if (is.vector(group) && is.atomic(group)) {
+    q <- length(unique(group))
     if (is.numeric(group)) {
-      .check(x = group, type = "integer", dim = p, min = 1, max = p)
+      .check_arg(x = group, type = "integer", dim = p, min = 1, max = p)
     } else if (is.character(group)) {
-      .check(x = group, type = "nominal", dim = p)
+      .check_arg(x = group, type = "nominal", dim = p)
     } else {
       stop("If argument 'group' is a vector, ",
            "it must be of class 'numeric' or 'character'.")
     }
   } else if (is.list(group)) {
+    q <- length(group)
     for (i in seq_along(group)) {
       if (is.numeric(group[[i]])) {
-        .check(x = group[[i]], type = "integer", dim = Inf, min = 1, max = p)
+        .check_arg(x = group[[i]], type = "integer", dim = Inf,
+                   min = 1, max = p)
       } else if (is.character(group[[i]])) {
-        .check(x = group[[i]], type = "nominal", dim = Inf,
-               support = colnames(x))
+        .check_arg(x = group[[i]], type = "nominal", dim = Inf,
+                   support = colnames(x))
       } else {
         stop("If argument 'group' is a list, ",
              "it must be a list of numeric or character vectors.")
       }
     }
   } else if (is.matrix(group)) {
-    .check(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)
+    q <- NA
+    .check_arg(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)
   } else {
     stop("Argument 'group' must be a vector, a list, or a matrix.")
   }
-  .check(x = include, type = "logical", dim = p)
-  .check(x = family, type = "nominal",
-         support = c("gaussian", "binomial", "poisson", "cox"))
+  # --- other arguments ---
+  .check_arg(x = include, type = "logical", dim = p)
   slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
-  .check(x = names(hyper), type = "nominal", dim = length(slots),
+  .check_arg(x = names(hyper), type = "nominal", dim = length(slots),
          support = slots)
-  .check(x = as.matrix(hyper), type = "numeric",
+  .check_arg(x = as.matrix(hyper), type = "numeric",
          dim = c(Inf, length(slots)), min = 0)
   if (is.character(alpha_init)) {
-    .check(x = alpha_init, type = "nominal",
+    .check_arg(x = alpha_init, type = "nominal",
            support = c("pearson", "spearman", "kendall"))
   } else {
-    .check(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
+    .check_arg(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
-  .check(x = alpha_final, type = "numeric", min = 0, max = 1)
+  .check_arg(x = alpha_final, type = "numeric", min = 0, max = 1)
   if (is.character(cor)) {
-    .check(x = cor, type = "nominal",
+    .check_arg(x = cor, type = "nominal",
            support = c("pearson", "spearman", "kendall"))
   } else {
-    .check(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
+    .check_arg(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
   }
-  .check(x = foldid, type = "integer", dim = n, min = 1, max = n)
-  .check(x = nfolds, type = "integer", min = 1, max = n)
-  .check(x = lambda_init, type = "numeric", min = 0)
-  invisible(NULL)
+  .check_arg(x = foldid, type = "integer", dim = n, min = 1, max = n)
+  .check_arg(x = nfolds, type = "integer", min = 1, max = n)
+  .check_arg(x = lambda_init, type = "numeric", min = 0)
+  list(n = n, p = p, q = q)
 }
 
 #' @title
@@ -201,9 +226,9 @@
 #' @keywords internal
 #'
 .is_adjacent <- function(group, j, p, names) {
-  .check(x = j, type = "integer", min = 1)
-  .check(x = p, type = "integer", min = j)
-  .check(x = names, type = "nominal", dim = p)
+  .check_arg(x = j, type = "integer", min = 1)
+  .check_arg(x = p, type = "integer", min = j)
+  .check_arg(x = names, type = "nominal", dim = p)
   if (is.vector(group) && is.atomic(group)) {
     group[j] == group
   } else if (is.list(group)) {
@@ -366,21 +391,21 @@
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL) {
-  .check_args(x = x,
-              y = y,
-              group = group,
-              include = include,
-              family = family,
-              hyper = hyper,
-              alpha_init = alpha_init,
-              alpha_final = alpha_final,
-              cor = cor,
-              foldid = foldid,
-              nfolds = nfolds,
-              lambda_init = lambda_init)
+  dims <- .check_args(x = x,
+                      y = y,
+                      group = group,
+                      include = include,
+                      family = family,
+                      hyper = hyper,
+                      alpha_init = alpha_init,
+                      alpha_final = alpha_final,
+                      cor = cor,
+                      foldid = foldid,
+                      nfolds = nfolds,
+                      lambda_init = lambda_init)
   #args <- as.list(match.call())[-1]
   #do.call(what = .check_args, args = args)
-  dims <- .validate(x = x, y = y, group = group, family = family)
+  #dims <- .validate(x = x, y = y, group = group, family = family)
   n <- dims$n
   p <- dims$p
   q <- dims$q
@@ -479,7 +504,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     #if (any(pf_ext < 0)) {
     #  stop(paste0("negative pf:", min(pf_ext)))
     #}
-    .check(x = pf_ext, type = "numeric", dim = 2 * p, min = 0)
+    .check_arg(x = pf_ext, type = "numeric", dim = 2 * p, min = 0)
     object[[i]] <- glmnet::glmnet(x = cbind(scale$x, -scale$x),
                                   y = scale$y,
                                   family = family,
@@ -535,9 +560,9 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #' @export
 predict.corila <- function(object, newx, index, s, ...) {
   # --- check arguments ---
-  .check(x = newx, type = "numeric", dim = c(Inf, length(object$scale$mu.x)))
-  .check(x = index, type = "integer", min = 1, max = length(object$model))
-  .check(x = s, type = "numeric", dim = Inf, min = 0)
+  .check_arg(x = newx, type = "numeric", dim = c(Inf, length(object$scale$mu.x)))
+  .check_arg(x = index, type = "integer", min = 1, max = length(object$model))
+  .check_arg(x = s, type = "numeric", dim = Inf, min = 0)
   # --- make predictions ---
   newx_stand <- .forescale(x = newx, pars = object$scale)$x
   y_hat_stand <- stats::predict(object = object$model[[index]],
@@ -568,7 +593,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' @keywords internal
 #'
 .set_candidates <- function(tune) {
-  .check(x = tune, type = "nominal")
+  .check_arg(x = tune, type = "nominal")
   #if (FALSE) {
   #  cand <- seq(from = 0, to = 1, by = 0.1)
   #  hyper <- data.frame(weight.local = cand,
@@ -776,7 +801,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                      choices = c("pearson", "spearman", "kendall"))
   }
   # set default parameters
-  .validate(x = x, y = y, group = group, family = family)
+  #.validate(x = x, y = y, group = group, family = family)
   if (is.null(include)) {
     include <- rep(x = TRUE, times = ncol(x))
   }
@@ -1062,8 +1087,8 @@ print.summary.cv.corila <- function(x, ...) {
 #' @export
 #'
 expand_auxiliary <- function(x, include) {
-  .check(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
-  .check(x = include, type = "logical", dim = Inf)
+  .check_arg(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
+  .check_arg(x = include, type = "logical", dim = Inf)
   if (ncol(x) == length(include)) {
     x
   } else if (ncol(x) == sum(include)) {
@@ -1166,8 +1191,8 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' @keywords internal
 #'
 .combine_slopes <- function(alpha, beta) {
-  .check(x = alpha, type = "numeric")
-  .check(x = beta, type = "numeric", dim = Inf, min = 0)
+  .check_arg(x = alpha, type = "numeric")
+  .check_arg(x = beta, type = "numeric", dim = Inf, min = 0)
   beta_positive <- beta[1:(length(beta) / 2)]
   beta_negative <- beta[(length(beta) / 2 + 1):(length(beta))]
   eps <- 1e-06

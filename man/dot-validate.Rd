@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{.validate}
 \alias{.validate}
-\title{Validate data}
+\title{Validate data - (integrated into check_args).}
 \usage{
 .validate(x, y, group, family)
 }
@@ -42,6 +42,6 @@ corila:::.validate(x = x, y = y, group = NULL, family = "gaussian")
 
 }
 \seealso{
-\code{\link{.check}()}
+\code{\link{.check_arg}()}
 }
 \keyword{internal}

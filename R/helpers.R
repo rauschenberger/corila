@@ -37,13 +37,13 @@
 #' @seealso \code{\link{.validate}()}
 #'
 #' @examples
-#' corila:::.check(x = NULL)
-#' corila:::.check(x = rnorm(1), type = "numeric")
-#' corila:::.check(x = "A", type = "nominal", support = LETTERS)
+#' corila:::.check_arg(x = NULL)
+#' corila:::.check_arg(x = rnorm(1), type = "numeric")
+#' corila:::.check_arg(x = "A", type = "nominal", support = LETTERS)
 #'
 #' @keywords internal
 #'
-.check <- function(x, type, dim = 1, na.rm = FALSE,
+.check_arg <- function(x, type, dim = 1, na.rm = FALSE,
                    support = NULL, min = -Inf, max = Inf) {
   if (is.null(x)) {
     return(invisible(NULL))
@@ -86,10 +86,8 @@
   )
 }
 
-# function .validate: add check on groups!
-
 #' @title
-#' Validate data
+#' Validate data - (integrated into check_args).
 #'
 #' @description
 #' Validates the predictor matrix x and the outcome vector y.
@@ -99,7 +97,7 @@
 #' @return
 #' Returns \code{NULL} or an error message.
 #'
-#' @seealso \code{\link{.check}()}
+#' @seealso \code{\link{.check_arg}()}
 #'
 #' @examples
 #' n <- 10
@@ -263,19 +261,19 @@
   # --- check arguments ---
   families <- c("gaussian", "binomial", "poisson", "cox")
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
-  .check(x = x, type = "numeric", dim = c(Inf, Inf))
-  .check(x = y, type = "numeric", dim = nrow(x))
+  .check_arg(x = x, type = "numeric", dim = c(Inf, Inf))
+  .check_arg(x = y, type = "numeric", dim = nrow(x))
   if (is.null(family) == is.null(pars)) {
     stop('Expect either "family" or "pars".')
   }
-  .check(x = family, type = "nominal", support = families)
-  .check(x = names(pars), type = "nominal", dim = length(slots),
+  .check_arg(x = family, type = "nominal", support = families)
+  .check_arg(x = names(pars), type = "nominal", dim = length(slots),
          support = slots)
-  .check(x = pars$family, type = "nominal", support = families)
-  .check(x = pars$mu.x, type = "numeric", dim = ncol(x))
-  .check(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0)
-  .check(x = pars$mu.y, type = "numeric")
-  .check(x = pars$sd.y, type = "numeric", min = 0)
+  .check_arg(x = pars$family, type = "nominal", support = families)
+  .check_arg(x = pars$mu.x, type = "numeric", dim = ncol(x))
+  .check_arg(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0)
+  .check_arg(x = pars$mu.y, type = "numeric")
+  .check_arg(x = pars$sd.y, type = "numeric", min = 0)
   # --- estimate parameters ---
   if (is.null(family)) {
     family <- pars$family
@@ -407,18 +405,18 @@
 .backscale <- function(pars, y = NULL, coef = NULL) {
   # --- check arguments ---
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
-  .check(x = names(pars), type = "nominal", dim = length(slots),
+  .check_arg(x = names(pars), type = "nominal", dim = length(slots),
          support = slots)
   families <- c("gaussian", "binomial", "poisson", "cox")
-  .check(x = pars$family, type = "nominal", support = families)
-  .check(x = pars$mu.x, type = "numeric", dim = Inf)
-  .check(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0)
-  .check(x = pars$mu.y, type = "numeric")
-  .check(x = pars$sd.y, type = "numeric", min = 0)
+  .check_arg(x = pars$family, type = "nominal", support = families)
+  .check_arg(x = pars$mu.x, type = "numeric", dim = Inf)
+  .check_arg(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0)
+  .check_arg(x = pars$mu.y, type = "numeric")
+  .check_arg(x = pars$sd.y, type = "numeric", min = 0)
   dim <- rep(x = Inf, times = 1 + is.matrix(y))
-  .check(x = y, type = "numeric", dim = dim)
+  .check_arg(x = y, type = "numeric", dim = dim)
   dim <- length(pars$mu.x) + !identical(pars$family, "cox")
-  .check(x = coef, type = "numeric", dim = dim)
+  .check_arg(x = coef, type = "numeric", dim = dim)
   # --- transform target ---
   list <- list()
   if (!is.null(y) && identical(pars$family, "gaussian")) {
@@ -491,13 +489,13 @@
 #'
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
-  .check(x = y, type = "numeric", dim = Inf)
+  .check_arg(x = y, type = "numeric", dim = Inf)
   support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
-  .check(x = family, type = "nominal", support = support)
+  .check_arg(x = family, type = "nominal", support = support)
   #if(identical(family, "cox") && !inherits(y, "Surv")){
   #  stop("Require object of class 'Surv'.")
   #}
-  .check(x = nfolds, type = "integer", min = 2, max = length(y))
+  .check_arg(x = nfolds, type = "integer", min = 2, max = length(y))
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
     if (identical(family, "cox")) {
@@ -537,8 +535,8 @@
 .mean_function <- function(x, family) {
   # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")
-  .check(x = x, type = "numeric", dim = Inf)
-  .check(x = family, type = "nominal", support = support)
+  .check_arg(x = x, type = "numeric", dim = Inf)
+  .check_arg(x = family, type = "nominal", support = support)
   # --- transform target ---
   if (family %in% c("gaussian", "cox")) {
     x
@@ -588,16 +586,16 @@
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")
-  .check(x = family, type = "nominal", support = support)
+  .check_arg(x = family, type = "nominal", support = support)
   if (identical(family, "binomial")) {
-    .check(x = y, type = "integer", dim = Inf, min = 0, max = 1)
-    .check(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
+    .check_arg(x = y, type = "integer", dim = Inf, min = 0, max = 1)
+    .check_arg(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
   } else if (identical(family, "poisson")) {
-    .check(x = y, type = "integer", dim = Inf, min = 0)
-    .check(x = y_hat, type = "numeric", dim = length(y), min = 0)
+    .check_arg(x = y, type = "integer", dim = Inf, min = 0)
+    .check_arg(x = y_hat, type = "numeric", dim = length(y), min = 0)
   } else {
-    .check(x = y, type = "numeric", dim = Inf)
-    .check(x = y_hat, type = "numeric", dim = length(y))
+    .check_arg(x = y, type = "numeric", dim = Inf)
+    .check_arg(x = y_hat, type = "numeric", dim = length(y))
   }
   # --- calculate deviance ---
   eps <- 1e-06

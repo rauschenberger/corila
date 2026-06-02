@@ -82,7 +82,7 @@
 #' \code{\link[multiridge]{SigmaFromBlocks}()},
 #' \code{\link[multiridge]{IWLSridge}()}, and
 #' \code{\link[multiridge]{IWLSCoxridge}()}.
-#' 
+#'
 #' The \code{\link[multiridge]{multiridge-package}} accepts not only
 #' an \eqn{n \times p} matrix but also
 #' a list of length \eqn{q} of \eqn{n \times p_k} matrices,
@@ -161,16 +161,16 @@
 multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
                        penalties = NULL) {
   # --- check arguments ---
-  .check(x = x, type = "numeric", dim = c(Inf, Inf))
-  .check(x = y, type = "numeric", dim = nrow(x))
-  .check(x = z, type = "integer", dim = ncol(x),
+  .check_arg(x = x, type = "numeric", dim = c(Inf, Inf))
+  .check_arg(x = y, type = "numeric", dim = nrow(x))
+  .check_arg(x = z, type = "integer", dim = ncol(x),
          min = 1, max = length(unique(z)))
-  .check(x = family, type = "nominal",
+  .check_arg(x = family, type = "nominal",
          support = c("gaussian", "binomial", "cox"))
-  .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
-  .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
-  .check(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
-  .validate(x = x, y = y, group = NULL, family = family)
+  .check_arg(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
+  .check_arg(x = nfolds, type = "integer", min = 1, max = nrow(x))
+  .check_arg(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
+  #.validate(x = x, y = y, group = NULL, family = family)
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop(paste(
       "For each variable,",
@@ -263,7 +263,7 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
 #' @export
 predict.multiridge <- function(object, newx, ...) {
   # --- check arguments ---
-  .check(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
+  .check_arg(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
   if (length(object$z) != ncol(newx)) {
     stop(paste(
       "Argument 'newx' must have one column",
