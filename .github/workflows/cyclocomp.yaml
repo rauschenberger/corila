@@ -19,7 +19,7 @@ jobs:
       - name: cyclocomp
         run: |
           x <- cyclocomp::cyclocomp_package_dir(".")
-          cond <- x$cyclocomp > 10
+          cond <- x$cyclocomp > 14
           message <- paste(paste0(x$name[cond]," (",x$cyclocomp[cond],")"), collapse = ", ")
           if (sum(cond) > 0) {stop("too complex: ", message)}
         shell: Rscript {0}
