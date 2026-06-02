@@ -159,11 +159,34 @@
   } else {
     stop("Invalid value for argument 'family'.")
   }
+  # --- group ---
+  n <- length(y)
+  p <- ncol(x)
   if (!is.null(group)) {
-    NULL
+    if (is.numeric(group) && !is.array(group)) {
+      q <- length(unique(group)) # number of groups = number of unique values
+    } else if (is.list(group)) {
+      q <- length(group) # number of groups = number of slots
+    } else {
+      q <- NA
+    }
+    if (is.numeric(group) && !is.array(group)) {
+      if (length(group) != p ||
+          max(group) != q ||
+          any(sort(unique(group)) != seq(from = 1, to = max(group), by = 1))) {
+        stop(paste("Argument 'group' should be of length p,",
+                   "with all entries in {1, ..., q}."))
+      }
+    } else {
+      if (is.character(group[[1]])) {
+        #test <- lapply(group, function(slot)
+        # sapply(slot, function(entry) which(colnames(x) == entry)))
+        warning("Implement this.")
+      }
+    }
   }
   # add tests for argument group
-  invisible(NULL)
+  list(n = n, p = p, q = q)
 }
 
 #' @title

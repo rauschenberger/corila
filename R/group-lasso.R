@@ -378,9 +378,12 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
               lambda_init = lambda_init)
   #args <- as.list(match.call())[-1]
   #do.call(what = .check_args, args = args)
-  .validate(x = x, y = y, group = group, family = family)
-  n <- nrow(x)
-  p <- ncol(x)
+  dims <- .validate(x = x, y = y, group = group, family = family)
+  n <- dims$n
+  p <- dims$p
+  q <- dims$q
+  #n <- nrow(x)
+  #p <- ncol(x)
   if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
     warning("Setting alpha_init=0 due to family='poisson'.")
     alpha_init <- 0
@@ -394,27 +397,27 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   #if (length(group) != p) {
   # stop("Argument 'group' must be a vector of length p.")
   #}
-  if (is.numeric(group) && !is.array(group)) {
-    q <- length(unique(group)) # number of groups = number of unique values
-  } else if (is.list(group)) {
-    q <- length(group) # number of groups = number of slots
-  } else {
-    q <- NA
-  }
-  if (is.numeric(group) && !is.array(group)) {
-    if (length(group) != p ||
-          max(group) != q ||
-          any(sort(unique(group)) != seq(from = 1, to = max(group), by = 1))) {
-      stop(paste("Argument 'group' should be of length p,",
-                 "with all entries in {1, ..., q}."))
-    }
-  } else {
-    if (is.character(group[[1]])) {
-      #test <- lapply(group, function(slot)
-      # sapply(slot, function(entry) which(colnames(x) == entry)))
-      warning("Implement this.")
-    }
-  }
+  # if (is.numeric(group) && !is.array(group)) {
+  #   q <- length(unique(group)) # number of groups = number of unique values
+  # } else if (is.list(group)) {
+  #   q <- length(group) # number of groups = number of slots
+  # } else {
+  #   q <- NA
+  # }
+  # if (is.numeric(group) && !is.array(group)) {
+  #   if (length(group) != p ||
+  #         max(group) != q ||
+  #         any(sort(unique(group)) != seq(from = 1, to = max(group), by = 1))) {
+  #     stop(paste("Argument 'group' should be of length p,",
+  #                "with all entries in {1, ..., q}."))
+  #   }
+  # } else {
+  #   if (is.character(group[[1]])) {
+  #     #test <- lapply(group, function(slot)
+  #     # sapply(slot, function(entry) which(colnames(x) == entry)))
+  #     warning("Implement this.")
+  #   }
+  # }
   args <- mget(setdiff(c("n", "p", "q", names(formals(corila))), c("x", "y")))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
