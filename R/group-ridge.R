@@ -12,19 +12,13 @@
 #' @param x
 #' predictors:
 #' \eqn{n \times p} matrix,
-#' or list of length \eqn{q} of \eqn{n \times p_k} matrices,
-#' with \eqn{k} in \eqn{\{1, \ldots, q\}}.
 #'
 #' @param y
 #' response:
 #' \eqn{n}-dimensional vector
 #'
 #' @param z
-#' groups:
 #' \eqn{p}-dimensional vector with entries in \eqn{\{1, \ldots, q\}}
-#' (if \code{x} is a matrix),
-#' or \code{NULL}
-#' (if \code{x} is a list of matrices)
 #'
 #' @param family
 #' character \code{"linear"} (or \code{"gaussian"}),
@@ -88,6 +82,11 @@
 #' \code{\link[multiridge]{SigmaFromBlocks}()},
 #' \code{\link[multiridge]{IWLSridge}()}, and
 #' \code{\link[multiridge]{IWLSCoxridge}()}.
+#' 
+#' The \code{\link[multiridge]{multiridge-package}} accepts not only
+#' an \eqn{n \times p} matrix but also
+#' a list of length \eqn{q} of \eqn{n \times p_k} matrices,
+#' with \eqn{k} in \eqn{\{1, \ldots, q\}}.
 #'
 #' @examples
 #' # minimal example

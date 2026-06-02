@@ -163,27 +163,51 @@
   n <- length(y)
   p <- ncol(x)
   if (!is.null(group)) {
-    if (is.numeric(group) && !is.array(group)) {
+    if (is.vector(group) && is.atomic(group)) {
       q <- length(unique(group)) # number of groups = number of unique values
+      if (length(group) != p) {
+        stop("If argument 'group' is a vector, ",
+             "it must be of length p.")
+      }
+      if (is.numeric(group)) {
+        NULL
+      } else if(is.character(group)) {
+        NULL
+      } else {
+        stop("If argument 'group' is a vector, ",
+             "it must be of class 'numeric' or 'character'.")
+      }
     } else if (is.list(group)) {
       q <- length(group) # number of groups = number of slots
-    } else {
+      size <- vapply(X = group, FUN = length, FUN.VALUE = numeric(1))
+      if (any(size > p)) {
+        stop("If argument 'group' is a list, ",
+             "no slot may contain more than p predictors.")
+      }
+    } else if (is.matrix(group)) {
+      if (nrow(group) != p || ncol(group) != p) {
+        stop("If argument 'group' is a matrix, ",
+             "it must have p rows and p columns.")
+      }
       q <- NA
-    }
-    if (is.numeric(group) && !is.array(group)) {
-      if (length(group) != p ||
-          max(group) != q ||
-          any(sort(unique(group)) != seq(from = 1, to = max(group), by = 1))) {
-        stop(paste("Argument 'group' should be of length p,",
-                   "with all entries in {1, ..., q}."))
-      }
     } else {
-      if (is.character(group[[1]])) {
-        #test <- lapply(group, function(slot)
-        # sapply(slot, function(entry) which(colnames(x) == entry)))
-        warning("Implement this.")
-      }
+      stop("Argument 'group' must be a vector, a list, or a matrix.")
     }
+    # remove code below
+    #if (is.numeric(group) && !is.array(group)) {
+    #  if (length(group) != p ||
+    #      max(group) != q ||
+    #      any(sort(unique(group)) != seq(from = 1, to = max(group), by = 1))) {
+    #    stop(paste("Argument 'group' should be of length p,",
+    #               "with all entries in {1, ..., q}."))
+    #  }
+    #} else {
+    #  if (is.character(group[[1]])) {
+    #    #test <- lapply(group, function(slot)
+    #    # sapply(slot, function(entry) which(colnames(x) == entry)))
+    #    warning("Implement this.")
+    #  }
+    #}
   }
   # add tests for argument group
   list(n = n, p = p, q = q)

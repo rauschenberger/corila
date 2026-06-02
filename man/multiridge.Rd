@@ -16,18 +16,12 @@ multiridge(
 }
 \arguments{
 \item{x}{predictors:
-\eqn{n \times p} matrix,
-or list of length \eqn{q} of \eqn{n \times p_k} matrices,
-with \eqn{k} in \eqn{\{1, \ldots, q\}}.}
+\eqn{n \times p} matrix,}
 
 \item{y}{response:
 \eqn{n}-dimensional vector}
 
-\item{z}{groups:
-\eqn{p}-dimensional vector with entries in \eqn{\{1, \ldots, q\}}
-(if \code{x} is a matrix),
-or \code{NULL}
-(if \code{x} is a list of matrices)}
+\item{z}{\eqn{p}-dimensional vector with entries in \eqn{\{1, \ldots, q\}}}
 
 \item{family}{character \code{"linear"} (or \code{"gaussian"}),
 \code{"logistic"} (or \code{"binomial"}),
@@ -175,6 +169,11 @@ namely
 \code{\link[multiridge]{SigmaFromBlocks}()},
 \code{\link[multiridge]{IWLSridge}()}, and
 \code{\link[multiridge]{IWLSCoxridge}()}.
+
+The \code{\link[multiridge]{multiridge-package}} accepts not only
+an \eqn{n \times p} matrix but also
+a list of length \eqn{q} of \eqn{n \times p_k} matrices,
+with \eqn{k} in \eqn{\{1, \ldots, q\}}.
 }
 \keyword{classif}
 \keyword{models,}

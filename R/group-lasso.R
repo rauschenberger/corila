@@ -126,10 +126,10 @@
     if (is.numeric(group)) {
       .check(x = group, type = "integer", dim = p, min = 1, max = p)
     } else if (is.character(group)) {
-      .check(x = group, type = "nominal", dim = p, support = colnames(x))
+      .check(x = group, type = "nominal", dim = p)
     } else {
       stop("If argument 'group' is a vector, ",
-           "it should be a numeric or character vector.")
+           "it must be of class 'numeric' or 'character'.")
     }
   } else if (is.list(group)) {
     for (i in seq_along(group)) {
@@ -140,13 +140,13 @@
                support = colnames(x))
       } else {
         stop("If argument 'group' is a list, ",
-             "it should be a list of numeric or character vectors.")
+             "it must be a list of numeric or character vectors.")
       }
     }
   } else if (is.matrix(group)) {
-    .check(x = group, type = "integer", dim = c(p, p), min = -1, max = 1)
+    .check(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)
   } else {
-    stop("Argument 'group' should be a vector, a list, or a matrix.")
+    stop("Argument 'group' must be a vector, a list, or a matrix.")
   }
   .check(x = include, type = "logical", dim = p)
   .check(x = family, type = "nominal",
@@ -212,13 +212,15 @@
                            FUN = function(slot) j %in% slot,
                            FUN.VALUE = logical(1))
       seq_len(p) %in% unlist(group[group_cond])
-    } else {
+    } else if (is.character(unlist(group))) {
       group_cond <- vapply(
         X = group,
         FUN = function(slot) names[j] %in% slot,
         FUN.VALUE = logical(1)
       )
       names %in% unlist(group[group_cond])
+    } else {
+      stop("Invalid type.")
     }
   } else if (is.matrix(group)) {
     group[, j] == 1
