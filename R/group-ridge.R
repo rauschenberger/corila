@@ -161,16 +161,16 @@
 multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
                        penalties = NULL) {
   # --- check arguments ---
-  .check_arg(x = x, type = "numeric", dim = c(Inf, Inf))
-  .check_arg(x = y, type = "numeric", dim = nrow(x))
-  .check_arg(x = z, type = "integer", dim = ncol(x),
-             min = 1, max = length(unique(z)))
-  .check_arg(x = family, type = "nominal",
-             support = c("gaussian", "binomial", "cox"))
-  .check_arg(x = foldid, type = "integer", dim = nrow(x),
-             min = 1, max = nrow(x))
-  .check_arg(x = nfolds, type = "integer", min = 1, max = nrow(x))
-  .check_arg(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
+  .assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  .assert(x = y, type = "numeric", dim = nrow(x))
+  .assert(x = z, type = "integer", dim = ncol(x),
+          min = 1, max = length(unique(z)))
+  .assert(x = family, type = "nominal",
+          support = c("gaussian", "binomial", "cox"))
+  .assert(x = foldid, type = "integer", dim = nrow(x),
+          min = 1, max = nrow(x))
+  .assert(x = nfolds, type = "integer", min = 1, max = nrow(x))
+  .assert(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
   #.validate(x = x, y = y, group = NULL, family = family)
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop(paste(
@@ -264,7 +264,7 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
 #' @export
 predict.multiridge <- function(object, newx, ...) {
   # --- check arguments ---
-  .check_arg(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
+  .assert(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
   if (length(object$z) != ncol(newx)) {
     stop(paste(
       "Argument 'newx' must have one column",

@@ -3,7 +3,9 @@
 
 set.seed(1)
 
-# function .forescale
+# Unit tests -------------------------------------------------------------------
+
+## functions ".forescale" and ".backscale" -------------------------------------
 
 n <- 5
 p <- 10
@@ -18,7 +20,7 @@ testthat::test_that("", {
   # and for coefficients (i.e., no effect if x is already standardised).
 })
 
-# function .type
+## function ".type" ------------------------------------------------------------
 
 expect <- list("ridge" = 0,
                "lasso" = 1,
@@ -40,7 +42,7 @@ testthat::test_that("initial coefficients are named correctly", {
   testthat::expect_error(object = .type(alpha = "blabla"))
 })
 
-# function expand_auxiliary
+## function ".expand_auxiliary" ------------------------------------------------
 
 n <- 5
 p <- 10
@@ -56,7 +58,7 @@ testthat::test_that("auxiliary features are zero", {
   testthat::expect_true(all(x_expanded[, !include] == 0))
 })
 
-# function .combine_slopes
+## function ".combine_slopes" --------------------------------------------------
 
 alpha <- stats::rnorm(1)
 temp <- stats::rnorm(10)
@@ -69,8 +71,7 @@ testthat::test_that("slopes do not change", {
   testthat::expect_identical(object = coef[-1], expected = temp)
 })
 
-
-# function .deviance
+## function ".deviance" --------------------------------------------------------
 
 for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
   n <- 10
@@ -111,7 +112,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
                           y_hat = -log(time_survival),
                           family = family)
     dev_random <- .deviance(y = y,
-                             y_hat = sample(-log(time_survival)),
+                            y_hat = sample(-log(time_survival)),
                             family = family)
     dev_worst <- .deviance(y = y,
                            y_hat = +log(time_survival),
@@ -121,13 +122,11 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
   })
   testthat::test_that("gamma deviance is not implemented", {
     testthat::skip_if(family != "gamma")
-    testthat::expect_error(.deviance(y = y, y_hat = y_hat, family = family))  
+    testthat::expect_error(.deviance(y = y, y_hat = y_hat, family = family))
   })
 }
 
-
-
-# function .set_candidates
+## function ".set_candidates" --------------------------------------------------
 
 for (tune in c("none", "trial", "wgt", "exp", "sep", "both", "all")) {
   hyper <- .set_candidates(tune = tune)
@@ -141,7 +140,8 @@ for (tune in c("none", "trial", "wgt", "exp", "sep", "both", "all")) {
   })
 }
 
-# function .mean_function
+## function ".mean_function" ---------------------------------------------------
+
 testthat::test_that("mean function works", {
   n <- 10
   eta <- stats::rnorm(n = n)
@@ -152,12 +152,63 @@ testthat::test_that("mean function works", {
   # CONTINUE HERE
 })
 
+## function "calc_sign_prec" ---------------------------------------------------
 
+truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
+estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 
+testthat::test_that("precision equals zero if all signs are inverted", {
+  prec <- calc_sign_prec(truth = truth, estim = -truth)
+  testthat::expect_true(prec == 0)
+})
 
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#----- functions ".forescale" and ".backscale" -----
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+testthat::test_that("precision equals one if all signs are true", {
+  prec <- calc_sign_prec(truth = truth, estim = truth)
+  testthat::expect_true(prec == 1)
+})
+
+testthat::test_that("precision is not defined if all signs equal zero", {
+  prec <- calc_sign_prec(truth = truth, estim = 0 * estim)
+  testthat::expect_true(is.na(prec))
+})
+
+testthat::test_that("precision is not influenced by estimated zeros", {
+  prec1 <- calc_sign_prec(truth = truth, estim = estim)
+  prec2 <- calc_sign_prec(truth = truth[estim != 0], estim = estim[estim != 0])
+  testthat::expect_true(prec1 == prec2)
+})
+
+## function ".folds" -----------------------------------------------------------
+
+n <- stats::rpois(n = 1, lambda = 50)
+for (family in c("gaussian", "binomial", "poisson", "cox")) {
+  if (family == "gaussian") {
+    y <- stats::rnorm(n = n)
+    index <- rep(x = 1, times = n)
+  } else if (family == "binomial") {
+    y <- stats::rbinom(n = n, size = 1, prob = 0.2)
+    index <- y
+  } else if (family == "poisson") {
+    y <- stats::rpois(n = n, lambda = 4)
+    index <- rep(x = 1, times = n)
+  } else if (family == "cox") {
+    time <- stats::rexp(n = n, rate = 2)
+    status <- stats::rbinom(n = n, prob = 0.2, size = 1)
+    y <- survival::Surv(time = time, event = status)
+    index <- y[, "status"]
+  }
+  foldid <- .folds(y = y, family = family, nfolds = 10)
+  diff <- tapply(X = foldid,
+                 INDEX = index,
+                 FUN = function(x) diff(range(table(x))))
+  testthat::test_that("folds are stratified and balanced", {
+    testthat::expect_true(all(diff <= 1))
+  })
+}
+
+# Integration tests ------------------------------------------------------------
+
+## functions ".forescale" and ".backscale" -------------------------------------
 
 for (glmnet in c(FALSE, TRUE)) {
   for (family in c("gaussian", "binomial", "poisson", "cox")) {
@@ -309,9 +360,7 @@ if (FALSE) {
   stats::cor(y_hat0, y_hat1)
 }
 
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#----- function "summary" -----
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## function "summary" ----------------------------------------------------------
 
 data <- simulate(family = "gaussian", n1 = 50, n_group = 3,
                  size_group = c(3, 2))
@@ -327,10 +376,7 @@ testthat::test_that("print.summary.cv.corila returns NULL",
 #testthat::test_that("plot.cv.corila returns NULL",
 #                    {testthat::expect_identical(out, NULL)})
 
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#----- function "corila" -----
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## function "cv.corila" --------------------------------------------------------
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   message(paste0("family=\"", family, "\""))
@@ -478,9 +524,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   })
 }
 
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#----- function "multiridge" -----
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## function "multiridge" -------------------------------------------------------
 
 # fix bug in Cox model
 
@@ -528,67 +572,7 @@ for (family in c("gaussian", "binomial", "cox")) {
   })
 }
 
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#----- function "nfolds" -----
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-n <- stats::rpois(n = 1, lambda = 50)
-for (family in c("gaussian", "binomial", "poisson", "cox")) {
-  if (family == "gaussian") {
-    y <- stats::rnorm(n = n)
-    index <- rep(x = 1, times = n)
-  } else if (family == "binomial") {
-    y <- stats::rbinom(n = n, size = 1, prob = 0.2)
-    index <- y
-  } else if (family == "poisson") {
-    y <- stats::rpois(n = n, lambda = 4)
-    index <- rep(x = 1, times = n)
-  } else if (family == "cox") {
-    time <- stats::rexp(n = n, rate = 2)
-    status <- stats::rbinom(n = n, prob = 0.2, size = 1)
-    y <- survival::Surv(time = time, event = status)
-    index <- y[, "status"]
-  }
-  foldid <- .folds(y = y, family = family, nfolds = 10)
-  diff <- tapply(X = foldid,
-                 INDEX = index,
-                 FUN = function(x) diff(range(table(x))))
-  testthat::test_that("folds are stratified and balanced", {
-    testthat::expect_true(all(diff <= 1))
-  })
-}
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#----- function "calc_sign_prec" -----
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
-estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
-
-testthat::test_that("precision equals zero if all signs are inverted", {
-  prec <- calc_sign_prec(truth = truth, estim = -truth)
-  testthat::expect_true(prec == 0)
-})
-
-testthat::test_that("precision equals one if all signs are true", {
-  prec <- calc_sign_prec(truth = truth, estim = truth)
-  testthat::expect_true(prec == 1)
-})
-
-testthat::test_that("precision is not defined if all signs equal zero", {
-  prec <- calc_sign_prec(truth = truth, estim = 0 * estim)
-  testthat::expect_true(is.na(prec))
-})
-
-testthat::test_that("precision is not influenced by estimated zeros", {
-  prec1 <- calc_sign_prec(truth = truth, estim = estim)
-  prec2 <- calc_sign_prec(truth = truth[estim != 0], estim = estim[estim != 0])
-  testthat::expect_true(prec1 == prec2)
-})
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#----- privileged information -----
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## privileged information ------------------------------------------------------
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   # simulate data

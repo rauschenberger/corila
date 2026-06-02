@@ -37,14 +37,14 @@
 #' @seealso \code{\link{.validate}()}
 #'
 #' @examples
-#' corila:::.check_arg(x = NULL)
-#' corila:::.check_arg(x = rnorm(1), type = "numeric")
-#' corila:::.check_arg(x = "A", type = "nominal", support = LETTERS)
+#' corila:::.assert(x = NULL)
+#' corila:::.assert(x = rnorm(1), type = "numeric")
+#' corila:::.assert(x = "A", type = "nominal", support = LETTERS)
 #'
 #' @keywords internal
 #'
-.check_arg <- function(x, type, dim = 1, na.rm = FALSE,
-                       support = NULL, min = -Inf, max = Inf) {
+.assert <- function(x, type, dim = 1, na.rm = FALSE,
+                    support = NULL, min = -Inf, max = Inf) {
   if (is.null(x)) {
     return(invisible(NULL))
   }
@@ -84,131 +84,6 @@
     "expected values less than or equal to maximum" =
       type == "nominal" || max == Inf || all(x <= max, na.rm = TRUE)
   )
-}
-
-#' @title
-#' Validate data - (integrated into check_args).
-#'
-#' @description
-#' Validates the predictor matrix x and the outcome vector y.
-#'
-#' @inheritParams corila
-#'
-#' @return
-#' Returns \code{NULL} or an error message.
-#'
-#' @seealso \code{\link{.check_arg}()}
-#'
-#' @examples
-#' n <- 10
-#' p <- 5
-#' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
-#' y <- rnorm(n)
-#' corila:::.validate(x = x, y = y, group = NULL, family = "gaussian")
-#'
-#' @keywords internal
-#'
-.validate <- function(x, y, group, family) {
-  if (!is.character(family) || length(family) != 1) {
-    stop("Argument 'family' must be a character string.")
-  }
-  #family <- match.arg(
-  #arg = tolower(family),
-  #choices = c("gaussian", "linear", "binomial", "logistic", "poisson", "cox"))
-  #)
-  family <- switch(family, linear = "gaussian", logistic = "binomial", family)
-  if (!is.matrix(x) || !is.numeric(x)) {
-    stop("Argument 'x' must be a numeric matrix.")
-  }
-  if (any(is.na(x))) {
-    stop("Argument 'x' must not contain any missing values.")
-  }
-  if (any(is.na(y))) {
-    stop("Argument 'y' must not contain any missing values.")
-  }
-  #cond_vector <- is.vector(y) && is.numeric(y)
-  #cond_matrix <- is.matrix(y) && ncol(y) == 1
-  cond_vector <- (is.vector(y) && is.atomic(y)) # || inherits(y, "Surv")
-  cond_matrix <- is.matrix(y) && ncol(y) == 1 && is.numeric(y)
-  if (!(identical(family, "cox") || cond_vector || cond_matrix)) {
-    stop("Argument 'y' must be a numeric vector.")
-  }
-  if (nrow(x) != length(y)) {
-    stop("For each observation, matrix 'x' must have one row,
-         and vector 'y' must have one entry.")
-  }
-  # --- outcome vector ---
-  if (identical(family, "gaussian")) {
-    if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-      stop("Gaussian family requires a numerical outcome.")
-    }
-  } else if (identical(family, "binomial")) {
-    if (!all(y %in% c(0, 1))) {
-      stop("Binomial family requires a binary outcome.")
-    }
-  } else if (identical(family, "poisson")) {
-    if (any(y %% 1 != 0)) {
-      stop("Poisson family requires a count outcome.")
-    }
-  } else if (identical(family, "cox")) {
-    if (!inherits(x = y, what = "Surv")) {
-      stop("Cox model requires a survival outcome.")
-    }
-  } else {
-    stop("Invalid value for argument 'family'.")
-  }
-  # --- group ---
-  n <- length(y)
-  p <- ncol(x)
-  if (!is.null(group)) {
-    if (is.vector(group) && is.atomic(group)) {
-      q <- length(unique(group)) # number of groups = number of unique values
-      if (length(group) != p) {
-        stop("If argument 'group' is a vector, ",
-             "it must be of length p.")
-      }
-      if (is.numeric(group)) {
-        NULL
-      } else if (is.character(group)) {
-        NULL
-      } else {
-        stop("If argument 'group' is a vector, ",
-             "it must be of class 'numeric' or 'character'.")
-      }
-    } else if (is.list(group)) {
-      q <- length(group) # number of groups = number of slots
-      size <- vapply(X = group, FUN = length, FUN.VALUE = numeric(1))
-      if (any(size > p)) {
-        stop("If argument 'group' is a list, ",
-             "no slot may contain more than p predictors.")
-      }
-    } else if (is.matrix(group)) {
-      if (nrow(group) != p || ncol(group) != p) {
-        stop("If argument 'group' is a matrix, ",
-             "it must have p rows and p columns.")
-      }
-      q <- NA
-    } else {
-      stop("Argument 'group' must be a vector, a list, or a matrix.")
-    }
-    # remove code below
-    #if (is.numeric(group) && !is.array(group)) {
-    #  if (length(group) != p ||
-    #      max(group) != q ||
-    #      any(sort(unique(group)) != seq(from = 1, to = max(group), by = 1))) {
-    #    stop(paste("Argument 'group' should be of length p,",
-    #               "with all entries in {1, ..., q}."))
-    #  }
-    #} else {
-    #  if (is.character(group[[1]])) {
-    #    #test <- lapply(group, function(slot)
-    #    # sapply(slot, function(entry) which(colnames(x) == entry)))
-    #    warning("Implement this.")
-    #  }
-    #}
-  }
-  # add tests for argument group
-  list(n = n, p = p, q = q)
 }
 
 #' @title
@@ -261,19 +136,19 @@
   # --- check arguments ---
   families <- c("gaussian", "binomial", "poisson", "cox")
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
-  .check_arg(x = x, type = "numeric", dim = c(Inf, Inf))
-  .check_arg(x = y, type = "numeric", dim = nrow(x))
+  .assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  .assert(x = y, type = "numeric", dim = nrow(x))
   if (is.null(family) == is.null(pars)) {
     stop('Expect either "family" or "pars".')
   }
-  .check_arg(x = family, type = "nominal", support = families)
-  .check_arg(x = names(pars), type = "nominal", dim = length(slots),
-             support = slots)
-  .check_arg(x = pars$family, type = "nominal", support = families)
-  .check_arg(x = pars$mu.x, type = "numeric", dim = ncol(x))
-  .check_arg(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0)
-  .check_arg(x = pars$mu.y, type = "numeric")
-  .check_arg(x = pars$sd.y, type = "numeric", min = 0)
+  .assert(x = family, type = "nominal", support = families)
+  .assert(x = names(pars), type = "nominal", dim = length(slots),
+          support = slots)
+  .assert(x = pars$family, type = "nominal", support = families)
+  .assert(x = pars$mu.x, type = "numeric", dim = ncol(x))
+  .assert(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0)
+  .assert(x = pars$mu.y, type = "numeric")
+  .assert(x = pars$sd.y, type = "numeric", min = 0)
   # --- estimate parameters ---
   if (is.null(family)) {
     family <- pars$family
@@ -405,18 +280,18 @@
 .backscale <- function(pars, y = NULL, coef = NULL) {
   # --- check arguments ---
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
-  .check_arg(x = names(pars), type = "nominal", dim = length(slots),
-             support = slots)
+  .assert(x = names(pars), type = "nominal", dim = length(slots),
+          support = slots)
   families <- c("gaussian", "binomial", "poisson", "cox")
-  .check_arg(x = pars$family, type = "nominal", support = families)
-  .check_arg(x = pars$mu.x, type = "numeric", dim = Inf)
-  .check_arg(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0)
-  .check_arg(x = pars$mu.y, type = "numeric")
-  .check_arg(x = pars$sd.y, type = "numeric", min = 0)
+  .assert(x = pars$family, type = "nominal", support = families)
+  .assert(x = pars$mu.x, type = "numeric", dim = Inf)
+  .assert(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0)
+  .assert(x = pars$mu.y, type = "numeric")
+  .assert(x = pars$sd.y, type = "numeric", min = 0)
   dim <- rep(x = Inf, times = 1 + is.matrix(y))
-  .check_arg(x = y, type = "numeric", dim = dim)
+  .assert(x = y, type = "numeric", dim = dim)
   dim <- length(pars$mu.x) + !identical(pars$family, "cox")
-  .check_arg(x = coef, type = "numeric", dim = dim)
+  .assert(x = coef, type = "numeric", dim = dim)
   # --- transform target ---
   list <- list()
   if (!is.null(y) && identical(pars$family, "gaussian")) {
@@ -489,13 +364,13 @@
 #'
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
-  .check_arg(x = y, type = "numeric", dim = Inf)
+  .assert(x = y, type = "numeric", dim = Inf)
   support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
-  .check_arg(x = family, type = "nominal", support = support)
+  .assert(x = family, type = "nominal", support = support)
   #if(identical(family, "cox") && !inherits(y, "Surv")){
   #  stop("Require object of class 'Surv'.")
   #}
-  .check_arg(x = nfolds, type = "integer", min = 2, max = length(y))
+  .assert(x = nfolds, type = "integer", min = 2, max = length(y))
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
     if (identical(family, "cox")) {
@@ -535,8 +410,8 @@
 .mean_function <- function(x, family) {
   # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")
-  .check_arg(x = x, type = "numeric", dim = Inf)
-  .check_arg(x = family, type = "nominal", support = support)
+  .assert(x = x, type = "numeric", dim = Inf)
+  .assert(x = family, type = "nominal", support = support)
   # --- transform target ---
   if (family %in% c("gaussian", "cox")) {
     x
@@ -586,16 +461,16 @@
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")
-  .check_arg(x = family, type = "nominal", support = support)
+  .assert(x = family, type = "nominal", support = support)
   if (identical(family, "binomial")) {
-    .check_arg(x = y, type = "integer", dim = Inf, min = 0, max = 1)
-    .check_arg(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
+    .assert(x = y, type = "integer", dim = Inf, min = 0, max = 1)
+    .assert(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
   } else if (identical(family, "poisson")) {
-    .check_arg(x = y, type = "integer", dim = Inf, min = 0)
-    .check_arg(x = y_hat, type = "numeric", dim = length(y), min = 0)
+    .assert(x = y, type = "integer", dim = Inf, min = 0)
+    .assert(x = y_hat, type = "numeric", dim = length(y), min = 0)
   } else {
-    .check_arg(x = y, type = "numeric", dim = Inf)
-    .check_arg(x = y_hat, type = "numeric", dim = length(y))
+    .assert(x = y, type = "numeric", dim = Inf)
+    .assert(x = y_hat, type = "numeric", dim = length(y))
   }
   # --- calculate deviance ---
   eps <- 1e-06
