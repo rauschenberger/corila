@@ -100,24 +100,24 @@
 # --- check arguments ---
 #' @title
 #' Argument Check
-#' 
+#'
 #' @description
 #' Checks arguments of functions \code{corila} and \code{cv.corila}.
-#' 
+#'
 #' @inheritParams cv.corila
-#' 
+#'
 #' @return
 #' Returns \code{NULL} or an error message.
 #'
 #' @seealso [.check()], [.validate()]
-#' 
+#'
 #' @examples
 #' NA
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 .check_args <- function(x, y, group, include, family, hyper, alpha_init,
-                alpha_final, cor, foldid, nfolds, lambda_init) {
+                        alpha_final, cor, foldid, nfolds, lambda_init) {
   .check(x = x, type = "numeric", dim = c(Inf, Inf))
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
@@ -172,35 +172,35 @@
   .check(x = foldid, type = "integer", dim = n, min = 1, max = n)
   .check(x = nfolds, type = "integer", min = 1, max = n)
   .check(x = lambda_init, type = "numeric", min = 0)
-  return(NULL)
+  invisible(NULL)
 }
 
 #' @title
 #' Adjacency
-#' 
+#'
 #' @description
 #' Identifies adjacent predictors.
-#' 
+#'
 #' @inheritParams corila
-#' 
+#'
 #' @param j
 #' index of predictor
-#' 
+#'
 #' @param p
 #' number of predictors
-#' 
+#'
 #' @param names
 #' names of predictors
-#' 
+#'
 #' @returns
 #' Returns a logical vector of length \eqn{p}.
-#' 
+#'
 #' @examples
 #' NA
-#' 
+#'
 #' @keywords internal
-#' 
-.is_adjacent <- function(group, j, p, names){
+#'
+.is_adjacent <- function(group, j, p, names) {
   .check(x = j, type = "integer", min = 1)
   .check(x = p, type = "integer", min = j)
   .check(x = names, type = "nominal", dim = p)
@@ -378,8 +378,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
               lambda_init = lambda_init)
   #args <- as.list(match.call())[-1]
   #do.call(what = .check_args, args = args)
-  .validate(x = x, y = y, family = family)
-  n <- nrow(x)
+  .validate(x = x, y = y, group = group, family = family)
+  #n <- nrow(x)
   p <- ncol(x)
   if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
     warning("Setting alpha_init=0 due to family='poisson'.")
@@ -771,7 +771,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
                      choices = c("pearson", "spearman", "kendall"))
   }
   # set default parameters
-  .validate(x = x, y = y, family = family)
+  .validate(x = x, y = y, group = group, family = family)
   if (is.null(include)) {
     include <- rep(x = TRUE, times = ncol(x))
   }

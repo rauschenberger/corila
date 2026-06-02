@@ -110,7 +110,7 @@
 #'
 #' @keywords internal
 #'
-.validate <- function(x, y, family) {
+.validate <- function(x, y, group, family) {
   if (!is.character(family) || length(family) != 1) {
     stop("Argument 'family' must be a character string.")
   }
@@ -158,6 +158,9 @@
     }
   } else {
     stop("Invalid value for argument 'family'.")
+  }
+  if(!is.null(group)){
+    NULL
   }
   # add tests for argument group
   invisible(NULL)

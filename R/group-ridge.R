@@ -171,7 +171,7 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
   .check(x = foldid, type = "integer", dim = nrow(x), min = 1, max = nrow(x))
   .check(x = nfolds, type = "integer", min = 1, max = nrow(x))
   .check(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
-  .validate(x = x, y = y, family = family)
+  .validate(x = x, y = y, group = NULL, family = family)
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop(paste(
       "For each variable,",
