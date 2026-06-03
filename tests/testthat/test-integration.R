@@ -258,7 +258,6 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
           object = as.numeric(pred),
           expected = as.numeric(y_hat$vector * mean(pred / y_hat$vector))
         )
-        warning("issue with cox")
       } else {
         testthat::expect_equal(
           object = as.numeric(pred),
