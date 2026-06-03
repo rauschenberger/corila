@@ -5,16 +5,38 @@
 
 n <- 5
 p <- 10
-testthat::test_that("", {
+testthat::test_that("forescale and backscale work", {
   set.seed(1)
-  x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
-  y <- stats::rnorm(n)
-  scale <- .forescale(x = x, y = y, family = "gaussian", pars = NULL)
-  y_back <- .backscale(pars = scale$pars, y = scale$y)
-  testthat::expect_equal(object = y_back$y_original, expected = y)
-  # CONTINUE HERE:
-  # add tests for other families (i.e., forescale has no effect)
-  # and for coefficients (i.e., no effect if x is already standardised).
+  sd <- seq(from = 0, to = 1, length.out = p)
+  x <- vapply(X = sd,
+              FUN = function(x) stats::rnorm(n = n, sd = x),
+              FUN.VALUE = numeric(n))
+  for(family in c("gaussian", "binomial", "poisson", "cox")) {
+    if (identical(family, "gaussian")){
+      y <- stats::rnorm(n)
+    } else if (identical(family, "binomial")) {
+      y <- stats::rbinom(n = n, size = 1, prob = 0.5)
+    } else if (identical(family, "poisson")) {
+      y <- stats::rpois(n = n, lambda = 4)
+    } else if (identical(family, "cox")) {
+      time_survival <- stats::rexp(n = n, rate = 1)
+      time_censoring <- stats::rexp(n = n, rate = 1)
+      time <- pmin(time_survival, time_censoring)
+      event <- 1 * (time_survival <= time_censoring)
+      y <- survival::Surv(time = time, event = event)
+    }
+    scale <- .forescale(x = x, y = y, family = family, pars = NULL)
+    y_back <- .backscale(pars = scale$pars, y = scale$y)
+    testthat::expect_equal(object = y_back$y_original, expected = y)
+  }
+  coef <- stats::rnorm(p)
+  mu.x <- rep(x = 0, times = p)
+  sd.x <- rep(x = 1, times = p)
+  mu.y <- 0
+  sd.y <- 1
+  pars <- list(mu.x = mu.x, sd.x = sd.x, mu.y = mu.y, sd.y = sd.y, family = family)
+  temp <- .backscale(pars = pars, coef = coef)$coef
+  testthat::expect_equal(object = temp, expected = coef)
 })
 
 ## function ".type" ------------------------------------------------------------
