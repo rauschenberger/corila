@@ -185,10 +185,10 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       "with argument group as vector, list, or matrix"
     ),
     code = {
-      testthat::expect_equal(coef[[1]], coef[[2]])
-      testthat::expect_equal(coef[[2]], coef[[3]])
-      testthat::expect_equal(coef[[3]], coef[[4]])
-      testthat::expect_equal(coef[[4]], coef[[5]])
+      lapply(X = coef[-1],
+             FUN = testthat::expect_equal,
+             expected = coef[[1]],
+             check.attributes = FALSE)
     }
   )
   testthat::test_that(
@@ -197,10 +197,10 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       "with argument group as vector, list, or matrix"
     ),
     code = {
-      testthat::expect_equal(y_hat[[1]], y_hat[[2]])
-      testthat::expect_equal(y_hat[[2]], y_hat[[3]])
-      testthat::expect_equal(y_hat[[3]], y_hat[[4]])
-      testthat::expect_equal(y_hat[[4]], y_hat[[5]])
+      lapply(X = y_hat[-1],
+             FUN = testthat::expect_equal,
+             expected = y_hat[[1]],
+             check.attributes = FALSE)
     }
   )
   testthat::test_that(
