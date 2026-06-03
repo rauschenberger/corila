@@ -126,42 +126,6 @@ for (glmnet in c(FALSE, TRUE)) {
   }
 }
 
-if (FALSE) {
-  #--- simulate data ---
-  n0 <- 1000
-  n1 <- 50
-  p <- 5
-  n <- n0 + n1
-  fold <- rep(x = c(0, 1), times = c(n0, n1))
-  sd <- seq_len(p)
-  x <- vapply(X = sd,
-              FUN = function(x) stats::rnorm(n = n, sd = x),
-              FUN.VALUE = numeric(length = n))
-  beta <- stats::rbinom(n = p, size = 1, prob = 0.2) * stats::rnorm(n = p)
-  eta <- x %*% beta
-  time <- stats::rexp(n = n, rate = exp(eta))
-  status <- stats::rbinom(n = n, prob = 0.5, size = 1)
-  y <- survival::Surv(time = time, event = status)
-  object <- survival::coxph(y[fold == 0] ~ .,
-                            data = data.frame(x)[fold == 0, ])
-  y_hat0 <- stats::predict(object = object,
-                           newdata = data.frame(x)[fold == 1, ],
-                           type = "risk")
-  coef0 <- as.numeric(stats::coef(object = object, s = 0))
-  object <- glmnet::cv.glmnet(x = x[fold == 0, ],
-                              y = y[fold == 0],
-                              family = "cox",
-                              lambda = c(99e99, 0))
-  y_hat1 <- as.numeric(stats::predict(object = object,
-                                      newx = x[fold == 1, ],
-                                      s = 0,
-                                      type = "response"))
-  coef1 <- as.numeric(stats::coef(object = object, s = 0))
-  all.equal(coef0, coef1, check.attributes = FALSE)
-  all.equal(y_hat0, y_hat1, check.attributes = FALSE)
-  stats::cor(y_hat0, y_hat1)
-}
-
 ## function "summary" ----------------------------------------------------------
 
 data <- simulate(family = "gaussian", n1 = 50, n_group = 3,
@@ -266,32 +230,6 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       }
     }
   )
-}
-
-if (FALSE) {
-  set.seed(1)
-  data <- simulate(family = "cox", n1 = 50, n_group = 3,
-                   size_group = c(3, 2))
-  #foldid <- sample(rep(x = seq_len(10), length.out = data$info$n0))
-  #object <- glmnet::cv.glmnet(x = data$x_train,
-  #                            y = data$y_train,
-  #                            family = "cox")
-  object <- cv.corila(x = data$x_train,
-                      y = data$y_train,
-                      group = data$group,
-                      family = "cox")
-  eta <- data$x_test %*% coef(object = object, s = "lambda.min")
-  #link <- predict(object = object,
-  #                newx = data$x_test,
-  #                type = "link",
-  #                s = "lambda.min")
-  #all.equal(as.numeric(manual), as.numeric(link)) # TRUE
-  risk <- predict(object = object,
-                  newx = data$x_test,
-                  type = "response",
-                  s = "lambda.min")
-  unique(as.numeric(exp(eta) / risk))
-  all.equal(as.numeric(exp(eta)), as.numeric(risk)) # TRUE
 }
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
