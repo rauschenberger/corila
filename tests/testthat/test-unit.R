@@ -153,8 +153,8 @@ testthat::test_that("mean function works", {
     if (family %in% c("binomial", "poisson")) {
       testthat::expect_gte(object = min(mean), expected = 0)
     }
-    if(identical(family, "binomial")) {
-      testthat::expect_lte(object = max(mean), expected = 1) 
+    if (identical(family, "binomial")) {
+      testthat::expect_lte(object = max(mean), expected = 1)
     }
   }
 })
