@@ -100,6 +100,6 @@ stopifnot(
 
 }
 \seealso{
-Use function \code{\link{.forescale}()} to standardise variables.
+Use function \code{\link[=.forescale]{.forescale()}} to standardise variables.
 }
 \keyword{internal}

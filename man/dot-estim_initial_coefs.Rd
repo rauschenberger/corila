@@ -30,11 +30,11 @@ with one penalty for each group
 (not implemented for \code{family="poisson"} or overlapping groups),
 or \code{NA} to set all initial coefficients equal to 1}
 
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+\item{group}{\strong{(i)} \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
-\emph{(ii)} list with \eqn{q} slots containing the variable indices
+\strong{(ii)} list with \eqn{q} slots containing the variable indices
 (in \eqn{\{1, \ldots, p\}}) or labels,
-or \emph{(iii)} \eqn{p \times p} matrix,
+\strong{(iii)} \eqn{p \times p} matrix,
 where the entry in the \eqn{j^{\text{th}}} row
 and the \eqn{k^{\text{th}}} column
 indicates whether information should be transferred

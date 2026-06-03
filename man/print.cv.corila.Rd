@@ -7,12 +7,12 @@
 \method{print}{cv.corila}(x, ...)
 }
 \arguments{
-\item{x}{object of class \code{"cv.corila"}}
+\item{x}{object of class \code{"cv.corila"}.}
 
 \item{...}{(not used)}
 }
 \value{
-Prints "object of class 'cv.corila'" to the console.
+Prints \code{"object of class 'cv.corila'"} to the console.
 }
 \description{
 Print method for class \code{"cv.corila"}.
@@ -31,5 +31,5 @@ summary(object)
 
 }
 \seealso{
-summary.cv.corila
+\link[=summary.cv.corila]{summary()}
 }

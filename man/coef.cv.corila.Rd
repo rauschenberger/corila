@@ -105,7 +105,7 @@ allowing for privileged information".
 \emph{In preparation}.
 }
 \seealso{
-Fit models with \code{\link{cv.corila}()}
-and make predictions with \code{\link{predict.cv.corila}()}.
+Fit models with \code{\link[=cv.corila]{cv.corila()}}
+and make predictions with \link[=predict.cv.corila]{predict()}.
 }
 \keyword{methods}

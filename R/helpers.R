@@ -11,30 +11,35 @@
 #'
 #' @param dim
 #' dimensionality:
-#' \code{dim = 1} for a scalar,
-#' \code{dim = Inf} for a vector of arbitrary length,
-#' \code{dim = c(Inf, Inf)} for a matrix of arbitrary dimensions,
-#' \code{dim = c(Inf, Inf, Inf)} for an array of arbitrary dimensions,
-#' \code{dim = 100} for a vector of length \code{100},
-#' \code{dim = c(Inf, 100)} for a matrix with \eqn{100} columns, etc.
+#' `dim = 1` for a scalar,
+#' `dim = Inf` for a vector of arbitrary length,
+#' `dim = c(Inf, Inf)` for a matrix of arbitrary dimensions,
+#' `dim = c(Inf, Inf, Inf)` for an array of arbitrary dimensions,
+#' `dim = 100` for a vector of length 100,
+#' `dim = c(Inf, 100)` for a matrix with 100 columns, etc.
 #'
 #' @param type
-#' character \code{"numeric"}, \code{"integer"},
-#' \code{"nominal"}, or \code{"logical"}
+#' character `"numeric"`, `"integer"`,
+#' `"nominal"`, or `"logical"`
 #'
 #' @param na.rm
 #' logical
 #'
 #' @param support
-#' character vector (only used for \code{type = "nominal"})
+#' character vector (only used for `type = "nominal"`)
 #'
 #' @param min
-#' numerical value (not used for \code{type = "nominal"})
+#' numerical value (not used for `type = "nominal"`)
 #'
 #' @param max
-#' numerical value (not used for \code{type = "nominal"})
+#' numerical value (not used for `type = "nominal"`)
 #'
-#' @seealso \code{\link{.validate}()}
+#' @details
+#' This function is called by multiple function of the [corila-package].
+#'
+#' @seealso
+#' The function [.validate()] verifies whether the main arguments
+#' have compatible dimensions (number of samples and features).
 #'
 #' @examples
 #' corila:::.assert(x = NULL)
@@ -102,39 +107,40 @@
 #'
 #' @param y
 #' \eqn{n_0}-dimensional response vector
-#' (only required if \code{family="gaussian"})
-#' or \code{NULL}
+#' (only required if `family="gaussian"`)
+#' or `NULL`
 #'
 #' @param family
-#' character string \code{"gaussian"}, \code{"binomial"},
-#' \code{"poisson"}, or \code{"cox"};
-#' or \code{NULL} (if \code{pars} is provided)
+#' character string `"gaussian"`, `"binomial"`,
+#' `"poisson"`, or `"cox"`;
+#' or `NULL` (if `pars` is provided)
 #'
 #' @param pars
 #' list as defined in section \emph{Value},
-#' or \code{NULL} (if \code{family} is provided)
+#' or `NULL` (if `family` is provided)
 #'
 #' @return
 #' \itemize{
 #' \item standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
 #' \item standardised \eqn{n_0}-dimensional response vector \eqn{y}
-#' (only if \eqn{y} is provided and \code{family = "gaussian"}
-#' or \code{pars$family = "gaussian"}; otherwise output equals input)
-#' \item character string \code{family} indicates the model (\code{"gaussian"},
-#' \code{"binomial"}, \code{"poisson"}, or \code{"cox"}),
-#' determined by argument \code{family} or \code{pars$family}
-#' \item list \code{pars} with slots \code{mu.x} and \code{sd.x}
+#' (only if \eqn{y} is provided and `family = "gaussian"`
+#' or `pars$family = "gaussian"`; otherwise output equals input)
+#' \item character string `family` indicates the model (`"gaussian"`,
+#' `"binomial"`, `"poisson"`, or `"cox"`),
+#' determined by argument `family` or `pars$family`
+#' \item list `pars` with slots `mu.x` and `sd.x`
 #' (\eqn{p}-dimensional vectors of means and standard deviations
 #' of the predictor variables),
-#' \code{mu.y} and \code{sd.y}
+#' `mu.y` and `sd.y`
 #' (mean and standard deviation of response variable for Gaussian family,
 #' 0 and 1 for other families),
-#' and \code{family}
-#' (character string \code{"gaussian"}, \code{"binomial"},
-#' \code{"poisson"}, or \code{"cox"})
+#' and `family`
+#' (character string `"gaussian"`, `"binomial"`,
+#' `"poisson"`, or `"cox"`)
 #' }
 #'
-#' @seealso Use function \code{\link{.backscale}()}
+#' @seealso
+#' Use function [.backscale()]
 #' to bring coefficients and predictions back to original scale.
 #'
 #' @inherit .backscale examples
@@ -207,33 +213,33 @@
 #' on original scales.
 #'
 #' @param pars
-#' list with slots \code{mu.x} and \code{sd.x}
+#' list with slots `mu.x` and `sd.x`
 #' (\eqn{p}-dimensional vectors of means and standard deviations
 #' of the predictor variables),
-#' \code{mu.y} and \code{sd.y}
+#' `mu.y` and `sd.y`
 #' (mean and standard deviation of response variable for Gaussian family,
 #' 0 and 1 for other families),
-#' and \code{family}
-#' (character string \code{"gaussian"}, \code{"binomial"},
-#' \code{"poisson"}, or \code{"cox"})
+#' and `family`
+#' (character string `"gaussian"`, `"binomial"`,
+#' `"poisson"`, or `"cox"`)
 #'
 #' @param y
 #' \eqn{n_1}-dimensional response vector
 #' or response matrix with \eqn{n_1} rows and multiple columns
 #' (for multiple values of the regularisation parameter),
-#' or \code{NULL} (default)
+#' or `NULL` (default)
 #'
 #' @param coef
 #' \eqn{(1 + p)}-dimensional vector
 #' containing the estimated intercept
 #' and the estimated slopes,
-#' or \code{NULL} (default)
+#' or `NULL` (default)
 #'
 #' @return
-#' Returns a list with slots \code{y_original} or \code{coef}.
+#' Returns a list with slots `y_original` or `coef`.
 #'
 #' @seealso
-#' Use function \code{\link{.forescale}()} to standardise variables.
+#' Use function [.forescale()] to standardise variables.
 #'
 #' @examples
 #' \donttest{
@@ -353,7 +359,7 @@
 #'
 #' @return
 #' Returns an \eqn{n_1}-dimensional vector
-#' with entries \eqn{\{1, \ldots, }\code{nfolds}\eqn{\}}
+#' with entries \eqn{\{1, \ldots, }`nfolds`\eqn{\}}
 #'
 #' @details
 #' Randomly splits observations into balanced folds
@@ -453,11 +459,11 @@
 #'
 #' @param y
 #' response:
-#' numeric vector of length \code{n}
+#' numeric vector of length \eqn{n}
 #'
 #' @param y_hat
 #' predicted response:
-#' numeric vector of length \code{n}
+#' numeric vector of length \eqn{n}
 #'
 #' @param family
 #' character

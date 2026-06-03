@@ -7,8 +7,8 @@
 .set_candidates(tune)
 }
 \arguments{
-\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"}
-for determining the candidate values for the hyperparameters;
+\item{tune}{character string\code{"to be defined"}
+or determining the candidate values for the hyperparameters;
 or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
 and \code{exp_global} (not yet implemented)}
 }

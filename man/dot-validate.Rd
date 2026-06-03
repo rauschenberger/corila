@@ -27,11 +27,11 @@ and \eqn{p} is the number of variables}
 \item{y}{\eqn{n_0}-dimensional response vector,
 where \eqn{n_0} is the number of observations used for model training}
 
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+\item{group}{\strong{(i)} \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
-\emph{(ii)} list with \eqn{q} slots containing the variable indices
+\strong{(ii)} list with \eqn{q} slots containing the variable indices
 (in \eqn{\{1, \ldots, p\}}) or labels,
-or \emph{(iii)} \eqn{p \times p} matrix,
+\strong{(iii)} \eqn{p \times p} matrix,
 where the entry in the \eqn{j^{\text{th}}} row
 and the \eqn{k^{\text{th}}} column
 indicates whether information should be transferred
@@ -75,13 +75,13 @@ or \eqn{p \times p} correlation matrix}
 Returns \code{NULL} or an error message.
 }
 \description{
-Checks arguments of functions \code{corila} and \code{cv.corila}.
+Checks arguments of functions \code{\link[=corila]{corila()}} and \code{\link[=cv.corila]{cv.corila()}}.
 }
 \examples{
 NA
 
 }
 \seealso{
-\code{\link[=.assert]{.assert()}}, \code{\link[=.validate]{.validate()}}
+This function repeatedly calls \code{\link[=.assert]{.assert()}}.
 }
 \keyword{internal}

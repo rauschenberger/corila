@@ -9,40 +9,40 @@
 #' Sparse group lasso
 #'
 #' @description
-#' The R package \code{corila} implements
+#' The R package `corila` implements
 #' "Sparse modelling with grouped and correlated features
-#' allowing for privileged information" (\emph{Rauschenberger, 2026}).
+#' allowing for privileged information" (*Rauschenberger, 2026*).
 #' This is the first implementation of a novel algorithm,
 #' which is based on adaptive lasso regression using the
-#' \code{\link[glmnet]{glmnet-package}}.
+#' [glmnet-package][glmnet::glmnet-package].
 #'
 #' @details
-#' Use function \code{\link[=cv.corila]{cv.corila}()} for model fitting.
-#' Type \code{library(corila)} and then \code{?cv.corila} or
-#' \code{help("cv.corila")} to open its help file.
+#' Use function [cv.corila()] for model fitting.
+#' Type `library(corila)` and then `?cv.corila` or
+#' `help("cv.corila")` to open its help file.
 #'
 #' See the vignette for further examples.
-#' Type \code{vignette("corila")} or \code{browseVignettes("corila")}
+#' Type `vignette("corila")` or `browseVignettes("corila")`
 #' to open the vignette.
 #'
-#' This package also includes the wrapper function
-#' \code{\link[=multiridge]{multiridge}()}
+#' This package also includes the wrapper function [multiridge()]
 #' for multi-penalty ridge regression with
-#' the \code{\link[multiridge]{multiridge-package}}.
+#' the [multiridge-package][multiridge::multiridge-package].
 #'
 #' @seealso
-#' First use \code{\link[=cv.corila]{cv.corila}()} to fit the model,
-#' and then \code{\link[=coef.cv.corila]{coef}()} to extract coefficients
-#' or \code{\link[=predict.cv.corila]{predict}()} to make predictions.
+#' First use [cv.corila()] to fit the model,
+#' and then [coef()][coef.cv.corila] to extract coefficients
+#' or [predict()][predict.cv.corila] to make predictions.
 #'
-#' @author \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
+#' @author
+#' [Armin Rauschenberger](https://orcid.org/0000-0001-6498-4801)
 #'
 #' @references
-#' \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
+#' [Armin Rauschenberger](https://orcid.org/0000-0001-6498-4801)
 #' (2026).
 #' "Sparse modelling with grouped and correlated features
 #' allowing for privileged information".
-#' \emph{In preparation}.
+#' *In preparation*.
 #'
 #' @examples
 #' ?cv.corila

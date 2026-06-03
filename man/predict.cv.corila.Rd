@@ -28,9 +28,9 @@ Makes predictions from an object of class \code{"cv.corila"}.
 \details{
 This function calls
 \code{\link[=.expand_auxiliary]{.expand_auxiliary()}} for handling auxiliary predictors,
-\code{\link{.forescale}()}
+\code{\link[=.forescale]{.forescale()}}
 for standardising the predictor matrix,
-and \code{\link{.backscale}()}
+and \code{\link[=.backscale]{.backscale()}}
 for bringing predicted values back to the original scale
 (if \code{family="gaussian"}).
 }
@@ -118,7 +118,7 @@ allowing for privileged information".
 \emph{In preparation}.
 }
 \seealso{
-Fit models with \code{\link{cv.corila}()}
-and extract coefficients with \code{\link{coef.cv.corila}()}.
+Fit models with \code{\link[=cv.corila]{cv.corila()}}
+and extract coefficients with \link[=coef.cv.corila]{coef()}.
 }
 \keyword{methods}

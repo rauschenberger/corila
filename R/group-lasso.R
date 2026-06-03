@@ -11,7 +11,7 @@
 #' @inheritParams corila
 #'
 #' @param lambda
-#' numeric scalar, or \code{NULL}
+#' numeric scalar, or `NULL`
 #' (determined by cross-validation)
 #'
 #' @details
@@ -114,14 +114,15 @@
 #' Argument Check
 #'
 #' @description
-#' Checks arguments of functions \code{corila} and \code{cv.corila}.
+#' Checks arguments of functions [corila()] and [cv.corila()].
 #'
 #' @inheritParams cv.corila
 #'
 #' @return
-#' Returns \code{NULL} or an error message.
+#' Returns `NULL` or an error message.
 #'
-#' @seealso [.assert()], [.validate()]
+#' @seealso
+#' This function repeatedly calls [.assert()].
 #'
 #' @examples
 #' NA
@@ -229,6 +230,9 @@
 #' @param names
 #' names of predictors
 #'
+#' @details
+#' This functions is called by [corila()].
+#'
 #' @returns
 #' Returns a logical vector of length \eqn{p}.
 #'
@@ -297,11 +301,11 @@
 #' where \eqn{n_0} is the number of observations used for model training
 #'
 #' @param group
-#' \emph{(i)} \eqn{p}-dimensional vector of group indices
+#' **(i)** \eqn{p}-dimensional vector of group indices
 #' (in \eqn{\{1, \ldots, q\}}) or labels,
-#' \emph{(ii)} list with \eqn{q} slots containing the variable indices
+#' **(ii)** list with \eqn{q} slots containing the variable indices
 #' (in \eqn{\{1, \ldots, p\}}) or labels,
-#' or \emph{(iii)} \eqn{p \times p} matrix,
+#' **(iii)** \eqn{p \times p} matrix,
 #' where the entry in the \eqn{j^{\text{th}}} row
 #' and the \eqn{k^{\text{th}}} column
 #' indicates whether information should be transferred
@@ -310,31 +314,31 @@
 #' @param include
 #' \eqn{p}-dimensional logical vector
 #' indicating whether a predictor may be included in the final model
-#' (\code{TRUE}, "primary predictors")
+#' (`TRUE`, "primary predictors")
 #' or must be excluded from the final model
-#' (\code{FALSE}, "auxiliary predictors")
+#' (`FALSE`, "auxiliary predictors")
 #'
 #' @param alpha_init
 #' elastic net mixing parameter
-#' (\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
+#' (\eqn{0 \leq} `alpha_init` \eqn{\leq 1})
 #' for initial regression
-#' (default: ridge penalisation with \code{alpha_init}=0);
+#' (default: ridge penalisation with `alpha_init`=0);
 #' alternative choices are
 #' "pearson", "spearman", or "kendall"
 #' to use initial correlation coefficients
-#' (not implemented for \code{family="cox"}),
+#' (not implemented for `family="cox"`),
 #' "multiridge" for multi-penalty ridge regression
 #' with one penalty for each group
-#' (not implemented for \code{family="poisson"} or overlapping groups),
-#' or \code{NA} to set all initial coefficients equal to 1
+#' (not implemented for `family="poisson"` or overlapping groups),
+#' or `NA` to set all initial coefficients equal to 1
 #'
 #' @param alpha_final
 #' elastic net mixing parameter for final regression
-#' (default: lasso penalisation with \code{alpha_final}=1)
+#' (default: lasso penalisation with `alpha_final`=1)
 #'
 #' @param family
-#' character string \code{"gaussian"}, \code{"binomial"},
-#' \code{"poisson"}, or \code{"cox"}
+#' character string `"gaussian"`, `"binomial"`,
+#' `"poisson"`, or `"cox"`
 #'
 #' @param foldid
 #' \eqn{n}-dimensional vector containing the fold identifiers
@@ -349,47 +353,45 @@
 #' for the regularisation and mixing hyperparameters
 #'
 #' @param cor
-#' character string \code{"pearson"},
-#' \code{"spearman"} (default),
-#' or \code{"kendall"};
+#' character string `"pearson"`,
+#' `"spearman"` (default),
+#' or `"kendall"`;
 #' or \eqn{p \times p} correlation matrix
 #'
 #' @param lambda_init
 #' regularisation hyperparameter(s),
-#' or \code{NULL} (cross-validation)
+#' or `NULL` (cross-validation)
 #'
 #' @details
 #' The number of observations (samples) for training or testing
 #' are indicated by \eqn{n_0} and \eqn{n_1}, respectively,
 #' the number of variables (features) is indicated by \eqn{p},
 #' and the number of variable groups is indicated by \eqn{q}.
-#'
 #' Observations (samples) are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
 #' variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
 #' and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
-#'
 #' The number of variables in the \eqn{k^{\text{th}}} group
 #' is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 #'
 #' @return
-#' Returns an object of class \code{"corila"}.
+#' Returns an object of class `"corila"`.
 #'
 #' @inherit corila-package references
 #'
 #' @seealso
 #' Estimate parameters and tune hyperparameters (using cross-validation)
-#' with \code{\link{cv.corila}()}.
+#' with [cv.corila()].
 #' Make predictions for a range of hyperparameters
-#' with \code{\link{predict.corila}()}.
+#' with [predict()][predict.corila].
 #'
 #' This function calls
-#' \code{\link{.forescale}()} and \code{\link{.backscale}()}
+#' [.forescale()] and [.backscale()]
 #' for standardising data and bringing results back to the original scale,
 #' respectively,
-#' \code{\link{.folds}()} for splitting samples into folds,
-#' \code{\link{.estim_initial_coefs}()} for obtaining initial coefficients,
-#' \code{\link{.is_adjacent}()} for identifying adjacent predictors,
-#' and \code{\link[glmnet]{cv.glmnet}()} and \code{\link[glmnet]{glmnet}()}
+#' [.folds()] for splitting samples into folds,
+#' [.estim_initial_coefs()] for obtaining initial coefficients,
+#' [.is_adjacent()] for identifying adjacent predictors,
+#' and [glmnet::cv.glmnet()] and [glmnet::glmnet()]
 #' for adaptive lasso regression.
 #'
 #' @examples
@@ -530,12 +532,12 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #' predict (S3 method)
 #'
 #' @description
-#' Makes prediction from an object of class \code{"corila"}.
+#' Makes prediction from an object of class `"corila"`.
 #'
 #' @inheritParams predict.cv.corila
 #'
 #' @param object
-#' object of class \code{"corila"}
+#' object of class `"corila"`
 #'
 #' @param index
 #' integer scalar specifying the index of the mixing hyperparameter(s)
@@ -552,9 +554,9 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #' @inherit corila-package references
 #'
 #' @seealso
-#' Estimate parameters with \code{\link{corila}()},
+#' Estimate parameters with [corila()],
 #' or estimate parameters and tune hyperparameters
-#' with \code{\link{cv.corila}()}.
+#' with [cv.corila()].
 #'
 #' @inherit corila examples
 #'
@@ -677,42 +679,42 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' @inheritParams corila
 #'
 #' @param tune
-#' character \code{"wgt"}, \code{"exp"}, or \code{"both"}
-#' for determining the candidate values for the hyperparameters;
-#' or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
-#' and \code{exp_global} (not yet implemented)
+#' character string`"to be defined"`
+#' or determining the candidate values for the hyperparameters;
+#' or list with slots `wgt_local`, `wgt_global`, `exp_local`,
+#' and `exp_global` (not yet implemented)
 #'
 #' @inherit corila details
 #'
 #' @return
-#' Returns an object of class \code{cv.corila},
+#' Returns an object of class `"cv.corila"`,
 #' a list with the following slots:
 #' \itemize{
-#' \item \code{object}:
+#' \item `object`:
 #' list with one slot for each combination of hyperparameters,
-#' each slot contains an object of class \code{"glmnet"}
-#' \item \code{hyper}:
+#' each slot contains an object of class `"glmnet"`
+#' \item `hyper`:
 #' data frame with one row for each combination of hyperparameters,
 #' four columns for the values of the hyperparameters
-#' (\code{wgt_local}, \code{wgt_global},
-#' \code{exp_global}, and \code{exp_local})
-#' and a column for the cross-validated loss (\code{cvm})
-#' \item \code{id_hyper}:
+#' (`wgt_local`, `wgt_global`,
+#' `exp_global`, and `exp_local`)
+#' and a column for the cross-validated loss (`cvm`)
+#' \item `id_hyper`:
 #' index of combination of hyperparameters
 #' leading to the lowest cross-validated loss
-#' \item \code{lambda.min}
+#' \item `lambda.min`
 #' optimised regularisation hyperparameter
-#' \item \code{scale}:
-#' output from \code{\link{.forescale}()}
+#' \item `scale`:
+#' output from [.forescale()]
 #' }
 #'
 #' @inherit corila-package references
 #'
 #' @seealso
-#' Extract coefficients with \code{\link[=coef.cv.corila]{coef}()}
-#' and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
+#' Extract coefficients with [coef()][coef.cv.corila]
+#' and make predictions with [predict()][predict.cv.corila]\.
 #'
-#' This user function repeatedly calls \code{\link{corila}()}
+#' This user function repeatedly calls [corila()]
 #' with different values for the regularisation and mixing hyperparameters.
 #'
 #' @examples
@@ -884,18 +886,19 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #' print (S3 method)
 #'
 #' @description
-#' Print method for class \code{"cv.corila"}.
+#' Print method for class `"cv.corila"`.
 #'
 #' @param x
-#' object of class \code{"cv.corila"}
+#' object of class `"cv.corila"`.
 #'
 #' @param ...
 #' (not used)
 #'
 #' @return
-#' Prints "object of class 'cv.corila'" to the console.
+#' Prints `"object of class 'cv.corila'"` to the console.
 #'
-#' @seealso summary.cv.corila
+#' @seealso
+#' [summary()][summary.cv.corila]
 #'
 #' @inherit summary.cv.corila examples
 #'
@@ -911,20 +914,19 @@ print.cv.corila <- function(x, ...) {
 #' Summarising Sparse Group Lasso (S3 method)
 #'
 #' @description
-#' Summary method for class \code{"cv.corila"}.
+#' Summary method for class `"cv.corila"`.
 #'
 #' @param object
-#' object of class \code{"cv.corila"}
+#' object of class `"cv.corila"`
 #'
 #' @param x
-#' object of class \code{"summary.cv.corila"}
+#' object of class `"summary.cv.corila"`
 #'
 #' @param ...
 #' (not used)
 #'
 #' @return
-#' The function \code{summary.cv.corila} returns
-#' an invisible list with multiple slots.
+#' Returns an invisible list with multiple slots.
 #'
 #' @examples
 #' n <- 12 # decrease to 10 to check LOOCV
@@ -938,7 +940,8 @@ print.cv.corila <- function(x, ...) {
 #' print(object)
 #' summary(object)
 #'
-#' @seealso print.corila
+#' @seealso
+#' [print.cv.corila()]
 #'
 #' @export
 summary.cv.corila <- function(object, ...) {
@@ -968,17 +971,17 @@ summary.cv.corila <- function(object, ...) {
 #'
 #' @param alpha
 #' elastic net mixing parameter or character string
-#' (see \code{alpha_init} and \code{alpha_final}
-#' in \code{\link{cv.corila}()})
+#' (see `alpha_init` and `alpha_final`
+#' in [cv.corila()])
 #'
 #' @return
 #' Returns a character string
-#' ("ridge regression", "lasso regression", "elastic net regression",
-#' "multi-penalty ridge regression",
-#' or "Pearson/Spearman/Kendall correlation")
+#' (`"ridge regression"`, `"lasso regression"`, `"elastic net regression"`,
+#' `"multi-penalty ridge regression"`,
+#' or `"Pearson/Spearman/Kendall correlation"`)
 #'
 #' @seealso
-#' This function is called by \code{\link{print.summary.cv.corila}()}.
+#' This function is called by [print.summary.cv.corila()].
 #'
 #' @examples
 #' corila:::.type(alpha = 0)
@@ -1039,21 +1042,20 @@ print.summary.cv.corila <- function(x, ...) {
   invisible(NULL)
 }
 
-
 # @title
 # Plot Sparse Group Lasso (S3 method)
 #
 # @description
-# Plot method for class \code{"cv.corila"}.
+# Plot method for class `"cv.corila"`.
 #
 # @param x
-# object of class \code{"cv.corila"}
+# object of class `"cv.corila"`
 #
 # @param ...
 # (not used)
 #
 # @return
-# Returns \code{NULL} (invisible).
+# Returns `NULL` (invisible).
 #
 # @inherit summary.cv.corila examples
 #
@@ -1076,8 +1078,8 @@ print.summary.cv.corila <- function(x, ...) {
 #'
 #' @param include
 #' logical vector of length \eqn{p_0 + p_1}
-#' with \eqn{p_0} entries equal to \code{TRUE} (primary features)
-#' and \eqn{p_1} entries equal to \code{FALSE} (auxiliary features)
+#' with \eqn{p_0} entries equal to `TRUE` (primary features)
+#' and \eqn{p_1} entries equal to `FALSE` (auxiliary features)
 #'
 #' @return
 #' matrix with \eqn{n} rows and \eqn{p_0 + p_1} columns
@@ -1112,10 +1114,10 @@ print.summary.cv.corila <- function(x, ...) {
 #' predict (S3 method)
 #'
 #' @description
-#' Makes predictions from an object of class \code{"cv.corila"}.
+#' Makes predictions from an object of class `"cv.corila"`.
 #'
 #' @param object
-#' object of class \code{"cv.corila"}
+#' object of class `"cv.corila"`
 #'
 #' @param newx
 #' \eqn{n_0 \times p} predictor matrix (training data)
@@ -1124,7 +1126,7 @@ print.summary.cv.corila <- function(x, ...) {
 #' to obtain predicted values
 #'
 #' @param s
-#' character \code{"lambda.min"} or numeric value
+#' character `"lambda.min"` or numeric value
 #'
 #' @param ...
 #' (not used)
@@ -1134,15 +1136,15 @@ print.summary.cv.corila <- function(x, ...) {
 #' @inherit corila-package references
 #'
 #' @seealso
-#' Fit models with \code{\link{cv.corila}()}
-#' and extract coefficients with \code{\link{coef.cv.corila}()}.
+#' Fit models with [cv.corila()]
+#' and extract coefficients with [coef()][coef.cv.corila].
 #'
 #' @details
 #' This function calls
 #' [.expand_auxiliary()] for handling auxiliary predictors,
-#' \code{\link{.forescale}()}
+#' [.forescale()]
 #' for standardising the predictor matrix,
-#' and \code{\link{.backscale}()}
+#' and [.backscale()]
 #' for bringing predicted values back to the original scale
 #' (if `family="gaussian"`).
 #'
@@ -1223,7 +1225,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' Extract coefficients
 #'
 #' @description
-#' Extracts coefficients from an object of class \code{"cv.corila"}.
+#' Extracts coefficients from an object of class `"cv.corila"`.
 #'
 #' @inheritParams predict.cv.corila
 #'
@@ -1235,8 +1237,8 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' @inherit corila-package references
 #'
 #' @seealso
-#' Fit models with \code{\link{cv.corila}()}
-#' and make predictions with \code{\link{predict.cv.corila}()}.
+#' Fit models with [cv.corila()]
+#' and make predictions with [predict()][predict.cv.corila].
 #'
 #' @inherit cv.corila examples
 #'

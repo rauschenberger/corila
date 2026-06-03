@@ -27,11 +27,11 @@ and \eqn{p} is the number of variables}
 \item{y}{\eqn{n_0}-dimensional response vector,
 where \eqn{n_0} is the number of observations used for model training}
 
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+\item{group}{\strong{(i)} \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
-\emph{(ii)} list with \eqn{q} slots containing the variable indices
+\strong{(ii)} list with \eqn{q} slots containing the variable indices
 (in \eqn{\{1, \ldots, p\}}) or labels,
-or \emph{(iii)} \eqn{p \times p} matrix,
+\strong{(iii)} \eqn{p \times p} matrix,
 where the entry in the \eqn{j^{\text{th}}} row
 and the \eqn{k^{\text{th}}} column
 indicates whether information should be transferred
@@ -93,11 +93,9 @@ The number of observations (samples) for training or testing
 are indicated by \eqn{n_0} and \eqn{n_1}, respectively,
 the number of variables (features) is indicated by \eqn{p},
 and the number of variable groups is indicated by \eqn{q}.
-
 Observations (samples) are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
 variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
 and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
-
 The number of variables in the \eqn{k^{\text{th}}} group
 is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 }
@@ -129,18 +127,18 @@ allowing for privileged information".
 }
 \seealso{
 Estimate parameters and tune hyperparameters (using cross-validation)
-with \code{\link{cv.corila}()}.
+with \code{\link[=cv.corila]{cv.corila()}}.
 Make predictions for a range of hyperparameters
-with \code{\link{predict.corila}()}.
+with \link[=predict.corila]{predict()}.
 
 This function calls
-\code{\link{.forescale}()} and \code{\link{.backscale}()}
+\code{\link[=.forescale]{.forescale()}} and \code{\link[=.backscale]{.backscale()}}
 for standardising data and bringing results back to the original scale,
 respectively,
-\code{\link{.folds}()} for splitting samples into folds,
-\code{\link{.estim_initial_coefs}()} for obtaining initial coefficients,
-\code{\link{.is_adjacent}()} for identifying adjacent predictors,
-and \code{\link[glmnet]{cv.glmnet}()} and \code{\link[glmnet]{glmnet}()}
+\code{\link[=.folds]{.folds()}} for splitting samples into folds,
+\code{\link[=.estim_initial_coefs]{.estim_initial_coefs()}} for obtaining initial coefficients,
+\code{\link[=.is_adjacent]{.is_adjacent()}} for identifying adjacent predictors,
+and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}} and \code{\link[glmnet:glmnet]{glmnet::glmnet()}}
 for adaptive lasso regression.
 }
 \keyword{classif}

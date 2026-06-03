@@ -17,8 +17,7 @@
 \item{x}{object of class \code{"summary.cv.corila"}}
 }
 \value{
-The function \code{summary.cv.corila} returns
-an invisible list with multiple slots.
+Returns an invisible list with multiple slots.
 }
 \description{
 Summary method for class \code{"cv.corila"}.
@@ -37,6 +36,6 @@ summary(object)
 
 }
 \seealso{
-print.corila
+\code{\link[=print.cv.corila]{print.cv.corila()}}
 }
 \keyword{internal}

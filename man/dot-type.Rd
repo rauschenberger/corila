@@ -9,13 +9,13 @@
 \arguments{
 \item{alpha}{elastic net mixing parameter or character string
 (see \code{alpha_init} and \code{alpha_final}
-in \code{\link{cv.corila}()})}
+in \code{\link[=cv.corila]{cv.corila()}})}
 }
 \value{
 Returns a character string
-("ridge regression", "lasso regression", "elastic net regression",
-"multi-penalty ridge regression",
-or "Pearson/Spearman/Kendall correlation")
+(\code{"ridge regression"}, \code{"lasso regression"}, \code{"elastic net regression"},
+\code{"multi-penalty ridge regression"},
+or \code{"Pearson/Spearman/Kendall correlation"})
 }
 \description{
 Names the method used for obtaining initial or final coefficients.
@@ -25,6 +25,6 @@ corila:::.type(alpha = 0)
 
 }
 \seealso{
-This function is called by \code{\link{print.summary.cv.corila}()}.
+This function is called by \code{\link[=print.summary.cv.corila]{print.summary.cv.corila()}}.
 }
 \keyword{internal}

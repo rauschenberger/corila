@@ -54,8 +54,8 @@ allowing for privileged information".
 \emph{In preparation}.
 }
 \seealso{
-Estimate parameters with \code{\link{corila}()},
+Estimate parameters with \code{\link[=corila]{corila()}},
 or estimate parameters and tune hyperparameters
-with \code{\link{cv.corila}()}.
+with \code{\link[=cv.corila]{cv.corila()}}.
 }
 \keyword{methods}

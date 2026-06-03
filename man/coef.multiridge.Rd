@@ -88,7 +88,7 @@ metric
 }
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
-\href{https://orcid.org/0000-0001-7715-1446}{Mirrelijn M. van Nee},
+\href{https://orcid.org/0000-0001-7715-1446}}{Mirrelijn M. van Nee}
 and
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
 (2021).
@@ -98,7 +98,7 @@ and
 \href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}. # nolint: line_length_linter.
 }
 \seealso{
-Fit models with \code{\link{multiridge}()}
-and make predictions with \code{\link{predict.multiridge}()}.
+Fit models with \code{\link[=multiridge]{multiridge()}}
+and make predictions with \link[=predict.multiridge]{predict()}.
 }
 \keyword{methods}

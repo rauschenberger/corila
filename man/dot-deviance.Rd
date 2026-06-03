@@ -8,10 +8,10 @@
 }
 \arguments{
 \item{y}{response:
-numeric vector of length \code{n}}
+numeric vector of length \eqn{n}}
 
 \item{y_hat}{predicted response:
-numeric vector of length \code{n}}
+numeric vector of length \eqn{n}}
 
 \item{family}{character}
 }

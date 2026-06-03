@@ -10,10 +10,10 @@ The R package \code{corila} implements
 allowing for privileged information" (\emph{Rauschenberger, 2026}).
 This is the first implementation of a novel algorithm,
 which is based on adaptive lasso regression using the
-\code{\link[glmnet]{glmnet-package}}.
+\link[glmnet:glmnet-package]{glmnet-package}.
 }
 \details{
-Use function \code{\link[=cv.corila]{cv.corila}()} for model fitting.
+Use function \code{\link[=cv.corila]{cv.corila()}} for model fitting.
 Type \code{library(corila)} and then \code{?cv.corila} or
 \code{help("cv.corila")} to open its help file.
 
@@ -21,10 +21,9 @@ See the vignette for further examples.
 Type \code{vignette("corila")} or \code{browseVignettes("corila")}
 to open the vignette.
 
-This package also includes the wrapper function
-\code{\link[=multiridge]{multiridge}()}
+This package also includes the wrapper function \code{\link[=multiridge]{multiridge()}}
 for multi-penalty ridge regression with
-the \code{\link[multiridge]{multiridge-package}}.
+the \link[multiridge:multiridge-package]{multiridge-package}.
 }
 \examples{
 ?cv.corila
@@ -40,9 +39,9 @@ allowing for privileged information".
 \emph{In preparation}.
 }
 \seealso{
-First use \code{\link[=cv.corila]{cv.corila}()} to fit the model,
-and then \code{\link[=coef.cv.corila]{coef}()} to extract coefficients
-or \code{\link[=predict.cv.corila]{predict}()} to make predictions.
+First use \code{\link[=cv.corila]{cv.corila()}} to fit the model,
+and then \link[=coef.cv.corila]{coef()} to extract coefficients
+or \link[=predict.cv.corila]{predict()} to make predictions.
 }
 \author{
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}

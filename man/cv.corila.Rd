@@ -26,11 +26,11 @@ and \eqn{p} is the number of variables}
 \item{y}{\eqn{n_0}-dimensional response vector,
 where \eqn{n_0} is the number of observations used for model training}
 
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+\item{group}{\strong{(i)} \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
-\emph{(ii)} list with \eqn{q} slots containing the variable indices
+\strong{(ii)} list with \eqn{q} slots containing the variable indices
 (in \eqn{\{1, \ldots, p\}}) or labels,
-or \emph{(iii)} \eqn{p \times p} matrix,
+\strong{(iii)} \eqn{p \times p} matrix,
 where the entry in the \eqn{j^{\text{th}}} row
 and the \eqn{k^{\text{th}}} column
 indicates whether information should be transferred
@@ -68,15 +68,15 @@ or \code{NA} to set all initial coefficients equal to 1}
 or \code{"kendall"};
 or \eqn{p \times p} correlation matrix}
 
-\item{tune}{character \code{"wgt"}, \code{"exp"}, or \code{"both"}
-for determining the candidate values for the hyperparameters;
+\item{tune}{character string\code{"to be defined"}
+or determining the candidate values for the hyperparameters;
 or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
 and \code{exp_global} (not yet implemented)}
 
 \item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
 }
 \value{
-Returns an object of class \code{cv.corila},
+Returns an object of class \code{"cv.corila"},
 a list with the following slots:
 \itemize{
 \item \code{object}:
@@ -94,7 +94,7 @@ leading to the lowest cross-validated loss
 \item \code{lambda.min}
 optimised regularisation hyperparameter
 \item \code{scale}:
-output from \code{\link{.forescale}()}
+output from \code{\link[=.forescale]{.forescale()}}
 }
 }
 \description{
@@ -105,11 +105,9 @@ The number of observations (samples) for training or testing
 are indicated by \eqn{n_0} and \eqn{n_1}, respectively,
 the number of variables (features) is indicated by \eqn{p},
 and the number of variable groups is indicated by \eqn{q}.
-
 Observations (samples) are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
 variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
 and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
-
 The number of variables in the \eqn{k^{\text{th}}} group
 is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 }
@@ -197,10 +195,10 @@ allowing for privileged information".
 \emph{In preparation}.
 }
 \seealso{
-Extract coefficients with \code{\link[=coef.cv.corila]{coef}()}
-and make predictions with \code{\link[=predict.cv.corila]{predict}()}.
+Extract coefficients with \link[=coef.cv.corila]{coef()}
+and make predictions with \link[=predict.cv.corila]{predict()}\.
 
-This user function repeatedly calls \code{\link{corila}()}
+This user function repeatedly calls \code{\link[=corila]{corila()}}
 with different values for the regularisation and mixing hyperparameters.
 }
 \keyword{classif}

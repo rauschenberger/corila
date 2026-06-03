@@ -17,8 +17,8 @@
 \code{dim = Inf} for a vector of arbitrary length,
 \code{dim = c(Inf, Inf)} for a matrix of arbitrary dimensions,
 \code{dim = c(Inf, Inf, Inf)} for an array of arbitrary dimensions,
-\code{dim = 100} for a vector of length \code{100},
-\code{dim = c(Inf, 100)} for a matrix with \eqn{100} columns, etc.}
+\code{dim = 100} for a vector of length 100,
+\code{dim = c(Inf, 100)} for a matrix with 100 columns, etc.}
 
 \item{na.rm}{logical}
 
@@ -31,6 +31,9 @@
 \description{
 Check whether provided arguments satisfy expectations.
 }
+\details{
+This function is called by multiple function of the \link{corila-package}.
+}
 \examples{
 corila:::.assert(x = NULL)
 corila:::.assert(x = rnorm(1), type = "numeric")
@@ -38,6 +41,7 @@ corila:::.assert(x = "A", type = "nominal", support = LETTERS)
 
 }
 \seealso{
-\code{\link{.validate}()}
+The function \code{\link[=.validate]{.validate()}} verifies whether the main arguments
+have compatible dimensions (number of samples and features).
 }
 \keyword{internal}

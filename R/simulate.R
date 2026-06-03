@@ -19,7 +19,7 @@
 #'
 #' @return
 #' Returns a scalar between 0 (minimum precision) and 1 (maximum precision),
-#' or \code{NA} if all estimated signs equal 0.
+#' or `NA` if all estimated signs equal 0.
 #'
 #' @examples
 #' truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
@@ -50,8 +50,7 @@ calc_sign_prec <- function(truth, estim) {
 #' Simulates data with grouped predictor variables
 #'
 #' @param family
-#' character \code{"gaussian"}, \code{"binomial"},
-#' \code{"poisson"} or \code{"cox"}
+#' character `"gaussian"`, `"binomial"`, `"poisson"` or `"cox"`
 #'
 #' @param n0
 #' number of training observations
@@ -91,7 +90,7 @@ calc_sign_prec <- function(truth, estim) {
 #'
 #' @param plot
 #' Attempt to visualise effects of and correlation between variables?
-#' (\code{TRUE} or \code{FALSE})
+#' (`TRUE` or `FALSE`)
 #'
 #' @param trial
 #' logical (groups of negatively correlated subgroups)
@@ -99,16 +98,16 @@ calc_sign_prec <- function(truth, estim) {
 #' @return
 #' Returns a list with the following slots:
 #' \itemize{
-#' \item \eqn{n_0 \times p} matrix \code{x_train}
-#' \item \eqn{p}-dimensional vector \code{type}
-#' \item \eqn{p}-dimensional vector \code{group}
-#' \item \eqn{n_0}-dimensional vector \code{y_train}
-#' \item \eqn{n_1 \times p} matrix \code{x_test}
-#' \item \eqn{n_1}-dimensional vector \code{y_test}
-#' \item \eqn{p}-dimensional vector \code{beta}
-#' \item data frame \code{info} with entries
-#' \eqn{n_0}, \eqn{n_1}, \eqn{p}, \code{n_type},
-#' \code{n_group}, and \code{family}
+#' \item \eqn{n_0 \times p} matrix `x_train`
+#' \item \eqn{p}-dimensional vector `type`
+#' \item \eqn{p}-dimensional vector `group`
+#' \item \eqn{n_0}-dimensional vector `y_train`
+#' \item \eqn{n_1 \times p} matrix `x_test`
+#' \item \eqn{n_1}-dimensional vector `y_test`
+#' \item \eqn{p}-dimensional vector `beta`
+#' \item data frame `info` with entries
+#' \eqn{n_0}, \eqn{n_1}, \eqn{p}, `n_type`,
+#' `n_group`, and `family`
 #' }
 #'
 #' @examples

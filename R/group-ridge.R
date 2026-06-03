@@ -8,7 +8,10 @@
 #' Fits multi-penalty ridge regression
 #' (tuning regularisation hyperparameters
 #' and estimating regression coefficients).
-#' @srrstats {G1.1} *improved API of a previously implemented algorithm*
+#' This is a wrapper function of some functions
+#' from the [multiridge-package][multiridge::multiridge-package].
+#'
+#' @srrstats {G1.1} *simplified interface for an implemented algorithm*
 #'
 #' @param x
 #' predictors:
@@ -22,70 +25,70 @@
 #' \eqn{p}-dimensional vector with entries in \eqn{\{1, \ldots, q\}}
 #'
 #' @param family
-#' character \code{"linear"} (or \code{"gaussian"}),
-#' \code{"logistic"} (or \code{"binomial"}),
-#' or \code{"cox"}
+#' character `"linear"` (or `"gaussian"`),
+#' `"logistic"` (or `"binomial"`), or `"cox"`
 #'
 #' @param penalties
 #' \eqn{q}-dimensional vector of penalty parameters,
-#' or \code{NULL} (cross-validation)
+#' or `NULL` (cross-validation)
 #'
 #' @inheritParams corila
 #'
 #' @inherit corila details
 #'
 #' @references
-#' \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
-#' \href{https://orcid.org/0000-0001-7715-1446}{Mirrelijn M. van Nee},
+#' [Mark A. van de Wiel](https://orcid.org/0000-0003-4780-8472),
+#' [Mirrelijn M. van Nee](https://orcid.org/0000-0001-7715-1446})
 #' and
-#' \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
+#' [Armin Rauschenberger](https://orcid.org/0000-0001-6498-4801)
 #' (2021).
 #' "Fast cross-validation for multi-penalty high-dimensional ridge regression"
-#' \emph{Journal of Computational and Graphical Statistics}
+#' *Journal of Computational and Graphical Statistics*
 #' 30(4):835-847.
-#' \href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}. # nolint: line_length_linter.
+#' [doi: 10.1080/10618600.2021.1904962](https://doi.org/10.1080/10618600.2021.1904962). # nolint: line_length_linter.
 #' @srrstats {G1.0} *primary reference*
 #'
 #' @return
-#' Returns an object of class \code{"multiridge"},
+#' Returns an object of class `"multiridge"`,
 #' a list with the following slots:
 #' \itemize{
-#' \item slots from \code{\link[multiridge]{IWLSridge}()} or
-#' \code{\link[multiridge]{IWLSCoxridge}()}
-#' \item character \code{family}
-#' with value \code{"gaussian"} (also for \code{"linear"}),
-#' \code{"binomial"} (also for \code{"logistic"}),
-#' \code{"poisson"}, or \code{"cox"}
-#' \item \eqn{q}-dimensional vector \code{penalties}
+#' \item slots from [IWLSridge()][multiridge::IWLSridge] or
+#' [IWLSCoxridge()][multiridge::IWLSCoxridge]
+#' \item character `family`
+#' with value `"gaussian"` (also for `"linear"`),
+#' `"binomial"` (also for `"logistic"`),
+#' `"poisson"`, or `"cox"`
+#' \item \eqn{q}-dimensional vector `penalties`
 #' containing optimised regularisation hyperparameters
 #' (one for each variable group)
-#' \item list \code{datablocks}
+#' \item list `datablocks`
 #' with \eqn{q} slots (one for each variable group),
 #' each containing an \eqn{n_0 \times p_k} matrix,
 #' where \eqn{k \in \{1, \ldots, q\}}
-#' \item \eqn{p}-dimensional group vector \code{z} (see argument)
-#' \item list \code{pars} with slots \code{family} (see above),
-#' the \eqn{n_0}-dimensional vectors \code{mu.x} and \code{sd.x}
-#' and the scalars \code{mu.y} and \code{sd.y}
+#' \item \eqn{p}-dimensional group vector `z` (see argument)
+#' \item list `pars` with slots `family` (see above),
+#' the \eqn{n_0}-dimensional vectors `mu.x` and `sd.x`
+#' and the scalars `mu.y` and `sd.y`
 #' }
 #'
 #' @seealso
-#' Extract coefficients with \code{\link[=coef.multiridge]{coef}()}
-#' or make predictions with \code{\link[=predict.multiridge]{predict}()}.
-#' Use \code{\link{cv.corila}()} to estimate sparse models.
+#' Extract coefficients with [coef()][coef.multiridge]
+#' or make predictions with [predict()][predict.multiridge].
+#' Use [cv.corila()] to estimate sparse models.
 #'
 #' This wrapper function calls various functions from the
-#' \code{\link[multiridge]{multiridge-package}},
+#' [multiridge-package][multiridge::multiridge-package],
 #' namely
-#' \code{\link[multiridge]{createXXblocks}()},
-#' \code{\link[multiridge]{fastCV2}()},
-#' \code{\link[multiridge]{CVfolds}()},
-#' \code{\link[multiridge]{optLambdasWrap}()},
-#' \code{\link[multiridge]{SigmaFromBlocks}()},
-#' \code{\link[multiridge]{IWLSridge}()}, and
-#' \code{\link[multiridge]{IWLSCoxridge}()}.
+#' [createXXblocks()][multiridge::createXXblocks],
+#' [fastCV2()][multiridge::fastCV2],
+#' [CVfolds()][multiridge::CVfolds],
+#' [optLambdasWrap()][multiridge::optLambdasWrap],
+#' [SigmaFromBlocks()][multiridge::SigmaFromBlocks],
+#' [IWLSridge()][multiridge::IWLSridge], and
+#' [IWLSCoxridge()][multiridge::IWLSCoxridge].
 #'
-#' The \code{\link[multiridge]{multiridge-package}} accepts not only
+#' The [multiridge-package][multiridge::multiridge-package]
+#' accepts not only
 #' an \eqn{n \times p} matrix but also
 #' a list of length \eqn{q} of \eqn{n \times p_k} matrices,
 #' with \eqn{k} in \eqn{\{1, \ldots, q\}}.
@@ -256,8 +259,8 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
 #' or an \eqn{n_1}-dimensional vector of predicted values.
 #'
 #' @seealso
-#' Fit models with \code{\link{multiridge}()}
-#' and extract coefficients with \code{\link{coef.multiridge}()}.
+#' Fit models with [multiridge()]
+#' and extract coefficients with [coef()][coef.multiridge()].
 #'
 #' @inherit multiridge examples
 #'
@@ -297,7 +300,7 @@ predict.multiridge <- function(object, newx, ...) {
 #' Extracts coefficients from a multi-penalty ridge regression model.
 #'
 #' @param object
-#' object of class \code{"multiridge"}
+#' object of class `"multiridge"`
 #'
 #' @param ...
 #' (not used)
@@ -309,8 +312,8 @@ predict.multiridge <- function(object, newx, ...) {
 #' (estimated intercept and estimated slopes).
 #'
 #' @seealso
-#' Fit models with \code{\link{multiridge}()}
-#' and make predictions with \code{\link{predict.multiridge}()}.
+#' Fit models with [multiridge()]
+#' and make predictions with [predict()][predict.multiridge()].
 #'
 #' @inherit multiridge examples
 #'

@@ -7,11 +7,11 @@
 .is_adjacent(group, j, p, names)
 }
 \arguments{
-\item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
+\item{group}{\strong{(i)} \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
-\emph{(ii)} list with \eqn{q} slots containing the variable indices
+\strong{(ii)} list with \eqn{q} slots containing the variable indices
 (in \eqn{\{1, \ldots, p\}}) or labels,
-or \emph{(iii)} \eqn{p \times p} matrix,
+\strong{(iii)} \eqn{p \times p} matrix,
 where the entry in the \eqn{j^{\text{th}}} row
 and the \eqn{k^{\text{th}}} column
 indicates whether information should be transferred
@@ -28,6 +28,9 @@ Returns a logical vector of length \eqn{p}.
 }
 \description{
 Identifies adjacent predictors.
+}
+\details{
+This functions is called by \code{\link[=corila]{corila()}}.
 }
 \examples{
 p <- 5

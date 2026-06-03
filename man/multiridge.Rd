@@ -24,8 +24,7 @@ multiridge(
 \item{z}{\eqn{p}-dimensional vector with entries in \eqn{\{1, \ldots, q\}}}
 
 \item{family}{character \code{"linear"} (or \code{"gaussian"}),
-\code{"logistic"} (or \code{"binomial"}),
-or \code{"cox"}}
+\code{"logistic"} (or \code{"binomial"}), or \code{"cox"}}
 
 \item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
 
@@ -38,8 +37,8 @@ or \code{NULL} (cross-validation)}
 Returns an object of class \code{"multiridge"},
 a list with the following slots:
 \itemize{
-\item slots from \code{\link[multiridge]{IWLSridge}()} or
-\code{\link[multiridge]{IWLSCoxridge}()}
+\item slots from \link[multiridge:IWLSridge]{IWLSridge()} or
+\link[multiridge:IWLSCoxridge]{IWLSCoxridge()}
 \item character \code{family}
 with value \code{"gaussian"} (also for \code{"linear"}),
 \code{"binomial"} (also for \code{"logistic"}),
@@ -61,17 +60,17 @@ and the scalars \code{mu.y} and \code{sd.y}
 Fits multi-penalty ridge regression
 (tuning regularisation hyperparameters
 and estimating regression coefficients).
+This is a wrapper function of some functions
+from the \link[multiridge:multiridge-package]{multiridge-package}.
 }
 \details{
 The number of observations (samples) for training or testing
 are indicated by \eqn{n_0} and \eqn{n_1}, respectively,
 the number of variables (features) is indicated by \eqn{p},
 and the number of variable groups is indicated by \eqn{q}.
-
 Observations (samples) are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
 variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
 and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
-
 The number of variables in the \eqn{k^{\text{th}}} group
 is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
 }
@@ -145,7 +144,7 @@ metric
 }
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
-\href{https://orcid.org/0000-0001-7715-1446}{Mirrelijn M. van Nee},
+\href{https://orcid.org/0000-0001-7715-1446}}{Mirrelijn M. van Nee}
 and
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
 (2021).
@@ -155,22 +154,23 @@ and
 \href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}. # nolint: line_length_linter.
 }
 \seealso{
-Extract coefficients with \code{\link[=coef.multiridge]{coef}()}
-or make predictions with \code{\link[=predict.multiridge]{predict}()}.
-Use \code{\link{cv.corila}()} to estimate sparse models.
+Extract coefficients with \link[=coef.multiridge]{coef()}
+or make predictions with \link[=predict.multiridge]{predict()}.
+Use \code{\link[=cv.corila]{cv.corila()}} to estimate sparse models.
 
 This wrapper function calls various functions from the
-\code{\link[multiridge]{multiridge-package}},
+\link[multiridge:multiridge-package]{multiridge-package},
 namely
-\code{\link[multiridge]{createXXblocks}()},
-\code{\link[multiridge]{fastCV2}()},
-\code{\link[multiridge]{CVfolds}()},
-\code{\link[multiridge]{optLambdasWrap}()},
-\code{\link[multiridge]{SigmaFromBlocks}()},
-\code{\link[multiridge]{IWLSridge}()}, and
-\code{\link[multiridge]{IWLSCoxridge}()}.
+\link[multiridge:createXXblocks]{createXXblocks()},
+\link[multiridge:fastCV2]{fastCV2()},
+\link[multiridge:CVfolds]{CVfolds()},
+\link[multiridge:optLambdasWrap]{optLambdasWrap()},
+\link[multiridge:SigmaFromBlocks]{SigmaFromBlocks()},
+\link[multiridge:IWLSridge]{IWLSridge()}, and
+\link[multiridge:IWLSCoxridge]{IWLSCoxridge()}.
 
-The \code{\link[multiridge]{multiridge-package}} accepts not only
+The \link[multiridge:multiridge-package]{multiridge-package}
+accepts not only
 an \eqn{n \times p} matrix but also
 a list of length \eqn{q} of \eqn{n \times p_k} matrices,
 with \eqn{k} in \eqn{\{1, \ldots, q\}}.

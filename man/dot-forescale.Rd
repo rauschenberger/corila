@@ -110,7 +110,7 @@ stopifnot(
 
 }
 \seealso{
-Use function \code{\link{.backscale}()}
+Use function \code{\link[=.backscale]{.backscale()}}
 to bring coefficients and predictions back to original scale.
 }
 \keyword{internal}
