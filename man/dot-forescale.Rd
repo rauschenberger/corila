@@ -34,9 +34,12 @@ determined by argument \code{family} or \code{pars$family}
 \item list \code{pars} with slots \code{mu.x} and \code{sd.x}
 (\eqn{p}-dimensional vectors of means and standard deviations
 of the predictor variables),
-and \code{mu.y} and \code{sd.y}
+\code{mu.y} and \code{sd.y}
 (mean and standard deviation of response variable for Gaussian family,
-0 and 1 for other families)
+0 and 1 for other families),
+and \code{family}
+(character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"})
 }
 }
 \description{

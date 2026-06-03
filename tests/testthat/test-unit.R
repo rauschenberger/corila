@@ -11,8 +11,8 @@ testthat::test_that("forescale and backscale work", {
   x <- vapply(X = sd,
               FUN = function(x) stats::rnorm(n = n, sd = x),
               FUN.VALUE = numeric(n))
-  for(family in c("gaussian", "binomial", "poisson", "cox")) {
-    if (identical(family, "gaussian")){
+  for (family in c("gaussian", "binomial", "poisson", "cox")) {
+    if (identical(family, "gaussian")) {
       y <- stats::rnorm(n)
     } else if (identical(family, "binomial")) {
       y <- stats::rbinom(n = n, size = 1, prob = 0.5)
@@ -30,11 +30,13 @@ testthat::test_that("forescale and backscale work", {
     testthat::expect_equal(object = y_back$y_original, expected = y)
   }
   coef <- stats::rnorm(p)
-  mu.x <- rep(x = 0, times = p)
-  sd.x <- rep(x = 1, times = p)
-  mu.y <- 0
-  sd.y <- 1
-  pars <- list(mu.x = mu.x, sd.x = sd.x, mu.y = mu.y, sd.y = sd.y, family = family)
+  mu_x <- rep(x = 0, times = p)
+  sd_x <- rep(x = 1, times = p)
+  mu_y <- 0
+  sd_y <- 1
+  pars <- list(mu.x = mu_x, sd.x = sd_x,
+               mu.y = mu_y, sd.y = sd_y,
+               family = family)
   temp <- .backscale(pars = pars, coef = coef)$coef
   testthat::expect_equal(object = temp, expected = coef)
 })

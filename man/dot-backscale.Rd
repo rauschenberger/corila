@@ -7,16 +7,25 @@
 .backscale(pars, y = NULL, coef = NULL)
 }
 \arguments{
-\item{pars}{list as defined in section \emph{Value},
-or \code{NULL} (if \code{family} is provided)}
+\item{pars}{list with slots \code{mu.x} and \code{sd.x}
+(\eqn{p}-dimensional vectors of means and standard deviations
+of the predictor variables),
+\code{mu.y} and \code{sd.y}
+(mean and standard deviation of response variable for Gaussian family,
+0 and 1 for other families),
+and \code{family}
+(character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"})}
 
 \item{y}{\eqn{n_1}-dimensional response vector
 or response matrix with \eqn{n_1} rows and multiple columns
-(for multiple values of the regularisation parameter)}
+(for multiple values of the regularisation parameter),
+or \code{NULL} (default)}
 
-\item{coef}{\eqn{(1 + p)-dimensional vector}
+\item{coef}{\eqn{(1 + p)}-dimensional vector
 containing the estimated intercept
-and the estimated slopes or \code{NULL} (default)}
+and the estimated slopes,
+or \code{NULL} (default)}
 }
 \value{
 Returns a list with slots \code{y_original} or \code{coef}.
@@ -91,6 +100,6 @@ stopifnot(
 
 }
 \seealso{
-\code{\link{.forescale}()}
+Use function \code{\link{.forescale}()} to standardise variables.
 }
 \keyword{internal}

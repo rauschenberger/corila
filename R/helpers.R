@@ -126,9 +126,12 @@
 #' \item list \code{pars} with slots \code{mu.x} and \code{sd.x}
 #' (\eqn{p}-dimensional vectors of means and standard deviations
 #' of the predictor variables),
-#' and \code{mu.y} and \code{sd.y}
+#' \code{mu.y} and \code{sd.y}
 #' (mean and standard deviation of response variable for Gaussian family,
-#' 0 and 1 for other families)
+#' 0 and 1 for other families),
+#' and \code{family}
+#' (character string \code{"gaussian"}, \code{"binomial"},
+#' \code{"poisson"}, or \code{"cox"})
 #' }
 #'
 #' @seealso Use function \code{\link{.backscale}()}
@@ -203,22 +206,34 @@
 #' or transforms coefficients for predictor variables and response variable
 #' on original scales.
 #'
-#' @inheritParams .forescale
+#' @param pars
+#' list with slots \code{mu.x} and \code{sd.x}
+#' (\eqn{p}-dimensional vectors of means and standard deviations
+#' of the predictor variables),
+#' \code{mu.y} and \code{sd.y}
+#' (mean and standard deviation of response variable for Gaussian family,
+#' 0 and 1 for other families),
+#' and \code{family}
+#' (character string \code{"gaussian"}, \code{"binomial"},
+#' \code{"poisson"}, or \code{"cox"})
 #'
 #' @param y
 #' \eqn{n_1}-dimensional response vector
 #' or response matrix with \eqn{n_1} rows and multiple columns
-#' (for multiple values of the regularisation parameter)
+#' (for multiple values of the regularisation parameter),
+#' or \code{NULL} (default)
 #'
 #' @param coef
-#' \eqn{(1 + p)-dimensional vector}
+#' \eqn{(1 + p)}-dimensional vector
 #' containing the estimated intercept
-#' and the estimated slopes or \code{NULL} (default)
+#' and the estimated slopes,
+#' or \code{NULL} (default)
 #'
 #' @return
 #' Returns a list with slots \code{y_original} or \code{coef}.
 #'
-#' @seealso \code{\link{.forescale}()}
+#' @seealso
+#' Use function \code{\link{.forescale}()} to standardise variables.
 #'
 #' @examples
 #' \donttest{
