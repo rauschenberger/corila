@@ -120,6 +120,13 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
     testthat::expect_gt(object = dev_random, expected = dev_best)
     testthat::expect_gt(object = dev_worst, expected = dev_random)
   })
+  testthat::test_that("mean shift does not change cox deviance", {
+    testthat::skip_if(family != "cox")
+    dev0 <- .deviance(y = y, y_hat = exp(y_hat), family = family)
+    dev1 <- .deviance(y = y, y_hat = exp(y_hat + stats::rnorm(1)),
+                      family = family)
+    testthat::expect_equal(object = dev1, expected = dev0)
+  })
   testthat::test_that("gamma deviance is not implemented", {
     testthat::skip_if(family != "gamma")
     testthat::expect_error(.deviance(y = y, y_hat = y_hat, family = family))
