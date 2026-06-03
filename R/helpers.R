@@ -481,7 +481,7 @@
   # --- calculate deviance ---
   eps <- 1e-06
   if (identical(family, "gaussian")) {
-    mean((y - y_hat)^2)
+    2 * mean((y - y_hat)^2)
   } else if (identical(family, "binomial")) {
     mean(
       -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
@@ -489,6 +489,6 @@
   } else if (identical(family, "poisson")) {
     mean(2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
   } else if (identical(family, "cox")) {
-    glmnet::coxnet.deviance(pred = y_hat, y = y)
+    glmnet::coxnet.deviance(pred = log(y_hat), y = y)
   }
 }
