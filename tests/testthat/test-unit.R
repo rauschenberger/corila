@@ -109,13 +109,13 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
     testthat::skip_if(family != "cox")
     # NB: inversion due to "higher risk = shorter time"
     dev_best <- .deviance(y = y,
-                          y_hat = -log(time_survival),
+                          y_hat = exp(-time_survival),
                           family = family)
     dev_random <- .deviance(y = y,
-                            y_hat = sample(-log(time_survival)),
+                            y_hat = sample(exp(-time_survival)),
                             family = family)
     dev_worst <- .deviance(y = y,
-                           y_hat = +log(time_survival),
+                           y_hat = exp(time_survival),
                            family = family)
     testthat::expect_gt(object = dev_random, expected = dev_best)
     testthat::expect_gt(object = dev_worst, expected = dev_random)
