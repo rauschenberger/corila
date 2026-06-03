@@ -5,14 +5,15 @@
 
 for (glmnet in c(FALSE, TRUE)) {
   for (family in c("gaussian", "binomial", "poisson", "cox")) {
-    if (family == "cox") {
-      next
-    }
+    #if (family == "cox") {
+    #  next
+    #}
     cat(paste0(
       ifelse(glmnet, "glmnet::cv.glmnet", "stats::glm"),
       ", family=\"", family, "\"\n"
     ))
     testthat::test_that("stats::glm without/with scale returns same results", {
+      set.seed(1)
       #--- simulate data ---
       n0 <- 100
       n1 <- 50
@@ -45,7 +46,8 @@ for (glmnet in c(FALSE, TRUE)) {
                                  y = y[fold == 0],
                                  family = family,
                                  foldid = foldid,
-                                 lambda = c(99e99, 0))
+                                 lambda = c(99e99, 0),
+                                 standardize = TRUE)
         y_hat1 <- as.numeric(stats::predict(object = lm1,
                                             newx = x[fold == 1, ],
                                             s = 0,
@@ -74,7 +76,8 @@ for (glmnet in c(FALSE, TRUE)) {
                                  y = scale$y,
                                  family = family,
                                  foldid = foldid,
-                                 lambda = c(99e99, 0))
+                                 lambda = c(99e99, 0),
+                                 standardize = TRUE)
         y_hat_temp <- as.numeric(stats::predict(object = lm2,
                                                 newx = newx,
                                                 s = 0,
@@ -101,17 +104,24 @@ for (glmnet in c(FALSE, TRUE)) {
       y_hat2 <- result$y_original
       coef2 <- result$coef
       #--- equality ---
-      testthat::expect_equal(coef1, coef2, check.attributes = FALSE)
+      testthat::expect_equal(object = coef1,
+                             expected = coef2,
+                             check.attributes = FALSE)
       if (glmnet & family == "cox") {
-        testthat::expect_equal(y_hat1,
-                               y_hat2 * mean(y_hat1 / y_hat2),
+        testthat::expect_equal(object = y_hat1,
+                               expected = y_hat2 * mean(y_hat1 / y_hat2),
+                               tolerance = 1e-06,
                                check.attributes = FALSE)
-        warning("issue with cox")
       } else {
-        testthat::expect_equal(y_hat1,
-                               y_hat2,
+        testthat::expect_equal(object = y_hat2,
+                               expected = y_hat1,
                                check.attributes = FALSE)
       }
+      dev1 <- .deviance(y = y[fold == 1], y_hat = y_hat1, family = family) 
+      dev2 <- .deviance(y = y[fold == 1], y_hat = y_hat2, family = family) 
+      testthat::expect_equal(object = dev1,
+                             expected = dev2,
+                             check.attributes = FALSE)
     })
   }
 }
@@ -147,7 +157,6 @@ if (FALSE) {
                                       s = 0,
                                       type = "response"))
   coef1 <- as.numeric(stats::coef(object = object, s = 0))
-  
   all.equal(coef0, coef1, check.attributes = FALSE)
   all.equal(y_hat0, y_hat1, check.attributes = FALSE)
   stats::cor(y_hat0, y_hat1)
