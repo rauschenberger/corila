@@ -137,7 +137,9 @@ This function calls
 \code{\link{.forescale}()} and \code{\link{.backscale}()}
 for standardising data and bringing results back to the original scale,
 respectively,
-\code{\link{multiridge}()} for obtaining initial group penalties,
+\code{\link{.folds}()} for splitting samples into folds,
+\code{\link{.estim_initial_coefs}()} for obtaining initial coefficients,
+\code{\link{.is_adjacent}()} for identifying adjacent predictors,
 and \code{\link[glmnet]{cv.glmnet}()} and \code{\link[glmnet]{glmnet}()}
 for adaptive lasso regression.
 }

@@ -34,6 +34,13 @@ from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 \description{
 Estimate initial coefficients.
 }
+\details{
+This function is called by \code{\link[=corila]{corila()}}.
+It calls \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}} or \code{\link[glmnet:glmnet]{glmnet::glmnet()}}
+for an initial lasso, ridge, or elastic net regression,
+\code{\link[=multiridge]{multiridge()}} for an initial multi-penalty ridge regression,
+or \code{\link[stats:cor]{stats::cor()}} for initial correlation coefficients.
+}
 \examples{
 n <- 20
 p <- 10

@@ -9,6 +9,19 @@
 #' Estimate initial coefficients.
 #'
 #' @inheritParams corila
+#' 
+#' @param alpha
+#' TO BE DOCUMENTED
+#'
+#' @param lambda
+#' TO BE DOCUMENTED
+#'
+#' @details
+#' This function is called by [corila()].
+#' It calls [glmnet::cv.glmnet()] or [glmnet::glmnet()]
+#' for an initial lasso, ridge, or elastic net regression,
+#' [multiridge()] for an initial multi-penalty ridge regression,
+#' or [stats::cor()] for initial correlation coefficients.
 #'
 #' @examples
 #' n <- 20
@@ -375,7 +388,9 @@
 #' \code{\link{.forescale}()} and \code{\link{.backscale}()}
 #' for standardising data and bringing results back to the original scale,
 #' respectively,
-#' \code{\link{multiridge}()} for obtaining initial group penalties,
+#' \code{\link{.folds}()} for splitting samples into folds,
+#' \code{\link{.estim_initial_coefs}()} for obtaining initial coefficients,
+#' \code{\link{.is_adjacent}()} for identifying adjacent predictors,
 #' and \code{\link[glmnet]{cv.glmnet}()} and \code{\link[glmnet]{glmnet}()}
 #' for adaptive lasso regression.
 #'
@@ -1123,6 +1138,15 @@ print.summary.cv.corila <- function(x, ...) {
 #' @seealso
 #' Fit models with \code{\link{cv.corila}()}
 #' and extract coefficients with \code{\link{coef.cv.corila}()}.
+#'
+#' @details
+#' This function calls
+#' [.expand_auxiliary()] for handling auxiliary predictors,
+#' \code{\link{.forescale}()}
+#' for standardising the predictor matrix,
+#' and \code{\link{.backscale}()}
+#' for bringing predicted values back to the original scale
+#' (if `family="gaussian"`).
 #'
 #' @inherit cv.corila examples
 #'

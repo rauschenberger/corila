@@ -25,6 +25,15 @@ Returns fitted or predicted values in an
 \description{
 Makes predictions from an object of class \code{"cv.corila"}.
 }
+\details{
+This function calls
+\code{\link[=.expand_auxiliary]{.expand_auxiliary()}} for handling auxiliary predictors,
+\code{\link{.forescale}()}
+for standardising the predictor matrix,
+and \code{\link{.backscale}()}
+for bringing predicted values back to the original scale
+(if \code{family="gaussian"}).
+}
 \examples{
 # minimal example
 n <- 50; p <- 20; q <- 5
