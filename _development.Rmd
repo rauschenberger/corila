@@ -35,13 +35,13 @@ setwd("C:/Users/arauschenberger/Desktop/corila/package")
 ```{r}
 #devtools::check()
 roxygen2::roxygenise()
+lintr::lint_package()
 rcmdcheck::rcmdcheck()
 
 devtools::spell_check()
 checkglobals::checkglobals(pkg=".")
-
 pkgdown::check_pkgdown()
-lintr::lint_package()
+
 x <- cyclocomp::cyclocomp_package_dir()
 
 #devtools::build()

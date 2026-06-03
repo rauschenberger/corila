@@ -117,8 +117,8 @@ for (glmnet in c(FALSE, TRUE)) {
                                expected = y_hat1,
                                check.attributes = FALSE)
       }
-      dev1 <- .deviance(y = y[fold == 1], y_hat = y_hat1, family = family) 
-      dev2 <- .deviance(y = y[fold == 1], y_hat = y_hat2, family = family) 
+      dev1 <- .deviance(y = y[fold == 1], y_hat = y_hat1, family = family)
+      dev2 <- .deviance(y = y[fold == 1], y_hat = y_hat2, family = family)
       testthat::expect_equal(object = dev1,
                              expected = dev2,
                              check.attributes = FALSE)
@@ -397,8 +397,8 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     newx <- data$x_test
     newx[, !include] <- 0
     y_hat3 <- predict(object = object, newx = newx)
-    testthat::expect_true(all(y_hat1  ==  y_hat2))
-    testthat::expect_true(all(y_hat1  ==  y_hat3))
-    testthat::expect_true(all(y_hat2  ==  y_hat3))
+    testthat::expect_equal(object = y_hat1, expected = y_hat2)
+    testthat::expect_equal(object = y_hat1, expected = y_hat3)
+    testthat::expect_equal(object = y_hat2, expected = y_hat3)
   })
 }

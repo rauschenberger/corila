@@ -55,7 +55,7 @@ testthat::test_that("primary predictors are equal", {
                              expected = x[, include])
 })
 testthat::test_that("auxiliary features are zero", {
-  testthat::expect_true(all(x_expanded[, !include] == 0))
+  testthat::expect_setequal(object = x_expanded[, !include], expected = 0)
 })
 
 ## function ".combine_slopes" --------------------------------------------------
@@ -159,23 +159,23 @@ estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 
 testthat::test_that("precision equals zero if all signs are inverted", {
   prec <- calc_sign_prec(truth = truth, estim = -truth)
-  testthat::expect_true(prec == 0)
+  testthat::expect_identical(object = prec, expected = 0)
 })
 
 testthat::test_that("precision equals one if all signs are true", {
   prec <- calc_sign_prec(truth = truth, estim = truth)
-  testthat::expect_true(prec == 1)
+  testthat::expect_identical(object = prec, expected = 1)
 })
 
 testthat::test_that("precision is not defined if all signs equal zero", {
   prec <- calc_sign_prec(truth = truth, estim = 0 * estim)
-  testthat::expect_true(is.na(prec))
+  testthat::expect_identical(object = prec, expected = NA)
 })
 
 testthat::test_that("precision is not influenced by estimated zeros", {
   prec1 <- calc_sign_prec(truth = truth, estim = estim)
   prec2 <- calc_sign_prec(truth = truth[estim != 0], estim = estim[estim != 0])
-  testthat::expect_true(prec1 == prec2)
+  testthat::expect_identical(object = prec1, expected = prec2)
 })
 
 ## function ".folds" -----------------------------------------------------------
