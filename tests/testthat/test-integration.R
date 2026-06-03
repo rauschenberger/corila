@@ -5,9 +5,6 @@
 
 for (glmnet in c(FALSE, TRUE)) {
   for (family in c("gaussian", "binomial", "poisson", "cox")) {
-    #if (family == "cox") {
-    #  next
-    #}
     cat(paste0(
       ifelse(glmnet, "glmnet::cv.glmnet", "stats::glm"),
       ", family=\"", family, "\"\n"
@@ -277,10 +274,6 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 # fix bug in Cox model
 
 for (family in c("gaussian", "binomial", "cox")) {
-  if (family == "cox") {
-    warning("issue with cox model")
-    next
-  }
   # simulate
   set.seed(1)
   n0 <- 100
@@ -316,7 +309,13 @@ for (family in c("gaussian", "binomial", "cox")) {
     )
   }
   testthat::test_that("multiridge predict can be reconstructed with coef", {
-    testthat::expect_equal(y_hat, temp)
+    if (family == "cox") {
+      testthat::expect_equal(object = temp,
+                             expected = y_hat * mean(temp / y_hat),
+                             check.attributes = FALSE)
+    } else {
+      testthat::expect_equal(object = temp, expected = y_hat)
+    }
   })
 }
 
