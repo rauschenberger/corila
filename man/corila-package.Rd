@@ -3,13 +3,14 @@
 \docType{package}
 \name{corila-package}
 \alias{corila-package}
-\title{Sparse group lasso}
+\title{Sparse modelling with grouped and correlated features
+allowing for privileged information}
 \description{
 The R package \code{corila} implements
 "Sparse modelling with grouped and correlated features
 allowing for privileged information" (\emph{Rauschenberger, 2026}).
-This is the first implementation of a novel algorithm,
-which is based on adaptive lasso regression using the
+This is the first implementation of a novel algorithm.
+It builds upon adaptive lasso regression with the
 \link[glmnet:glmnet-package]{glmnet-package}.
 }
 \details{

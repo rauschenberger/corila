@@ -15,6 +15,9 @@ numeric vector of length \eqn{n}}
 
 \item{family}{character}
 }
+\value{
+Returns the deviance (a numeric scalar).
+}
 \description{
 Calculates the deviance.
 }

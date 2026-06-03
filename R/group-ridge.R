@@ -15,7 +15,7 @@
 #'
 #' @param x
 #' predictors:
-#' \eqn{n \times p} matrix,
+#' \eqn{n \times p} matrix
 #'
 #' @param y
 #' response:
@@ -38,7 +38,7 @@
 #'
 #' @references
 #' [Mark A. van de Wiel](https://orcid.org/0000-0003-4780-8472),
-#' [Mirrelijn M. van Nee](https://orcid.org/0000-0001-7715-1446})
+#' [Mirrelijn M. van Nee](https://orcid.org/0000-0001-7715-1446)
 #' and
 #' [Armin Rauschenberger](https://orcid.org/0000-0001-6498-4801)
 #' (2021).
@@ -51,25 +51,22 @@
 #' @return
 #' Returns an object of class `"multiridge"`,
 #' a list with the following slots:
-#' \itemize{
-#' \item slots from [IWLSridge()][multiridge::IWLSridge] or
+#' - slots from [IWLSridge()][multiridge::IWLSridge] or
 #' [IWLSCoxridge()][multiridge::IWLSCoxridge]
-#' \item character `family`
+#' - character `family`
 #' with value `"gaussian"` (also for `"linear"`),
-#' `"binomial"` (also for `"logistic"`),
-#' `"poisson"`, or `"cox"`
-#' \item \eqn{q}-dimensional vector `penalties`
+#' `"binomial"` (also for `"logistic"`), or `"cox"`
+#' - \eqn{q}-dimensional vector `penalties`
 #' containing optimised regularisation hyperparameters
 #' (one for each variable group)
-#' \item list `datablocks`
+#' - list `datablocks`
 #' with \eqn{q} slots (one for each variable group),
 #' each containing an \eqn{n_0 \times p_k} matrix,
 #' where \eqn{k \in \{1, \ldots, q\}}
-#' \item \eqn{p}-dimensional group vector `z` (see argument)
-#' \item list `pars` with slots `family` (see above),
-#' the \eqn{n_0}-dimensional vectors `mu.x` and `sd.x`
+#' - \eqn{p}-dimensional group vector `z` (see argument)
+#' - list `pars` with slots `family` (see above),
+#' the \eqn{p}-dimensional vectors `mu.x` and `sd.x`
 #' and the scalars `mu.y` and `sd.y`
-#' }
 #'
 #' @seealso
 #' Extract coefficients with [coef()][coef.multiridge]
@@ -160,7 +157,7 @@
 #' metric
 #' }
 #'
-#' @keywords models, regression, classif
+#' @keywords methods models regression classif
 #'
 #' @export
 multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
@@ -250,7 +247,11 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
 #' Makes predictions from a multi-penalty ridge regression model.
 #'
 #' @inheritParams coef.multiridge
+#'
 #' @inheritParams predict.corila
+#'
+#' @param ...
+#' (not used)
 #'
 #' @inherit multiridge references
 #'
@@ -276,7 +277,7 @@ predict.multiridge <- function(object, newx, ...) {
       "for each variable used in model fitting."
     ))
   }
-  # --- make prediction s---
+  # --- make predictions ---
   scale <- .forescale(x = newx, pars = object$pars)
   newxx <- lapply(X = unique(object$z),
                   FUN = function(x) scale$x[, object$z == x])

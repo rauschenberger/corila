@@ -27,15 +27,18 @@ and \eqn{p} is the number of variables}
 \item{y}{\eqn{n_0}-dimensional response vector,
 where \eqn{n_0} is the number of observations used for model training}
 
-\item{group}{\strong{(i)} \eqn{p}-dimensional vector of group indices
+\item{group}{group structure (three options):
+\itemize{
+\item \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
-\strong{(ii)} list with \eqn{q} slots containing the variable indices
+\item list with \eqn{q} slots containing the variable indices
 (in \eqn{\{1, \ldots, p\}}) or labels,
-\strong{(iii)} \eqn{p \times p} matrix,
+\item \eqn{p \times p} matrix,
 where the entry in the \eqn{j^{\text{th}}} row
 and the \eqn{k^{\text{th}}} column
 indicates whether information should be transferred
-from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
+from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
+}}
 
 \item{include}{\eqn{p}-dimensional logical vector
 indicating whether a predictor may be included in the final model
@@ -46,7 +49,7 @@ or must be excluded from the final model
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
 
-\item{hyper}{list of of \eqn{m}-dimensional vectors
+\item{hyper}{list of \eqn{m}-dimensional vectors
 or a data frame with \eqn{m} rows
 containing candidate values
 for the regularisation and mixing hyperparameters}
@@ -72,7 +75,7 @@ or \code{NA} to set all initial coefficients equal to 1}
 or \code{"kendall"};
 or \eqn{p \times p} correlation matrix}
 
-\item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
+\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
 
 \item{nfolds}{integer specifying the number of folds}
 
@@ -142,5 +145,6 @@ and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}} and \code{\link[glmnet:g
 for adaptive lasso regression.
 }
 \keyword{classif}
-\keyword{models,}
-\keyword{regression,}
+\keyword{methods}
+\keyword{models}
+\keyword{regression}

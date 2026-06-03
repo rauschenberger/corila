@@ -7,9 +7,12 @@
 .mean_function(x, family)
 }
 \arguments{
-\item{x}{numeric vector}
+\item{x}{numeric vector of length \eqn{n}}
 
 \item{family}{character}
+}
+\value{
+Returns a numeric vector of length \eqn{n}.
 }
 \description{
 Transform the linear predictor to predicted values/probabilities.

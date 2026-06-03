@@ -23,7 +23,7 @@ simulate(
 )
 }
 \arguments{
-\item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"} or \code{"cox"}}
+\item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
 \item{n0}{number of training observations}
 
@@ -33,21 +33,29 @@ simulate(
 
 \item{n_type}{number of variable types}
 
-\item{size_group}{size of variable groups (per variable type)}
+\item{size_group}{size of variable groups (per variable type):
+integer vector of length \code{n_type}}
 
-\item{effect_size}{effect sizes (per variable type)}
+\item{effect_size}{effect sizes (per variable type):
+numeric vector of length \code{n_type}}
 
-\item{corfac_feature}{decrease of correlation if different variable}
+\item{corfac_feature}{decrease of correlation if different variable:
+scalar in unit interval}
 
-\item{corfac_type}{decrease of correlation if different type}
+\item{corfac_type}{decrease of correlation if different type:
+scalar in unit interval}
 
-\item{corfac_group}{decrease of correlation if different group}
+\item{corfac_group}{decrease of correlation if different group:
+scalar in unit interval}
 
-\item{n_group_causal}{number of causal groups}
+\item{n_group_causal}{number of causal groups:
+integer}
 
-\item{prop_causal}{proportion of causal features within causal groups}
+\item{prop_causal}{proportion of causal features within causal groups:
+scalar in unit interval}
 
-\item{noise_factor}{noise factor}
+\item{noise_factor}{noise factor:
+numeric scalar}
 
 \item{plot}{Attempt to visualise effects of and correlation between variables?
 (\code{TRUE} or \code{FALSE})}
@@ -70,7 +78,7 @@ Returns a list with the following slots:
 }
 }
 \description{
-Simulates data with grouped predictor variables
+Simulates data with grouped predictor variables.
 }
 \examples{
 data <- corila:::simulate()

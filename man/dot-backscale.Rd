@@ -35,6 +35,12 @@ Transforms response variable back to original scale
 or transforms coefficients for predictor variables and response variable
 on original scales.
 }
+\details{
+This function is called by \code{\link[=predict.cv.corila]{predict.cv.corila()}}
+for the predicted values
+and by \code{\link[=coef.cv.corila]{coef.cv.corila()}}
+for the estimated coefficients.
+}
 \examples{
 \donttest{
 # simulate data

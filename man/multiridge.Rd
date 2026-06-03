@@ -16,7 +16,7 @@ multiridge(
 }
 \arguments{
 \item{x}{predictors:
-\eqn{n \times p} matrix,}
+\eqn{n \times p} matrix}
 
 \item{y}{response:
 \eqn{n}-dimensional vector}
@@ -26,7 +26,7 @@ multiridge(
 \item{family}{character \code{"linear"} (or \code{"gaussian"}),
 \code{"logistic"} (or \code{"binomial"}), or \code{"cox"}}
 
-\item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
+\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
 
 \item{nfolds}{integer specifying the number of folds}
 
@@ -41,8 +41,7 @@ a list with the following slots:
 \link[multiridge:IWLSCoxridge]{IWLSCoxridge()}
 \item character \code{family}
 with value \code{"gaussian"} (also for \code{"linear"}),
-\code{"binomial"} (also for \code{"logistic"}),
-\code{"poisson"}, or \code{"cox"}
+\code{"binomial"} (also for \code{"logistic"}), or \code{"cox"}
 \item \eqn{q}-dimensional vector \code{penalties}
 containing optimised regularisation hyperparameters
 (one for each variable group)
@@ -52,7 +51,7 @@ each containing an \eqn{n_0 \times p_k} matrix,
 where \eqn{k \in \{1, \ldots, q\}}
 \item \eqn{p}-dimensional group vector \code{z} (see argument)
 \item list \code{pars} with slots \code{family} (see above),
-the \eqn{n_0}-dimensional vectors \code{mu.x} and \code{sd.x}
+the \eqn{p}-dimensional vectors \code{mu.x} and \code{sd.x}
 and the scalars \code{mu.y} and \code{sd.y}
 }
 }
@@ -144,7 +143,7 @@ metric
 }
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
-\href{https://orcid.org/0000-0001-7715-1446}}{Mirrelijn M. van Nee}
+\href{https://orcid.org/0000-0001-7715-1446}{Mirrelijn M. van Nee}
 and
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
 (2021).
@@ -176,5 +175,6 @@ a list of length \eqn{q} of \eqn{n \times p_k} matrices,
 with \eqn{k} in \eqn{\{1, \ldots, q\}}.
 }
 \keyword{classif}
-\keyword{models,}
-\keyword{regression,}
+\keyword{methods}
+\keyword{models}
+\keyword{regression}

@@ -7,15 +7,17 @@
 .set_candidates(tune)
 }
 \arguments{
-\item{tune}{character string\code{"to be defined"}
-or determining the candidate values for the hyperparameters;
-or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
-and \code{exp_global} (not yet implemented)}
+\item{tune}{character string for determining the candidate values
+for the hyperparameters
+(to implement: list with slots
+\code{wgt_local}, \code{wgt_global}, \code{exp_local}, and \code{exp_global})}
 }
 \value{
 Returns a data frame with
-the slots "wgt_local" and "exp_local" for the local prior information
-and the slots "wgt_global" and "exp_global" for the global prior information.
+the slots \code{"wgt_local"} and \code{"exp_local"}
+for the local prior information
+and the slots \code{"wgt_global"} and \code{"exp_global"}
+for the global prior information.
 }
 \description{
 Set candidate values for hyperparameters.

@@ -88,7 +88,7 @@ metric
 }
 \references{
 \href{https://orcid.org/0000-0003-4780-8472}{Mark A. van de Wiel},
-\href{https://orcid.org/0000-0001-7715-1446}}{Mirrelijn M. van Nee}
+\href{https://orcid.org/0000-0001-7715-1446}{Mirrelijn M. van Nee}
 and
 \href{https://orcid.org/0000-0001-6498-4801}{Armin Rauschenberger}
 (2021).

@@ -26,15 +26,18 @@ and \eqn{p} is the number of variables}
 \item{y}{\eqn{n_0}-dimensional response vector,
 where \eqn{n_0} is the number of observations used for model training}
 
-\item{group}{\strong{(i)} \eqn{p}-dimensional vector of group indices
+\item{group}{group structure (three options):
+\itemize{
+\item \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
-\strong{(ii)} list with \eqn{q} slots containing the variable indices
+\item list with \eqn{q} slots containing the variable indices
 (in \eqn{\{1, \ldots, p\}}) or labels,
-\strong{(iii)} \eqn{p \times p} matrix,
+\item \eqn{p \times p} matrix,
 where the entry in the \eqn{j^{\text{th}}} row
 and the \eqn{k^{\text{th}}} column
 indicates whether information should be transferred
-from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
+from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
+}}
 
 \item{include}{\eqn{p}-dimensional logical vector
 indicating whether a predictor may be included in the final model
@@ -68,12 +71,12 @@ or \code{NA} to set all initial coefficients equal to 1}
 or \code{"kendall"};
 or \eqn{p \times p} correlation matrix}
 
-\item{tune}{character string\code{"to be defined"}
-or determining the candidate values for the hyperparameters;
-or list with slots \code{wgt_local}, \code{wgt_global}, \code{exp_local},
-and \code{exp_global} (not yet implemented)}
+\item{tune}{character string for determining the candidate values
+for the hyperparameters
+(to implement: list with slots
+\code{wgt_local}, \code{wgt_global}, \code{exp_local}, and \code{exp_global})}
 
-\item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
+\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
 }
 \value{
 Returns an object of class \code{"cv.corila"},
@@ -85,8 +88,7 @@ each slot contains an object of class \code{"glmnet"}
 \item \code{hyper}:
 data frame with one row for each combination of hyperparameters,
 four columns for the values of the hyperparameters
-(\code{wgt_local}, \code{wgt_global},
-\code{exp_global}, and \code{exp_local})
+(\code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global})
 and a column for the cross-validated loss (\code{cvm})
 \item \code{id_hyper}:
 index of combination of hyperparameters
@@ -196,11 +198,12 @@ allowing for privileged information".
 }
 \seealso{
 Extract coefficients with \link[=coef.cv.corila]{coef()}
-and make predictions with \link[=predict.cv.corila]{predict()}\.
+and make predictions with \link[=predict.cv.corila]{predict()}.
 
 This user function repeatedly calls \code{\link[=corila]{corila()}}
 with different values for the regularisation and mixing hyperparameters.
 }
 \keyword{classif}
-\keyword{models,}
-\keyword{regression,}
+\keyword{methods}
+\keyword{models}
+\keyword{regression}

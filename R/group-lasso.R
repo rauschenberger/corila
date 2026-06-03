@@ -30,7 +30,7 @@
 #' corila:::.estim_initial_coefs(x = x,
 #'                               y = y,
 #'                               family = "gaussian",
-#'                               alpha = "spearman",
+#'                               alpha_init = "spearman",
 #'                               group = NULL,
 #'                               foldid = NULL,
 #'                               nfolds = 10,
@@ -103,7 +103,7 @@
       coef <- stats::coef(object = model, s = lambda)[cond]
     }
   } else {
-    stop("Invalid value for argument 'alpha'.")
+    stop("Invalid value for argument 'alpha_init'.")
   }
   list(coef = drop(coef), lambda = lambda)
 }
@@ -116,16 +116,18 @@
 #' @description
 #' Checks arguments of functions [corila()] and [cv.corila()].
 #'
+#' @inheritParams corila
 #' @inheritParams cv.corila
 #'
+#' @details
+#' This function is called by [corila()] and [cv.corila()].
+#' It repeatedly calls [.assert()].
+#'
 #' @return
-#' Returns `NULL` or an error message.
+#' Returns a list with slots `n`, `p`, and `q` or an error message.
 #'
 #' @seealso
-#' This function repeatedly calls [.assert()].
-#'
-#' @examples
-#' NA
+#' Use [.assert()] to validate individual arguments.
 #'
 #' @keywords internal
 #'
@@ -231,9 +233,9 @@
 #' names of predictors
 #'
 #' @details
-#' This functions is called by [corila()].
+#' This function is called by [corila()].
 #'
-#' @returns
+#' @return
 #' Returns a logical vector of length \eqn{p}.
 #'
 #' @examples
@@ -301,11 +303,12 @@
 #' where \eqn{n_0} is the number of observations used for model training
 #'
 #' @param group
-#' **(i)** \eqn{p}-dimensional vector of group indices
+#' group structure (three options):
+#' - \eqn{p}-dimensional vector of group indices
 #' (in \eqn{\{1, \ldots, q\}}) or labels,
-#' **(ii)** list with \eqn{q} slots containing the variable indices
+#' - list with \eqn{q} slots containing the variable indices
 #' (in \eqn{\{1, \ldots, p\}}) or labels,
-#' **(iii)** \eqn{p \times p} matrix,
+#' - \eqn{p \times p} matrix,
 #' where the entry in the \eqn{j^{\text{th}}} row
 #' and the \eqn{k^{\text{th}}} column
 #' indicates whether information should be transferred
@@ -341,13 +344,13 @@
 #' `"poisson"`, or `"cox"`
 #'
 #' @param foldid
-#' \eqn{n}-dimensional vector containing the fold identifiers
+#' \eqn{n_0}-dimensional vector containing the fold identifiers
 #'
 #' @param nfolds
 #' integer specifying the number of folds
 #'
 #' @param hyper
-#' list of of \eqn{m}-dimensional vectors
+#' list of \eqn{m}-dimensional vectors
 #' or a data frame with \eqn{m} rows
 #' containing candidate values
 #' for the regularisation and mixing hyperparameters
@@ -412,7 +415,7 @@
 #' y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 #' }
 #'
-#' @keywords models, regression, classif
+#' @keywords methods models regression classif
 #'
 #' @export
 #'
@@ -549,7 +552,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #'
 #' @return
 #' Returns fitted or predicted values in an
-#' \eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
+#' \eqn{n_0 x m}-dimensional or \eqn{n_1 x m}-dimensional matrix, respectively.
 #'
 #' @inherit corila-package references
 #'
@@ -590,8 +593,10 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 #' @return
 #' Returns a data frame with
-#' the slots "wgt_local" and "exp_local" for the local prior information
-#' and the slots "wgt_global" and "exp_global" for the global prior information.
+#' the slots `"wgt_local"` and `"exp_local"`
+#' for the local prior information
+#' and the slots `"wgt_global"` and `"exp_global"`
+#' for the global prior information.
 #'
 #' @examples
 #' corila:::.set_candidates(tune = "none")
@@ -679,40 +684,37 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' @inheritParams corila
 #'
 #' @param tune
-#' character string`"to be defined"`
-#' or determining the candidate values for the hyperparameters;
-#' or list with slots `wgt_local`, `wgt_global`, `exp_local`,
-#' and `exp_global` (not yet implemented)
+#' character string for determining the candidate values
+#' for the hyperparameters
+#' (to implement: list with slots
+#' `wgt_local`, `wgt_global`, `exp_local`, and `exp_global`)
 #'
 #' @inherit corila details
 #'
 #' @return
 #' Returns an object of class `"cv.corila"`,
 #' a list with the following slots:
-#' \itemize{
-#' \item `object`:
+#' - `object`:
 #' list with one slot for each combination of hyperparameters,
 #' each slot contains an object of class `"glmnet"`
-#' \item `hyper`:
+#' - `hyper`:
 #' data frame with one row for each combination of hyperparameters,
 #' four columns for the values of the hyperparameters
-#' (`wgt_local`, `wgt_global`,
-#' `exp_global`, and `exp_local`)
+#' (`wgt_local`, `exp_local`, `wgt_global`, and `exp_global`)
 #' and a column for the cross-validated loss (`cvm`)
-#' \item `id_hyper`:
+#' - `id_hyper`:
 #' index of combination of hyperparameters
 #' leading to the lowest cross-validated loss
-#' \item `lambda.min`
+#' - `lambda.min`
 #' optimised regularisation hyperparameter
-#' \item `scale`:
+#' - `scale`:
 #' output from [.forescale()]
-#' }
 #'
 #' @inherit corila-package references
 #'
 #' @seealso
 #' Extract coefficients with [coef()][coef.cv.corila]
-#' and make predictions with [predict()][predict.cv.corila]\.
+#' and make predictions with [predict()][predict.cv.corila].
 #'
 #' This user function repeatedly calls [corila()]
 #' with different values for the regularisation and mixing hyperparameters.
@@ -792,7 +794,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' #                     include = include, family = family)
 #' }
 #'
-#' @keywords models, regression, classif
+#' @keywords methods models regression classif
 #'
 #' @export
 #'
@@ -895,7 +897,9 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #' (not used)
 #'
 #' @return
-#' Prints `"object of class 'cv.corila'"` to the console.
+#' Prints `"object of class 'cv.corila'"` to the console
+#' (with a note on the number of cross-validated models).
+#' Returns `x` invisibly.
 #'
 #' @seealso
 #' [summary()][summary.cv.corila]
@@ -1082,7 +1086,7 @@ print.summary.cv.corila <- function(x, ...) {
 #' and \eqn{p_1} entries equal to `FALSE` (auxiliary features)
 #'
 #' @return
-#' matrix with \eqn{n} rows and \eqn{p_0 + p_1} columns
+#' Returns a matrix with \eqn{n} rows and \eqn{p_0 + p_1} columns.
 #'
 #' @examples
 #' n <- 5
@@ -1197,7 +1201,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' and \eqn{p} estimated coefficients for negative effects
 #'
 #' @return
-#' numeric vector of length \eqn{1 + p}
+#' Returns a numeric vector of length \eqn{1 + p}.
 #'
 #' @examples
 #' p <- 10

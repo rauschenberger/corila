@@ -15,7 +15,7 @@ with \eqn{p_0} entries equal to \code{TRUE} (primary features)
 and \eqn{p_1} entries equal to \code{FALSE} (auxiliary features)}
 }
 \value{
-matrix with \eqn{n} rows and \eqn{p_0 + p_1} columns
+Returns a matrix with \eqn{n} rows and \eqn{p_0 + p_1} columns.
 }
 \description{
 Add empty columns for auxiliary features.

@@ -20,7 +20,7 @@ to obtain predicted values}
 }
 \value{
 Returns fitted or predicted values in an
-\eqn{n_0}-dimensional or \eqn{n_1}-dimensional vector, respectively.
+\eqn{n_0 x m}-dimensional or \eqn{n_1 x m}-dimensional matrix, respectively.
 }
 \description{
 Makes predictions from an object of class \code{"cv.corila"}.

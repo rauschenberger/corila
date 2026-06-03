@@ -11,7 +11,7 @@
 where \eqn{n_0} is the number of observations used for model training
 and \eqn{p} is the number of variables}
 
-\item{y}{\eqn{n_0}-dimensional response vector
+\item{y}{response vector
 (only required if \code{family="gaussian"})
 or \code{NULL}}
 
@@ -23,9 +23,12 @@ or \code{NULL} (if \code{pars} is provided)}
 or \code{NULL} (if \code{family} is provided)}
 }
 \value{
+Returns a list with multiple slots:
 \itemize{
-\item standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
-\item standardised \eqn{n_0}-dimensional response vector \eqn{y}
+\item standardised \eqn{n_0 \times p} or \eqn{n_1 \times p}
+predictor matrix \eqn{x}
+\item standardised \eqn{n_0}-dimensional or \eqn{n_1}-dimensional
+response vector \eqn{y}
 (only if \eqn{y} is provided and \code{family = "gaussian"}
 or \code{pars$family = "gaussian"}; otherwise output equals input)
 \item character string \code{family} indicates the model (\code{"gaussian"},
@@ -43,7 +46,11 @@ and \code{family}
 }
 }
 \description{
-Transforming variables to mean 0 and variance 1.
+Transforms variables to mean 0 and variance 1.
+}
+\details{
+This function is called by \code{\link[=corila]{corila()}} for the training data
+and by \code{\link[=predict.corila]{predict.corila()}} for the testing data.
 }
 \examples{
 \donttest{

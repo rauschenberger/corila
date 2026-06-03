@@ -23,7 +23,9 @@
 #' `"nominal"`, or `"logical"`
 #'
 #' @param na.rm
-#' logical
+#' logical;
+#' `FALSE`: missing values are not allowed,
+#' `TRUE`: missing values are allowed
 #'
 #' @param support
 #' character vector (only used for `type = "nominal"`)
@@ -36,6 +38,9 @@
 #'
 #' @details
 #' This function is called by multiple function of the [corila-package].
+#'
+#' @return
+#' Returns `NULL` invisibly, or an error message.
 #'
 #' @seealso
 #' The function [.validate()] verifies whether the main arguments
@@ -95,18 +100,19 @@
     "expected values less than or equal to maximum" =
       type == "nominal" || max == Inf || all(x <= max, na.rm = TRUE)
   )
+  invisible(NULL)
 }
 
 #' @title
 #' Standardisation
 #'
 #' @description
-#' Transforming variables to mean 0 and variance 1.
+#' Transforms variables to mean 0 and variance 1.
 #'
 #' @inheritParams corila
 #'
 #' @param y
-#' \eqn{n_0}-dimensional response vector
+#' response vector
 #' (only required if `family="gaussian"`)
 #' or `NULL`
 #'
@@ -116,19 +122,25 @@
 #' or `NULL` (if `pars` is provided)
 #'
 #' @param pars
-#' list as defined in section \emph{Value},
+#' list as defined in section *Value*,
 #' or `NULL` (if `family` is provided)
 #'
+#' @details
+#' This function is called by [corila()] for the training data
+#' and by [predict.corila()] for the testing data.
+#'
 #' @return
-#' \itemize{
-#' \item standardised \eqn{n_0 \times p} predictor matrix \eqn{x}
-#' \item standardised \eqn{n_0}-dimensional response vector \eqn{y}
+#' Returns a list with multiple slots:
+#' - standardised \eqn{n_0 \times p} or \eqn{n_1 \times p}
+#' predictor matrix \eqn{x}
+#' - standardised \eqn{n_0}-dimensional or \eqn{n_1}-dimensional
+#' response vector \eqn{y}
 #' (only if \eqn{y} is provided and `family = "gaussian"`
 #' or `pars$family = "gaussian"`; otherwise output equals input)
-#' \item character string `family` indicates the model (`"gaussian"`,
+#' - character string `family` indicates the model (`"gaussian"`,
 #' `"binomial"`, `"poisson"`, or `"cox"`),
 #' determined by argument `family` or `pars$family`
-#' \item list `pars` with slots `mu.x` and `sd.x`
+#' - list `pars` with slots `mu.x` and `sd.x`
 #' (\eqn{p}-dimensional vectors of means and standard deviations
 #' of the predictor variables),
 #' `mu.y` and `sd.y`
@@ -137,7 +149,6 @@
 #' and `family`
 #' (character string `"gaussian"`, `"binomial"`,
 #' `"poisson"`, or `"cox"`)
-#' }
 #'
 #' @seealso
 #' Use function [.backscale()]
@@ -234,6 +245,12 @@
 #' containing the estimated intercept
 #' and the estimated slopes,
 #' or `NULL` (default)
+#'
+#' @details
+#' This function is called by [predict.cv.corila()]
+#' for the predicted values
+#' and by [coef.cv.corila()]
+#' for the estimated coefficients.
 #'
 #' @return
 #' Returns a list with slots `y_original` or `coef`.
@@ -353,13 +370,13 @@
 #' Fold Identifiers
 #'
 #' @description
-#' Splits observations into balanced and stratified folds
+#' Splits observations into balanced and stratified folds.
 #'
 #' @inheritParams cv.corila
 #'
 #' @return
-#' Returns an \eqn{n_1}-dimensional vector
-#' with entries \eqn{\{1, \ldots, }`nfolds`\eqn{\}}
+#' Returns an \eqn{n_0}-dimensional vector
+#' with entries in \eqn{\{1, \ldots, }`nfolds`\eqn{\}}.
 #'
 #' @details
 #' Randomly splits observations into balanced folds
@@ -424,10 +441,13 @@
 #' Transform the linear predictor to predicted values/probabilities.
 #'
 #' @param x
-#' numeric vector
+#' numeric vector of length \eqn{n}
 #'
 #' @param family
 #' character
+#'
+#' @return
+#' Returns a numeric vector of length \eqn{n}.
 #'
 #' @examples
 #' x <- rnorm(10)
@@ -467,6 +487,9 @@
 #'
 #' @param family
 #' character
+#'
+#' @return
+#' Returns the deviance (a numeric scalar).
 #'
 #' @examples
 #' n <- 10

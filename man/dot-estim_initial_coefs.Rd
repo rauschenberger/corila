@@ -30,17 +30,20 @@ with one penalty for each group
 (not implemented for \code{family="poisson"} or overlapping groups),
 or \code{NA} to set all initial coefficients equal to 1}
 
-\item{group}{\strong{(i)} \eqn{p}-dimensional vector of group indices
+\item{group}{group structure (three options):
+\itemize{
+\item \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
-\strong{(ii)} list with \eqn{q} slots containing the variable indices
+\item list with \eqn{q} slots containing the variable indices
 (in \eqn{\{1, \ldots, p\}}) or labels,
-\strong{(iii)} \eqn{p \times p} matrix,
+\item \eqn{p \times p} matrix,
 where the entry in the \eqn{j^{\text{th}}} row
 and the \eqn{k^{\text{th}}} column
 indicates whether information should be transferred
-from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
+from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
+}}
 
-\item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
+\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
 
 \item{nfolds}{integer specifying the number of folds}
 
@@ -66,7 +69,7 @@ y <- drop(x \%*\% beta)
 corila:::.estim_initial_coefs(x = x,
                               y = y,
                               family = "gaussian",
-                              alpha = "spearman",
+                              alpha_init = "spearman",
                               group = NULL,
                               foldid = NULL,
                               nfolds = 10,

@@ -16,11 +16,11 @@ where \eqn{n_0} is the number of observations used for model training}
 \item{nfolds}{integer specifying the number of folds}
 }
 \value{
-Returns an \eqn{n_1}-dimensional vector
-with entries \eqn{\{1, \ldots, }\code{nfolds}\eqn{\}}
+Returns an \eqn{n_0}-dimensional vector
+with entries in \eqn{\{1, \ldots, }\code{nfolds}\eqn{\}}.
 }
 \description{
-Splits observations into balanced and stratified folds
+Splits observations into balanced and stratified folds.
 }
 \details{
 Randomly splits observations into balanced folds

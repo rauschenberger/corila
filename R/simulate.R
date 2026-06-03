@@ -47,10 +47,10 @@ calc_sign_prec <- function(truth, estim) {
 #' Data simulation
 #'
 #' @description
-#' Simulates data with grouped predictor variables
+#' Simulates data with grouped predictor variables.
 #'
 #' @param family
-#' character `"gaussian"`, `"binomial"`, `"poisson"` or `"cox"`
+#' character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 #'
 #' @param n0
 #' number of training observations
@@ -65,28 +65,36 @@ calc_sign_prec <- function(truth, estim) {
 #' number of variable types
 #'
 #' @param size_group
-#' size of variable groups (per variable type)
+#' size of variable groups (per variable type):
+#' integer vector of length `n_type`
 #'
 #' @param effect_size
-#' effect sizes (per variable type)
+#' effect sizes (per variable type):
+#' numeric vector of length `n_type`
 #'
 #' @param corfac_feature
-#' decrease of correlation if different variable
+#' decrease of correlation if different variable:
+#' scalar in unit interval
 #'
 #' @param corfac_type
-#' decrease of correlation if different type
+#' decrease of correlation if different type:
+#' scalar in unit interval
 #'
 #' @param corfac_group
-#' decrease of correlation if different group
+#' decrease of correlation if different group:
+#' scalar in unit interval
 #'
 #' @param n_group_causal
-#' number of causal groups
+#' number of causal groups:
+#' integer
 #'
 #' @param prop_causal
-#' proportion of causal features within causal groups
+#' proportion of causal features within causal groups:
+#' scalar in unit interval
 #'
 #' @param noise_factor
-#' noise factor
+#' noise factor:
+#' numeric scalar
 #'
 #' @param plot
 #' Attempt to visualise effects of and correlation between variables?
@@ -97,18 +105,16 @@ calc_sign_prec <- function(truth, estim) {
 #'
 #' @return
 #' Returns a list with the following slots:
-#' \itemize{
-#' \item \eqn{n_0 \times p} matrix `x_train`
-#' \item \eqn{p}-dimensional vector `type`
-#' \item \eqn{p}-dimensional vector `group`
-#' \item \eqn{n_0}-dimensional vector `y_train`
-#' \item \eqn{n_1 \times p} matrix `x_test`
-#' \item \eqn{n_1}-dimensional vector `y_test`
-#' \item \eqn{p}-dimensional vector `beta`
-#' \item data frame `info` with entries
+#' - \eqn{n_0 \times p} matrix `x_train`
+#' - \eqn{p}-dimensional vector `type`
+#' - \eqn{p}-dimensional vector `group`
+#' - \eqn{n_0}-dimensional vector `y_train`
+#' - \eqn{n_1 \times p} matrix `x_test`
+#' - \eqn{n_1}-dimensional vector `y_test`
+#' - \eqn{p}-dimensional vector `beta`
+#' - data frame `info` with entries
 #' \eqn{n_0}, \eqn{n_1}, \eqn{p}, `n_type`,
 #' `n_group`, and `family`
-#' }
 #'
 #' @examples
 #' data <- corila:::simulate()
@@ -137,7 +143,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
   .assert(x = n_group, type = "integer", min = 2)
   .assert(x = n_type, type = "integer", min = 2)
   .assert(x = size_group, type = "integer", dim = n_type, min = 1)
-  .assert(x = effect_size, type = "integer", dim = n_type, min = 0)
+  .assert(x = effect_size, type = "numeric", dim = n_type, min = 0)
   .assert(x = corfac_feature, type = "numeric", min = 0, max = 1)
   .assert(x = corfac_type, type = "numeric", min = 0, max = 1)
   .assert(x = corfac_group, type = "numeric", min = 0, max = 1)

@@ -20,13 +20,18 @@
 \code{dim = 100} for a vector of length 100,
 \code{dim = c(Inf, 100)} for a matrix with 100 columns, etc.}
 
-\item{na.rm}{logical}
+\item{na.rm}{logical;
+\code{FALSE}: missing values are not allowed,
+\code{TRUE}: missing values are allowed}
 
 \item{support}{character vector (only used for \code{type = "nominal"})}
 
 \item{min}{numerical value (not used for \code{type = "nominal"})}
 
 \item{max}{numerical value (not used for \code{type = "nominal"})}
+}
+\value{
+Returns \code{NULL} invisibly, or an error message.
 }
 \description{
 Check whether provided arguments satisfy expectations.

@@ -16,7 +16,7 @@ namely of \eqn{p} estimated coefficients for positive effects
 and \eqn{p} estimated coefficients for negative effects}
 }
 \value{
-numeric vector of length \eqn{1 + p}
+Returns a numeric vector of length \eqn{1 + p}.
 }
 \description{
 Combine estimated coefficients for positive effects

@@ -12,7 +12,9 @@
 \item{...}{(not used)}
 }
 \value{
-Prints \code{"object of class 'cv.corila'"} to the console.
+Prints \code{"object of class 'cv.corila'"} to the console
+(with a note on the number of cross-validated models).
+Returns \code{x} invisibly.
 }
 \description{
 Print method for class \code{"cv.corila"}.

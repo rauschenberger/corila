@@ -6,14 +6,15 @@
 #' @aliases corila-package
 #'
 #' @title
-#' Sparse group lasso
+#' Sparse modelling with grouped and correlated features
+#' allowing for privileged information
 #'
 #' @description
 #' The R package `corila` implements
 #' "Sparse modelling with grouped and correlated features
 #' allowing for privileged information" (*Rauschenberger, 2026*).
-#' This is the first implementation of a novel algorithm,
-#' which is based on adaptive lasso regression using the
+#' This is the first implementation of a novel algorithm.
+#' It builds upon adaptive lasso regression with the
 #' [glmnet-package][glmnet::glmnet-package].
 #'
 #' @details
