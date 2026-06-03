@@ -1,8 +1,4 @@
 
-# Add unit tests for Cox model!
-
-set.seed(1)
-
 # Unit tests -------------------------------------------------------------------
 
 ## functions ".forescale" and ".backscale" -------------------------------------
@@ -10,6 +6,7 @@ set.seed(1)
 n <- 5
 p <- 10
 testthat::test_that("", {
+  set.seed(1)
   x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
   y <- stats::rnorm(n)
   scale <- .forescale(x = x, y = y, family = "gaussian", pars = NULL)
@@ -46,8 +43,9 @@ testthat::test_that("initial coefficients are named correctly", {
 
 n <- 5
 p <- 10
-x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
-include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+set.seed(1)
+x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
+include <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
 x_primary <- x[, include]
 x_expanded <- .expand_auxiliary(x = x_primary, include = include)
 testthat::test_that("primary predictors are equal", {
@@ -60,6 +58,7 @@ testthat::test_that("auxiliary features are zero", {
 
 ## function ".combine_slopes" --------------------------------------------------
 
+set.seed(1)
 alpha <- stats::rnorm(1)
 temp <- stats::rnorm(10)
 beta <- pmax(c(temp, -temp), 0)
@@ -168,6 +167,7 @@ testthat::test_that("mean function works", {
 
 ## function "calc_sign_prec" ---------------------------------------------------
 
+set.seed(1)
 truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 
@@ -194,6 +194,7 @@ testthat::test_that("precision is not influenced by estimated zeros", {
 
 ## function ".folds" -----------------------------------------------------------
 
+set.seed(1)
 n <- stats::rpois(n = 1, lambda = 50)
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   if (family == "gaussian") {

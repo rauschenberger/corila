@@ -143,9 +143,6 @@ testthat::test_that("print.summary.cv.corila returns NULL invisibly", {
   testthat::expect_invisible(call = print(summary(object)))
   testthat::expect_identical(object = print(summary(object)), expected = NULL)
 })
-#out <- plot(object)
-#testthat::test_that("plot.cv.corila returns NULL",
-#                    {testthat::expect_identical(out, NULL)})
 
 ## function "cv.corila" --------------------------------------------------------
 
