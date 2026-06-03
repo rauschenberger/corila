@@ -9,12 +9,10 @@
 #' Estimate initial coefficients.
 #'
 #' @inheritParams corila
-#' 
-#' @param alpha
-#' TO BE DOCUMENTED
 #'
 #' @param lambda
-#' TO BE DOCUMENTED
+#' numeric scalar, or \code{NULL}
+#' (determined by cross-validation)
 #'
 #' @details
 #' This function is called by [corila()].
@@ -40,7 +38,7 @@
 #'
 #' @keywords internal
 #'
-.estim_initial_coefs <- function(x, y, family, alpha, group,
+.estim_initial_coefs <- function(x, y, family, alpha_init, group,
                                  foldid, nfolds, lambda) {
   # --- check arguments ---
   methods <- c("pearson", "spearman", "kendall")
@@ -48,11 +46,11 @@
   .assert(x = y, type = "numeric", dim = nrow(x))
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
-  if (is.character(alpha)) {
-    .assert(x = alpha, type = "nominal",
+  if (is.character(alpha_init)) {
+    .assert(x = alpha_init, type = "nominal",
             support = methods)
   } else {
-    .assert(x = alpha, type = "numeric", min = 0, max = 1, na.rm = TRUE)
+    .assert(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
   .assert(x = foldid, type = "integer", dim = nrow(x),
           min = 1, max = nrow(x))
@@ -60,9 +58,9 @@
   .assert(x = lambda, type = "numeric", min = 0)
   # --- estimate initial coefficients ---
   p <- ncol(x)
-  if (all(is.na(alpha))) {
+  if (all(is.na(alpha_init))) {
     coef <- rep(x = 1, times = p) # Remove this confusing option?
-  } else if (is.character(alpha) && identical(alpha, "multiridge")) {
+  } else if (is.character(alpha_init) && identical(alpha_init, "multiridge")) {
     if (is.null(lambda)) {
       model <- multiridge(x = x,
                           y = y,
@@ -80,19 +78,19 @@
                           penalties = lambda)
       coef <- stats::coef(object = model)[-1]
     }
-  } else if (is.character(alpha) && alpha %in% methods) {
+  } else if (is.character(alpha_init) && alpha_init %in% methods) {
     coef <- stats::cor(x = x,
                        y = y,
-                       method = alpha,
+                       method = alpha_init,
                        use = "pairwise.complete")
     coef[is.na(coef)] <- 0
-  } else if (is.numeric(alpha) && alpha >= 0 && alpha <= 1) {
+  } else if (is.numeric(alpha_init) && alpha_init >= 0 && alpha_init <= 1) {
     cond <- rep(c(FALSE, TRUE), times = c(family != "cox", p))
     if (is.null(lambda)) {
       model <- glmnet::cv.glmnet(x = x,
                                  y = y,
                                  family = family,
-                                 alpha = alpha,
+                                 alpha = alpha_init,
                                  foldid = foldid,
                                  nfolds = nfolds)
       coef <- stats::coef(object = model, s = "lambda.min")[cond]
@@ -101,7 +99,7 @@
       model <- glmnet::glmnet(x = x,
                               y = y,
                               family = family,
-                              alpha = alpha)
+                              alpha = alpha_init)
       coef <- stats::coef(object = model, s = lambda)[cond]
     }
   } else {
@@ -461,7 +459,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   init <- .estim_initial_coefs(x = scale$x,
                                y = scale$y,
                                family = family,
-                               alpha = alpha_init,
+                               alpha_init = alpha_init,
                                group = group,
                                foldid = foldid,
                                nfolds = nfolds,

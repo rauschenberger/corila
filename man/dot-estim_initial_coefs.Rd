@@ -4,7 +4,7 @@
 \alias{.estim_initial_coefs}
 \title{Initial coefficients}
 \usage{
-.estim_initial_coefs(x, y, family, alpha, group, foldid, nfolds, lambda)
+.estim_initial_coefs(x, y, family, alpha_init, group, foldid, nfolds, lambda)
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix,
@@ -16,6 +16,19 @@ where \eqn{n_0} is the number of observations used for model training}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
+
+\item{alpha_init}{elastic net mixing parameter
+(\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
+for initial regression
+(default: ridge penalisation with \code{alpha_init}=0);
+alternative choices are
+"pearson", "spearman", or "kendall"
+to use initial correlation coefficients
+(not implemented for \code{family="cox"}),
+"multiridge" for multi-penalty ridge regression
+with one penalty for each group
+(not implemented for \code{family="poisson"} or overlapping groups),
+or \code{NA} to set all initial coefficients equal to 1}
 
 \item{group}{\emph{(i)} \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
@@ -30,6 +43,9 @@ from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable}
 \item{foldid}{\eqn{n}-dimensional vector containing the fold identifiers}
 
 \item{nfolds}{integer specifying the number of folds}
+
+\item{lambda}{numeric scalar, or \code{NULL}
+(determined by cross-validation)}
 }
 \description{
 Estimate initial coefficients.
