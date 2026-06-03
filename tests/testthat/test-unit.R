@@ -148,8 +148,15 @@ testthat::test_that("mean function works", {
   for (family in c("gaussian", "binomial", "poisson", "cox")) {
     mean <- .mean_function(x = eta, family = family)
     testthat::expect_length(object = mean, n = n)
+    cor <- stats::cor(mean, eta, method = "spearman")
+    testthat::expect_equal(object = cor, expected = 1)
+    if (family %in% c("binomial", "poisson")) {
+      testthat::expect_gte(object = min(mean), expected = 0)
+    }
+    if(identical(family, "binomial")) {
+      testthat::expect_lte(object = max(mean), expected = 1) 
+    }
   }
-  # CONTINUE HERE
 })
 
 ## function "calc_sign_prec" ---------------------------------------------------
