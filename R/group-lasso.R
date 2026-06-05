@@ -475,7 +475,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   }
   cor[is.na(cor)] <- 0
   #--- regression ---
-  object <- list()
+  model <- list()
   for (i in seq_len(nrow(hyper))) {
     weight <- list()
     weight$global <- weight$local <- rep(x = NA, times = p)
@@ -513,7 +513,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     #  stop(paste0("negative pf:", min(pf_ext)))
     #}
     .assert(x = pf_ext, type = "numeric", dim = 2 * p, min = 0)
-    object[[i]] <- glmnet::glmnet(x = cbind(scale$x, -scale$x),
+    model[[i]] <- glmnet::glmnet(x = cbind(scale$x, -scale$x),
                                   y = scale$y,
                                   family = family,
                                   penalty.factor = pf_ext,
@@ -522,7 +522,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   }
   structure(
     list(
-      model = object,
+      model = model,
       lambda_init = init$lambda,
       scale = scale$pars,
       args = args
