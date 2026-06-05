@@ -53,8 +53,8 @@
     .assert(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
   .assert(x = foldid, type = "integer", dim = nrow(x),
-          min = 2, max = nrow(x))
-  .assert(x = nfolds, type = "integer", min = 1, max = nrow(x))
+          min = 1, max = nrow(x))
+  .assert(x = nfolds, type = "integer", min = 2, max = nrow(x))
   .assert(x = lambda, type = "numeric", min = 0)
   # --- estimate initial coefficients ---
   p <- ncol(x)
@@ -577,7 +577,6 @@ predict.corila <- function(object, newx, index, s, ...) {
                                 newx = cbind(newx_stand, -newx_stand),
                                 s = s,
                                 type = "response")
-  #type = ifelse(object$scale$family == "cox", "link", "response"))
   y_hat <- .backscale(y = y_hat_stand, pars = object$scale)$y
   y_hat
 }
@@ -1232,6 +1231,9 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' Extracts coefficients from an object of class `"cv.corila"`.
 #'
 #' @inheritParams predict.cv.corila
+#'
+#' @param ...
+#' (not used)
 #'
 #' @return
 #' Returns an \eqn{(1 + p)}-dimensional vector of the estimated coefficients.

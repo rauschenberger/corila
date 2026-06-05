@@ -444,7 +444,7 @@
 #' numeric vector of length \eqn{n}
 #'
 #' @param family
-#' character
+#' character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 #'
 #' @return
 #' Returns a numeric vector of length \eqn{n}.

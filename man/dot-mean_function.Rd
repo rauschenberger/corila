@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{numeric vector of length \eqn{n}}
 
-\item{family}{character}
+\item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 }
 \value{
 Returns a numeric vector of length \eqn{n}.
