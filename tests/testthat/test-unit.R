@@ -27,7 +27,7 @@ testthat::test_that("forescale and backscale work", {
     }
     scale <- .forescale(x = x, y = y, family = family, pars = NULL)
     y_back <- .backscale(pars = scale$pars, y = scale$y)
-    testthat::expect_equal(object = y_back$y_original, expected = y)
+    testthat::expect_equal(object = y_back$y, expected = y)
   }
   coef <- stats::rnorm(p)
   mu_x <- rep(x = 0, times = p)
