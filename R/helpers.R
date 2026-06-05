@@ -253,7 +253,7 @@
 #' for the estimated coefficients.
 #'
 #' @return
-#' Returns a list with slots `y_original` or `coef`.
+#' Returns a list with slots `y` or `coef`.
 #'
 #' @seealso
 #' Use function [.forescale()] to standardise variables.
@@ -308,7 +308,7 @@
 #'                               y = yhat_temp,
 #'                               coef = coef_temp)
 #' coef2 <- result$coef
-#' yhat2 <- result$y_original
+#' yhat2 <- result$y
 #'
 #' # equality
 #' all.equal(coef1, coef2, check.attributes = FALSE)
@@ -341,9 +341,9 @@
   # --- transform target ---
   list <- list()
   if (!is.null(y) && identical(pars$family, "gaussian")) {
-    list$y_original <- pars$mu.y + pars$sd.y * y
+    list$y <- pars$mu.y + pars$sd.y * y
   } else if (!is.null(y)) {
-    list$y_original <- y
+    list$y <- y
   }
   # --- transform coefficients ---
   if (!is.null(coef)) {
