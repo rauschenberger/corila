@@ -71,7 +71,8 @@ Observations (samples) are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
 variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
 and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
 The number of variables in the \eqn{k^{\text{th}}} group
-is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
+is indicated by \eqn{p_k},
+with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 }
 \examples{
 # minimal example

@@ -28,7 +28,7 @@ and the estimated slopes,
 or \code{NULL} (default)}
 }
 \value{
-Returns a list with slots \code{y_original} or \code{coef}.
+Returns a list with slots \code{y} or \code{coef}.
 }
 \description{
 Transforms response variable back to original scale
@@ -91,7 +91,7 @@ result <- corila:::.backscale(pars = scale$pars,
                               y = yhat_temp,
                               coef = coef_temp)
 coef2 <- result$coef
-yhat2 <- result$y_original
+yhat2 <- result$y
 
 # equality
 all.equal(coef1, coef2, check.attributes = FALSE)

@@ -17,14 +17,14 @@ Simulates outcome vector.
 }
 \examples{
 # simulate independent outcome
-.simulate_outcome(family = "gaussian", n = 10)
+corila:::.simulate_outcome(family = "gaussian", n = 10)
 
 # simulate dependent outcome
 n <- 10
 p <- 20
 x <- matrix(rnorm(n * p), n, p)
 beta <- rnorm(p)
-.simulate_outcome(family = "gaussian", x = x, beta = beta)
+corila:::.simulate_outcome(family = "gaussian", x = x, beta = beta)
 
 }
 \seealso{

@@ -327,12 +327,13 @@
 #' for initial regression
 #' (default: ridge penalisation with `alpha_init`=0);
 #' alternative choices are
-#' "pearson", "spearman", or "kendall"
+#' `"pearson"`, `"spearman"`, or `"kendall"`
 #' to use initial correlation coefficients
 #' (not implemented for `family="cox"`),
-#' "multiridge" for multi-penalty ridge regression
+#' `"multiridge"` for multi-penalty ridge regression
 #' with one penalty for each group
-#' (not implemented for `family="poisson"` or overlapping groups),
+#' (not implemented for `family="poisson"` or overlapping groups,
+#' falls back to `alpha_init=0` for `family="poisson"`),
 #' or `NA` to set all initial coefficients equal to 1
 #'
 #' @param alpha_final
@@ -374,7 +375,8 @@
 #' variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
 #' and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
 #' The number of variables in the \eqn{k^{\text{th}}} group
-#' is indicated by \eqn{p_k}, with \eqn{\sum_{k=1}^q p_k = p}.
+#' is indicated by \eqn{p_k},
+#' with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 #'
 #' @return
 #' Returns an object of class `"corila"`.
@@ -514,11 +516,11 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     #}
     .assert(x = pf_ext, type = "numeric", dim = 2 * p, min = 0)
     model[[i]] <- glmnet::glmnet(x = cbind(scale$x, -scale$x),
-                                  y = scale$y,
-                                  family = family,
-                                  penalty.factor = pf_ext,
-                                  lower.limits = 0,
-                                  alpha = alpha_final)
+                                 y = scale$y,
+                                 family = family,
+                                 penalty.factor = pf_ext,
+                                 lower.limits = 0,
+                                 alpha = alpha_final)
   }
   structure(
     list(
@@ -552,7 +554,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
 #'
 #' @return
 #' Returns fitted or predicted values in an
-#' \eqn{n_0 x m}-dimensional or \eqn{n_1 x m}-dimensional matrix, respectively.
+#' \eqn{n_0 \times m}-dimensional or
+#' \eqn{n_1 \times m}-dimensional matrix, respectively.
 #'
 #' @inherit corila-package references
 #'

@@ -259,9 +259,6 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
        info = info)
 }
 
-
-
-
 #' @title
 #' Simulate outcome
 #'
@@ -279,14 +276,14 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 #'
 #' @examples
 #' # simulate independent outcome
-#' .simulate_outcome(family = "gaussian", n = 10)
+#' corila:::.simulate_outcome(family = "gaussian", n = 10)
 #'
 #' # simulate dependent outcome
 #' n <- 10
 #' p <- 20
 #' x <- matrix(rnorm(n * p), n, p)
 #' beta <- rnorm(p)
-#' .simulate_outcome(family = "gaussian", x = x, beta = beta)
+#' corila:::.simulate_outcome(family = "gaussian", x = x, beta = beta)
 #'
 .simulate_outcome <- function(family, x = NULL, beta = NULL, n = NULL,
                               factor = 1) {

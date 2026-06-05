@@ -59,12 +59,13 @@ for the regularisation and mixing hyperparameters}
 for initial regression
 (default: ridge penalisation with \code{alpha_init}=0);
 alternative choices are
-"pearson", "spearman", or "kendall"
+\code{"pearson"}, \code{"spearman"}, or \code{"kendall"}
 to use initial correlation coefficients
 (not implemented for \code{family="cox"}),
-"multiridge" for multi-penalty ridge regression
+\code{"multiridge"} for multi-penalty ridge regression
 with one penalty for each group
-(not implemented for \code{family="poisson"} or overlapping groups),
+(not implemented for \code{family="poisson"} or overlapping groups,
+falls back to \code{alpha_init=0} for \code{family="poisson"}),
 or \code{NA} to set all initial coefficients equal to 1}
 
 \item{alpha_final}{elastic net mixing parameter for final regression

@@ -102,7 +102,7 @@ result <- corila:::.backscale(pars = scale$pars,
                               y = yhat_temp,
                               coef = coef_temp)
 coef2 <- result$coef
-yhat2 <- result$y_original
+yhat2 <- result$y
 
 # equality
 all.equal(coef1, coef2, check.attributes = FALSE)
