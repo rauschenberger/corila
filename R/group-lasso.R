@@ -41,7 +41,7 @@
 .estim_initial_coefs <- function(x, y, family, alpha_init, group,
                                  foldid, nfolds, lambda) {
   # --- check arguments ---
-  methods <- c("pearson", "spearman", "kendall")
+  methods <- c("pearson", "spearman", "kendall", "multiridge")
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = y, type = "numeric", dim = nrow(x))
   .assert(x = family, type = "nominal",
@@ -198,7 +198,7 @@
           dim = c(Inf, length(slots)), min = 0)
   if (is.character(alpha_init)) {
     .assert(x = alpha_init, type = "nominal",
-            support = c("pearson", "spearman", "kendall"))
+            support = c("pearson", "spearman", "kendall", "multiridge"))
   } else {
     .assert(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
