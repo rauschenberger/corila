@@ -33,7 +33,9 @@ Use the function `cv.corila` to model an outcome (`n`-dimensional vector _y_) ba
 
 ``` r
 library(corila)
-object <- cv.corila(x = x_train, y = y_train, group = group, include = include)
+data <- simulate()
+attach(data)
+object <- cv.corila(x = x_train, y = data$y_train, group = group, include = include)
 coef(object)
 predict(object, newx = x_test)
 ```
