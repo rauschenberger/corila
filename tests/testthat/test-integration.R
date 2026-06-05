@@ -98,7 +98,7 @@ for (glmnet in c(FALSE, TRUE)) {
       }
       coef.temp <- as.numeric(stats::coef(object = lm2, s = 0))
       result <- .backscale(pars = scale$pars, y = y_hat_temp, coef = coef.temp)
-      y_hat2 <- result$y_original
+      y_hat2 <- result$y
       coef2 <- result$coef
       #--- equality ---
       testthat::expect_equal(object = coef1,

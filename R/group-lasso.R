@@ -53,7 +53,7 @@
     .assert(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
   .assert(x = foldid, type = "integer", dim = nrow(x),
-          min = 1, max = nrow(x))
+          min = 2, max = nrow(x))
   .assert(x = nfolds, type = "integer", min = 1, max = nrow(x))
   .assert(x = lambda, type = "numeric", min = 0)
   # --- estimate initial coefficients ---
@@ -440,11 +440,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   )
   #args <- as.list(match.call())[-1]
   #do.call(what = .validate, args = args)
-  #dims <- .validate(x = x, y = y, group = group, family = family)
   p <- args$p
-  #q <- args$q
-  #n <- nrow(x)
-  #p <- ncol(x)
   if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
     warning("Setting alpha_init=0 due to family='poisson'.")
     alpha_init <- 0

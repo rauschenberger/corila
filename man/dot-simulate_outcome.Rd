@@ -8,6 +8,16 @@
 }
 \arguments{
 \item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+
+\item{x}{numeric \eqn{n \times p} matrix}
+
+\item{beta}{numeric \eqn{p}-dimensional vector}
+
+\item{n}{integer or \code{NULL}}
+
+\item{factor}{non-negative scalar (default: \code{factor=1})
+for multiplying the linear predictor
+(to increase or decrease the signal strength)}
 }
 \value{
 Returns an \eqn{n}-dimensional outcome vector.

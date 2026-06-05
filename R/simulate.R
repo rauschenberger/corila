@@ -267,6 +267,20 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 #'
 #' @inheritParams simulate
 #'
+#' @param x
+#' numeric \eqn{n \times p} matrix
+#'
+#' @param beta
+#' numeric \eqn{p}-dimensional vector
+#'
+#' @param n
+#' integer or \code{NULL}
+#'
+#' @param factor
+#' non-negative scalar (default: `factor=1`)
+#' for multiplying the linear predictor
+#' (to increase or decrease the signal strength)
+#'
 #' @return
 #' Returns an \eqn{n}-dimensional outcome vector.
 #'
