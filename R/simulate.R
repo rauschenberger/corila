@@ -258,3 +258,62 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
        beta = beta,
        info = info)
 }
+
+
+
+
+#' @title
+#' Simulate outcome
+#'
+#' @description
+#' Simulates outcome vector.
+#'
+#' @inheritParams simulate
+#'
+#' @return
+#' Returns an \eqn{n}-dimensional outcome vector.
+#'
+#' @seealso
+#' Use [simulate()] to simulate a predictor matrix,
+#' an effect vector, and an outcome vector.
+#'
+#' @examples
+#' # simulate independent outcome
+#' .simulate_outcome(family = "gaussian", n = 10)
+#'
+#' # simulate dependent outcome
+#' n <- 10
+#' p <- 20
+#' x <- matrix(rnorm(n * p), n, p)
+#' beta <- rnorm(p)
+#' .simulate_outcome(family = "gaussian", x = x, beta = beta)
+#'
+.simulate_outcome <- function(family, x = NULL, beta = NULL, n = NULL,
+                              factor = 1) {
+  .assert(x = family, type = "nominal",
+          support = c("gaussian", "binomial", "poisson", "cox"))
+  .assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  .assert(x = beta, type = "numeric", dim = ncol(x))
+  .assert(x = n, type = "integer", min = 1)
+  .assert(x = factor, type = "numeric", min = 0)
+  if (!is.null(x) && !is.null(beta)) {
+    eta <- as.numeric(scale(x %*% as.vector(beta))) # was without scale
+    n <- nrow(x)
+  } else if (!is.null(n)) {
+    eta <- rep(x = 0, times = n)
+  } else {
+    stop("Provide either `x` and `beta` or `n`.")
+  }
+  if (identical(family, "gaussian")) {
+    factor * eta + stats::rnorm(n = n, sd = 1)
+  } else if (identical(family, "binomial")) {
+    stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-factor * eta)))
+    # NB: was without 2*
+  } else if (identical(family, "cox")) {
+    time <- stats::rexp(n = n, rate = exp(factor * eta))
+    status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+    survival::Surv(time = time, event = status)
+  } else if (identical(family, "poisson")) {
+    stats::rpois(n = n, lambda = exp(factor * eta))
+  }
+}
