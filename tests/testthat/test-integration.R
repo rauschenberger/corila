@@ -321,7 +321,7 @@ for (family in c("gaussian", "binomial", "cox")) {
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   # simulate data
   data <- simulate(family = family)
-  include <- stats::rbinom(n = data$info$p, size = 1, prob = 0.5)  ==  1
+  include <- as.logical(stats::rbinom(n = data$info$p, size = 1, prob = 0.5))
   # fit model
   object <- cv.corila(x = data$x_train, y = data$y_train,
                       group = data$group, include = include, family = family)

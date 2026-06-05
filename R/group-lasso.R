@@ -1164,13 +1164,6 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
     stop("Set s='lambda.min' or provide non-negative value.")
   }
   # --- handle auxiliary predictors ---
-  #if(any(object$args$include == 0) && sum(object$args$include) == ncol(newx)){
-  #  full <- matrix(data = 0,
-  #                 nrow = nrow(newx),
-  #                 ncol = length(object$args$include))
-  #  full[, object$args$include] <- newx
-  #  newx <- full
-  #}
   newx_full <- .expand_auxiliary(x = newx, include = object$args$include)
   # --- make predictions ---
   newx_stand <- .forescale(x = newx_full, pars = object$scale)$x
@@ -1276,5 +1269,5 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
                  !object$args$include)] != 0)) {
     stop("Excluded coefs must equal zero.")
   }
-  coef[c(TRUE[object$scale$family != "cox"], object$args$include == 1)]
+  coef[c(TRUE[object$scale$family != "cox"], object$args$include)]
 }
