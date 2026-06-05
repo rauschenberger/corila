@@ -1273,7 +1273,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef <- .combine_slopes(alpha = alpha, beta = beta)
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   if (any(coef[c(FALSE[object$scale$family != "cox"],
-                 !object$args$include == 1)] != 0)) {
+                 !object$args$include)] != 0)) {
     stop("Excluded coefs must equal zero.")
   }
   coef[c(TRUE[object$scale$family != "cox"], object$args$include == 1)]
