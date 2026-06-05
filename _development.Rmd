@@ -58,6 +58,10 @@ x <- pkgcheck::pkgcheck(goodpractice=FALSE)
 notes <- autotest::autotest_package(exclude=c("F1","F2"),test=TRUE)
 notes <- autotest::autotest_package(test=TRUE)
 srr::srr_stats_roxygen(category = c("ml", "regression"))
+
+#devtools::install()
+.rs.restartR()
+devtools::load_all()
 ```
 
 # Setting up a private GitLab mirror of a private GitHub repository:
