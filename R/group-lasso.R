@@ -694,7 +694,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' @return
 #' Returns an object of class `"cv.corila"`,
 #' a list with the following slots:
-#' - `object`:
+#' - `model`:
 #' list with one slot for each combination of hyperparameters,
 #' each slot contains an object of class `"glmnet"`
 #' - `hyper`:
@@ -878,6 +878,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   lambda.min <- object_ext$model[[id_hyper]]$lambda[which.min(cvm[[id_hyper]])]
   # return fitted model
   object <- object_ext
+  object$hyper <- hyper
   object$id_hyper <- id_hyper
   object$lambda.min <- lambda.min
   class(object) <- "cv.corila"
