@@ -909,7 +909,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
 #' @export
 print.cv.corila <- function(x, ...) {
   cat("object of class", sQuote("cv.corila"), "\n")
-  content <- ifelse(length(x$object) == 1, "an object", "multiple objects")
+  content <- ifelse(length(x$model) == 1, "an object", "multiple objects")
   cat("(contains ", content, " of class ", sQuote("cv.glmnet"), ")", sep = "")
   invisible(x)
 }
