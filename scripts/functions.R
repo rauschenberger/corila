@@ -544,55 +544,69 @@
 }
 
 
-# load("../results/simulation_lupi.RData")
-# 
-# ylim <- list()
-# ylim$prec <- range(sapply(results,function(x) range(x$prec[,-1])))
-# ylim$mse <- range(sapply(results,function(x) range(x$mse[,-1])))
-# 
-# prec <- lapply(results[-length(results)],function(x) x$prec[,-1])
-# mse <- lapply(results[-length(results)],function(x) x$mse[,-1])
-# 
-# graphics::par(mfcol=c(2,4))
-# .plot_change(x = prec, ylab = "precision", main = c("(i)","(ii)","(iii)","(iv)"))
-# .plot_change(x = mse, ylab = "MSE")
-# 
-# .plot_change <- function(x,ylab="",main=names(x)){
-#   graphics::par(mar=c(2,2,0.5,0.5),oma=c(0,2,1,0),xpd=NA)
-#   ylim <- range(x)
-#   nslot <- length(x)
-#   ncol <- ncol(x[[1]])
-#   nrow <- nrow(x[[1]])
-#   for(i in seq_len(nslot)){
-#     graphics::plot.new()
-#     graphics::plot.window(xlim=c(0.5,ncol + 5),ylim=ylim)
-#     usr <- graphics::par("usr")
-#     if(i==1){
-#       graphics::axis(side=2)
-#       graphics::segments(x0=usr[1],y0=usr[3],y1=usr[4])
-#       graphics::segments(x0=usr[1],x1=99,y0=usr[3])
-#       graphics::title(ylab=ylab)
-#     }
-#     graphics::title(main=main[i],line=0.5)
-#     for(k in seq_len(nrow)){
-#       graphics::lines(x=seq_len(ncol),y=x[[i]][k,],col="grey",lwd=1.2)
-#     }
-#     graphics::points(x=col(x[[i]]),y=x[[i]],col=c("blue","grey","red")[col(x[[i]])],pch=16,cex=1.1)
-#     pvalue <- stats::t.test(x[[i]][,"glmnet"],x[[i]][,"corila_lupi"],paired=TRUE,alternative=ifelse(j=="prec","less","greater"))$p.value
-#     graphics::mtext(text=paste0("p=",format(x=signif(pvalue,digits=2),scientific=TRUE)),side=1,cex=0.7,line=0.2)
-#   }
-# }
-
-
-
-
+#' @title
+#' Plot Change
+#'
+#' @description
+#' Visualises change from start to end value
+#' in different repetitions of different settings.
+#' 
+#' @param x
+#' list of matrices of equal dimensions
+#' 
+.plot_change <- function(x, ylab = "", main = names(x) , alternative = "both"){
+  if(!is.list(x)){stop("Expect list.")}
+  nslot <- length(x)
+  for (i in seq_len(nslot)) {
+    .assert(x = x[[i]], type = "numeric", dim = c(Inf, Inf))
+  }
+  .assert(x = main, type = "nominal", dim = nslot)
+  .assert(x= alternative, type = "nominal",
+          support = c("both", "greater", "less"))
+  ylim <- range(x)
+  if(graphics::par()$mfrow[2] != nslot){
+    warning("Set graphics::par(mfrow=c(...,length(x)))." )
+  }
+  if(!is.na(graphics::par()$xpd)){
+    warning("Set graphics::par(xpd=NA).")
+  }
+  for (i in seq_len(nslot)) {
+    ncol <- ncol(x[[i]])
+    nrow <- nrow(x[[i]])
+    graphics::plot.new()
+    graphics::plot.window(xlim = c(0.5, ncol + 0.5), ylim = ylim)
+    usr <- graphics::par("usr")
+    if (i == 1) {
+      graphics::axis(side = 2)
+      graphics::segments(x0 = usr[1], y0 = usr[3], y1 = usr[4])
+      graphics::segments(x0 = usr[1], x1 = 99, y0 = usr[3])
+      graphics::title(ylab = ylab)
+    }
+    graphics::title(main = main[i], line = 0.5)
+    for (k in seq_len(nrow)) {
+      graphics::lines(x = seq_len(ncol), y = x[[i]][k, ],
+        col = "grey", lwd = 1.2)
+    }
+    col <- matrix(data = "grey", nrow = nrow , ncol = ncol)
+    col[, 1] <- "blue"
+    col[, ncol] <- "red"
+    graphics::points(x = col(x[[i]]), y = x[[i]],
+                     col = col, pch = 16, cex = 1.1)
+    pvalue <- stats::t.test(x = x[[i]][, 1],
+                            y = x[[i]][, ncol],
+                            paired = TRUE,
+                            alternative = alternative)$p.value
+    text <- paste0("p=", format(x = signif(pvalue, digits = 2),
+                                scientific = TRUE))
+    graphics::mtext(text = text, side = 1, cex = 0.7, line = 0.2)
+  }
+  invisible(NULL)
+}
 
 # dependencies: imports: , mvtnorm, pROC, survival
 # suggests: CBPE, MLGL, Matrix, SGL, ecpc, gglasso,
 # grpreg, grpregOverlap, multiview, pcLasso,
 # scoop, sparsegl, squeezy, graper
-
-
 
 simulate_overlap <- function() {
   n0 <- 100
