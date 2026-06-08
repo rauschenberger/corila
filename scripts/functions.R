@@ -275,7 +275,8 @@
       x = 1,
       y = c(1, 5, 10),
       label = expression(x["1,0"], x["2,0"], x["50,0"]),
-      col = "blue"
+      col = "blue",
+      cex = cex
     )
     graphics::segments(
       x0 = 1 + mar,
@@ -299,7 +300,8 @@
       label = expression(x["1,1"], x["1,2"], x["1,3"],
                          x["2,1"], x["2,2"], x["2,3"],
                          x["50,1"], x["50,2"], x["50,3"]),
-      col = "red"
+      col = "red",
+      cex = cex
     )
     knot <- c(2.5, 5, 8) # c(2,5,9)
     graphics::segments(
@@ -327,7 +329,8 @@
       x = 5,
       y = 5,
       label = "y",
-      col = "blue"
+      col = "blue",
+      cex = cex
     )
     graphics::text(
       x = c(1, 3),
@@ -335,7 +338,8 @@
       label = "...",
       srt = 90,
       font = 2,
-      col = c("blue", "red")
+      col = c("blue", "red"),
+      cex = cex
     )
   } else if (identical(mode, "aggregated")) {
     graphics::mtext(
@@ -351,7 +355,8 @@
       x = 1,
       y = c(1, 5, 10),
       label = expression(x["1,0"], x["2,0"], x["50,0"]),
-      col = "blue"
+      col = "blue",
+      cex = cex
     )
     graphics::segments(
       x0 = 3 - mar,
@@ -375,7 +380,8 @@
       label = expression(x["1,1"], x["1,2"], x["1,3"],
                          x["2,1"], x["2,2"], x["2,3"],
                          x["50,1"], x["50,2"], x["50,3"]),
-      col = "red"
+      col = "red",
+      cex = cex
     )
     knot <- c(2.5, 5, 8) # c(2,5,9)
     graphics::segments(
@@ -403,7 +409,8 @@
       x = 5,
       y = 5,
       label = "y",
-      col = "blue"
+      col = "blue",
+      cex = cex
     )
     graphics::text(
       x = c(1, 3),
@@ -411,7 +418,8 @@
       label = "...",
       srt = 90,
       font = 2,
-      col = c("blue", "red")
+      col = c("blue", "red"),
+      cex = cex
     )
   } else if (identical(mode, "surrogate")) {
     graphics::mtext(
@@ -421,7 +429,7 @@
       col = c("blue", "red"),
       side = 3,
       line = 0.5,
-      cex = cex
+      cex = cex,
     )
     graphics::text(
       x = 1,
@@ -429,7 +437,8 @@
       label = expression(x["1,1"], x["1,2"], x["1,3"],
                          x["2,1"], x["2,2"], x["2,3"],
                          x["50,1"], x["50,2"], x["50,3"]),
-      col = "blue"
+      col = "blue",
+      cex = cex
     )
     graphics::segments(
       x0 = 3 - mar,
@@ -451,7 +460,8 @@
       x = 3,
       y = c(1, 5, 10),
       label = expression(x["1,0"], x["2,0"], x["50,0"]),
-      col = "red"
+      col = "red",
+      cex = cex
     )
     graphics::arrows(
       x0 = 3 + mar,
@@ -470,7 +480,8 @@
       x = 5,
       y = 5,
       label = "y",
-      col = "blue"
+      col = "blue",
+      cex = cex
     )
     graphics::text(
       x = c(1, 3),
@@ -478,7 +489,8 @@
       label = "...",
       srt = 90,
       font = 2,
-      col = c("blue", "red")
+      col = c("blue", "red"),
+      cex = cex
     )
   } else if (identical(mode, "baseline")) {
     graphics::mtext(
@@ -494,7 +506,8 @@
       x = 1,
       y = c(1, 5, 10),
       labels = expression(x["1,0"], x["2,0"], x["50,0"]),
-      col = "blue"
+      col = "blue",
+      cex = cex
     )
     graphics::arrows(
       x0 = 1:3 + mar,
@@ -510,7 +523,8 @@
       labels = expression(x["1,1"], x["1,2"], x["1,3"],
                           x["2,1"], x["2,2"], x["2,3"],
                           x["50,1"], x["50,2"], x["50,3"]),
-      col = "red"
+      col = "red",
+      cex = cex
     )
     graphics::arrows(
       x0 = 4 + mar,
@@ -529,7 +543,8 @@
       x = 5,
       y = 5,
       label = "y",
-      col = "blue"
+      col = "blue",
+      cex = cex
     )
     graphics::text(
       x = c(1, 2, 3, 4),
@@ -537,7 +552,8 @@
       label = "...",
       srt = 90,
       font = 2,
-      col = rep(x = c("blue", "red"), times = c(1, 3))
+      col = rep(x = c("blue", "red"), times = c(1, 3)),
+      cex = cex
     )
   }
   invisible(NULL)
