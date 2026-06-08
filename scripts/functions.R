@@ -1,4 +1,546 @@
 
+
+#' @title
+#' Simulation with Privileged Information
+#'
+#' @description
+#' Simulates data for learning using privileged information (LUPI).
+#'
+#' @param mode
+#' character string `"upstream"`, `"aggregated"`, `"surrogate"`, `"baseline"`,
+#' or `"uninformative"`
+#'
+#' @param n0
+#' number of observations used for fitting the model
+#' ("training samples", integer \eqn{>= 2})
+#'
+#' @param n1
+#' number of observations used for making predictions
+#' ("testing samples", integer \eqn{>=2})
+#'
+#' @param p
+#' number of predictors
+#' (integer \eqn{>=2})
+#'
+#' @param q
+#' number of predictor groups
+#' (integer \eqn{>=2})
+#'
+#' @param plot
+#' logical
+#'
+#' @return
+#' Returns the \eqn{n0}-dimensional and \eqn{n1}-dimensional
+#' outcome vectors `y_train` and `y_test`,
+#' the \eqn{n0 \times p} and \eqn{n1 \times p} predictor matrices
+#' `x_train` and `x_test`,
+#' the \eqn{p}-dimensional integer vector `group`
+#' grouping the predictors,
+#' the \eqn{p}-dimensional logical vector `include`
+#' indicating primary predictors,
+#' and the \eqn{p}-dimensional effect vector `beta`.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' data <- corila:::.simulate_lupi_data(mode = "baseline")
+#'
+.simulate_lupi_data <- function(mode, n0 = 100, n1 = 10000, p = 200, q = 4,
+                                plot = FALSE) {
+  .assert(x = n0, type = "integer", min = 2)
+  .assert(x = n1, type = "integer", min = 2)
+  .assert(x = p, type = "integer", min = 2)
+  .assert(x = q, type = "integer", min = 2)
+  .assert(x = mode, type = "nominal",
+          support = c("upstream", "aggregated", "surrogate", "baseline"))
+  .assert(x = plot, type = "logical")
+  fold <- rep(x = c(0, 1), times = c(n0, n1))
+  n <- n0 + n1
+  if (p %% q != 0) {
+    stop("This function simulates equally sized groups.",
+         "So `p` must be a multiple of `q`.")
+  }
+  if (mode == "upstream") {
+    #--- upstream and downstream predictors ---
+    group <- rep(x = seq_len(p / q),
+                 each = q)
+    include <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
+                   times = p / q)
+    causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5, p / q - 5))),
+                  each = q)
+    x <- matrix(data = NA, nrow = n, ncol = p)
+    for (j in seq_len(p / q)) {
+      sel_pry <- group == j & include
+      sel_aux <- group == j & !include
+      x[, sel_pry] <- stats::rnorm(n = n)
+      #w <- c(0.2,0.5,0.8) # original
+      w <- stats::runif(3) # trial
+      x[, sel_aux] <- x[, sel_pry] %*% t(sqrt(w)) + t(t(matrix(
+        stats::rnorm(n * sum(sel_aux)),
+        nrow = n,
+        ncol = sum(sel_aux)
+      )) * sqrt(1 - w))
+    }
+    beta <- (!include) * causal * abs(stats::rnorm(n = p))
+    eta <- x %*% beta
+    y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
+  } else if (mode == "aggregated") {
+    #--- fine-grained and aggregated predictors ---
+    group <- rep(x = seq_len(p / q), each = q)
+    include <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)), times =
+                     p / q)
+    causal <- rep(x = sample(rep(
+      x = c(TRUE, FALSE), times = c(5, p / q - 5)
+    )), each = q)
+    x <- matrix(data = NA,
+                nrow = n,
+                ncol = p)
+    #w <- 0.5
+    #w <- c(1/3,1/3,1/3)
+    #w <- stats::rgamma(n=3,shape=1,rate=1)
+    #w <- w/sum(w)
+    for (j in seq_len(p / q)) {
+      sel_pry <- group == j & include
+      sel_aux <- group == j & !include
+      w <- stats::runif(n = 1)
+      #x[,sel_aux] <- sqrt(w)*stats::rnorm(n=n)+
+      #sqrt(1-w)*stats::rnorm(n=n*sum(sel_aux))
+      #x[,sel_pry] <- rowSums(x[,sel_aux])
+      x[, sel_aux] <- stats::rnorm(n = n * sum(sel_aux))
+      w <- stats::runif(n = 4)
+      #w <- c(1/3,1/3,1/3)
+      #w <- stats::rgamma(n=4,shape=1,rate=1)
+      w <- w / sum(w)
+      #x[,sel_pry] <- sqrt(v)*(x[,sel_aux] %*% sqrt(w))+
+      #sqrt(1-v)*stats::rnorm(n=n) # originally with v=0.7
+      #w <- c(1/4,1/4,1/4); x[,sel_pry] <-
+      #sqrt(1)*(x[,sel_aux] %*% sqrt(w))+sqrt(1/4)*stats::rnorm(n=n)
+      # original # TRIAL (was above)
+      #w <- stats::runif(n=4)
+      #
+      #w[4] <- 0
+      #w <- c(0.1,0.2,0.4,0.3)
+      #w <- w/sum(w)
+      x[, sel_pry] <- cbind(x[, sel_aux], stats::rnorm(n = n)) %*% sqrt(w)
+      #x[,sel_pry] <- x[,sel_aux] %*% sqrt(w)
+    }
+    beta <- (!include) * causal * abs(stats::rnorm(n = p))
+    eta <- x %*% beta
+    y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
+  } else if (mode == "surrogate") {
+    #--- canonical and surrogate predictors ---
+    group <- rep(x = seq_len(p / q), each = q)
+    include <- rep(x = rep(x = c(FALSE, TRUE), times = c(1, q - 1)), times =
+                     p / q)
+    causal <- rep(x = sample(rep(
+      x = c(TRUE, FALSE), times = c(5, p / q - 5)
+    )), each = q)
+    x <- matrix(data = NA,
+                nrow = n,
+                ncol = p)
+    for (j in seq_len(p / q)) {
+      sel_pry <- group == j & include
+      sel_aux <- group == j & !include
+      x[, sel_aux] <- stats::rnorm(n = n)
+      # w <- c(0.2,0.5,0.8) # TRIAL
+      # was c(0.7,0.5,0.3)#  stats::runif(n=q-1) # rep(x=0.9,times=q-1)
+      w <- stats::runif(3)
+      x[, sel_pry] <- x[, sel_aux] %*% t(sqrt(w)) + t(t(matrix(
+        stats::rnorm(n * sum(sel_pry)),
+        nrow = n,
+        ncol = sum(sel_pry)
+      )) * sqrt(1 - w))
+    }
+    beta <- (!include) * causal * abs(stats::rnorm(n = p))
+    eta <- x %*% beta
+    y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
+  } else if (mode == "baseline") {
+    #--- baseline and follow-up predictors ---
+    w <- c(NA, 0.9, 0.9, 0.9)
+    #w <- c(NA,runif(3)) # TRIAl
+    list <- list()
+    list[[1]] <- matrix(
+      data = stats::rnorm(n = n * p / q),
+      nrow = n,
+      ncol = p / q
+    )
+    for (j in seq(from = 2, to = q)) {
+      list[[j]] <- sqrt(w[j]) * list[[j - 1]] +
+        sqrt(1 - w[j]) * stats::rnorm(n = n * p / q)
+    }
+    x <- do.call(what = "cbind", args = list)
+    group <- rep(x = seq_len(p / q), times = q)
+    include <- rep(x = c(TRUE, FALSE), times = c(p / q, p / q * (q - 1)))
+    beta <- sample(rep(x = c(0, 1),
+                       times = c(p / q - 5, 5))) * abs(stats::rnorm(n = p / q))
+    eta <- list[[length(list)]] %*% beta
+    y <- eta + stats::rnorm(n = n, sd = 0.5 * sd(eta))
+  } else if (mode == "uninformative") {
+    group <- rep(x = seq_len(p / q), each = q)
+    include <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
+                   times = p / q)
+    causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5, p / q - 5))),
+                  each = q)
+    x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
+    beta <- include * causal * abs(stats::rnorm(n = p))
+    eta <- x %*% beta
+    y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
+  }
+  # else if(mode=="adversarial"){
+  #   group <- rep(x=seq_len(p/q),each=q)
+  #   include <- rep(x=rep(x=c(TRUE,FALSE),times=c(1,q-1)),times=p/q)
+  #   causal <- rep(x=sample(rep(x=c(TRUE,FALSE),times=c(5,p/q-5))),each=q)
+  #   x <- matrix(data=NA,nrow=n,ncol=p)
+  #   for(j in seq_len(p/q)){
+  #     sel.pry <- group==j & include
+  #     sel.aux <- group==j & !include
+  #     x[,sel.pry] <- stats::rnorm(n=n)
+  #     w <- stats::runif(3)
+  #     x[,sel.aux] <- x[,sel.pry] %*% t(sqrt(w)) + t(t(matrix(stats::rnorm(n*sum(sel.aux)),nrow=n,ncol=sum(sel.aux))) * sqrt(1-w))
+  #   }
+  #   beta <- ifelse(include,1,-1/3) * causal * abs(stats::rnorm(n=p))
+  #   eta <- x %*% beta
+  #   y <- eta + stats::rnorm(n=n,sd=0.5*stats::sd(eta))
+  # }
+  #else if(mode=="multiview"){
+  #   #--- multi-view blocks ---
+  #   mean <- rep(x=0,times=p/q)
+  #   sigma <- matrix(data=NA,nrow=p/q,ncol=p/q)
+  #   sigma <- 0^abs(col(sigma)-row(sigma))
+  #   z <- mvtnorm::rmvnorm(n=n,mean=mean,sigma=sigma)
+  #   list <- list()
+  #   w <- 0.7
+  #   for(j in seq_len(q)){
+  #     list[[j]] <- sqrt(w)*z + sqrt(1-w)*stats::rnorm(n=n*p/q)
+  #   }
+  #   x <- do.call(what="cbind",args=list)
+  #   group <- rep(x=seq_len(p/q),times=q)
+  #   include <- rep(x=c(TRUE,FALSE),times=c(p/q,p/q*(q-1)))
+  #   beta <- sample(rep(x=c(0,1),times=c(p/q-5,5)))*abs(stats::rnorm(n=p/q))
+  #   eta <- z %*% beta
+  #   y <- eta + stats::rnorm(n=n,sd=0.5*sd(eta))
+  # }
+  sd <- apply(X = x, MARGIN = 2, FUN = function(x) stats::sd(x))
+  if (any(sd <= 0.95) || any(sd >= 1.05)) {
+    warning("no unit variance")
+  }
+  if (plot) {
+    graphics::par(mfrow = c(1, 2))
+    graphics::plot(beta, col = group)
+    graphics::image(t(stats::cor(x)[p:1, ]))
+  }
+  list(y_train = y[fold == 0],
+       x_train = x[fold == 0, ],
+       y_test = y[fold == 1],
+       x_test = x[fold == 1, ],
+       group = group,
+       include = include,
+       beta = beta)
+}
+
+
+#' @title
+#' Visualise Simulation Settings
+#'
+#' @examples
+#' graphics::par(mar=c(0,0,1.5,0))
+#' corila:::.visualise_lupi_data(mode = "baseline")
+#'
+.visualise_lupi_data <- function(mode, lwd = 1.5, length_arrow = 0.06,
+                                 mar = 0.3, xlim = c(1, 5), ylim = c(11, 0),
+                                 cex = 0.9) {
+  .assert(x = mode, type = "nominal",
+          support = c("upstream", "aggregated", "surrogate", "baseline"))
+  .assert(x = lwd, type = "numeric", min = 0)
+  .assert(x = length_arrow, type = "numeric", min = 0)
+  .assert(x = mar, type = "numeric", min = 0)
+  .assert(x = xlim, type = "numeric", dim = 2)
+  .assert(x = ylim, type = "numeric", dim = 2)
+  .assert(x = cex, type = "numeric", min = 0)
+  graphics::plot.new()
+  graphics::plot.window(xlim = xlim, ylim = ylim)
+  if (identical(mode, "upstream")) {
+    graphics::mtext(
+      at = c(NA, 3),
+      adj = c(0, NA),
+      text = c("upstream", "downstream"),
+      col = c("blue", "red"),
+      side = 3,
+      line = 0.5,
+      cex = cex
+    )
+    graphics::text(
+      x = 1,
+      y = c(1, 5, 10),
+      label = expression(x["1,0"], x["2,0"], x["50,0"]),
+      col = "blue"
+    )
+    graphics::segments(
+      x0 = 1 + mar,
+      y0 = c(1, 5, 10),
+      x1 = 2,
+      lwd = lwd,
+      col = "grey"
+    )
+    graphics::arrows(
+      x0 = 2,
+      y0 = rep(c(1, 5, 10), each = 3),
+      x1 = 3 - mar,
+      y1 = c(0:2, 4:6, 9:11),
+      length = length_arrow,
+      col = "grey",
+      lwd = lwd
+    )
+    graphics::text(
+      x = 3,
+      y = c(0:2, 4:6, 9:11),
+      label = expression(x["1,1"], x["1,2"], x["1,3"],
+                         x["2,1"], x["2,2"], x["2,3"],
+                         x["50,1"], x["50,2"], x["50,3"]),
+      col = "red"
+    )
+    knot <- c(2.5, 5, 8) # c(2,5,9)
+    graphics::segments(
+      x0 = 3 + mar,
+      y0 = c(0:2, 4:6, 9:11),
+      x1 = 4,
+      y = rep(knot, each = 3),
+      lwd = lwd,
+      col = "grey"
+    )
+    graphics::arrows(
+      x0 = 4,
+      y0 = knot,
+      x1 = 5 - mar,
+      y1 = 5 + seq(
+        from = -1,
+        to = +1,
+        length.out = 3
+      ),
+      length = length_arrow,
+      col = "grey",
+      lwd = lwd
+    )
+    graphics::text(
+      x = 5,
+      y = 5,
+      label = "y",
+      col = "blue"
+    )
+    graphics::text(
+      x = c(1, 3),
+      y = 7.5,
+      label = "...",
+      srt = 90,
+      font = 2,
+      col = c("blue", "red")
+    )
+  } else if (identical(mode, "aggregated")) {
+    graphics::mtext(
+      at = c(NA, 3),
+      adj = c(0, NA),
+      text = c("aggregated", "fine-grained"),
+      col = c("blue", "red"),
+      side = 3,
+      line = 0.5,
+      cex = cex
+    )
+    graphics::text(
+      x = 1,
+      y = c(1, 5, 10),
+      label = expression(x["1,0"], x["2,0"], x["50,0"]),
+      col = "blue"
+    )
+    graphics::segments(
+      x0 = 3 - mar,
+      y0 = c(0:2, 4:6, 9:11),
+      x1 = 2,
+      y = rep(c(1, 5, 10), each = 3),
+      lwd = lwd,
+      col = "grey"
+    )
+    graphics::arrows(
+      x0 = 2,
+      y0 = c(1, 5, 10),
+      x1 = 1 + mar,
+      length = length_arrow,
+      col = "grey",
+      lwd = lwd
+    )
+    graphics::text(
+      x = 3,
+      y = c(0:2, 4:6, 9:11),
+      label = expression(x["1,1"], x["1,2"], x["1,3"],
+                         x["2,1"], x["2,2"], x["2,3"],
+                         x["50,1"], x["50,2"], x["50,3"]),
+      col = "red"
+    )
+    knot <- c(2.5, 5, 8) # c(2,5,9)
+    graphics::segments(
+      x0 = 3 + mar,
+      y0 = c(0:2, 4:6, 9:11),
+      x1 = 4,
+      y = rep(knot, each = 3),
+      lwd = lwd,
+      col = "grey"
+    )
+    graphics::arrows(
+      x0 = 4,
+      y0 = knot,
+      x1 = 5 - mar,
+      y1 = 5 + seq(
+        from = -1,
+        to = +1,
+        length.out = 3
+      ),
+      length = length_arrow,
+      col = "grey",
+      lwd = lwd
+    )
+    graphics::text(
+      x = 5,
+      y = 5,
+      label = "y",
+      col = "blue"
+    )
+    graphics::text(
+      x = c(1, 3),
+      y = 7.5,
+      label = "...",
+      srt = 90,
+      font = 2,
+      col = c("blue", "red")
+    )
+  } else if (identical(mode, "surrogate")) {
+    graphics::mtext(
+      at = c(NA, 3),
+      adj = c(0, NA),
+      text = c("surrogate", "canonical"),
+      col = c("blue", "red"),
+      side = 3,
+      line = 0.5,
+      cex = cex
+    )
+    graphics::text(
+      x = 1,
+      y = c(0:2, 4:6, 9:11),
+      label = expression(x["1,1"], x["1,2"], x["1,3"],
+                         x["2,1"], x["2,2"], x["2,3"],
+                         x["50,1"], x["50,2"], x["50,3"]),
+      col = "blue"
+    )
+    graphics::segments(
+      x0 = 3 - mar,
+      y0 = c(1, 5, 10),
+      x1 = 2,
+      lwd = lwd,
+      col = "grey"
+    )
+    graphics::arrows(
+      x0 = 2,
+      y0 = rep(c(1, 5, 10), each = 3),
+      x1 = 1 + mar,
+      y1 = c(0:2, 4:6, 9:11),
+      length = length_arrow,
+      col = "grey",
+      lwd = lwd
+    )
+    graphics::text(
+      x = 3,
+      y = c(1, 5, 10),
+      label = expression(x["1,0"], x["2,0"], x["50,0"]),
+      col = "red"
+    )
+    graphics::arrows(
+      x0 = 3 + mar,
+      y0 = c(1, 5, 10),
+      x1 = 5 - mar,
+      y1 = 5 + seq(
+        from = -1,
+        to = +1,
+        length.out = 3
+      ),
+      length = length_arrow,
+      col = "grey",
+      lwd = lwd
+    )
+    graphics::text(
+      x = 5,
+      y = 5,
+      label = "y",
+      col = "blue"
+    )
+    graphics::text(
+      x = c(1, 3),
+      y = 7.5,
+      label = "...",
+      srt = 90,
+      font = 2,
+      col = c("blue", "red")
+    )
+  } else if (identical(mode, "baseline")) {
+    graphics::mtext(
+      at = c(NA, 3),
+      adj = c(0, NA),
+      text = c("baseline", "follow-up"),
+      col = c("blue", "red"),
+      side = 3,
+      line = 0.5,
+      cex = cex
+    )
+    graphics::text(
+      x = 1,
+      y = c(1, 5, 10),
+      labels = expression(x["1,0"], x["2,0"], x["50,0"]),
+      col = "blue"
+    )
+    graphics::arrows(
+      x0 = 1:3 + mar,
+      y0 = rep(c(1, 5, 10), each = 3),
+      x1 = 2:4 - mar,
+      length = length_arrow,
+      col = "grey",
+      lwd = lwd
+    )
+    graphics::text(
+      x = rep(x = c(2, 3, 4), times = 3),
+      y = rep(c(1, 5, 10), each = 3),
+      labels = expression(x["1,1"], x["1,2"], x["1,3"],
+                          x["2,1"], x["2,2"], x["2,3"],
+                          x["50,1"], x["50,2"], x["50,3"]),
+      col = "red"
+    )
+    graphics::arrows(
+      x0 = 4 + mar,
+      y0 = c(1, 5, 10),
+      x1 = 5 - mar,
+      y1 = 5 + seq(
+        from = -1,
+        to = +1,
+        length.out = 3
+      ),
+      length = length_arrow,
+      col = "grey",
+      lwd = lwd
+    )
+    graphics::text(
+      x = 5,
+      y = 5,
+      label = "y",
+      col = "blue"
+    )
+    graphics::text(
+      x = c(1, 2, 3, 4),
+      y = 7.5,
+      label = "...",
+      srt = 90,
+      font = 2,
+      col = rep(x = c("blue", "red"), times = c(1, 3))
+    )
+  }
+  invisible(NULL)
+}
+
 # dependencies: imports: , mvtnorm, pROC, survival
 # suggests: CBPE, MLGL, Matrix, SGL, ecpc, gglasso,
 # grpreg, grpregOverlap, multiview, pcLasso,
