@@ -171,8 +171,9 @@
     x <- do.call(what = "cbind", args = list)
     group <- rep(x = seq_len(p / q), times = q)
     include <- rep(x = c(TRUE, FALSE), times = c(p / q, p / q * (q - 1)))
-    beta <- sample(rep(x = c(0, 1),
-                       times = c(p / q - 5, 5))) * abs(stats::rnorm(n = p / q))
+    beta <- sample(rep(x = c(0, 1), times = c(p / q - 5, 5))) * 
+      abs(stats::rnorm(n = p / q))
+    causal <- NULL
     eta <- list[[length(list)]] %*% beta
     y <- eta + stats::rnorm(n = n, sd = 0.5 * sd(eta))
   } else if (mode == "uninformative") {
@@ -235,6 +236,7 @@
        x_test = x[fold == 1, ],
        group = group,
        include = include,
+       causal = causal,
        beta = beta)
 }
 
@@ -540,6 +542,50 @@
   }
   invisible(NULL)
 }
+
+
+# load("../results/simulation_lupi.RData")
+# 
+# ylim <- list()
+# ylim$prec <- range(sapply(results,function(x) range(x$prec[,-1])))
+# ylim$mse <- range(sapply(results,function(x) range(x$mse[,-1])))
+# 
+# prec <- lapply(results[-length(results)],function(x) x$prec[,-1])
+# mse <- lapply(results[-length(results)],function(x) x$mse[,-1])
+# 
+# graphics::par(mfcol=c(2,4))
+# .plot_change(x = prec, ylab = "precision", main = c("(i)","(ii)","(iii)","(iv)"))
+# .plot_change(x = mse, ylab = "MSE")
+# 
+# .plot_change <- function(x,ylab="",main=names(x)){
+#   graphics::par(mar=c(2,2,0.5,0.5),oma=c(0,2,1,0),xpd=NA)
+#   ylim <- range(x)
+#   nslot <- length(x)
+#   ncol <- ncol(x[[1]])
+#   nrow <- nrow(x[[1]])
+#   for(i in seq_len(nslot)){
+#     graphics::plot.new()
+#     graphics::plot.window(xlim=c(0.5,ncol + 5),ylim=ylim)
+#     usr <- graphics::par("usr")
+#     if(i==1){
+#       graphics::axis(side=2)
+#       graphics::segments(x0=usr[1],y0=usr[3],y1=usr[4])
+#       graphics::segments(x0=usr[1],x1=99,y0=usr[3])
+#       graphics::title(ylab=ylab)
+#     }
+#     graphics::title(main=main[i],line=0.5)
+#     for(k in seq_len(nrow)){
+#       graphics::lines(x=seq_len(ncol),y=x[[i]][k,],col="grey",lwd=1.2)
+#     }
+#     graphics::points(x=col(x[[i]]),y=x[[i]],col=c("blue","grey","red")[col(x[[i]])],pch=16,cex=1.1)
+#     pvalue <- stats::t.test(x[[i]][,"glmnet"],x[[i]][,"corila_lupi"],paired=TRUE,alternative=ifelse(j=="prec","less","greater"))$p.value
+#     graphics::mtext(text=paste0("p=",format(x=signif(pvalue,digits=2),scientific=TRUE)),side=1,cex=0.7,line=0.2)
+#   }
+# }
+
+
+
+
 
 # dependencies: imports: , mvtnorm, pROC, survival
 # suggests: CBPE, MLGL, Matrix, SGL, ecpc, gglasso,
