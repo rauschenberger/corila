@@ -570,14 +570,15 @@
 #' @param x
 #' list of matrices of equal dimensions
 #' 
-.plot_change <- function(x, ylab = "", main = names(x) , alternative = "both"){
+.plot_change <- function(x, ylab = "", main = names(x) , alternative = "both",
+                         lwd = 1, cex = 1, cex.axis = 1, cex.lab = 1){
   if(!is.list(x)){stop("Expect list.")}
   nslot <- length(x)
   for (i in seq_len(nslot)) {
     .assert(x = x[[i]], type = "numeric", dim = c(Inf, Inf))
   }
   .assert(x = main, type = "nominal", dim = nslot)
-  .assert(x= alternative, type = "nominal",
+  .assert(x = alternative, type = "nominal",
           support = c("both", "greater", "less"))
   ylim <- range(x)
   if(graphics::par()$mfrow[2] != nslot){
@@ -593,28 +594,30 @@
     graphics::plot.window(xlim = c(0.5, ncol + 0.5), ylim = ylim)
     usr <- graphics::par("usr")
     if (i == 1) {
-      graphics::axis(side = 2)
+      graphics::axis(side = 2, cex.axis = cex.axis)
       graphics::segments(x0 = usr[1], y0 = usr[3], y1 = usr[4])
       graphics::segments(x0 = usr[1], x1 = 99, y0 = usr[3])
-      graphics::title(ylab = ylab)
+      graphics::title(ylab = ylab , cex.lab = cex.lab)
     }
-    graphics::title(main = main[i], line = 0.5)
+    graphics::title(main = main[i], line = 0.5, cex.main = cex.lab)
     for (k in seq_len(nrow)) {
       graphics::lines(x = seq_len(ncol), y = x[[i]][k, ],
-        col = "grey", lwd = 1.2)
+        col = "grey", lwd = lwd)
     }
     col <- matrix(data = "grey", nrow = nrow , ncol = ncol)
     col[, 1] <- "blue"
     col[, ncol] <- "red"
     graphics::points(x = col(x[[i]]), y = x[[i]],
-                     col = col, pch = 16, cex = 1.1)
+                     col = col, pch = 16, cex = cex)
     pvalue <- stats::t.test(x = x[[i]][, 1],
                             y = x[[i]][, ncol],
                             paired = TRUE,
                             alternative = alternative)$p.value
     text <- paste0("p=", format(x = signif(pvalue, digits = 2),
                                 scientific = TRUE))
-    graphics::mtext(text = text, side = 1, cex = 0.7, line = 0.2)
+    #graphics::mtext(text = text, side = 1, cex = cex.axis, line = 0.2)
+    graphics::axis(side = 1, at = ncol/2 + 0.5, labels = text,
+                   cex.axis = cex.axis, tick = FALSE, line = - 0.5)
   }
   invisible(NULL)
 }
