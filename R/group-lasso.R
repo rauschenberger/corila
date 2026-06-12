@@ -365,6 +365,10 @@
 #' @param lambda_init
 #' regularisation hyperparameter(s),
 #' or `NULL` (cross-validation)
+#' 
+#' @param threshold
+#' threshold for absolute correlation coefficients:
+#' numeric in unit interval
 #'
 #' @details
 #' The number of observations (samples) for training or testing
@@ -423,7 +427,7 @@
 #'
 corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
-                   nfolds = 10, lambda_init = NULL) {
+                   nfolds = 10, lambda_init = NULL, threshold = 0) {
   args <- .validate(
     x = x,
     y = y,
@@ -470,6 +474,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   #--- feature correlation ---
   if (!is.matrix(cor)) {
     cor <- stats::cor(x = scale$x, method = cor, use = "pairwise.complete")
+    cor[abs(cor) <= threshold] <- 0
   }
   cor[is.na(cor)] <- 0
   #--- regression ---
