@@ -1,4 +1,138 @@
 
+.visualise_groups <- function(z, col = "black"){
+  if(ncol(z) != nrow(z)) {
+    stop()
+  }
+  p <- ncol(z)
+  xpos <- seq(from = 0, to = 1, length.out = p)
+  ypos <- seq(from = 1, to = 0, length.out = p)
+  lines <- seq(from = - 0.5 / (p - 1),
+               to = 1 + 0.5 / (p - 1),
+               length.out = p + 1)
+  if(all(z %in% c(0,1))) {
+    breaks <- c(0,0.5,1)
+    col <- c("white", col)
+  } else {
+    max <- 1.1*max(abs(z))
+    eps <- 1e-06
+    breaks <- c(seq(-max, -eps, length.out = 50),
+                seq(eps, max, length.out = 50))
+    col  <- grDevices::colorRampPalette(c("blue","white","red"))(99)
+    col <- c(col[1:49], "white", col[51:99])
+  }
+  graphics::par(mar=c(0,2,2,0))
+  graphics::image(t(z[p:1,]), breaks = breaks, col = col, axes = FALSE)
+  graphics::abline(h=lines, col = "white")
+  graphics::abline(v=lines, col = "white")
+  labels <- parse(text = paste0("x[", seq_len(p), "]"))
+  graphics::axis(side = 2, at = ypos, labels = labels, tick = FALSE, las = 2, line = -0.5)
+  graphics::axis(side = 3, at = xpos, labels = labels, tick = FALSE, las = 1, line = -0.5)
+}
+
+
+.visualise_lupi <- function(x, y, holdout = NULL, group = NULL, include = NULL) {
+  .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
+  n <- nrow(x)
+  p <- ncol(x)
+  .assert(x = y, type = "numeric", dim = n, na.rm = TRUE)
+  .assert(x = holdout, type = "logical", dim = n, na.rm = TRUE)
+  .assert(x = group, type = "numeric", dim = p)
+  if(!is.null(group)) {
+    if( any(group != sort(group)) ) {
+      stop("Vector group should be sorted.")
+    }
+  }
+  .assert(x = include, type = "logical", dim = p)
+  if(is.null(group)) {
+    group <- rep(x = 1, times = p)
+  }
+  if(is.null(include)) {
+    include <- rep(x = TRUE, times = p)
+  }
+  y[holdout] <- NA
+  x[holdout, !include] <- NA
+  graphics::par(mar=c(0, 0, 0, 0), oma = c(2, 4, 4, 2))
+  cols <- list(na = "lightgrey", grid="grey",sep="black",box="grey")
+  lwd <- list(grid=1,sep=3,box=1)
+  cex <- list(axis=1.1, cell=1.2, lab=0.9)
+  col  <- grDevices::colorRampPalette(c("blue","white","red"))(99)
+  col <- c(col[1:49], "white", col[51:99], cols$na)
+  max <- 1.01*max(abs(c(as.vector(x),as.vector(beta),as.vector(y))),na.rm=TRUE)
+  eps <- 1e-06
+  breaks <- c(seq(-max, -eps, length.out = 50),
+              seq(eps, max, length.out = 50), 99e99)
+  xpos <- seq(from = 0, to = 1, length.out = p)
+  ypos <- seq(from = 1, to = 0, length.out = n)
+  vlines <- seq(from = - 0.5 / (p - 1),
+                to = 1 + 0.5 / (p - 1),
+                length.out = p + 1)
+  hlines <- seq(from = - 0.5 / (n - 1),
+                to = 1 + 0.5 / (n - 1),
+                length.out = n + 1)
+  thick_vlines <- (which(diff(group) == 1)-0.5) * 1/(p-1)
+  
+  #x[is.na(x)] <- 99e99
+  y[is.na(y)] <- 99e99
+  beta[is.na(beta)] <- 99e99
+  
+  #--- feature matrix ---
+  graphics::layout(mat = matrix(data = seq_len(9), nrow = 3, ncol = 3),
+                   widths = c(p, 1, 1), height = c(n, 1, 1))
+  graphics::image(x = t(x[nrow(x):1,]), axes = FALSE, col = col, breaks = breaks)
+  graphics::mtext(side = 2, at = c(0.75, 0.25), text = c("training samples", "testing samples"), line = 2, font = 2, cex = cex$lab)
+  graphics::mtext(side = 3, text = "predictors", line = 2, font = 2, cex = cex$lab)
+  graphics::abline(h = hlines, col = cols$grid, lwd = lwd$grid)
+  graphics::abline(v = vlines, col = cols$grid, lwd = lwd$grid)
+  graphics::abline(v = thick_vlines, lwd = lwd$sep, col = cols$sep)
+  is.na <- which(is.na(x) | x == 99e99, arr.ind = TRUE)
+  if(nrow(is.na)>0){
+    graphics::text(x = xpos[is.na[,"col"]], y = ypos[is.na[,"row"]], labels = "?", font = 2, cex = cex$cell)
+  }
+  graphics::abline(h = 0.5, lwd = lwd$sep, col = cols$sep)
+  graphics::box(col=cols$box, lwd=lwd$box)
+  graphics::axis(side = 2,
+                 at = ypos,
+                 labels = seq_len(n), tick = FALSE, line = 0, las = 2,
+                 cex.axis=cex$axis)
+  graphics::axis(side = 3,
+                 at = xpos,
+                 labels = parse(text = paste0("x[", seq_len(p), "]")),
+                 tick = FALSE, line = -0.5,
+                 cex.axis=cex$axis)
+  
+  #--- effect vector ---
+  graphics::plot.new()
+  graphics::image(x = matrix(ifelse(include,1,NA), ncol = 1),
+                  axes = FALSE, col = cols$na)
+  graphics::abline(v = vlines, col = cols$grid, lwd = lwd$grid)
+  graphics::mtext(side = 2, text = "coefs", line = 2, font = 2, cex = cex$lab)
+  graphics::box(col=cols$box,lwd=lwd$box)
+  graphics::abline(v = thick_vlines, lwd = lwd$sep, col = cols$sep)
+  graphics::axis(side = 1,
+                 at = xpos,
+                 labels = parse(text = paste0("hat(beta)[", seq_len(p), "]")),
+                 tick = FALSE,
+                 line = -0.3,
+                 cex.axis=cex$axis)
+  graphics::text(x = xpos[!include], y = 0, label = "0", font = 2, cex = cex$cell, col = "black")
+  graphics::text(x = xpos[include], y = 0, label = "?", font = 2, cex = cex$cell)
+  graphics::plot.new()
+  graphics::plot.new()
+  graphics::plot.new()
+  
+  #--- target vector ---
+  graphics::image(x = matrix(rev(y), nrow = 1), axes = FALSE, col = col, breaks = breaks)
+  graphics::abline(h = hlines, col = cols$grid, lwd = lwd$grid)
+  graphics::abline(h = 0.5, lwd = lwd$sep, col = cols$sep)
+  graphics::mtext(text = "response", side = 3, line = 2, font = 2, cex = cex$lab)
+  graphics::axis(side = 3, at = 0, labels = "y", tick = FALSE, line = -0.5, cex.axis = cex$cell)
+  graphics::box(col=cols$box,lwd=lwd$box)
+  graphics::text(x = 0, y = ypos[holdout], labels = "?", font = 2, cex = cex$cell)
+  graphics::plot.new()
+  
+  invisible(NULL)
+}
+
 
 #' @title
 #' Simulation with Privileged Information
