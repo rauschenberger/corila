@@ -16,7 +16,7 @@
 
 ## Scope
 
-The R package `corila` implements sparse modelling with grouped and correlated features allowing for privileged information (_Rauschenberger_, 2026.)
+The R package `corila` implements sparse modelling with grouped and correlated features allowing for privileged information (_Rauschenberger_, 2026).
 
 ##  Installation
 
