@@ -64,6 +64,22 @@ srr::srr_stats_roxygen(category = c("ml", "regression"))
 devtools::load_all()
 ```
 
+# Some notes on sparse correlation matrices
+
+```{r, eval = FALSE}
+group <- rep(x = seq_len(50), each = 5)
+p <- length(group)
+sigma <- 0.8*outer(group, group, "==") + 0.2 * diag(p)
+mean <- rep(x = 0, times = p)
+x <- mvtnorm::rmvnorm(n = 100, mean = mean, sigma = sigma)
+
+model <- RSC::rsc_cv(x,)
+fit <- RSC::rsc(model, threshold = "minimum") 
+cor <- as.matrix(fit)
+image(cor)
+```
+
+
 # Setting up a private GitLab mirror of a private GitHub repository:
 
 - Generate fine-grained personal access token (PAT) in GitHub developer settings (repository access: specific repository; repository permissions: read-access to content, i.e., code and metadata).
