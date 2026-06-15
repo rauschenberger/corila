@@ -321,15 +321,15 @@ for (family in c("gaussian", "binomial", "cox")) {
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   # simulate data
   data <- simulate(family = family)
-  include <- as.logical(stats::rbinom(n = data$info$p, size = 1, prob = 0.5))
+  primary <- as.logical(stats::rbinom(n = data$info$p, size = 1, prob = 0.5))
   # fit model
   object <- cv.corila(x = data$x_train, y = data$y_train,
-                      group = data$group, include = include, family = family)
+                      group = data$group, primary = primary, family = family)
   testthat::test_that("predict is not influenced by auxiliary predictors", {
     y_hat1 <- predict(object = object, newx = data$x_test)
-    y_hat2 <- predict(object = object, newx = data$x_test[, include])
+    y_hat2 <- predict(object = object, newx = data$x_test[, primary])
     newx <- data$x_test
-    newx[, !include] <- 0
+    newx[, !primary] <- 0
     y_hat3 <- predict(object = object, newx = newx)
     testthat::expect_equal(object = y_hat1, expected = y_hat2)
     testthat::expect_equal(object = y_hat1, expected = y_hat3)

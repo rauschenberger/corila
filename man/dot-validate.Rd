@@ -8,7 +8,7 @@
   x,
   y,
   group,
-  include,
+  primary,
   family,
   hyper,
   alpha_init,
@@ -40,11 +40,11 @@ indicates whether information should be transferred
 from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 }}
 
-\item{include}{\eqn{p}-dimensional logical vector
+\item{primary}{\eqn{p}-dimensional logical vector
 indicating whether a predictor may be included in the final model
-(\code{TRUE}, "primary predictors")
+(\code{TRUE} for "primary predictors")
 or must be excluded from the final model
-(\code{FALSE}, "auxiliary predictors")}
+(\code{FALSE} for "auxiliary predictors")}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}

@@ -34,14 +34,14 @@ Makes prediction from an object of class \code{"corila"}.
 n <- 100
 p <- 50
 group <- rep(x = 1:10, each = 5)
-include <- NULL
+primary <- NULL
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
 
 # model fitting
 hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
                     exp_global = 1, wgt_global = 0.5)
-object <- corila(x, y, group, include, family = "gaussian", hyper = hyper)
+object <- corila(x, y, group, primary, family = "gaussian", hyper = hyper)
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 }

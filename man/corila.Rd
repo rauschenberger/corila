@@ -8,7 +8,7 @@ corila(
   x,
   y,
   group,
-  include,
+  primary,
   family,
   hyper,
   alpha_init = 0,
@@ -16,7 +16,8 @@ corila(
   cor = "spearman",
   foldid = NULL,
   nfolds = 10,
-  lambda_init = NULL
+  lambda_init = NULL,
+  threshold = 0
 )
 }
 \arguments{
@@ -40,11 +41,11 @@ indicates whether information should be transferred
 from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 }}
 
-\item{include}{\eqn{p}-dimensional logical vector
+\item{primary}{\eqn{p}-dimensional logical vector
 indicating whether a predictor may be included in the final model
-(\code{TRUE}, "primary predictors")
+(\code{TRUE} for "primary predictors")
 or must be excluded from the final model
-(\code{FALSE}, "auxiliary predictors")}
+(\code{FALSE} for "auxiliary predictors")}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
@@ -82,6 +83,9 @@ or \eqn{p \times p} correlation matrix}
 
 \item{lambda_init}{regularisation hyperparameter(s),
 or \code{NULL} (cross-validation)}
+
+\item{threshold}{threshold for absolute correlation coefficients:
+numeric in unit interval}
 }
 \value{
 Returns an object of class \code{"corila"}.
@@ -110,14 +114,14 @@ with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 n <- 100
 p <- 50
 group <- rep(x = 1:10, each = 5)
-include <- NULL
+primary <- NULL
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
 
 # model fitting
 hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
                     exp_global = 1, wgt_global = 0.5)
-object <- corila(x, y, group, include, family = "gaussian", hyper = hyper)
+object <- corila(x, y, group, primary, family = "gaussian", hyper = hyper)
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 }

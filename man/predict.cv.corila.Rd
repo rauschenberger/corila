@@ -41,8 +41,8 @@ n <- 50; p <- 20; q <- 5
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
 group <- rep(seq_len(q), length.out = p)
-include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-cv.corila(x = x, y = y, group = group, include = include, tune = "none")
+primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+cv.corila(x = x, y = y, group = group, primary = primary, tune = "none")
 
 \donttest{
 # simulation
@@ -105,9 +105,9 @@ if (identical(family, "gaussian")) {
 metric
 
 # privileged information
-#include <- stats::rbinom(n = sum(p), size = 1, prob = 0.5) == 1
+#primary <- stats::rbinom(n = sum(p), size = 1, prob = 0.5) == 1
 #object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
-#                     include = include, family = family)
+#                     primary = primary, family = family)
 }
 
 }

@@ -8,7 +8,7 @@ cv.corila(
   x,
   y,
   group,
-  include = NULL,
+  primary = NULL,
   alpha_init = 0,
   alpha_final = 1,
   family = "gaussian",
@@ -39,11 +39,11 @@ indicates whether information should be transferred
 from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 }}
 
-\item{include}{\eqn{p}-dimensional logical vector
+\item{primary}{\eqn{p}-dimensional logical vector
 indicating whether a predictor may be included in the final model
-(\code{TRUE}, "primary predictors")
+(\code{TRUE} for "primary predictors")
 or must be excluded from the final model
-(\code{FALSE}, "auxiliary predictors")}
+(\code{FALSE} for "auxiliary predictors")}
 
 \item{alpha_init}{elastic net mixing parameter
 (\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
@@ -121,8 +121,8 @@ n <- 50; p <- 20; q <- 5
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
 group <- rep(seq_len(q), length.out = p)
-include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-cv.corila(x = x, y = y, group = group, include = include, tune = "none")
+primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+cv.corila(x = x, y = y, group = group, primary = primary, tune = "none")
 
 \donttest{
 # simulation
@@ -185,9 +185,9 @@ if (identical(family, "gaussian")) {
 metric
 
 # privileged information
-#include <- stats::rbinom(n = sum(p), size = 1, prob = 0.5) == 1
+#primary <- stats::rbinom(n = sum(p), size = 1, prob = 0.5) == 1
 #object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
-#                     include = include, family = family)
+#                     primary = primary, family = family)
 }
 
 }

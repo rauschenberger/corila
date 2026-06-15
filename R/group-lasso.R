@@ -131,7 +131,7 @@
 #'
 #' @keywords internal
 #'
-.validate <- function(x, y, group, include, family, hyper, alpha_init,
+.validate <- function(x, y, group, primary, family, hyper, alpha_init,
                       alpha_final, cor, foldid, nfolds, lambda_init) {
   # --- feature matrix ---
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
@@ -190,7 +190,7 @@
     stop("Argument 'group' must be a vector, a list, or a matrix.")
   }
   # --- other arguments ---
-  .assert(x = include, type = "logical", dim = p)
+  .assert(x = primary, type = "logical", dim = p)
   slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
   .assert(x = names(hyper), type = "nominal", dim = length(slots),
           support = slots)
@@ -314,12 +314,12 @@
 #' indicates whether information should be transferred
 #' from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 #'
-#' @param include
+#' @param primary
 #' \eqn{p}-dimensional logical vector
 #' indicating whether a predictor may be included in the final model
-#' (`TRUE`, "primary predictors")
+#' (`TRUE` for "primary predictors")
 #' or must be excluded from the final model
-#' (`FALSE`, "auxiliary predictors")
+#' (`FALSE` for "auxiliary predictors")
 #'
 #' @param alpha_init
 #' elastic net mixing parameter
@@ -365,7 +365,7 @@
 #' @param lambda_init
 #' regularisation hyperparameter(s),
 #' or `NULL` (cross-validation)
-#' 
+#'
 #' @param threshold
 #' threshold for absolute correlation coefficients:
 #' numeric in unit interval
@@ -409,14 +409,14 @@
 #' n <- 100
 #' p <- 50
 #' group <- rep(x = 1:10, each = 5)
-#' include <- NULL
+#' primary <- NULL
 #' x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 #' y <- rnorm(n = n)
 #'
 #' # model fitting
 #' hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
 #'                     exp_global = 1, wgt_global = 0.5)
-#' object <- corila(x, y, group, include, family = "gaussian", hyper = hyper)
+#' object <- corila(x, y, group, primary, family = "gaussian", hyper = hyper)
 #'
 #' y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 #' }
@@ -425,14 +425,14 @@
 #'
 #' @export
 #'
-corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
+corila <- function(x, y, group, primary, family, hyper, alpha_init = 0,
                    alpha_final = 1, cor = "spearman", foldid = NULL,
                    nfolds = 10, lambda_init = NULL, threshold = 0) {
   args <- .validate(
     x = x,
     y = y,
     group = group,
-    include = include,
+    primary = primary,
     family = family,
     hyper = hyper,
     alpha_init = alpha_init,
@@ -452,8 +452,8 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
   if (is.null(group)) {
     group <- seq_len(p)
   }
-  if (is.null(include)) {
-    include <- rep(x = TRUE, times = p)
+  if (is.null(primary)) {
+    primary <- rep(x = TRUE, times = p)
   }
   args <- c(args, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
@@ -508,7 +508,7 @@ corila <- function(x, y, group, include, family, hyper, alpha_init = 0,
     pf_ext <- 1 / (weight$local * hyper$wgt_local[i] +
                      weight$global * hyper$wgt_global[i])
     # To obtain standard lasso set pf_ext equal to 1.
-    pf_ext[!c(include, include)] <- Inf # excluded features
+    pf_ext[!c(primary, primary)] <- Inf # excluded features
     #if (any(is.na(pf_ext))) {
     #  stop("missing pf: ", sum(is.na(pf_ext)))
     #}
@@ -728,8 +728,8 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 #' y <- rnorm(n)
 #' group <- rep(seq_len(q), length.out = p)
-#' include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-#' cv.corila(x = x, y = y, group = group, include = include, tune = "none")
+#' primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+#' cv.corila(x = x, y = y, group = group, primary = primary, tune = "none")
 #'
 #' \donttest{
 #' # simulation
@@ -792,9 +792,9 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' metric
 #'
 #' # privileged information
-#' #include <- stats::rbinom(n = sum(p), size = 1, prob = 0.5) == 1
+#' #primary <- stats::rbinom(n = sum(p), size = 1, prob = 0.5) == 1
 #' #object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
-#' #                     include = include, family = family)
+#' #                     primary = primary, family = family)
 #' }
 #'
 #' @keywords methods models regression classif
@@ -804,7 +804,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' @srrstats {G2.3b} *uses tolower() for arguments family and cor*
 #' @srrstats {RE4.0} *returns a "model" object (see @return)*
 #'
-cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
+cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
                       nfolds = 10, cor = "spearman", tune = "both",
                       foldid = NULL) {
@@ -817,8 +817,8 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   }
   # set default parameters
   #.validate(x = x, y = y, group = group, family = family)
-  if (is.null(include)) {
-    include <- rep(x = TRUE, times = ncol(x))
+  if (is.null(primary)) {
+    primary <- rep(x = TRUE, times = ncol(x))
   }
   if (is.null(foldid)) {
     foldid <- .folds(y = y, family = family, nfolds = nfolds)
@@ -828,7 +828,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
   object_ext <- corila(x = x,
                        y = y,
                        group = group,
-                       include = include,
+                       primary = primary,
                        alpha_init = alpha_init,
                        alpha_final = alpha_final,
                        family = family,
@@ -849,7 +849,7 @@ cv.corila <- function(x, y, group, include = NULL, alpha_init = 0,
     object_int <- corila(x = x[foldid !=  i, ],
                          y = y[foldid != i],
                          group = group,
-                         include = include,
+                         primary = primary,
                          alpha_init = alpha_init,
                          alpha_final = alpha_final,
                          family = family,
@@ -943,8 +943,8 @@ print.cv.corila <- function(x, ...) {
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- rnorm(n)
 #' group <- rep(seq_len(q), length.out = p)
-#' include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-#' object <- cv.corila(x = x, y = y, group = group, include = include)
+#' primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+#' object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #' print(object)
 #' summary(object)
 #'
@@ -957,8 +957,8 @@ summary.cv.corila <- function(object, ...) {
   list$family <- object$args$family
   #list$n <- object$n
   list$p <- object$args$p
-  list$p_primary <- sum(object$args$include)
-  list$p_auxiliary <- sum(!object$args$include)
+  list$p_primary <- sum(object$args$primary)
+  list$p_auxiliary <- sum(!object$args$primary)
   list$alpha_init <- object$args$alpha_init
   list$alpha_final <- object$args$alpha_final
   list$lambda.min <- object$lambda.min
@@ -1084,7 +1084,7 @@ print.summary.cv.corila <- function(x, ...) {
 #' matrix with \eqn{n} rows and either
 #' \eqn{p_0} or \eqn{p_0 + p_1} features
 #'
-#' @param include
+#' @param primary
 #' logical vector of length \eqn{p_0 + p_1}
 #' with \eqn{p_0} entries equal to `TRUE` (primary features)
 #' and \eqn{p_1} entries equal to `FALSE` (auxiliary features)
@@ -1096,22 +1096,22 @@ print.summary.cv.corila <- function(x, ...) {
 #' n <- 5
 #' p <- 10
 #' x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
-#' include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-#' x_primary <- x[,include]
-#' x_expanded <- corila:::.expand_auxiliary(x = x_primary, include = include)
-#' all(x_expanded[, include] == x[, include])
-#' all(x_expanded[, !include] == 0)
+#' primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+#' x_primary <- x[, primary]
+#' x_expanded <- corila:::.expand_auxiliary(x = x_primary, primary = primary)
+#' all(x_expanded[, primary] == x[, primary])
+#' all(x_expanded[, !primary] == 0)
 #'
 #' @keywords internal
 #'
-.expand_auxiliary <- function(x, include) {
+.expand_auxiliary <- function(x, primary) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
-  .assert(x = include, type = "logical", dim = Inf)
-  if (ncol(x) == length(include)) {
+  .assert(x = primary, type = "logical", dim = Inf)
+  if (ncol(x) == length(primary)) {
     x
-  } else if (ncol(x) == sum(include)) {
-    full <- matrix(data = 0, nrow = nrow(x), ncol = length(include))
-    full[, include] <- x
+  } else if (ncol(x) == sum(primary)) {
+    full <- matrix(data = 0, nrow = nrow(x), ncol = length(primary))
+    full[, primary] <- x
     full
   } else {
     stop("incompatible number of (primary) features")
@@ -1169,7 +1169,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
     stop("Set s='lambda.min' or provide non-negative value.")
   }
   # --- handle auxiliary predictors ---
-  newx_full <- .expand_auxiliary(x = newx, include = object$args$include)
+  newx_full <- .expand_auxiliary(x = newx, primary = object$args$primary)
   # --- make predictions ---
   newx_stand <- .forescale(x = newx_full, pars = object$scale)$x
   x_all <- cbind(newx_stand, -newx_stand)
@@ -1271,8 +1271,8 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef <- .combine_slopes(alpha = alpha, beta = beta)
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   if (any(coef[c(FALSE[object$scale$family != "cox"],
-                 !object$args$include)] != 0)) {
+                 !object$args$primary)] != 0)) {
     stop("Excluded coefs must equal zero.")
   }
-  coef[c(TRUE[object$scale$family != "cox"], object$args$include)]
+  coef[c(TRUE[object$scale$family != "cox"], object$args$primary)]
 }

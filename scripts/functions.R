@@ -79,7 +79,7 @@
   graphics::layout(mat = matrix(data = seq_len(9), nrow = 3, ncol = 3),
                    widths = c(p, 1, 1), height = c(n, 1, 1))
   graphics::image(x = t(x[nrow(x):1,]), axes = FALSE, col = col, breaks = breaks)
-  graphics::mtext(side = 2, at = c(0.75, 0.25), text = c("training samples", "testing samples"), line = 2, font = 2, cex = cex$lab)
+  graphics::mtext(side = 2, at = c(0.75, 0.25), text = c("training set", "test set"), line = 2, font = 2, cex = cex$lab)
   graphics::mtext(side = 3, text = "predictors", line = 2, font = 2, cex = cex$lab)
   graphics::abline(h = hlines, col = cols$grid, lwd = lwd$grid)
   graphics::abline(v = vlines, col = cols$grid, lwd = lwd$grid)
@@ -146,11 +146,11 @@
 #'
 #' @param n0
 #' number of observations used for fitting the model
-#' ("training samples", integer \eqn{>= 2})
+#' (size of training set, integer \eqn{>= 2})
 #'
 #' @param n1
 #' number of observations used for making predictions
-#' ("testing samples", integer \eqn{>=2})
+#' (size of test set, integer \eqn{>=2})
 #'
 #' @param p
 #' number of predictors

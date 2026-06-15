@@ -4,13 +4,13 @@
 \alias{.expand_auxiliary}
 \title{Expand auxiliary features}
 \usage{
-.expand_auxiliary(x, include)
+.expand_auxiliary(x, primary)
 }
 \arguments{
 \item{x}{matrix with \eqn{n} rows and either
 \eqn{p_0} or \eqn{p_0 + p_1} features}
 
-\item{include}{logical vector of length \eqn{p_0 + p_1}
+\item{primary}{logical vector of length \eqn{p_0 + p_1}
 with \eqn{p_0} entries equal to \code{TRUE} (primary features)
 and \eqn{p_1} entries equal to \code{FALSE} (auxiliary features)}
 }
@@ -24,11 +24,11 @@ Add empty columns for auxiliary features.
 n <- 5
 p <- 10
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
-include <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-x_primary <- x[,include]
-x_expanded <- corila:::.expand_auxiliary(x = x_primary, include = include)
-all(x_expanded[, include] == x[, include])
-all(x_expanded[, !include] == 0)
+primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+x_primary <- x[, primary]
+x_expanded <- corila:::.expand_auxiliary(x = x_primary, primary = primary)
+all(x_expanded[, primary] == x[, primary])
+all(x_expanded[, !primary] == 0)
 
 }
 \keyword{internal}

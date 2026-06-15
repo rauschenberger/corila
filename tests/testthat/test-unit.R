@@ -69,15 +69,15 @@ n <- 5
 p <- 10
 set.seed(1)
 x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
-include <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
-x_primary <- x[, include]
-x_expanded <- .expand_auxiliary(x = x_primary, include = include)
+primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
+x_primary <- x[, primary]
+x_expanded <- .expand_auxiliary(x = x_primary, primary = primary)
 testthat::test_that("primary predictors are equal", {
-  testthat::expect_identical(object = x_expanded[, include],
-                             expected = x[, include])
+  testthat::expect_identical(object = x_expanded[, primary],
+                             expected = x[, primary])
 })
 testthat::test_that("auxiliary features are zero", {
-  testthat::expect_setequal(object = x_expanded[, !include], expected = 0)
+  testthat::expect_setequal(object = x_expanded[, !primary], expected = 0)
 })
 
 ## function ".combine_slopes" --------------------------------------------------

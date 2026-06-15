@@ -29,13 +29,13 @@ remotes::install_github("rauschenberger/corila")
 
 ## Usage
 
-Use the function `cv.corila` to model an outcome (`n`-dimensional vector _y_) based on many predictors (`n x p` matrix _X_) that are structured by groups (e.g., `p`-dimensional vector `group`) and potentially split into primary and auxiliary predictors (`p`-dimensional vector `include`). See the vignette for detailed examples.
+Use the function `cv.corila` to model an outcome (`n`-dimensional vector _y_) based on many predictors (`n x p` matrix _X_) that are structured by groups (e.g., `p`-dimensional vector `group`) and potentially split into primary and auxiliary predictors (`p`-dimensional vector `primary`). See the vignette for detailed examples.
 
 ``` r
 library(corila)
 data <- simulate()
 attach(data)
-object <- cv.corila(x = x_train, y = data$y_train, group = group, include = include)
+object <- cv.corila(x = x_train, y = data$y_train, group = group, primary = primary)
 coef(object)
 predict(object, newx = x_test)
 ```
@@ -47,6 +47,8 @@ Armin Rauschenberger
 (2026).
 "Sparse modelling with grouped and correlated features allowing for privileged information".
 *Manuscript in preparation*.
+
+(Presented at [SIS-FENStatS](https://sis2026.sis-statistica.it/) in Rome, Italy, on 25 June 2026.)
 
 ## Disclaimer
 
