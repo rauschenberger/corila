@@ -1,8 +1,47 @@
 
 
+#' @title
+#' Correlation Plot
+#' 
+#' @description
+#' Visualise correlation among grouped variables
+#' 
+#' @param x
+#' \eqn{p \times p} numerical matrix
+#' 
+#' @param group
+#' \eqn{p}-dimensional character vector
+#' 
+#' @param exp
+#  non-negative scalar
+#' 
+#' @param min
+#' positive integer
+#' 
+#' @param cex
+#' non-negative scalar
+#' 
+#' @param xline
+#' non-negative scalar or `NULL`
+#' 
+#' @param yline
+#' non-negative scalar or `NULL`
+#'
+#' @examples
+#' q <- 10
+#' group <- rep(LETTERS[seq_len(q)], times = stats::rpois(n = q, lambda = 4))
+#' p <- length(group)
+#' rho <- 0.8
+#' sigma <- rho * outer(X = group, Y = group, FUN = "==") + (1 - rho) * diag(p)
+#' x <- MASS::mvrnorm(n = 10, mu = rep(0, times = p), Sigma = sigma)
+#' .plot_cor(x = sigma, group = group, min = 1)
+#' .plot_cor(x = cor(x), group = group, min = 1)
+#' 
 .plot_cor <- function(x, group, exp = 1, min = 5, cex = 0.7, xline = 0.5, yline = 0.5) {
-  .assert(x = group, type = "nominal", dim = Inf)
-  .assert(x = x, type = "numeric", dim = c(length(group), length(group)))
+  .assert(x = x, type = "numeric", dim = c(Inf, Inf),
+          min = -1, max = 1)
+  p <- ncol(x)
+  .assert(x = group, type = "nominal", dim = p)
   .assert(x = exp, type = "numeric", min = 0)
   .assert(x = min, type = "integer", min = 1)
   .assert(x = cex, type = "numeric", min = 0)
@@ -12,11 +51,11 @@
   index <- sapply(levels, function(x) which(group == x))
   size <- sapply(index, length)
   order <- unlist(index)
-  cor_exp <- sign(cor) * abs(cor) ^ exp
+  cor_exp <- sign(x) * abs(x) ^ exp
   col <- grDevices::colorRampPalette(c("blue", "white", "red"))(200)
   graphics::image(x = cor_exp[order, rev(order)],
-                  axes = FALSE, col=col, zlim = c(-1,1))
-  pos <- (c(0, cumsum(size)) - 0.5) / (ncol(cor) - 1)
+                  axes = FALSE, col = col, zlim = c(-1,1))
+  pos <- (c(0, cumsum(size)) - 0.5) / (ncol(x) - 1)
   # add grid
   lwd <- ifelse(size >= min, 2, ifelse(size > 2, 1, 0.5))
   graphics::abline(v = pos, col = "grey", lty = 1, lwd = 0.5)
@@ -28,11 +67,12 @@
   graphics::axis(side = 2, at= 1 - pos, labels = spaces,
                  lwd = 0, lwd.ticks = 0.5)
   # add labels
-  label <- which(size > min)
+  label <- which(size >= min)
   pos_centre <- 0.5 * pos[label] + 0.5 * pos[label + 1]
   if(!is.null(xline)){
+    las <- ifelse(any(nchar(label) >= 10), 2, 1)
     graphics::mtext(text = levels[label], side = 3, at = pos_centre,
-                  las = 2, cex = cex, line = xline)
+                  las = las, cex = cex, line = xline)
   }
   if(!is.null(yline)){
     graphics::mtext(text = levels[label], side = 2, at = 1 - pos_centre,
@@ -41,10 +81,27 @@
   invisible(NULL)
 }
 
-
+#' @title
+#' Visualise adjacency or correlation matrix
+#'
+#' @param z
+#' \eqn{p \times p} adjacency or correlation matrix
+#'
+#' @param col
+#' colour
+#'
+#' @examples
+#' size <- c(3, 3, 2, 1)
+#' group <- rep(x = seq_along(size), times = size)
+#' z <- outer(group, group, FUN = "==")
+#' .plot_groups(z, col = "black")
+#'
 .plot_groups <- function(z, col = "black"){
   if(ncol(z) != nrow(z)) {
-    stop()
+    stop("Requires p rows and p columns.")
+  }
+  if(any(diag(z)!=1)){
+    stop("Requires unit diagonal.")
   }
   p <- ncol(z)
   xpos <- seq(from = 0, to = 1, length.out = p)
