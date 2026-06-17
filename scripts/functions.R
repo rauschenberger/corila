@@ -232,7 +232,7 @@
                   col = col, breaks = breaks)
   if(all(!holdout)){
     graphics::mtext(side = 2, at = 0.5, text = "observations",
-                    line = 2, fond = 2, cex = cex$lab)
+                    line = 2, font = 2, cex = cex$lab)
   } else {
       graphics::mtext(side = 2,
                       at = c(1 - mean(holdout) / 2, mean(holdout) / 2),
