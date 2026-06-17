@@ -1,11 +1,13 @@
 
 
-.visualise_cor <- function(x, group, exp = 1, xline = 0.5, yline = 0.5) {
+.visualise_cor <- function(x, group, exp = 1, min = 5, cex = 0.7, xline = 0.5, yline = 0.5) {
   .assert(x = group, type = "nominal", dim = Inf)
   .assert(x = x, type = "numeric", dim = c(length(group), length(group)))
-  .assert(x = exp, type = "numeric", dim = 1, min = 0)
-  .assert(x = xline, type = "numeric", dim = 1, min = 0)
-  .assert(x = yline, type = "numeric", dim = 1, min = 0)
+  .assert(x = exp, type = "numeric", min = 0)
+  .assert(x = min, type = "integer", min = 1)
+  .assert(x = cex, type = "numeric", min = 0)
+  .assert(x = xline, type = "numeric", min = 0)
+  .assert(x = yline, type = "numeric", min = 0)
   levels <- names(sort(table(group), decreasing = TRUE))
   index <- sapply(levels, function(x) which(group == x))
   size <- sapply(index, length)
@@ -16,7 +18,7 @@
                   axes = FALSE, col=col, zlim = c(-1,1))
   pos <- (c(0, cumsum(size)) - 0.5) / (ncol(cor) - 1)
   # add grid
-  lwd <- ifelse(size >= 5, 2, ifelse(size > 2, 1, 0.5))
+  lwd <- ifelse(size >= min, 2, ifelse(size > 2, 1, 0.5))
   graphics::abline(v = pos, col = "grey", lty = 1, lwd = 0.5)
   graphics::abline(h = 1 - pos, col = "grey" ,lty = 1, lwd = 0.5)
   # add ticks
@@ -26,15 +28,15 @@
   graphics::axis(side = 2, at= 1 - pos, labels = spaces,
                  lwd = 0, lwd.ticks = 0.5)
   # add labels
-  label <- which(size > 5)
+  label <- which(size > min)
   pos_centre <- 0.5 * pos[label] + 0.5 * pos[label + 1]
   if(!is.null(xline)){
     graphics::mtext(text = levels[label], side = 3, at = pos_centre,
-                  las = 2, cex = 0.7, line = xline)
+                  las = 2, cex = cex, line = xline)
   }
   if(!is.null(yline)){
     graphics::mtext(text = levels[label], side = 2, at = 1 - pos_centre,
-                  las = 1, cex = 0.7, line = yline)
+                  las = 1, cex = cex, line = yline)
   }
   invisible(NULL)
 }
