@@ -13,7 +13,7 @@
 #' \eqn{p}-dimensional character vector
 #' 
 #' @param exp
-#  non-negative scalar
+#' non-negative scalar
 #' 
 #' @param min
 #' positive integer
@@ -37,7 +37,8 @@
 #' .plot_cor(x = sigma, group = group, min = 1)
 #' .plot_cor(x = cor(x), group = group, min = 1)
 #' 
-.plot_cor <- function(x, group, exp = 1, min = 5, cex = 0.7, xline = 0.5, yline = 0.5) {
+.plot_cor <- function(x, group, exp = 1, min = 5, cex = 0.7,
+                      xline = 0.5, yline = 0.5) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf),
           min = -1, max = 1)
   p <- ncol(x)
@@ -57,7 +58,7 @@
                   axes = FALSE, col = col, zlim = c(-1,1))
   pos <- (c(0, cumsum(size)) - 0.5) / (ncol(x) - 1)
   # add grid
-  lwd <- ifelse(size >= min, 2, ifelse(size > 2, 1, 0.5))
+  #lwd <- ifelse(size >= min, 2, ifelse(size > 2, 1, 0.5))
   graphics::abline(v = pos, col = "grey", lty = 1, lwd = 0.5)
   graphics::abline(h = 1 - pos, col = "grey" ,lty = 1, lwd = 0.5)
   # add ticks
@@ -70,7 +71,7 @@
   label <- which(size >= min)
   pos_centre <- 0.5 * pos[label] + 0.5 * pos[label + 1]
   if(!is.null(xline)){
-    las <- ifelse(any(nchar(label) >= 10), 2, 1)
+    las <- ifelse(any(nchar(levels) >= 10), 2, 1)
     graphics::mtext(text = levels[label], side = 3, at = pos_centre,
                   las = las, cex = cex, line = xline)
   }
@@ -97,10 +98,15 @@
 #' .plot_groups(z, col = "black")
 #'
 .plot_groups <- function(z, col = "black"){
+  if(is.logical(z)){
+    class(z) <- "numeric"
+  }
+  .assert(x = z, type = "numeric", dim = c(Inf, Inf))
+  .assert(x = col, type = "nominal")
   if(ncol(z) != nrow(z)) {
     stop("Requires p rows and p columns.")
   }
-  if(any(diag(z)!=1)){
+  if(any(abs(diag(z) - 1) > 1e-06)){
     stop("Requires unit diagonal.")
   }
   p <- ncol(z)
@@ -117,7 +123,7 @@
     eps <- 1e-06
     breaks <- c(seq(-max, -eps, length.out = 50),
                 seq(eps, max, length.out = 50))
-    col  <- grDevices::colorRampPalette(c("blue","white","red"))(99)
+    col <- grDevices::colorRampPalette(c("blue","white","red"))(99)
     col <- c(col[1:49], "white", col[51:99])
   }
   graphics::par(mar=c(0,2,2,0))
@@ -138,19 +144,19 @@
 #' and the response vector.
 #' 
 #' @param x
-#' predictor matrix with `n` rows and `p` columns
+#' predictor matrix with \eqn{n} rows and \eqn{p} columns
 #' 
 #' @param y
-#' response vector of length `n`
+#' response vector of length \eqn{n}
 #' 
 #' @param holdout
-#' logical vector of length `n`
+#' logical vector of length \eqn{n}
 #' 
 #' @param group
-#' integer vector of length `p`
+#' integer vector of length \eqn{p}
 #' 
 #' @param primary
-#' logical vector of length `p`
+#' logical vector of length \eqn{p}
 #' 
 #' @return
 #' Renders a plot and returns `NULL` invisibly.
@@ -167,12 +173,21 @@
 #' primary <- rep(rep(c(TRUE, FALSE), times = c(1, p / q - 1)), times = q)
 #' .heatmap_lupi(x = x, y = y, holdout = holdout, group = group, primary = primary)
 #' 
+#' data <- .simulate_lupi_data(mode = "upstream",
+#'     p = 30, q = 5, n0 = 10, n1 = 20)
+#' .heatmap_lupi(x = data$x_train, y = data$y_train,
+#'    group = data$group, primary = data$primary,
+#'    holdout = rep(c(FALSE, TRUE), times = c(5, 5)))
+#' 
 .heatmap_lupi <- function(x, y, holdout = NULL, group = NULL, primary = NULL) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
   n <- nrow(x)
   p <- ncol(x)
   .assert(x = y, type = "numeric", dim = n, na.rm = TRUE)
   .assert(x = holdout, type = "logical", dim = n, na.rm = TRUE)
+  if(is.null(holdout)){
+    holdout <- rep(x = FALSE, times = n)
+  }
   .assert(x = group, type = "numeric", dim = p)
   if(!is.null(group)) {
     if( any(group != sort(group)) ) {
@@ -188,13 +203,13 @@
   }
   y[holdout] <- NA
   x[holdout, !primary] <- NA
-  graphics::par(mar=c(0, 0, 0, 0), oma = c(2, 4, 4, 2))
-  cols <- list(na = "lightgrey", grid="grey",sep="black",box="grey")
-  lwd <- list(grid=1,sep=3,box=1)
-  cex <- list(axis=1.1, cell=1.2, lab=0.9)
+  graphics::par(mar = c(0, 0, 0, 0), oma = c(2, 4, 4, 2))
+  cols <- list(na = "lightgrey", grid = "grey",sep = "black", box = "grey")
+  lwd <- list(grid = 1, sep = 3, box = 1)
+  cex <- list(axis = 1.1, cell = 1.2, lab = 0.9)
   col  <- grDevices::colorRampPalette(c("blue","white","red"))(99)
   col <- c(col[1:49], "white", col[51:99], cols$na)
-  max <- 1.01*max(abs(c(as.vector(x),as.vector(beta),as.vector(y))),na.rm=TRUE)
+  max <- 1.01 * max(abs(c(as.vector(x), as.vector(y))), na.rm=TRUE)
   eps <- 1e-06
   breaks <- c(seq(-max, -eps, length.out = 50),
               seq(eps, max, length.out = 50), 99e99)
@@ -206,24 +221,33 @@
   hlines <- seq(from = - 0.5 / (n - 1),
                 to = 1 + 0.5 / (n - 1),
                 length.out = n + 1)
-  thick_vlines <- (which(diff(group) == 1)-0.5) * 1/(p-1)
+  thick_vlines <- (which(diff(group) != 0) - 0.5) * 1/ (p - 1)
   
-  #x[is.na(x)] <- 99e99
-  y[is.na(y)] <- 99e99
-  beta[is.na(beta)] <- 99e99
+  y[is.na(y)] <- 99e99 # for grey colour
   
   #--- feature matrix ---
   graphics::layout(mat = matrix(data = seq_len(9), nrow = 3, ncol = 3),
-                   widths = c(p, 1, 1), height = c(n, 1, 1))
-  graphics::image(x = t(x[nrow(x):1,]), axes = FALSE, col = col, breaks = breaks)
-  graphics::mtext(side = 2, at = c(0.75, 0.25), text = c("training set", "test set"), line = 2, font = 2, cex = cex$lab)
-  graphics::mtext(side = 3, text = "predictors", line = 2, font = 2, cex = cex$lab)
+                   widths = c(p, 1, 1), heights = c(n, 1, 1))
+  graphics::image(x = t(x[nrow(x):1, ]), axes = FALSE,
+                  col = col, breaks = breaks)
+  if(all(!holdout)){
+    graphics::mtext(side = 2, at = 0.5, text = "observations",
+                    line = 2, fond = 2, cex = cex$lab)
+  } else {
+      graphics::mtext(side = 2,
+                      at = c(1 - mean(holdout) / 2, mean(holdout) / 2),
+                      text = c("training set", "test set"),
+                      line = 2, font = 2, cex = cex$lab)
+  }
+  graphics::mtext(side = 3, text = "predictors",
+                  line = 2, font = 2, cex = cex$lab)
   graphics::abline(h = hlines, col = cols$grid, lwd = lwd$grid)
   graphics::abline(v = vlines, col = cols$grid, lwd = lwd$grid)
   graphics::abline(v = thick_vlines, lwd = lwd$sep, col = cols$sep)
-  is.na <- which(is.na(x) | x == 99e99, arr.ind = TRUE)
-  if(nrow(is.na)>0){
-    graphics::text(x = xpos[is.na[,"col"]], y = ypos[is.na[,"row"]], labels = "?", font = 2, cex = cex$cell)
+  is_na <- which(is.na(x) | x == 99e99, arr.ind = TRUE)
+  if(nrow(is_na)>0){
+    graphics::text(x = xpos[is_na[, "col"]], y = ypos[is_na[, "row"]],
+                   labels = "?", font = 2, cex = cex$cell)
   }
   graphics::abline(h = mean(holdout), lwd = lwd$sep, col = cols$sep)
   graphics::box(col=cols$box, lwd=lwd$box)
@@ -239,7 +263,7 @@
   
   #--- effect vector ---
   graphics::plot.new()
-  graphics::image(x = matrix(ifelse(primary,1,NA), ncol = 1),
+  graphics::image(x = matrix(ifelse(primary, 1, NA), ncol = 1),
                   axes = FALSE, col = cols$na)
   graphics::abline(v = vlines, col = cols$grid, lwd = lwd$grid)
   graphics::mtext(side = 2, text = "coefs", line = 2, font = 2, cex = cex$lab)
@@ -251,20 +275,26 @@
                  tick = FALSE,
                  line = -0.3,
                  cex.axis=cex$axis)
-  graphics::text(x = xpos[!primary], y = 0, label = "0", font = 2, cex = cex$cell, col = "black")
-  graphics::text(x = xpos[primary], y = 0, label = "?", font = 2, cex = cex$cell)
+  graphics::text(x = xpos[!primary], y = 0, label = "0",
+                 font = 2, cex = cex$cell, col = "black")
+  graphics::text(x = xpos[primary], y = 0, label = "?",
+                 font = 2, cex = cex$cell)
   graphics::plot.new()
   graphics::plot.new()
   graphics::plot.new()
   
   #--- target vector ---
-  graphics::image(x = matrix(rev(y), nrow = 1), axes = FALSE, col = col, breaks = breaks)
+  graphics::image(x = matrix(rev(y), nrow = 1), axes = FALSE,
+                  col = col, breaks = breaks)
   graphics::abline(h = hlines, col = cols$grid, lwd = lwd$grid)
   graphics::abline(h = mean(holdout), lwd = lwd$sep, col = cols$sep)
-  graphics::mtext(text = "response", side = 3, line = 2, font = 2, cex = cex$lab)
-  graphics::axis(side = 3, at = 0, labels = "y", tick = FALSE, line = -0.5, cex.axis = cex$cell)
-  graphics::box(col=cols$box,lwd=lwd$box)
-  graphics::text(x = 0, y = ypos[holdout], labels = "?", font = 2, cex = cex$cell)
+  graphics::mtext(text = "response", side = 3, line = 2,
+                  font = 2, cex = cex$lab)
+  graphics::axis(side = 3, at = 0, labels = "y", tick = FALSE,
+                 line = -0.5, cex.axis = cex$cell)
+  graphics::box(col = cols$box, lwd = lwd$box)
+  graphics::text(x = 0, y = ypos[holdout], labels = "?",
+                 font = 2, cex = cex$cell)
   graphics::plot.new()
   
   invisible(NULL)
@@ -278,8 +308,8 @@
 #' Simulates data for learning using privileged information (LUPI).
 #'
 #' @param mode
-#' character string `"upstream"`, `"aggregated"`, `"surrogate"`, `"baseline"`,
-#' or `"uninformative"`
+#' character string `"upstream"`, `"aggregated"`,
+#' `"surrogate"`, `"baseline"`, or `"uninformative"`
 #'
 #' @param n0
 #' number of observations used for fitting the model
@@ -314,16 +344,21 @@
 #' @keywords internal
 #'
 #' @examples
-#' data <- corila:::.simulate_lupi_data(mode = "baseline")
+#' data <- .simulate_lupi_data(mode = "upstream")
+#' sapply(data, length)
+#' 
+#' data <- .simulate_lupi_data(mode = "baseline")
+#' sapply(data, length)
+#' # Also return ordered group object (sort X, beta, group, binary, causal).
 #'
 .simulate_lupi_data <- function(mode, n0 = 100, n1 = 10000, p = 200, q = 4,
                                 plot = FALSE) {
   .assert(x = n0, type = "integer", min = 2)
   .assert(x = n1, type = "integer", min = 2)
-  .assert(x = p, type = "integer", min = 2)
-  .assert(x = q, type = "integer", min = 2)
+  .assert(x = p, type = "integer", min = 5)
+  .assert(x = q, type = "integer", min = 2, max = p)
   .assert(x = mode, type = "nominal",
-          support = c("upstream", "aggregated", "surrogate", "baseline"))
+          support = c("upstream", "aggregated", "surrogate", "baseline", "uninformative"))
   .assert(x = plot, type = "logical")
   fold <- rep(x = c(0, 1), times = c(n0, n1))
   n <- n0 + n1
@@ -345,7 +380,7 @@
       sel_aux <- group == j & !primary
       x[, sel_pry] <- stats::rnorm(n = n)
       #w <- c(0.2,0.5,0.8) # original
-      w <- stats::runif(3) # trial
+      w <- stats::runif(q - 1) # trial
       x[, sel_aux] <- x[, sel_pry] %*% t(sqrt(w)) + t(t(matrix(
         stats::rnorm(n * sum(sel_aux)),
         nrow = n,
@@ -358,8 +393,8 @@
   } else if (mode == "aggregated") {
     #--- fine-grained and aggregated predictors ---
     group <- rep(x = seq_len(p / q), each = q)
-    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)), times =
-                     p / q)
+    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
+                   times = p / q)
     causal <- rep(x = sample(rep(
       x = c(TRUE, FALSE), times = c(5, p / q - 5)
     )), each = q)
@@ -378,7 +413,7 @@
       #sqrt(1-w)*stats::rnorm(n=n*sum(sel_aux))
       #x[,sel_pry] <- rowSums(x[,sel_aux])
       x[, sel_aux] <- stats::rnorm(n = n * sum(sel_aux))
-      w <- stats::runif(n = 4)
+      w <- stats::runif(n = q)
       #w <- c(1/3,1/3,1/3)
       #w <- stats::rgamma(n=4,shape=1,rate=1)
       w <- w / sum(w)
@@ -401,8 +436,8 @@
   } else if (mode == "surrogate") {
     #--- canonical and surrogate predictors ---
     group <- rep(x = seq_len(p / q), each = q)
-    primary <- rep(x = rep(x = c(FALSE, TRUE), times = c(1, q - 1)), times =
-                     p / q)
+    primary <- rep(x = rep(x = c(FALSE, TRUE), times = c(1, q - 1)),
+                   times = p / q)
     causal <- rep(x = sample(rep(
       x = c(TRUE, FALSE), times = c(5, p / q - 5)
     )), each = q)
@@ -415,7 +450,7 @@
       x[, sel_aux] <- stats::rnorm(n = n)
       # w <- c(0.2,0.5,0.8) # TRIAL
       # was c(0.7,0.5,0.3)#  stats::runif(n=q-1) # rep(x=0.9,times=q-1)
-      w <- stats::runif(3)
+      w <- stats::runif(q - 1)
       x[, sel_pry] <- x[, sel_aux] %*% t(sqrt(w)) + t(t(matrix(
         stats::rnorm(n * sum(sel_pry)),
         nrow = n,
@@ -427,7 +462,7 @@
     y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
   } else if (mode == "baseline") {
     #--- baseline and follow-up predictors ---
-    w <- c(NA, 0.9, 0.9, 0.9)
+    w <- c(NA, rep(x = 0.9, times = q - 1))
     #w <- c(NA,runif(3)) # TRIAl
     list <- list()
     list[[1]] <- matrix(
@@ -467,8 +502,10 @@
   #     sel.pry <- group==j & primary
   #     sel.aux <- group==j & !primary
   #     x[,sel.pry] <- stats::rnorm(n=n)
-  #     w <- stats::runif(3)
-  #     x[,sel.aux] <- x[,sel.pry] %*% t(sqrt(w)) + t(t(matrix(stats::rnorm(n*sum(sel.aux)),nrow=n,ncol=sum(sel.aux))) * sqrt(1-w))
+  #     w <- stats::runif(q - 1)
+  #     x[,sel.aux] <- x[,sel.pry] %*% t(sqrt(w)) +
+  # t(t(matrix(stats::rnorm(n*sum(sel.aux)),nrow=n,ncol=sum(sel.aux))) *
+  # sqrt(1-w))
   #   }
   #   beta <- ifelse(primary,1,-1/3) * causal * abs(stats::rnorm(n=p))
   #   eta <- x %*% beta
@@ -700,7 +737,7 @@
       col = c("blue", "red"),
       side = 3,
       line = 0.5,
-      cex = cex,
+      cex = cex
     )
     graphics::text(
       x = 1,
@@ -841,7 +878,7 @@
 #' @param x
 #' list of matrices of equal dimensions
 #' 
-.plot_change <- function(x, ylab = "", main = names(x) , alternative = "both",
+.plot_change <- function(x, ylab = "", main = names(x) , alternative = "two.sided",
                          lwd = 1, cex = 1, cex.axis = 1, cex.lab = 1){
   if(!is.list(x)){stop("Expect list.")}
   nslot <- length(x)
@@ -850,7 +887,7 @@
   }
   .assert(x = main, type = "nominal", dim = nslot)
   .assert(x = alternative, type = "nominal",
-          support = c("both", "greater", "less"))
+          support = c("two.sided", "greater", "less"))
   ylim <- range(x)
   if(graphics::par()$mfrow[2] != nslot){
     warning("Set graphics::par(mfrow=c(...,length(x)))." )
