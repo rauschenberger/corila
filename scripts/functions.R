@@ -73,7 +73,44 @@
 }
 
 
-.visualise_lupi <- function(x, y, holdout = NULL, group = NULL, include = NULL) {
+#' @title
+#' Visualise learning with privileged information (LUPI)
+#' 
+#' @description
+#' Visualises the predictor matrix, the coefficient vector,
+#' and the response vector.
+#' 
+#' @param x
+#' predictor matrix with `n` rows and `p` columns
+#' 
+#' @param y
+#' response vector of length `n`
+#' 
+#' @param holdout
+#' logical vector of length `n`
+#' 
+#' @param group
+#' integer vector of length `p`
+#' 
+#' @param primary
+#' logical vector of length `p`
+#' 
+#' @return
+#' Renders a plot and returns `NULL` invisibly.
+#' 
+#' @examples
+#' set.seed(1)
+#' n <- 10; p <- 20; q <- 5
+#' group <- rep(x = seq_len(q), each = p / q)
+#' sigma <- 0.9 * outer(group, group, "==") + 0.1 * diag(p)
+#' x <- mvtnorm::rmvnorm(n = n, mean = rep(0, times = p), sigma = sigma)
+#' beta <- stats::rbinom(n = p, size = 1, prob = 0.25) * stats::rnorm(p)
+#' y <- as.numeric(scale(x %*% beta))
+#' holdout <- rep(c(FALSE, TRUE), each = n / 2)
+#' primary <- rep(rep(c(TRUE, FALSE), times = c(1, p / q - 1)), times = q)
+#' .visualise_lupi(x = x, y = y, holdout = holdout, group = group, primary = primary)
+#' 
+.visualise_lupi <- function(x, y, holdout = NULL, group = NULL, primary = NULL) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
   n <- nrow(x)
   p <- ncol(x)
@@ -85,15 +122,15 @@
       stop("Vector group should be sorted.")
     }
   }
-  .assert(x = include, type = "logical", dim = p)
+  .assert(x = primary, type = "logical", dim = p)
   if(is.null(group)) {
     group <- rep(x = 1, times = p)
   }
-  if(is.null(include)) {
-    include <- rep(x = TRUE, times = p)
+  if(is.null(primary)) {
+    primary <- rep(x = TRUE, times = p)
   }
   y[holdout] <- NA
-  x[holdout, !include] <- NA
+  x[holdout, !primary] <- NA
   graphics::par(mar=c(0, 0, 0, 0), oma = c(2, 4, 4, 2))
   cols <- list(na = "lightgrey", grid="grey",sep="black",box="grey")
   lwd <- list(grid=1,sep=3,box=1)
@@ -131,7 +168,7 @@
   if(nrow(is.na)>0){
     graphics::text(x = xpos[is.na[,"col"]], y = ypos[is.na[,"row"]], labels = "?", font = 2, cex = cex$cell)
   }
-  graphics::abline(h = 0.5, lwd = lwd$sep, col = cols$sep)
+  graphics::abline(h = mean(holdout), lwd = lwd$sep, col = cols$sep)
   graphics::box(col=cols$box, lwd=lwd$box)
   graphics::axis(side = 2,
                  at = ypos,
@@ -145,7 +182,7 @@
   
   #--- effect vector ---
   graphics::plot.new()
-  graphics::image(x = matrix(ifelse(include,1,NA), ncol = 1),
+  graphics::image(x = matrix(ifelse(primary,1,NA), ncol = 1),
                   axes = FALSE, col = cols$na)
   graphics::abline(v = vlines, col = cols$grid, lwd = lwd$grid)
   graphics::mtext(side = 2, text = "coefs", line = 2, font = 2, cex = cex$lab)
@@ -157,8 +194,8 @@
                  tick = FALSE,
                  line = -0.3,
                  cex.axis=cex$axis)
-  graphics::text(x = xpos[!include], y = 0, label = "0", font = 2, cex = cex$cell, col = "black")
-  graphics::text(x = xpos[include], y = 0, label = "?", font = 2, cex = cex$cell)
+  graphics::text(x = xpos[!primary], y = 0, label = "0", font = 2, cex = cex$cell, col = "black")
+  graphics::text(x = xpos[primary], y = 0, label = "?", font = 2, cex = cex$cell)
   graphics::plot.new()
   graphics::plot.new()
   graphics::plot.new()
@@ -166,7 +203,7 @@
   #--- target vector ---
   graphics::image(x = matrix(rev(y), nrow = 1), axes = FALSE, col = col, breaks = breaks)
   graphics::abline(h = hlines, col = cols$grid, lwd = lwd$grid)
-  graphics::abline(h = 0.5, lwd = lwd$sep, col = cols$sep)
+  graphics::abline(h = mean(holdout), lwd = lwd$sep, col = cols$sep)
   graphics::mtext(text = "response", side = 3, line = 2, font = 2, cex = cex$lab)
   graphics::axis(side = 3, at = 0, labels = "y", tick = FALSE, line = -0.5, cex.axis = cex$cell)
   graphics::box(col=cols$box,lwd=lwd$box)
@@ -213,7 +250,7 @@
 #' `x_train` and `x_test`,
 #' the \eqn{p}-dimensional integer vector `group`
 #' grouping the predictors,
-#' the \eqn{p}-dimensional logical vector `include`
+#' the \eqn{p}-dimensional logical vector `primary`
 #' indicating primary predictors,
 #' and the \eqn{p}-dimensional effect vector `beta`.
 #'
@@ -241,14 +278,14 @@
     #--- upstream and downstream predictors ---
     group <- rep(x = seq_len(p / q),
                  each = q)
-    include <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
+    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
                    times = p / q)
     causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5, p / q - 5))),
                   each = q)
     x <- matrix(data = NA, nrow = n, ncol = p)
     for (j in seq_len(p / q)) {
-      sel_pry <- group == j & include
-      sel_aux <- group == j & !include
+      sel_pry <- group == j & primary
+      sel_aux <- group == j & !primary
       x[, sel_pry] <- stats::rnorm(n = n)
       #w <- c(0.2,0.5,0.8) # original
       w <- stats::runif(3) # trial
@@ -258,13 +295,13 @@
         ncol = sum(sel_aux)
       )) * sqrt(1 - w))
     }
-    beta <- (!include) * causal * abs(stats::rnorm(n = p))
+    beta <- (!primary) * causal * abs(stats::rnorm(n = p))
     eta <- x %*% beta
     y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
   } else if (mode == "aggregated") {
     #--- fine-grained and aggregated predictors ---
     group <- rep(x = seq_len(p / q), each = q)
-    include <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)), times =
+    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)), times =
                      p / q)
     causal <- rep(x = sample(rep(
       x = c(TRUE, FALSE), times = c(5, p / q - 5)
@@ -277,8 +314,8 @@
     #w <- stats::rgamma(n=3,shape=1,rate=1)
     #w <- w/sum(w)
     for (j in seq_len(p / q)) {
-      sel_pry <- group == j & include
-      sel_aux <- group == j & !include
+      sel_pry <- group == j & primary
+      sel_aux <- group == j & !primary
       w <- stats::runif(n = 1)
       #x[,sel_aux] <- sqrt(w)*stats::rnorm(n=n)+
       #sqrt(1-w)*stats::rnorm(n=n*sum(sel_aux))
@@ -301,13 +338,13 @@
       x[, sel_pry] <- cbind(x[, sel_aux], stats::rnorm(n = n)) %*% sqrt(w)
       #x[,sel_pry] <- x[,sel_aux] %*% sqrt(w)
     }
-    beta <- (!include) * causal * abs(stats::rnorm(n = p))
+    beta <- (!primary) * causal * abs(stats::rnorm(n = p))
     eta <- x %*% beta
     y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
   } else if (mode == "surrogate") {
     #--- canonical and surrogate predictors ---
     group <- rep(x = seq_len(p / q), each = q)
-    include <- rep(x = rep(x = c(FALSE, TRUE), times = c(1, q - 1)), times =
+    primary <- rep(x = rep(x = c(FALSE, TRUE), times = c(1, q - 1)), times =
                      p / q)
     causal <- rep(x = sample(rep(
       x = c(TRUE, FALSE), times = c(5, p / q - 5)
@@ -316,8 +353,8 @@
                 nrow = n,
                 ncol = p)
     for (j in seq_len(p / q)) {
-      sel_pry <- group == j & include
-      sel_aux <- group == j & !include
+      sel_pry <- group == j & primary
+      sel_aux <- group == j & !primary
       x[, sel_aux] <- stats::rnorm(n = n)
       # w <- c(0.2,0.5,0.8) # TRIAL
       # was c(0.7,0.5,0.3)#  stats::runif(n=q-1) # rep(x=0.9,times=q-1)
@@ -328,7 +365,7 @@
         ncol = sum(sel_pry)
       )) * sqrt(1 - w))
     }
-    beta <- (!include) * causal * abs(stats::rnorm(n = p))
+    beta <- (!primary) * causal * abs(stats::rnorm(n = p))
     eta <- x %*% beta
     y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
   } else if (mode == "baseline") {
@@ -347,7 +384,7 @@
     }
     x <- do.call(what = "cbind", args = list)
     group <- rep(x = seq_len(p / q), times = q)
-    include <- rep(x = c(TRUE, FALSE), times = c(p / q, p / q * (q - 1)))
+    primary <- rep(x = c(TRUE, FALSE), times = c(p / q, p / q * (q - 1)))
     beta <- sample(rep(x = c(0, 1), times = c(p / q - 5, 5))) * 
       abs(stats::rnorm(n = p / q))
     causal <- NULL
@@ -355,28 +392,28 @@
     y <- eta + stats::rnorm(n = n, sd = 0.5 * sd(eta))
   } else if (mode == "uninformative") {
     group <- rep(x = seq_len(p / q), each = q)
-    include <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
+    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
                    times = p / q)
     causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5, p / q - 5))),
                   each = q)
     x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
-    beta <- include * causal * abs(stats::rnorm(n = p))
+    beta <- primary * causal * abs(stats::rnorm(n = p))
     eta <- x %*% beta
     y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
   }
   # else if(mode=="adversarial"){
   #   group <- rep(x=seq_len(p/q),each=q)
-  #   include <- rep(x=rep(x=c(TRUE,FALSE),times=c(1,q-1)),times=p/q)
+  #   primary <- rep(x=rep(x=c(TRUE,FALSE),times=c(1,q-1)),times=p/q)
   #   causal <- rep(x=sample(rep(x=c(TRUE,FALSE),times=c(5,p/q-5))),each=q)
   #   x <- matrix(data=NA,nrow=n,ncol=p)
   #   for(j in seq_len(p/q)){
-  #     sel.pry <- group==j & include
-  #     sel.aux <- group==j & !include
+  #     sel.pry <- group==j & primary
+  #     sel.aux <- group==j & !primary
   #     x[,sel.pry] <- stats::rnorm(n=n)
   #     w <- stats::runif(3)
   #     x[,sel.aux] <- x[,sel.pry] %*% t(sqrt(w)) + t(t(matrix(stats::rnorm(n*sum(sel.aux)),nrow=n,ncol=sum(sel.aux))) * sqrt(1-w))
   #   }
-  #   beta <- ifelse(include,1,-1/3) * causal * abs(stats::rnorm(n=p))
+  #   beta <- ifelse(primary,1,-1/3) * causal * abs(stats::rnorm(n=p))
   #   eta <- x %*% beta
   #   y <- eta + stats::rnorm(n=n,sd=0.5*stats::sd(eta))
   # }
@@ -393,7 +430,7 @@
   #   }
   #   x <- do.call(what="cbind",args=list)
   #   group <- rep(x=seq_len(p/q),times=q)
-  #   include <- rep(x=c(TRUE,FALSE),times=c(p/q,p/q*(q-1)))
+  #   primary <- rep(x=c(TRUE,FALSE),times=c(p/q,p/q*(q-1)))
   #   beta <- sample(rep(x=c(0,1),times=c(p/q-5,5)))*abs(stats::rnorm(n=p/q))
   #   eta <- z %*% beta
   #   y <- eta + stats::rnorm(n=n,sd=0.5*sd(eta))
@@ -412,7 +449,7 @@
        y_test = y[fold == 1],
        x_test = x[fold == 1, ],
        group = group,
-       include = include,
+       primary = primary,
        causal = causal,
        beta = beta)
 }
@@ -903,7 +940,7 @@ simulate_overlap <- function() {
 #' results <- holdout(x_train = data$x_train,
 #'                    y_train = data$y_train,
 #'                    group = data$group,
-#'                    include = rep(c(TRUE, FALSE), each = 80),
+#'                    primary = rep(c(TRUE, FALSE), each = 80),
 #'                    x_test = data$x_test,
 #'                    y_test = data$y_test,
 #'                    family = data$info$family,
@@ -914,14 +951,14 @@ simulate_overlap <- function() {
 #' @keywords iteration
 #'
 #' @export
-holdout <- function(x_train, y_train, group, include, family,
+holdout <- function(x_train, y_train, group, primary, family,
                     alpha_init = 0, alpha_final = 1,
                     x_test = NULL, y_test = NULL,
                     nfolds = 10, foldid = NULL, method = NULL,
                     seed = NULL, tune = "both") {
   # nfolds <- 10; foldid <- NULL; seed <- NULL
   
-  if (!is.null(include) && any(include == 0) && !is.numeric(group)) {
+  if (!is.null(primary) && any(primary == 0) && !is.numeric(group)) {
     stop(paste0("Function holdout is not fully implemented",
                 "for privileged learning with overlapping groups."))
   }
@@ -930,8 +967,8 @@ holdout <- function(x_train, y_train, group, include, family,
   #n0 <- nrow(x_train)
   n1 <- nrow(x_test)
   
-  if (is.null(include)) {
-    include <- rep(x = TRUE, times = p)
+  if (is.null(primary)) {
+    primary <- rep(x = TRUE, times = p)
   }
   
   if (is.null(x_test) != is.null(y_test)) {
@@ -990,17 +1027,17 @@ holdout <- function(x_train, y_train, group, include, family,
                             no = ifelse(test = family == "poisson",
                                         yes = log(mean(y_train)),
                                         no = mean(y_train))),
-                     rep(x = 0, times = sum(include)))
+                     rep(x = 0, times = sum(primary)))
     } else if (i == "ridge") {
       #--- ridge ---
-      object <- glmnet::cv.glmnet(x = x_train[, include],
+      object <- glmnet::cv.glmnet(x = x_train[, primary],
                                   y = y_train,
                                   family = family,
                                   alpha = 0,
                                   foldid = foldid)
       if (!is.null(x_test)) {
         y_hat$ridge <- stats::predict(object = object,
-                                      newx = x_test[, include],
+                                      newx = x_test[, primary],
                                       s = "lambda.min",
                                       type = "response")
       }
@@ -1012,25 +1049,25 @@ holdout <- function(x_train, y_train, group, include, family,
         next
       }
       #--- multiridge ---
-      object <- multiridge(x = x_train[, include],
+      object <- multiridge(x = x_train[, primary],
                            y = y_train,
-                           z = group[include],
+                           z = group[primary],
                            family = family)
       if (!is.null(x_test)) {
         y_hat$multiridge <- stats::predict(object = object,
-                                           newx = x_test[, include])
+                                           newx = x_test[, primary])
       }
       coef$multiridge <- stats::coef(object = object)
     } else if (i == "lasso") {
       #--- lasso ---
-      object <- glmnet::cv.glmnet(x = x_train[, include],
+      object <- glmnet::cv.glmnet(x = x_train[, primary],
                                   y = y_train,
                                   family = family,
                                   alpha = 1,
                                   foldid = foldid)
       if (!is.null(x_test)) {
         y_hat$lasso <- stats::predict(object = object,
-                                      newx = x_test[, include],
+                                      newx = x_test[, primary],
                                       s = "lambda.min",
                                       type = "response")
       }
@@ -1049,14 +1086,14 @@ holdout <- function(x_train, y_train, group, include, family,
         temp_y_train <- y_train
         temp_loss <- "ls"
       }
-      object <- gglasso::cv.gglasso(x = x_train[, include],
+      object <- gglasso::cv.gglasso(x = x_train[, primary],
                                     y = temp_y_train,
                                     loss = temp_loss,
-                                    group = group[include],
+                                    group = group[primary],
                                     foldid = foldid)
       if (!is.null(x_test)) {
         temp <- stats::predict(object = object,
-                               newx = x_test[, include],
+                               newx = x_test[, primary],
                                s = "lambda.min",
                                type = "link")
         if (family == "binomial") {
@@ -1072,20 +1109,20 @@ holdout <- function(x_train, y_train, group, include, family,
       #if (family == "cox") {next}
       #--- group lasso (grpreg) ---
       if (family == "cox") {
-        object <- grpreg::cv.grpsurv(X = x_train[, include],
+        object <- grpreg::cv.grpsurv(X = x_train[, primary],
                                      y = y_train,
-                                     group = group[include],
+                                     group = group[primary],
                                      fold = foldid)
       } else {
-        object <- grpreg::cv.grpreg(X = x_train[, include],
+        object <- grpreg::cv.grpreg(X = x_train[, primary],
                                     y = y_train,
                                     family = family,
-                                    group = group[include],
+                                    group = group[primary],
                                     fold = foldid)
       }
       if (!is.null(x_test)) {
         y_hat$grpreg <- stats::predict(object = object,
-                                       X = x_test[, include],
+                                       X = x_test[, primary],
                                        type = "response",
                                        lambda = object$lambda.min)
       }
@@ -1103,18 +1140,18 @@ holdout <- function(x_train, y_train, group, include, family,
       # } else if (family == "poisson") {
       #   model <- grplasso::PoissReg()
       # }
-      # lambda <- grplasso::lambdamax(x = cbind(1, x_train[, include]),
-      # y = y_train, index = c(NA, group[include]),
+      # lambda <- grplasso::lambdamax(x = cbind(1, x_train[, primary]),
+      # y = y_train, index = c(NA, group[primary]),
       # penscale = base::sqrt, model = model) * 0.9^(0:100)
-      # object <- grplasso::grplasso(x = cbind(1, x_train[, include]),
+      # object <- grplasso::grplasso(x = cbind(1, x_train[, primary]),
       #                              y = y_train,
-      #                              index = c(NA, group[include]),
+      #                              index = c(NA, group[primary]),
       #                              model = model,
       #                              lambda = lambda,
       # control = grplasso::grpl.control(update.hess = "lambda", trace = 0))
       # if (!is.null(x_test)) {
       #   y_hat$grplasso <- stats::predict(object = object,
-      # newdata = cbind(1, x_test[, include]), type = "response")
+      # newdata = cbind(1, x_test[, primary]), type = "response")
       # }
       # coef$grplasso <- object$coefficients[, 1]
     } else if (i == "sparsegl") {
@@ -1122,14 +1159,14 @@ holdout <- function(x_train, y_train, group, include, family,
         next
       }
       #--- sparse group lasso (sparsegl) ---
-      object <- sparsegl::cv.sparsegl(x = x_train[, include],
+      object <- sparsegl::cv.sparsegl(x = x_train[, primary],
                                       y = y_train,
-                                      group = group[include],
+                                      group = group[primary],
                                       family = family,
                                       foldid = foldid)
       if (!is.null(x_test)) {
         y_hat$sparsegl <- stats::predict(object = object,
-                                         newx = x_test[, include],
+                                         newx = x_test[, primary],
                                          type = "response",
                                          s = "lambda.min")
       }
@@ -1145,23 +1182,23 @@ holdout <- function(x_train, y_train, group, include, family,
                                         yes = "logit",
                                         no = family))
       if (family == "cox") {
-        data_temp <- list(x = x_train[, include],
+        data_temp <- list(x = x_train[, primary],
                           time = as.matrix(y_train)[, "time"],
                           status = as.matrix(y_train)[, "status"])
       } else {
-        data_temp <- list(x = x_train[, include], y = y_train)
+        data_temp <- list(x = x_train[, primary], y = y_train)
       }
       cv_object <- SGL::cvSGL(data = data_temp,
-                              index = group[include],
+                              index = group[primary],
                               type = family_temp,
                               foldid = foldid)
       object <- SGL::SGL(data = data_temp,
-                         index = group[include],
+                         index = group[primary],
                          type = family_temp,
                          lambdas = cv_object$lambdas)
       if (!is.null(x_test)) {
         y_hat$SGL <- SGL::predictSGL(x = object,
-                                     newX = x_test[, include],
+                                     newX = x_test[, primary],
                                      lam = which.min(cv_object$lldiff))
       }
       if (family == "gaussian") {
@@ -1177,15 +1214,15 @@ holdout <- function(x_train, y_train, group, include, family,
       }
       invisible(utils::capture.output(
         object <- suppressMessages(graper::graper(
-          X = x_train[, include],
+          X = x_train[, primary],
           y = y_train,
-          annot = as.factor(group[include]),
+          annot = as.factor(group[primary]),
           family = family
         ))
       ))
       if (!is.null(x_test)) {
         y_hat$graper <- stats::predict(object = object,
-                                       newX = x_test[, include],
+                                       newX = x_test[, primary],
                                        type = "response")
       }
       coef$graper <- stats::coef(object = object)
@@ -1199,26 +1236,26 @@ holdout <- function(x_train, y_train, group, include, family,
                                value = func,
                                ns = "grpregOverlap")
       if (is.numeric(group)) {
-        list <- c(lapply(X = unique(group[include]),
-                         FUN = function(z) which(group[include] == z)))
-        #lapply(X = unique(type[include]),
-        # FUN = function(z) which(type[include]  == z))
+        list <- c(lapply(X = unique(group[primary]),
+                         FUN = function(z) which(group[primary] == z)))
+        #lapply(X = unique(type[primary]),
+        # FUN = function(z) which(type[primary]  == z))
       } else {
         list <- group
       }
       if (family == "cox") {
-        object <- grpregOverlap::cv.grpsurvOverlap(X = x_train[, include],
+        object <- grpregOverlap::cv.grpsurvOverlap(X = x_train[, primary],
                                                    y = y_train,
                                                    group = list)
       } else {
-        object <- grpregOverlap::cv.grpregOverlap(X = x_train[, include],
+        object <- grpregOverlap::cv.grpregOverlap(X = x_train[, primary],
                                                   y = y_train,
                                                   group = list,
                                                   family = family)
       }
       if (!is.null(x_test)) {
         y_hat$grpregOverlap <- stats::predict(object = object,
-                                              X = x_test[, include],
+                                              X = x_test[, primary],
                                               type = "response",
                                               lambda = object$lambda.min)
       }
@@ -1238,15 +1275,15 @@ holdout <- function(x_train, y_train, group, include, family,
       #rho <- c(0.00, 0.10, 0.25, 0.50, 1.00)
       #for (j in seq_along(rho)) {
       #  object[[j]] <- multiview::cv.multiview(
-      # x_list = lapply(X = unique(type[include]),
-      # FUN = function(z) x_train[, type[include] == z]),
+      # x_list = lapply(X = unique(type[primary]),
+      # FUN = function(z) x_train[, type[primary] == z]),
       # y = y_train, family = temp, rho = rho[j], foldid = foldid)
       #}
       #id <- which.min(sapply(object, function(x) min(x$cvm)))
       #if (!is.null(x_test)) {
       #  y_hat$multiview <- stats::predict(object = object[[id]],
-      # newx = lapply(X = unique(type[include]),
-      # FUN = function(z) x_test[, type[include] == z]),
+      # newx = lapply(X = unique(type[primary]),
+      # FUN = function(z) x_test[, type[primary] == z]),
       # type = "response", s = "lambda.min")
       #}
       #coef$multiview <- stats::coef(object = object[[id]], s = "lambda.min")
@@ -1254,23 +1291,23 @@ holdout <- function(x_train, y_train, group, include, family,
       if (!family %in% c("gaussian", "binomial")) {
         next
       }
-      if (all(table(group[include]) == 1)) {
+      if (all(table(group[primary]) == 1)) {
         #group_temp <- rep(x = 1, times = length(group))
-        object <- scoop::coop.lasso(x = x_train[, include],
+        object <- scoop::coop.lasso(x = x_train[, primary],
                                     y = y_train,
                                     group = group,
                                     family = family)
       } else {
-        object <- scoop::sparse.coop.lasso(x = x_train[, include],
+        object <- scoop::sparse.coop.lasso(x = x_train[, primary],
                                            y = y_train,
-                                           group = group[include],
+                                           group = group[primary],
                                            family = family)
       }
       object_cv <- scoop::crossval(object)
       id <- which(object_cv@lambda == object_cv@lambda.min)
       if (!is.null(x_test)) {
         y_hat$scoop <- scoop::predict(object = object,
-                                      newx = x_test[, include])[, id]
+                                      newx = x_test[, primary])[, id]
       }
       coef$scoop <- object_cv@beta.min
     } else if (i == "MLGL") {
@@ -1284,15 +1321,15 @@ holdout <- function(x_train, y_train, group, include, family,
       } else {
         y_train_temp <- y_train
       }
-      cv <- MLGL::cv.MLGL(X = x_train[, include],
+      cv <- MLGL::cv.MLGL(X = x_train[, primary],
                           y = y_train_temp,
                           loss = loss)
-      object <- MLGL::MLGL(X = x_train[, include],
+      object <- MLGL::MLGL(X = x_train[, primary],
                            y = y_train_temp,
                            loss = loss)
       if (!is.null(x_test)) {
         temp <- stats::predict(object = object,
-                               newx = x_test[, include],
+                               newx = x_test[, primary],
                                type = "fit",
                                s = cv$lambda.min)
         if (loss == "ls") {
@@ -1317,9 +1354,9 @@ holdout <- function(x_train, y_train, group, include, family,
                       no = ifelse(test = family == "binomial",
                                   yes = "logistic",
                                   no = family))
-      if (is.numeric(group[include])) {
+      if (is.numeric(group[primary])) {
         invisible(utils::capture.output(
-          groupset <- ecpc::createGroupset(values = as.factor(group[include]))
+          groupset <- ecpc::createGroupset(values = as.factor(group[primary]))
         ))
       } else if (is.list(group)) {
         base <- lapply(group, function(x) as.integer(x))
@@ -1332,16 +1369,16 @@ holdout <- function(x_train, y_train, group, include, family,
       #invisible(utils::capture.output(
       #  typeset <- ecpc::createGroupset(values = as.factor(type))
       #))
-      #datablocks <- lapply(X = unique(type[include]),
-      #                     FUN = function(x) which(type[include] == x))
+      #datablocks <- lapply(X = unique(type[primary]),
+      #                     FUN = function(x) which(type[primary] == x))
       invisible(
         tryCatch(
           utils::capture.output(
             object <- ecpc::ecpc(
               Y = y_temp,
-              X = x_train[, include],
+              X = x_train[, primary],
               groupsets = list(groupset),
-              X2 = x_test[, include],
+              X2 = x_test[, primary],
               model = model,
               fold = nfolds,
               datablocks = NULL
@@ -1362,7 +1399,7 @@ holdout <- function(x_train, y_train, group, include, family,
       #                                  FUN = function(x) which(group == x)),
       #                   type = lapply(X = unique(type),
       #                                 FUN = function(x) which(type == x)))
-      #object <- gren::cv.gren(x = x_train[, include],
+      #object <- gren::cv.gren(x = x_train[, primary],
       #                        y = y_train,
       #                        partitions = list(group = group, type = type),
       #                        trace = TRUE)
@@ -1372,8 +1409,8 @@ holdout <- function(x_train, y_train, group, include, family,
         next
       }
       if (is.numeric(group)) {
-        groupset <- lapply(X = unique(group[include]),
-                           FUN = function(x) which(group[include] == x))
+        groupset <- lapply(X = unique(group[primary]),
+                           FUN = function(x) which(group[primary] == x))
       } else if (is.list(group)) {
         base <- lapply(group, function(x) as.integer(x))
         # 1st alternative
@@ -1383,9 +1420,9 @@ holdout <- function(x_train, y_train, group, include, family,
         groupset <- c(base, extra)
       }
       object <- squeezy::squeezy(Y = y_train,
-                                 X = x_train[, include],
+                                 X = x_train[, primary],
                                  groupset = groupset,
-                                 X2 = x_test[, include])
+                                 X2 = x_test[, primary])
       # Check whether type can be included (e.g., as groups).
       y_hat$squeezy <- object$YpredApprox
       coef$squeezy <- c(object$a0Approx, object$betaApprox)
@@ -1407,10 +1444,10 @@ holdout <- function(x_train, y_train, group, include, family,
       #lambda <- exp(seq(from = log(1e06), to = log(1e-06), length.out = 20))
       # no predict function implemented
       #for (i in seq_len(nfolds)) {
-      #  coef <- CBPE(X = x_train[foldid !=  i, include],
+      #  coef <- CBPE(X = x_train[foldid !=  i, primary],
       #               y = y_train[foldid != i],
       #               lambda = 0)
-      #  x_train[foldid == i, include] %*% coef
+      #  x_train[foldid == i, primary] %*% coef
       #}
       # internal cross-validation to tune lambda
       # refit on full training data with optimal lambda
@@ -1419,8 +1456,8 @@ holdout <- function(x_train, y_train, group, include, family,
       if (!family %in% c("gaussian", "binomial")) {
         next
       }
-      group_temp <- lapply(X = unique(group[include]),
-                           FUN = function(x) which(x == group[include]))
+      group_temp <- lapply(X = unique(group[primary]),
+                           FUN = function(x) which(x == group[primary]))
       # duplicating singletons:
       .duplicate_singletons <- function(x) {
         if (length(x) == 1) {
@@ -1431,7 +1468,7 @@ holdout <- function(x_train, y_train, group, include, family,
       }
       group_temp <- lapply(X = group_temp, FUN = .duplicate_singletons)
       # combining remaining features
-      indices <- seq_len(ncol(x_train[, include]))
+      indices <- seq_len(ncol(x_train[, primary]))
       extra <- indices[!indices %in% unlist(group_temp)]
       if (length(extra) > 0) {
         group_temp <- c(group_temp, extra)
@@ -1445,7 +1482,7 @@ holdout <- function(x_train, y_train, group, include, family,
       object <- list()
       for (j in seq_along(ratio)) {
         invisible(utils::capture.output(
-          object[[j]] <- pcLasso::cv.pcLasso(x = x_train[, include],
+          object[[j]] <- pcLasso::cv.pcLasso(x = x_train[, primary],
                                              y = y_train,
                                              family = family,
                                              groups = group_temp,
@@ -1458,7 +1495,7 @@ holdout <- function(x_train, y_train, group, include, family,
       object <- object[[id]]
       if (!is.null(x_test)) {
         y_hat$pcLasso <- pcLasso::predict.cv.pcLasso(object = object,
-                                                     xnew = x_test[, include],
+                                                     xnew = x_test[, primary],
                                                      s = "lambda.min")
       }
       coef$pcLasso <- c(
@@ -1471,7 +1508,7 @@ holdout <- function(x_train, y_train, group, include, family,
       object <- cv.corila(x = x_train,
                           y = y_train,
                           group = group,
-                          include = include,
+                          primary = primary,
                           alpha_init = alpha_init,
                           alpha_final = alpha_final,
                           family = family,
@@ -1480,7 +1517,7 @@ holdout <- function(x_train, y_train, group, include, family,
       print(object$hyper[object$id_hyper, ])
       if (!is.null(x_test)) {
         y_hat$corila <- stats::predict(object = object,
-                                       newx = x_test[, include])
+                                       newx = x_test[, primary])
       }
       coef$corila <- stats::coef(object = object)
     }
@@ -1507,7 +1544,7 @@ holdout <- function(x_train, y_train, group, include, family,
         if (all(is.na(original))) {
           next
         }
-        eta <- coef[[i]][1] + x_test[, include] %*% coef[[i]][-1]
+        eta <- coef[[i]][1] + x_test[, primary] %*% coef[[i]][-1]
         if (family %in% c("gaussian", "cox")) {
           manual <- eta
         } else if (family == "binomial") {
@@ -1547,7 +1584,7 @@ holdout <- function(x_train, y_train, group, include, family,
     }
     if (any(vapply(X = coef,
                    FUN = base::length,
-                   FUN.VALUE = numeric(1)) != sum(include) + 1)) {
+                   FUN.VALUE = numeric(1)) != sum(primary) + 1)) {
       stop("invalid coef length")
     }
   } else {
@@ -1603,7 +1640,7 @@ holdout <- function(x_train, y_train, group, include, family,
 #' @keywords iteration
 #'
 #' @export
-crossval <- function(x, y, family, group = NULL, include = NULL,
+crossval <- function(x, y, family, group = NULL, primary = NULL,
                      alpha_init = 0, alpha_final = 1, iter = 5, foldid = NULL,
                      nfolds = 10, method = NULL, tune = "both") {
   n <- nrow(x)
@@ -1634,7 +1671,7 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
                          x_test = x[cond, ],
                          y_test = y[cond],
                          group = group,
-                         include = include,
+                         primary = primary,
                          alpha_init = alpha_init,
                          alpha_final = alpha_final,
                          family = family,
@@ -1681,7 +1718,7 @@ crossval <- function(x, y, family, group = NULL, include = NULL,
       refit <- holdout(x_train = x[foldid != 0, ],
                        y_train = y[foldid != 0],
                        group = group,
-                       include = include,
+                       primary = primary,
                        alpha_init = alpha_init,
                        alpha_final = alpha_final,
                        family = family,
