@@ -1,6 +1,6 @@
 
 
-.visualise_cor <- function(x, group, exp = 1, min = 5, cex = 0.7, xline = 0.5, yline = 0.5) {
+.plot_cor <- function(x, group, exp = 1, min = 5, cex = 0.7, xline = 0.5, yline = 0.5) {
   .assert(x = group, type = "nominal", dim = Inf)
   .assert(x = x, type = "numeric", dim = c(length(group), length(group)))
   .assert(x = exp, type = "numeric", min = 0)
@@ -42,7 +42,7 @@
 }
 
 
-.visualise_groups <- function(z, col = "black"){
+.plot_groups <- function(z, col = "black"){
   if(ncol(z) != nrow(z)) {
     stop()
   }
@@ -108,9 +108,9 @@
 #' y <- as.numeric(scale(x %*% beta))
 #' holdout <- rep(c(FALSE, TRUE), each = n / 2)
 #' primary <- rep(rep(c(TRUE, FALSE), times = c(1, p / q - 1)), times = q)
-#' .visualise_lupi(x = x, y = y, holdout = holdout, group = group, primary = primary)
+#' .heatmap_lupi(x = x, y = y, holdout = holdout, group = group, primary = primary)
 #' 
-.visualise_lupi <- function(x, y, holdout = NULL, group = NULL, primary = NULL) {
+.heatmap_lupi <- function(x, y, holdout = NULL, group = NULL, primary = NULL) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
   n <- nrow(x)
   p <- ncol(x)
@@ -460,9 +460,9 @@
 #'
 #' @examples
 #' graphics::par(mar=c(0,0,1.5,0))
-#' corila:::.visualise_lupi_data(mode = "baseline")
+#' .flowchart_lupi(mode = "baseline")
 #'
-.visualise_lupi_data <- function(mode, lwd = 1.5, length_arrow = 0.06,
+.flowchart_lupi <- function(mode, lwd = 1.5, length_arrow = 0.06,
                                  mar = 0.3, xlim = c(1, 5), ylim = c(11, 0),
                                  cex = 0.9) {
   .assert(x = mode, type = "nominal",
@@ -1777,12 +1777,12 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
 #'
 #' @examples
 #' x <- data.frame(mean = 0, corila = rnorm(100) - 1, other = rnorm(100))
-#' plot_boxes(x)
+#' .plot_boxes(x)
 #'
 #' @keywords graphs
 #'
 #' @export
-plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
+.plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
                        ylim = NULL, cex.main = 1.2) {
   #--- hypothesis testing ---
   pvalue <- list()
