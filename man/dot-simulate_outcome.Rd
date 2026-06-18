@@ -41,3 +41,4 @@ corila:::.simulate_outcome(family = "gaussian", x = x, beta = beta)
 Use \code{\link[=simulate]{simulate()}} to simulate a predictor matrix,
 an effect vector, and an outcome vector.
 }
+\keyword{internal}
