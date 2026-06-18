@@ -14,7 +14,7 @@ navbar:
     - text: "functions"
       href: reference/index.html
     - text: "vignette"
-      href: vignettes/vignette.html
+      href: articles/vignette.html
     - text: "news"
       href: news/index.html
 
