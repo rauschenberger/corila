@@ -285,7 +285,7 @@
 }
 
 #' @title
-#' Group lasso
+#' Sparse group lasso regression (without cross-validation)
 #'
 #' @description
 #' Fits an initial ridge regression to obtain weights
@@ -653,7 +653,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 }
 
 #' @title
-#' Sparse Group Lasso
+#' Sparse group lasso regression
 #'
 #' @description
 #' Optimises the parameters and the hyperparameters of the sparse group lasso.
@@ -898,6 +898,8 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #' [summary()][summary.cv.corila]
 #'
 #' @inherit summary.cv.corila examples
+#'
+#' @keywords internal
 #'
 #' @export
 print.cv.corila <- function(x, ...) {

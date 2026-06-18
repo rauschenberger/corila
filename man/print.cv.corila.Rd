@@ -35,3 +35,4 @@ summary(object)
 \seealso{
 \link[=summary.cv.corila]{summary()}
 }
+\keyword{internal}

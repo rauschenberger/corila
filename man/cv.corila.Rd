@@ -2,7 +2,7 @@
 % Please edit documentation in R/group-lasso.R
 \name{cv.corila}
 \alias{cv.corila}
-\title{Sparse Group Lasso}
+\title{Sparse group lasso regression}
 \usage{
 cv.corila(
   x,

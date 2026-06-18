@@ -2,7 +2,7 @@
 % Please edit documentation in R/group-lasso.R
 \name{corila}
 \alias{corila}
-\title{Group lasso}
+\title{Sparse group lasso regression (without cross-validation)}
 \usage{
 corila(
   x,
