@@ -1,0 +1,206 @@
+# Getting started with the R package \`corila\`
+
+## Introduction
+
+The R package `corila` implements “sparse modelling with grouped and
+correlated features allowing for privileged information”
+(*Rauschenberger, 2026*).
+
+It can be installed from GitHub (development version) or CRAN (stable
+release, *not yet available*):
+
+``` r
+
+remotes::install_github(repo = "rauschenberger/corila")
+#utils::install.packages(pkgs = "corila")
+```
+
+This R package provides the functions `corila` and `cv.corila` for model
+fitting without and with hyperparameter tuning, respectively. These
+functions require the arguments `x` (predictor matrix), `y` (response
+vector), `group` (group object), and `family` (character “gaussian”,
+“binomial”, “poisson”, or “cox”). They return objects of classes
+`"corila"` and `"cv.corila"`, respectively, for which standard S3
+methods like `coef` (for extracting coefficients) and `predict` (for
+making predictions) are available. The R package `corila` is an
+extension of the R package `glmnet` (*Friedman et al., 2010*), using a
+similar user interface.
+
+## Simulating data
+
+We will simulate some toy data for \\n_0\\ training observations,
+\\n_1\\ test observations, and \\p\\ predictor variables arranged in
+\\q\\ groups. The logical vector `holdout` indicates which observations
+will be held out for model testing.
+
+``` r
+
+set.seed(1)
+n0 <- 100
+n1 <- 10000
+p <- 200
+q <- 20
+holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
+```
+
+Here we simulate equally sized and non-overlapping groups of predictor
+variables. The \\p\\-dimensional character vector `group` indicates the
+predictor group. We set the correlation between two predictors to
+\\0.5\\ if they are in the same group, and otherwise to \\0\\.
+Simulation from a multivariate Gaussian distribution leads to the
+\\(n_0+n_1) \times p\\ numerical matrix \\\boldsymbol{X}\\.
+
+``` r
+
+group <- rep(x = seq_len(q), each = p / q)
+mu <- rep(x = 0, times = p)
+sigma <- 0.5 * outer(X = group, Y = group, FUN = "==")
+diag(sigma) <- 1
+x <- MASS::mvrnorm(n = n0 + n1, mu = mu, Sigma = sigma)
+```
+
+Here we simulate the \\p\\-dimensional effect vector
+\\\boldsymbol{\beta}\\, and the \\n\\-dimensional response vector
+\\\boldsymbol{y}\\. For each group, all coefficients either equal zero
+(with probability \\90\\\\) or are drawn from the folded standard
+Gaussian distribution (with probability \\10\\\\).
+
+``` r
+
+beta <- rep(x = stats::rbinom(n = q, size = 1, prob = 0.1), each = p / q) *
+  abs(stats::rnorm(n = p))
+y <- stats::rnorm(n = 1) + x %*% beta + stats::rnorm(n = n0 + n1)
+```
+
+## Model fitting
+
+Model fitting is done as in the R package `glmnet`. But next to the
+\\n_0 \times p\\ predictor matrix \\\boldsymbol{X}\_{\text{train}}\\ and
+the \\n_0\\-dimensional response vector
+\\\boldsymbol{y}\_{\text{train}}\\, it also requires the
+\\p\\-dimensional group vector `group`. If this argument is set to
+`NULL`, information exchange is only based on the correlation (not on
+the grouping). This is for the Gaussian family, but the proposed method
+also allows for the binomial and Poisson families as well as the Cox
+model.
+
+``` r
+
+object <- list()
+object$glmnet <- glmnet::cv.glmnet(x = x[!holdout, ],
+                                   y = y[!holdout],
+                                   family = "gaussian")
+object$corila <- cv.corila(x = x[!holdout, ],
+                           y = y[!holdout],
+                           group = group,
+                           family = "gaussian")
+```
+
+## Extracting coefficients and making predictions
+
+The S3 methods `coef` and `predict` can be used for extracting
+coefficients and making predictions.
+
+``` r
+
+coef <- lapply(
+  X = object,
+  FUN = function(y) coef(object = y, s = "lambda.min")
+)
+y_hat <- lapply(
+  X = object,
+  FUN = function(y) predict(object = y, newx = x[holdout, ], s = "lambda.min")
+)
+```
+
+In this example, the proposed method improves the selection performance
+(higher precision) and the predictive performance (lower mean-squared
+error) as compared to standard lasso regression.
+
+``` r
+
+lapply(
+  X = coef,
+  FUN = function(x) sum(x[-1] != 0 & beta != 0) / sum(x[-1] != 0)
+)
+lapply(
+  X = y_hat,
+  FUN = function(x) mean((x - y[holdout])^2)
+)
+```
+
+## Modelling under complex group structures
+
+To exploit known groups of predictors or known relationships between
+predictors, the R package `corila` can exploit three different types of
+inputs for the argument `z`: (i) If each predictor is in a single group,
+the simplest choice is a vector of group labels (or indices). (ii) If
+some groups are overlapping, however, a list of predictor labels (or
+indices) becomes necessary. (iii) If predictors have asymmetric
+relationships (e.g., the \\i^{\text{th}}\\ predictor should share
+information with with the \\j^{\text{th}}\\ predictor but not vice
+versa), this requires an adjacency matrix (with a unit diagonal).
+
+\\ \begin{array}{ccc} \text{vector of group labels} & \text{list of
+predictor labels} & \text{adjacency matrix} \\ \begin{array}{ccccc}
+{\color{gray}{x_1}} & {\color{gray}{x_2}} & {\color{gray}{x_3}} &
+{\color{gray}{x_4}} & {\color{gray}{x_5}} \\ \hline \text{A} & \text{A}
+& \text{B} & \text{B} & \text{C} \end{array} & \begin{array}{ccl}
+{\color{gray}{\text{A}}} & \| & \begin{array}{cc} x_1 & x_2 \end{array}
+\\ {\color{gray}{\text{B}}} & \| & \begin{array}{cc} x_3 & x_4
+\end{array} \\ {\color{gray}{\text{C}}} & \| & \begin{array}{c} x_5
+\end{array} \\ \end{array} & \begin{array}{c\|ccccc} ~ &
+{\color{gray}{x_1}} & {\color{gray}{x_2}} & {\color{gray}{x_3}} &
+{\color{gray}{x_4}} & {\color{gray}{x_5}} \\ \hline {\color{gray}{x_1}}
+& 1 & 1 & 0 & 0 & 0 \\ {\color{gray}{x_2}} & 1 & 1 & 0 & 0 & 0 \\
+{\color{gray}{x_3}} & 0 & 0 & 1 & 1 & 0 \\ {\color{gray}{x_4}} & 0 & 0 &
+1 & 1 & 0 \\ {\color{gray}{x_5}} & 0 & 0 & 0 & 0 & 1 \\ \end{array}
+\end{array} \\
+
+``` r
+
+group <- list()
+group$vector <- c(x1 = "A", x2 = "A", x3 = "B", x4 = "B", x5 = "C")
+group$list <- lapply(X = setNames(nm = unique(group$vector)),
+                     FUN = function(x) which(group$vector == x))
+group$matrix <- 1 * outer(X = group$vector, Y = group$vector, FUN = "==")
+```
+
+*NB: While it is possible to transform a vector of group labels to a
+list of feature labels or indices, and such a list to an adjacency
+matrix, this only works in the other direction if the groups are
+non-overlapping or the relationships symmetric, respectively.*
+
+## Modelling under privileged information
+
+The optional argument `primary` (\\p\\-dimensional logical vector) can
+be used to specify which predictors may be selected by the final model
+(`TRUE` for primary predictors, `FALSE` for auxiliary predictors).
+Coefficients of auxiliary predictors always equal zero. Predictions can
+be made providing the primary and auxiliary predictors, the latter being
+ignored, or providing the primary predictors only.
+
+``` r
+
+primary <- stats::rbinom(n = p, size = 1, prob = 0.5) == 1
+object <- cv.corila(x = x[!holdout, ],
+                    y = y[!holdout],
+                    group = group,
+                    primary = primary,
+                    family = "gaussian")
+
+coef <- coef(object)
+all(coef[-1][!primary] == 0)
+
+y_hat <- list()
+y_hat$all <- predict(object = object, newx = x[holdout, ])
+y_hat$sub <- predict(object = object, newx = x[holdout, primary])
+all(y_hat$all == y_hat$sub)
+```
+
+## Reference
+
+Armin Rauschenberger
+[![AR](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png)](https://orcid.org/0000-0001-6498-4801)
+(2026). “Sparse modelling with grouped and correlated features allowing
+for privileged information”. *Manuscript in preparation*.

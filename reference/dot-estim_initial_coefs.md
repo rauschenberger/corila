@@ -1,0 +1,103 @@
+# Initial coefficients
+
+Estimate initial coefficients.
+
+## Usage
+
+``` r
+.estim_initial_coefs(x, y, family, alpha_init, group, foldid, nfolds, lambda)
+```
+
+## Arguments
+
+- x:
+
+  \\n_0 \times p\\ predictor matrix, where \\n_0\\ is the number of
+  observations used for model training and \\p\\ is the number of
+  variables
+
+- y:
+
+  \\n_0\\-dimensional response vector, where \\n_0\\ is the number of
+  observations used for model training
+
+- family:
+
+  character string `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
+
+- alpha_init:
+
+  elastic net mixing parameter (\\0 \leq\\ `alpha_init` \\\leq 1\\) for
+  initial regression (default: ridge penalisation with `alpha_init`=0);
+  alternative choices are `"pearson"`, `"spearman"`, or `"kendall"` to
+  use initial correlation coefficients (not implemented for
+  `family="cox"`), `"multiridge"` for multi-penalty ridge regression
+  with one penalty for each group (not implemented for
+  `family="poisson"` or overlapping groups, falls back to `alpha_init=0`
+  for `family="poisson"`), or `NA` to set all initial coefficients equal
+  to 1
+
+- group:
+
+  group structure (three options):
+
+  - \\p\\-dimensional vector of group indices (in \\\\1, \ldots, q\\\\)
+    or labels,
+
+  - list with \\q\\ slots containing the variable indices (in \\\\1,
+    \ldots, p\\\\) or labels,
+
+  - \\p \times p\\ matrix, where the entry in the \\j^{\text{th}}\\ row
+    and the \\k^{\text{th}}\\ column indicates whether information
+    should be transferred from the \\j^{\text{th}}\\ to the
+    \\k^{\text{th}}\\ variable
+
+- foldid:
+
+  \\n_0\\-dimensional vector containing the fold identifiers
+
+- nfolds:
+
+  integer specifying the number of folds
+
+- lambda:
+
+  numeric scalar, or `NULL` (determined by cross-validation)
+
+## Details
+
+This function is called by
+[`corila()`](https://rauschenberger.github.io/corila/reference/corila.md).
+It calls
+[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+or [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
+an initial lasso, ridge, or elastic net regression,
+[`multiridge()`](https://rauschenberger.github.io/corila/reference/multiridge.md)
+for an initial multi-penalty ridge regression, or
+[`stats::cor()`](https://rdrr.io/r/stats/cor.html) for initial
+correlation coefficients.
+
+## Examples
+
+``` r
+n <- 20
+p <- 10
+x <- matrix(rnorm(n * p), nrow = n, ncol = p)
+beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
+y <- drop(x %*% beta)
+corila:::.estim_initial_coefs(x = x,
+                              y = y,
+                              family = "gaussian",
+                              alpha_init = "spearman",
+                              group = NULL,
+                              foldid = NULL,
+                              nfolds = 10,
+                              lambda = NULL)
+#> $coef
+#>  [1] -0.50676692  0.04060150  0.48872180  0.05714286 -0.26466165  0.41353383
+#>  [7]  0.04360902  0.23909774  0.49774436 -0.31127820
+#> 
+#> $lambda
+#> NULL
+#> 
+```

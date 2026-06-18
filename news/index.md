@@ -1,0 +1,9 @@
+# Changelog
+
+## corila 0.1.0 (2026-06-02)
+
+- first release
+
+## corila 0.0.1 (2025-09-24)
+
+- initial commit
