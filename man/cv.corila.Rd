@@ -14,7 +14,7 @@ cv.corila(
   family = "gaussian",
   nfolds = 10,
   cor = "spearman",
-  tune = "both",
+  tune = "weight",
   foldid = NULL
 )
 }
@@ -73,9 +73,26 @@ or \code{"kendall"};
 or \eqn{p \times p} correlation matrix}
 
 \item{tune}{character string for determining the candidate values
-for the hyperparameters
+for the hyperparameters:
+\itemize{
+\item "none":
+fixed weights and exponents
+(\code{wgt_local}=1, \code{exp_local}=1, \code{wgt_global}=0),
+no tuning
+\item "weight":
+fixed exponents (\code{exp_local}=0, \code{exp_global}=1),
+tuning \code{wgt_local}=1-\code{wgt_global}
+\item "exponent":
+fixed weights (\code{wgt_local}=1, \code{wgt_global}=0),
+tuning \code{exp_local}
+\item "bivariate":
+tuning \code{wgt_local}=1-\code{wgt_global} and \code{exp_local}=\code{exp_global}
+\item "factorial":
+tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
+}
+
 (to implement: list with slots
-\code{wgt_local}, \code{wgt_global}, \code{exp_local}, and \code{exp_global})}
+\code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global})}
 
 \item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
 }

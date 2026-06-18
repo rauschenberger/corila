@@ -608,59 +608,33 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 .set_candidates <- function(tune) {
   .assert(x = tune, type = "nominal")
-  #if (FALSE) {
-  #  cand <- seq(from = 0, to = 1, by = 0.1)
-  #  hyper <- data.frame(weight.local = cand,
-  #                      weight.global = 1 - cand,
-  #                      exp_local = 1,
-  #                      exp_global = 1)
-  #  cand <- seq(from = 0, to = 2, by = 0.2)
-  #  hyper <- data.frame(weight.local = 0,
-  #                      weight.global = 1,
-  #                      exp_local = 0,
-  #                      exp_global = cand)
-  #}
   if (identical(tune, "none")) {
     hyper <- data.frame(wgt_local = 1,
                         exp_local = 1,
                         wgt_global = 0,
                         exp_global = Inf)
-  } else if (identical(tune, "trial")) {
+  } else if (identical(tune, "weight")) {
     wgt_cand <- seq(from = 0, to = 1, by = 0.1)
     hyper <- data.frame(wgt_local = wgt_cand,
                         exp_local = 0,
                         wgt_global = 1 - wgt_cand,
                         exp_global = 1)
-  } else if (identical(tune, "wgt")) {
-    wgt_cand <- seq(from = 0, to = 1, by = 0.1) # for weighted sums
-    hyper <- data.frame(wgt_local = wgt_cand,
-                        exp_local = 1,
-                        wgt_global = 1 - wgt_cand,
-                        exp_global = 1)
-  } else if (identical(tune, "exp")) {
+  } else if (identical(tune, "exponent")) {
     exp_cand <- c(0, 0.1, 0.25, 1 / 3, 0.5, 1, 2, 3, 4, 10, Inf)
     hyper <- data.frame(wgt_local = 1,
                         exp_local = exp_cand,
                         wgt_global = 0,
-                        exp_global = exp_cand)
-  } else if (identical(tune, "sep")) {
-    exp_cand <- c(0.1, 0.5, 1, 2, 10)
-    hyper <- expand.grid(wgt_local = 0.5,
-                         exp_local = exp_cand,
-                         wgt_global = 0.5,
-                         exp_global = exp_cand)
-  } else if (identical(tune, "both")) {
-    #wgt_cand <- seq(from = 0, to = 1, by = 0.25) # original
-    wgt_cand <- seq(from = 0, to = 1, by = 0.1) # trial
+                        exp_global = Inf)
+  } else if (identical(tune, "bivariate")) {
+    wgt_cand <- seq(from = 0, to = 1, by = 0.1)
     hyper <- data.frame(wgt_local = wgt_cand,
                         exp_local = NA,
                         wgt_global = 1 - wgt_cand,
                         exp_global = NA)
-    #exp_cand <- c(0.1, 0.5, 1, 2, 10) # original
     exp_cand <- c(0.1, 0.5, 0.8, 1, 1.25, 2, 10)
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
     hyper$exp_local <- hyper$exp_global <- exp_cand
-  } else if (identical(tune, "all")) {
+  } else if (identical(tune, "factorial")) {
     wgt_cand <- seq(from = 0, to = 1, by = 0.25)
     exp_cand <- c(0.1, 0.5, 1, 2, 10)
     hyper <- expand.grid(wgt_local = wgt_cand,
@@ -668,11 +642,11 @@ predict.corila <- function(object, newx, index, s, ...) {
                          wgt_global = NA,
                          exp_global = exp_cand)
     hyper$wgt_global <- 1 - hyper$wgt_local
-    hyper$exp_local[hyper$wgt_local == 0] <- Inf
-    hyper$exp_global[hyper$wgt_global == 0] <- Inf
   } else {
     stop("Invalid value for argument 'tune'.")
   }
+  hyper$exp_local[hyper$wgt_local == 0] <- Inf
+  hyper$exp_global[hyper$wgt_global == 0] <- Inf
   hyper <- unique(hyper)
   rownames(hyper) <- seq_len(nrow(hyper))
   hyper
@@ -688,9 +662,24 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 #' @param tune
 #' character string for determining the candidate values
-#' for the hyperparameters
+#' for the hyperparameters:
+#' - "none":
+#' fixed weights and exponents
+#' (`wgt_local`=1, `exp_local`=1, `wgt_global`=0),
+#' no tuning
+#' - "weight":
+#' fixed exponents (`exp_local`=0, `exp_global`=1),
+#' tuning `wgt_local`=1-`wgt_global`
+#' - "exponent":
+#' fixed weights (`wgt_local`=1, `wgt_global`=0),
+#' tuning `exp_local`
+#' - "bivariate":
+#' tuning `wgt_local`=1-`wgt_global` and `exp_local`=`exp_global`
+#' - "factorial":
+#' tuning `wgt_local`, `exp_local`, `wgt_global`, `exp_global`
+#'
 #' (to implement: list with slots
-#' `wgt_local`, `wgt_global`, `exp_local`, and `exp_global`)
+#' `wgt_local`, `exp_local`, `wgt_global`, and `exp_global`)
 #'
 #' @inherit corila details
 #'
@@ -806,7 +795,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
-                      nfolds = 10, cor = "spearman", tune = "both",
+                      nfolds = 10, cor = "spearman", tune = "weight",
                       foldid = NULL) {
   # match arguments
   family <- match.arg(arg = tolower(family),

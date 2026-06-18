@@ -158,7 +158,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
 
 ## function ".set_candidates" --------------------------------------------------
 
-for (tune in c("none", "trial", "wgt", "exp", "sep", "both", "all")) {
+for (tune in c("none", "weight", "exponent", "bivariate", "factorial")) {
   hyper <- .set_candidates(tune = tune)
   testthat::test_that("candidate values", {
     labels <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
