@@ -1,4 +1,4 @@
-# Sparse Group Lasso
+# Sparse group lasso regression
 
 Optimises the parameters and the hyperparameters of the sparse group
 lasso.

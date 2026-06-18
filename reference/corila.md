@@ -1,4 +1,4 @@
-# Group lasso
+# Sparse group lasso regression (without cross-validation)
 
 Fits an initial ridge regression to obtain weights for an adaptive lasso
 regression that allows for heterogeneous, overlapping and unknown groups

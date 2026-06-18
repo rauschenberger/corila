@@ -9,7 +9,7 @@
 ## Sparse group lasso regression
 
 - [`cv.corila()`](https://rauschenberger.github.io/corila/reference/cv.corila.md)
-  : Sparse Group Lasso
+  : Sparse group lasso regression
 - [`coef(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/coef.cv.corila.md)
   : Extract coefficients
 - [`predict(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/predict.cv.corila.md)
@@ -17,7 +17,7 @@
 - [`print(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/print.cv.corila.md)
   : print (S3 method)
 - [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md)
-  : Group lasso
+  : Sparse group lasso regression (without cross-validation)
 - [`predict(`*`<corila>`*`)`](https://rauschenberger.github.io/corila/reference/predict.corila.md)
   : predict (S3 method)
 
@@ -62,6 +62,8 @@
   : Name (helper function)
 - [`.validate()`](https://rauschenberger.github.io/corila/reference/dot-validate.md)
   : Argument Check
+- [`print(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/print.cv.corila.md)
+  : print (S3 method)
 - [`simulate()`](https://rauschenberger.github.io/corila/reference/simulate.md)
   : Data simulation
 - [`summary(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
