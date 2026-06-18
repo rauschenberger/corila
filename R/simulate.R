@@ -287,6 +287,8 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 #' @seealso
 #' Use [simulate()] to simulate a predictor matrix,
 #' an effect vector, and an outcome vector.
+#' 
+#' @keywords internal
 #'
 #' @examples
 #' # simulate independent outcome
