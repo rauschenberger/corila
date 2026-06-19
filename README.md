@@ -33,9 +33,8 @@ Use the function [`cv.corila`](https://rauschenberger.github.io/corila/reference
 
 ``` r
 library(corila)
-data <- simulate()
-attach(data)
-object <- cv.corila(x = x_train, y = data$y_train, group = group, primary = primary)
+#load(toydata)
+object <- cv.corila(x = x_train, y = y_train, group = group, primary = primary)
 coef(object)
 predict(object, newx = x_test)
 ```
