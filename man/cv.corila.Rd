@@ -55,8 +55,7 @@ to use initial correlation coefficients
 (not implemented for \code{family="cox"}),
 \code{"multiridge"} for multi-penalty ridge regression
 with one penalty for each group
-(not implemented for \code{family="poisson"} or overlapping groups,
-falls back to \code{alpha_init=0} for \code{family="poisson"}),
+(not implemented for \code{family="poisson"} or overlapping groups),
 or \code{NA} to set all initial coefficients equal to 1}
 
 \item{alpha_final}{elastic net mixing parameter for final regression

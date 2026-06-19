@@ -43,23 +43,29 @@
   # --- check arguments ---
   methods <- c("pearson", "spearman", "kendall", "multiridge")
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
-  .assert(x = y, type = "numeric", dim = nrow(x))
+  n <- nrow(x)
+  p <- ncol(x)
+  .assert(x = y, type = "numeric", dim = n)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   if (is.character(alpha_init)) {
-    .assert(x = alpha_init, type = "nominal",
-            support = methods)
+    .assert(x = alpha_init, type = "nominal", support = methods)
   } else {
     .assert(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
-  .assert(x = foldid, type = "integer", dim = nrow(x),
-          min = 1, max = nrow(x))
-  .assert(x = nfolds, type = "integer", min = 2, max = nrow(x))
-  .assert(x = lambda, type = "numeric", min = 0)
+  .assert(x = foldid, type = "integer", dim = n,
+          min = 1, max = n)
+  .assert(x = nfolds, type = "integer", min = 2, max = n)
+  if (identical(alpha_init, "multiridge")) {
+    dim <- length(unique(group))
+  } else {
+    dim <- 1
+  }
+  .assert(x = lambda, type = "numeric", dim = dim, min = 0)
   # --- estimate initial coefficients ---
-  p <- ncol(x)
+  is_slope <- rep(c(FALSE, TRUE), times = c(family != "cox", p))
   if (all(is.na(alpha_init))) {
-    coef <- rep(x = 1, times = p) # Remove this confusing option?
+    coef <- rep(x = 1, times = p)
   } else if (is.character(alpha_init) && identical(alpha_init, "multiridge")) {
     if (is.null(lambda)) {
       model <- multiridge(x = x,
@@ -68,7 +74,7 @@
                           family = family,
                           foldid = foldid,
                           nfolds = nfolds)
-      coef <- stats::coef(object = model, s = "lambda.min")[-1]
+      coef <- stats::coef(object = model)[is_slope]
       lambda <- model$penalties
     } else {
       model <- multiridge(x = x,
@@ -76,7 +82,7 @@
                           z = group,
                           family = family,
                           penalties = lambda)
-      coef <- stats::coef(object = model)[-1]
+      coef <- stats::coef(object = model)[is_slope]
     }
   } else if (is.character(alpha_init) && alpha_init %in% methods) {
     coef <- stats::cor(x = x,
@@ -85,7 +91,6 @@
                        use = "pairwise.complete")
     coef[is.na(coef)] <- 0
   } else if (is.numeric(alpha_init) && alpha_init >= 0 && alpha_init <= 1) {
-    cond <- rep(c(FALSE, TRUE), times = c(family != "cox", p))
     if (is.null(lambda)) {
       model <- glmnet::cv.glmnet(x = x,
                                  y = y,
@@ -93,21 +98,20 @@
                                  alpha = alpha_init,
                                  foldid = foldid,
                                  nfolds = nfolds)
-      coef <- stats::coef(object = model, s = "lambda.min")[cond]
+      coef <- stats::coef(object = model, s = "lambda.min")[is_slope]
       lambda <- model$lambda.min
     } else {
       model <- glmnet::glmnet(x = x,
                               y = y,
                               family = family,
                               alpha = alpha_init)
-      coef <- stats::coef(object = model, s = lambda)[cond]
+      coef <- stats::coef(object = model, s = lambda)[is_slope]
     }
   } else {
     stop("Invalid value for argument 'alpha_init'.")
   }
   list(coef = drop(coef), lambda = lambda)
 }
-
 
 # --- check arguments ---
 #' @title
@@ -332,8 +336,7 @@
 #' (not implemented for `family="cox"`),
 #' `"multiridge"` for multi-penalty ridge regression
 #' with one penalty for each group
-#' (not implemented for `family="poisson"` or overlapping groups,
-#' falls back to `alpha_init=0` for `family="poisson"`),
+#' (not implemented for `family="poisson"` or overlapping groups),
 #' or `NA` to set all initial coefficients equal to 1
 #'
 #' @param alpha_final

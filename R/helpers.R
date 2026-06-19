@@ -86,7 +86,8 @@
     "expected no missing values" =
       na.rm || !anyNA(x),
     "expected numeric values" =
-      !type %in% c("numeric", "integer") || is.numeric(x),
+      !type %in% c("numeric", "integer") ||
+      is.numeric(x) || (na.rm && all(is.na(x))),
     "expected integer values" =
       type != "integer" || all(x %% 1 == 0, na.rm = TRUE),
     "expected nominal values" =
