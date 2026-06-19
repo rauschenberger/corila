@@ -28,8 +28,6 @@ reference:
   - coef.cv.corila
   - predict.cv.corila
   - print.cv.corila
-  - corila
-  - predict.corila
 - title: "Multi-penalty ridge regression"
   contents:
   - multiridge
