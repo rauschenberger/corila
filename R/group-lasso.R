@@ -419,18 +419,27 @@
 #' # model fitting
 #' hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
 #'                     exp_global = 1, wgt_global = 0.5)
-#' object <- corila(x, y, group, primary, family = "gaussian", hyper = hyper)
+#' object <- corila(x = x,
+#'                  y = y,
+#'                  group = group,
+#'                  primary = primary,
+#'                  family = "gaussian",
+#'                  alpha_init = 0,
+#'                  alpha_final = 1,
+#'                  cor = "spearman",
+#'                  foldid = NULL,
+#'                  nfolds = 10,
+#'                  hyper = hyper,
+#'                  lambda_init = NULL)
 #'
 #' y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 #' }
 #'
-#' @keywords methods models regression classif
+#' @keywords internal
 #'
-#' @export
-#'
-corila <- function(x, y, group, primary, family, hyper, alpha_init = 0,
-                   alpha_final = 1, cor = "spearman", foldid = NULL,
-                   nfolds = 10, lambda_init = NULL, threshold = 0) {
+corila <- function(x, y, group, primary, family, hyper, alpha_init,
+                   alpha_final, cor, foldid,
+                   nfolds, lambda_init, threshold = 0) {
   args <- .validate(
     x = x,
     y = y,
@@ -570,9 +579,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init = 0,
 #'
 #' @inherit corila examples
 #'
-#' @keywords methods
+#' @keywords internal
 #'
-#' @export
 predict.corila <- function(object, newx, index, s, ...) {
   # --- check arguments ---
   .assert(x = newx, type = "numeric",
@@ -807,8 +815,8 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
     cor <- match.arg(arg = tolower(cor),
                      choices = c("pearson", "spearman", "kendall"))
   }
-  # set default parameters
   #.validate(x = x, y = y, group = group, family = family)
+  # set default parameters
   if (is.null(primary)) {
     primary <- rep(x = TRUE, times = ncol(x))
   }
@@ -821,12 +829,14 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                        y = y,
                        group = group,
                        primary = primary,
+                       family = family,
                        alpha_init = alpha_init,
                        alpha_final = alpha_final,
-                       family = family,
                        cor = cor,
                        foldid = foldid,
-                       hyper = hyper)
+                       nfolds = NULL,
+                       hyper = hyper,
+                       lambda_init = NULL)
   lambda <- lapply(X = object_ext$model, FUN = function(x) x$lambda)
   # initialise matrices for predictions
   pred <- list()
@@ -842,10 +852,12 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                          y = y[foldid != i],
                          group = group,
                          primary = primary,
+                         family = family,
                          alpha_init = alpha_init,
                          alpha_final = alpha_final,
-                         family = family,
                          cor = cor,
+                         foldid = NULL,
+                         nfolds = NULL,
                          hyper = hyper,
                          lambda_init = object_ext$lambda_init)
     for (j in seq_len(nrow(hyper))) {
@@ -946,6 +958,7 @@ print.cv.corila <- function(x, ...) {
 #' [print.cv.corila()]
 #'
 #' @export
+#'
 summary.cv.corila <- function(object, ...) {
   list <- list()
   list$family <- object$args$family
