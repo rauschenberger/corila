@@ -19,11 +19,14 @@ remotes::install_github("rauschenberger/corila")
 
 ## Usage
 
-Use the function `cv.corila` to model an outcome (`n`-dimensional vector
-*y*) based on many predictors (`n x p` matrix *X*) that are structured
-by groups (e.g., `p`-dimensional vector `group`) and potentially split
-into primary and auxiliary predictors (`p`-dimensional vector
-`primary`). See the vignette for detailed examples.
+Use the function
+[`cv.corila`](https://rauschenberger.github.io/corila/reference/cv.corila.html)
+to model an outcome (`n`-dimensional vector *y*) based on many
+predictors (`n x p` matrix *X*) that are structured by groups (e.g.,
+`p`-dimensional vector `group`) and potentially split into primary and
+auxiliary predictors (`p`-dimensional vector `primary`). See the
+[vignette](https://rauschenberger.github.io/corila/articles/vignette.html)
+for detailed examples.
 
 ``` r
 
