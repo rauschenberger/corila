@@ -111,7 +111,7 @@
 
 # --- check arguments ---
 #' @title
-#' Argument Check
+#' Argument check
 #'
 #' @description
 #' Checks arguments of functions [corila()] and [cv.corila()].
@@ -216,7 +216,7 @@
 }
 
 #' @title
-#' Adjacency
+#' Adjacency indicator
 #'
 #' @description
 #' Identifies adjacent predictors.
@@ -587,10 +587,10 @@ predict.corila <- function(object, newx, index, s, ...) {
 }
 
 #' @title
-#' Candidate Values
+#' Candidate values
 #'
 #' @description
-#' Set candidate values for hyperparameters.
+#' Sets candidate values for hyperparameters.
 #'
 #' @inheritParams cv.corila
 #'
@@ -910,7 +910,7 @@ print.cv.corila <- function(x, ...) {
 }
 
 #' @title
-#' Summarising Sparse Group Lasso (S3 method)
+#' Summarising sparse group lasso (S3 method)
 #'
 #' @description
 #' Summary method for class `"cv.corila"`.
@@ -963,7 +963,7 @@ summary.cv.corila <- function(object, ...) {
 }
 
 #' @title
-#' Name (helper function)
+#' Name method (helper function)
 #'
 #' @description
 #' Names the method used for obtaining initial or final coefficients.

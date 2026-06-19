@@ -2,7 +2,7 @@
 % Please edit documentation in R/group-ridge.R
 \name{predict.multiridge}
 \alias{predict.multiridge}
-\title{Make Predictions}
+\title{Make predictions}
 \usage{
 \method{predict}{multiridge}(object, newx, ...)
 }

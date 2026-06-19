@@ -2,7 +2,7 @@
 #----- group-ridge -----
 
 #' @title
-#' Multi-Penalty Ridge Regression
+#' Multi-penalty ridge regression
 #'
 #' @description
 #' Fits multi-penalty ridge regression
@@ -241,7 +241,7 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
 }
 
 #' @title
-#' Make Predictions
+#' Make predictions
 #'
 #' @description
 #' Makes predictions from a multi-penalty ridge regression model.
@@ -295,7 +295,7 @@ predict.multiridge <- function(object, newx, ...) {
 }
 
 #' @title
-#' Extract Coefficients
+#' Extract coefficients
 #'
 #' @description
 #' Extracts coefficients from a multi-penalty ridge regression model.

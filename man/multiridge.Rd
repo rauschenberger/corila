@@ -2,7 +2,7 @@
 % Please edit documentation in R/group-ridge.R
 \name{multiridge}
 \alias{multiridge}
-\title{Multi-Penalty Ridge Regression}
+\title{Multi-penalty ridge regression}
 \usage{
 multiridge(
   x,

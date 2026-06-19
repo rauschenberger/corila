@@ -2,7 +2,7 @@
 % Please edit documentation in R/group-lasso.R
 \name{.is_adjacent}
 \alias{.is_adjacent}
-\title{Adjacency}
+\title{Adjacency indicator}
 \usage{
 .is_adjacent(group, j, p, names)
 }

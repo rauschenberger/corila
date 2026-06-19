@@ -2,7 +2,7 @@
 % Please edit documentation in R/group-lasso.R
 \name{.set_candidates}
 \alias{.set_candidates}
-\title{Candidate Values}
+\title{Candidate values}
 \usage{
 .set_candidates(tune)
 }
@@ -37,7 +37,7 @@ and the slots \code{"wgt_global"} and \code{"exp_global"}
 for the global prior information.
 }
 \description{
-Set candidate values for hyperparameters.
+Sets candidate values for hyperparameters.
 }
 \examples{
 corila:::.set_candidates(tune = "none")

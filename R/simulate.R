@@ -4,7 +4,7 @@
 # Functions for the manuscript are in the folder "scripts".
 
 #' @title
-#' Calculates precision for sign variable
+#' Precision for sign variable
 #'
 #' @description
 #' Calculates precision for ternary variables with support \eqn{\{-1, 0, 1\}},

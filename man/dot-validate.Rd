@@ -2,7 +2,7 @@
 % Please edit documentation in R/group-lasso.R
 \name{.validate}
 \alias{.validate}
-\title{Argument Check}
+\title{Argument check}
 \usage{
 .validate(
   x,

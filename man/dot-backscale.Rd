@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{.backscale}
 \alias{.backscale}
-\title{Inverse Standardisation}
+\title{Inverse standardisation}
 \usage{
 .backscale(pars, y = NULL, coef = NULL)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/group-lasso.R
 \name{.type}
 \alias{.type}
-\title{Name (helper function)}
+\title{Name method (helper function)}
 \usage{
 .type(alpha)
 }

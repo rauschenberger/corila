@@ -2,7 +2,7 @@
 % Please edit documentation in R/group-ridge.R
 \name{coef.multiridge}
 \alias{coef.multiridge}
-\title{Extract Coefficients}
+\title{Extract coefficients}
 \usage{
 \method{coef}{multiridge}(object, ...)
 }

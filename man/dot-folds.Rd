@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{.folds}
 \alias{.folds}
-\title{Fold Identifiers}
+\title{Fold identifiers}
 \usage{
 .folds(y, family, nfolds)
 }

@@ -3,7 +3,7 @@
 \name{summary.cv.corila}
 \alias{summary.cv.corila}
 \alias{print.summary.cv.corila}
-\title{Summarising Sparse Group Lasso (S3 method)}
+\title{Summarising sparse group lasso (S3 method)}
 \usage{
 \method{summary}{cv.corila}(object, ...)
 

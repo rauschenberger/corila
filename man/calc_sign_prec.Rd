@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate.R
 \name{calc_sign_prec}
 \alias{calc_sign_prec}
-\title{Calculates precision for sign variable}
+\title{Precision for sign variable}
 \usage{
 calc_sign_prec(truth, estim)
 }

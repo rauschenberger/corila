@@ -216,7 +216,7 @@
 }
 
 #' @title
-#' Inverse Standardisation
+#' Inverse standardisation
 #'
 #' @description
 #' Transforms response variable back to original scale
@@ -367,7 +367,7 @@
 }
 
 #' @title
-#' Fold Identifiers
+#' Fold identifiers
 #'
 #' @description
 #' Splits observations into balanced and stratified folds.
