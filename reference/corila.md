@@ -76,9 +76,8 @@ corila(
   use initial correlation coefficients (not implemented for
   `family="cox"`), `"multiridge"` for multi-penalty ridge regression
   with one penalty for each group (not implemented for
-  `family="poisson"` or overlapping groups, falls back to `alpha_init=0`
-  for `family="poisson"`), or `NA` to set all initial coefficients equal
-  to 1
+  `family="poisson"` or overlapping groups), or `NA` to set all initial
+  coefficients equal to 1
 
 - alpha_final:
 
