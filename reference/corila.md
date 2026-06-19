@@ -14,12 +14,12 @@ corila(
   primary,
   family,
   hyper,
-  alpha_init = 0,
-  alpha_final = 1,
-  cor = "spearman",
-  foldid = NULL,
-  nfolds = 10,
-  lambda_init = NULL,
+  alpha_init,
+  alpha_final,
+  cor,
+  foldid,
+  nfolds,
+  lambda_init,
   threshold = 0
 )
 ```
@@ -168,8 +168,21 @@ y <- rnorm(n = n)
 # model fitting
 hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
                     exp_global = 1, wgt_global = 0.5)
-object <- corila(x, y, group, primary, family = "gaussian", hyper = hyper)
+object <- corila(x = x,
+                 y = y,
+                 group = group,
+                 primary = primary,
+                 family = "gaussian",
+                 alpha_init = 0,
+                 alpha_final = 1,
+                 cor = "spearman",
+                 foldid = NULL,
+                 nfolds = 10,
+                 hyper = hyper,
+                 lambda_init = NULL)
+#> Error in corila(x = x, y = y, group = group, primary = primary, family = "gaussian",     alpha_init = 0, alpha_final = 1, cor = "spearman", foldid = NULL,     nfolds = 10, hyper = hyper, lambda_init = NULL): could not find function "corila"
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
+#> Error: object 'object' not found
 # }
 ```
