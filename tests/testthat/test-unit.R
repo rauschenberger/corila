@@ -273,3 +273,56 @@ testthat::test_that("adjacency is detected", {
          expected = cond[[1]],
          check.attributes = FALSE)
 })
+
+## function ".estim_initial_coefs" ---------------------------------------------
+
+testthat::test_that("initial coefficients are estimated", {
+  family <- c("gaussian", "binomial", "poisson", "cox")
+  alpha <- list(0, 0.5, 1, "pearson", "spearman", "kendall", "multiridge", NA)
+  n <- 20
+  p <- 10
+  x <- matrix(rnorm(n * p), nrow = n, ncol = p)
+  group <- rep(1:4, times = c(3, 3, 2, 2))
+  beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
+  for (i in seq_along(family)) {
+    for (j in seq_along(alpha)) {
+      if (identical(family[i], "poisson") &
+            identical(alpha[[j]][1], "multiridge")) {
+        next
+      }
+      if (identical(family[i], "cox")
+          & alpha[[j]][1] %in% c("pearson", "spearman", "kendall")) {
+        next
+      }
+      y <- .simulate_outcome(family = family[i], x = x, beta = beta)
+      init <- list()
+      for (k in 1:2) {
+        if (k == 1) {
+          lambda <- NULL
+        } else {
+          lambda <- init[[1]]$lambda
+        }
+        init[[k]] <- .estim_initial_coefs(
+          x = x,
+          y = y,
+          family = family[i],
+          alpha_init = alpha[[j]][1],
+          group = group,
+          foldid = NULL,
+          nfolds = 10,
+          lambda = lambda
+        )
+      }
+      testthat::expect_identical(object = init[[1]], expected = init[[2]])
+      testthat::expect_length(object = init[[1]]$coef, n = p)
+      if (identical(alpha[[j]][1], "multiridge")) {
+        length <- length(unique(group))
+      } else if (is.character(alpha[[j]][1]) | is.na(alpha[[j]][1])) {
+        length <- 0
+      } else {
+        length <- 1
+      }
+      testthat::expect_length(object = init[[1]]$lambda, n = length)
+    }
+  }
+})
