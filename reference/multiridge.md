@@ -1,4 +1,4 @@
-# Multi-Penalty Ridge Regression
+# Multi-penalty ridge regression
 
 Fits multi-penalty ridge regression (tuning regularisation
 hyperparameters and estimating regression coefficients). This is a

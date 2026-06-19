@@ -1,4 +1,4 @@
-# Make Predictions
+# Make predictions
 
 Makes predictions from a multi-penalty ridge regression model.
 

@@ -48,7 +48,7 @@ variables. The \\p\\-dimensional character vector `group` indicates the
 predictor group. We set the correlation between two predictors to
 \\0.5\\ if they are in the same group, and otherwise to \\0\\.
 Simulation from a multivariate Gaussian distribution leads to the
-\\(n_0+n_1) \times p\\ numerical matrix \\\boldsymbol{X}\\.
+\\(n_0+n_1) \times p\\ numerical matrix `x`.
 
 ``` r
 
@@ -59,11 +59,10 @@ diag(sigma) <- 1
 x <- MASS::mvrnorm(n = n0 + n1, mu = mu, Sigma = sigma)
 ```
 
-Here we simulate the \\p\\-dimensional effect vector
-\\\boldsymbol{\beta}\\, and the \\n\\-dimensional response vector
-\\\boldsymbol{y}\\. For each group, all coefficients either equal zero
-(with probability \\90\\\\) or are drawn from the folded standard
-Gaussian distribution (with probability \\10\\\\).
+Here we simulate the \\p\\-dimensional effect vector `beta`, and the
+\\n\\-dimensional response vector `y`. For each group, all coefficients
+either equal zero (with probability \\90\\\\) or are drawn from the
+folded standard Gaussian distribution (with probability \\10\\\\).
 
 ``` r
 
@@ -75,14 +74,12 @@ y <- stats::rnorm(n = 1) + x %*% beta + stats::rnorm(n = n0 + n1)
 ## Model fitting
 
 Model fitting is done as in the R package `glmnet`. But next to the
-\\n_0 \times p\\ predictor matrix \\\boldsymbol{X}\_{\text{train}}\\ and
-the \\n_0\\-dimensional response vector
-\\\boldsymbol{y}\_{\text{train}}\\, it also requires the
-\\p\\-dimensional group vector `group`. If this argument is set to
-`NULL`, information exchange is only based on the correlation (not on
-the grouping). This is for the Gaussian family, but the proposed method
-also allows for the binomial and Poisson families as well as the Cox
-model.
+\\n_0 \times p\\ predictor matrix `x_train` and the \\n_0\\-dimensional
+response vector `y_train`, it also requires the \\p\\-dimensional group
+vector `group`. If this argument is set to `NULL`, information exchange
+is only based on the correlation (not on the grouping). This is for the
+Gaussian family, but the proposed method also allows for the binomial
+and Poisson families as well as the Cox model.
 
 ``` r
 
@@ -99,7 +96,8 @@ object$corila <- cv.corila(x = x[!holdout, ],
 ## Extracting coefficients and making predictions
 
 The S3 methods `coef` and `predict` can be used for extracting
-coefficients and making predictions.
+coefficients and obtaining predicted values based on the \\n_1 \times
+p\\ predictor matrix `x_test`.
 
 ``` r
 
@@ -142,19 +140,15 @@ information with with the \\j^{\text{th}}\\ predictor but not vice
 versa), this requires an adjacency matrix (with a unit diagonal).
 
 \\ \begin{array}{ccc} \text{vector of group labels} & \text{list of
-predictor labels} & \text{adjacency matrix} \\ \begin{array}{ccccc}
-{\color{gray}{x_1}} & {\color{gray}{x_2}} & {\color{gray}{x_3}} &
-{\color{gray}{x_4}} & {\color{gray}{x_5}} \\ \hline \text{A} & \text{A}
-& \text{B} & \text{B} & \text{C} \end{array} & \begin{array}{ccl}
-{\color{gray}{\text{A}}} & \| & \begin{array}{cc} x_1 & x_2 \end{array}
-\\ {\color{gray}{\text{B}}} & \| & \begin{array}{cc} x_3 & x_4
-\end{array} \\ {\color{gray}{\text{C}}} & \| & \begin{array}{c} x_5
-\end{array} \\ \end{array} & \begin{array}{c\|ccccc} ~ &
-{\color{gray}{x_1}} & {\color{gray}{x_2}} & {\color{gray}{x_3}} &
-{\color{gray}{x_4}} & {\color{gray}{x_5}} \\ \hline {\color{gray}{x_1}}
-& 1 & 1 & 0 & 0 & 0 \\ {\color{gray}{x_2}} & 1 & 1 & 0 & 0 & 0 \\
-{\color{gray}{x_3}} & 0 & 0 & 1 & 1 & 0 \\ {\color{gray}{x_4}} & 0 & 0 &
-1 & 1 & 0 \\ {\color{gray}{x_5}} & 0 & 0 & 0 & 0 & 1 \\ \end{array}
+predictor labels} & \text{adjacency matrix} \\ \begin{array}{ccccc} x_1
+& x_2 & x_3 & x_4 & x_5 \\ \hline \text{A} & \text{A} & \text{B} &
+\text{B} & \text{C} \end{array} & \begin{array}{ccl} \text{A} & \| &
+\begin{array}{cc} x_1 & x_2 \end{array} \\ \text{B} & \| &
+\begin{array}{cc} x_3 & x_4 \end{array} \\ \text{C} & \| &
+\begin{array}{c} x_5 \end{array} \\ \end{array} &
+\begin{array}{c\|ccccc} ~ & x_1 & x_2 & x_3 & x_4 & x_5 \\ \hline x_1 &
+1 & 1 & 0 & 0 & 0 \\ x_2 & 1 & 1 & 0 & 0 & 0 \\ x_3 & 0 & 0 & 1 & 1 & 0
+\\ x_4 & 0 & 0 & 1 & 1 & 0 \\ x_5 & 0 & 0 & 0 & 0 & 1 \\ \end{array}
 \end{array} \\
 
 ``` r

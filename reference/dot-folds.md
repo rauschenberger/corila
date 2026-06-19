@@ -1,4 +1,4 @@
-# Fold Identifiers
+# Fold identifiers
 
 Splits observations into balanced and stratified folds.
 

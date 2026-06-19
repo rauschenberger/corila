@@ -1,4 +1,4 @@
-# Name (helper function)
+# Name method (helper function)
 
 Names the method used for obtaining initial or final coefficients.
 

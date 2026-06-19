@@ -1,4 +1,4 @@
-# Summarising Sparse Group Lasso (S3 method)
+# Summarising sparse group lasso (S3 method)
 
 Summary method for class `"cv.corila"`.
 

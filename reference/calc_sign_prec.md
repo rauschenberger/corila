@@ -1,4 +1,4 @@
-# Calculates precision for sign variable
+# Precision for sign variable
 
 Calculates precision for ternary variables with support \\\\-1, 0,
 1\\\\, i.e., the proportion of positive or negative estimated signs that

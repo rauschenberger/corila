@@ -1,4 +1,4 @@
-# Extract Coefficients
+# Extract coefficients
 
 Extracts coefficients from a multi-penalty ridge regression model.
 

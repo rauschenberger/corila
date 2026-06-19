@@ -24,20 +24,20 @@
 ## Multi-penalty ridge regression
 
 - [`multiridge()`](https://rauschenberger.github.io/corila/reference/multiridge.md)
-  : Multi-Penalty Ridge Regression
+  : Multi-penalty ridge regression
 - [`coef(`*`<multiridge>`*`)`](https://rauschenberger.github.io/corila/reference/coef.multiridge.md)
-  : Extract Coefficients
+  : Extract coefficients
 - [`predict(`*`<multiridge>`*`)`](https://rauschenberger.github.io/corila/reference/predict.multiridge.md)
-  : Make Predictions
+  : Make predictions
 
 ## Internal functions
 
 - [`calc_sign_prec()`](https://rauschenberger.github.io/corila/reference/calc_sign_prec.md)
-  : Calculates precision for sign variable
+  : Precision for sign variable
 - [`.assert()`](https://rauschenberger.github.io/corila/reference/dot-assert.md)
   : Assertions
 - [`.backscale()`](https://rauschenberger.github.io/corila/reference/dot-backscale.md)
-  : Inverse Standardisation
+  : Inverse standardisation
 - [`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/dot-combine_slopes.md)
   : Combine coefficients
 - [`.deviance()`](https://rauschenberger.github.io/corila/reference/dot-deviance.md)
@@ -47,25 +47,25 @@
 - [`.expand_auxiliary()`](https://rauschenberger.github.io/corila/reference/dot-expand_auxiliary.md)
   : Expand auxiliary features
 - [`.folds()`](https://rauschenberger.github.io/corila/reference/dot-folds.md)
-  : Fold Identifiers
+  : Fold identifiers
 - [`.forescale()`](https://rauschenberger.github.io/corila/reference/dot-forescale.md)
   : Standardisation
 - [`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/dot-is_adjacent.md)
-  : Adjacency
+  : Adjacency indicator
 - [`.mean_function()`](https://rauschenberger.github.io/corila/reference/dot-mean_function.md)
   : Mean function
 - [`.set_candidates()`](https://rauschenberger.github.io/corila/reference/dot-set_candidates.md)
-  : Candidate Values
+  : Candidate values
 - [`.simulate_outcome()`](https://rauschenberger.github.io/corila/reference/dot-simulate_outcome.md)
   : Simulate outcome
 - [`.type()`](https://rauschenberger.github.io/corila/reference/dot-type.md)
-  : Name (helper function)
+  : Name method (helper function)
 - [`.validate()`](https://rauschenberger.github.io/corila/reference/dot-validate.md)
-  : Argument Check
+  : Argument check
 - [`print(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/print.cv.corila.md)
   : print (S3 method)
 - [`simulate()`](https://rauschenberger.github.io/corila/reference/simulate.md)
   : Data simulation
 - [`summary(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
   [`print(`*`<summary.cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
-  : Summarising Sparse Group Lasso (S3 method)
+  : Summarising sparse group lasso (S3 method)

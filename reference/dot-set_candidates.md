@@ -1,6 +1,6 @@
-# Candidate Values
+# Candidate values
 
-Set candidate values for hyperparameters.
+Sets candidate values for hyperparameters.
 
 ## Usage
 

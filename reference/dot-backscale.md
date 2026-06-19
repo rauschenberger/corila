@@ -1,4 +1,4 @@
-# Inverse Standardisation
+# Inverse standardisation
 
 Transforms response variable back to original scale or transforms
 coefficients for predictor variables and response variable on original

@@ -1,4 +1,4 @@
-# Argument Check
+# Argument check
 
 Checks arguments of functions
 [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md)

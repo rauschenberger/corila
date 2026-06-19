@@ -1,4 +1,4 @@
-# Adjacency
+# Adjacency indicator
 
 Identifies adjacent predictors.
 
