@@ -2,6 +2,7 @@
 
 S3method(coef,cv.corila)
 S3method(coef,multiridge)
+S3method(predict,corila)
 S3method(predict,cv.corila)
 S3method(predict,multiridge)
 S3method(print,cv.corila)

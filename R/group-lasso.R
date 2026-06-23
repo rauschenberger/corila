@@ -432,7 +432,7 @@
 #'                           hyper = hyper,
 #'                           lambda_init = NULL)
 #'
-#' y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
+#' y_hat <- predict(object, newx = x, index = 1, s = 0)
 #' }
 #'
 #' @keywords internal
@@ -579,7 +579,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'
 #' @inherit corila examples
 #'
-#' @keywords internal
+#' @export
 #'
 predict.corila <- function(object, newx, index, s, ...) {
   # --- check arguments ---
