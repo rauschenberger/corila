@@ -41,18 +41,18 @@ y <- rnorm(n = n)
 # model fitting
 hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
                     exp_global = 1, wgt_global = 0.5)
-object <- corila::corila(x = x,
-                         y = y,
-                         group = group,
-                         primary = primary,
-                         family = "gaussian",
-                         alpha_init = 0,
-                         alpha_final = 1,
-                         cor = "spearman",
-                         foldid = NULL,
-                         nfolds = 10,
-                         hyper = hyper,
-                         lambda_init = NULL)
+object <- corila:::corila(x = x,
+                          y = y,
+                          group = group,
+                          primary = primary,
+                          family = "gaussian",
+                          alpha_init = 0,
+                          alpha_final = 1,
+                          cor = "spearman",
+                          foldid = NULL,
+                          nfolds = 10,
+                          hyper = hyper,
+                          lambda_init = NULL)
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 }
