@@ -68,10 +68,9 @@ Estimate initial coefficients.
 This function is called by
 [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md).
 It calls
-[`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-or
-[`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-for an initial lasso, ridge, or elastic net regression,
+[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+or [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
+an initial lasso, ridge, or elastic net regression,
 [`multiridge()`](https://rauschenberger.github.io/corila/reference/multiridge.md)
 for an initial multi-penalty ridge regression, or
 [`stats::cor()`](https://rdrr.io/r/stats/cor.html) for initial

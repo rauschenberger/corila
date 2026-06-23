@@ -148,10 +148,9 @@ for splitting samples into folds,
 for obtaining initial coefficients,
 [`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/dot-is_adjacent.md)
 for identifying adjacent predictors, and
-[`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-and
-[`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-for adaptive lasso regression.
+[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+and [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
+adaptive lasso regression.
 
 ## Examples
 
@@ -168,19 +167,19 @@ y <- rnorm(n = n)
 # model fitting
 hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
                     exp_global = 1, wgt_global = 0.5)
-object <- corila(x = x,
-                 y = y,
-                 group = group,
-                 primary = primary,
-                 family = "gaussian",
-                 alpha_init = 0,
-                 alpha_final = 1,
-                 cor = "spearman",
-                 foldid = NULL,
-                 nfolds = 10,
-                 hyper = hyper,
-                 lambda_init = NULL)
-#> Error in corila(x = x, y = y, group = group, primary = primary, family = "gaussian",     alpha_init = 0, alpha_final = 1, cor = "spearman", foldid = NULL,     nfolds = 10, hyper = hyper, lambda_init = NULL): could not find function "corila"
+object <- corila::corila(x = x,
+                         y = y,
+                         group = group,
+                         primary = primary,
+                         family = "gaussian",
+                         alpha_init = 0,
+                         alpha_final = 1,
+                         cor = "spearman",
+                         foldid = NULL,
+                         nfolds = 10,
+                         hyper = hyper,
+                         lambda_init = NULL)
+#> Error: 'corila' is not an exported object from 'namespace:corila'
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 #> Error: object 'object' not found
