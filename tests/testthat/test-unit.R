@@ -39,6 +39,9 @@ testthat::test_that("forescale and backscale work", {
                family = family)
   temp <- .backscale(pars = pars, coef = coef)$coef
   testthat::expect_equal(object = temp, expected = coef)
+  testthat::expect_true(all(is.finite(temp)))
+  testthat::expect_type(object = temp, type = "double")
+  testthat::expect_length(object = temp, n = p)
 })
 
 ## function ".type" ------------------------------------------------------------
@@ -79,14 +82,25 @@ testthat::test_that("primary predictors are equal", {
 testthat::test_that("auxiliary features are zero", {
   testthat::expect_setequal(object = x_expanded[, !primary], expected = 0)
 })
+testthat::test_that("expanded features are finite", {
+  testthat::expect_type(object = x_expanded, type = "double")
+  testthat::expect_true(all(is.finite(x_expanded)))
+  testthat::expect_length(object = x_expanded, n = n * p)
+})
 
 ## function ".combine_slopes" --------------------------------------------------
 
 set.seed(1)
+p <- 10
 alpha <- stats::rnorm(1)
-temp <- stats::rnorm(10)
+temp <- stats::rnorm(p)
 beta <- pmax(c(temp, -temp), 0)
 coef <- .combine_slopes(alpha = alpha, beta = beta)
+testthat::test_that("coefficients are finite", {
+  testthat::expect_type(object = coef, type = "double")
+  testthat::expect_true(all(is.finite(coef)))
+  testthat::expect_length(object = coef, n = p + 1)
+})
 testthat::test_that("intercept does not change", {
   testthat::expect_identical(object = coef[1], expected = alpha)
 })
@@ -114,10 +128,17 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
     time <- pmin(time_survival, time_censoring)
     event <- 1 * (time_survival <= time_censoring)
     y <- survival::Surv(time = time, event = event)
+    y_hat <- stats::rexp(n = n, rate = 1)
   } else if (family == "gamma") {
     y <- stats::rgamma(n = n, shape = 0.5)
     y_hat <- stats::rgamma(n = n, shape = 0.5)
   }
+  testthat::test_that("deviance is finite", {
+    testthat::skip_if(family == "gamma")
+    deviance <- .deviance(y = y, y_hat = y_hat, family = family)
+    testthat::expect_type(object = deviance, type = "double")
+    testthat::expect_true(all(is.finite(deviance)))
+  })
   testthat::test_that("imperfect predictions lead to positive deviance", {
     testthat::skip_if(family == "gamma")
     deviance <- .deviance(y = y, y_hat = y_hat, family = family)
@@ -128,7 +149,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
     deviance <- .deviance(y = y, y_hat = y, family = family)
     testthat::expect_identical(object = deviance, expected = 0)
   })
-  testthat::test_that("worse predictions increase deviance", {
+  testthat::test_that("worse predictions increase cox deviance", {
     testthat::skip_if(family != "cox")
     # NB: inversion due to "higher risk = shorter time"
     dev_best <- .deviance(y = y,
@@ -162,6 +183,7 @@ for (tune in c("none", "weight", "exponent", "bivariate", "factorial")) {
   hyper <- .set_candidates(tune = tune)
   testthat::test_that("candidate values", {
     labels <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
+    testthat::expect_type(object = hyper, type = "list")
     testthat::expect_equal(object = names(hyper), expected = labels)
     testthat::expect_gte(object = min(hyper), expected = 0)
     testthat::expect_identical(object = hyper, expected = unique(hyper))
@@ -177,6 +199,8 @@ testthat::test_that("mean function works", {
   eta <- stats::rnorm(n = n)
   for (family in c("gaussian", "binomial", "poisson", "cox")) {
     mean <- .mean_function(x = eta, family = family)
+    testthat::expect_type(object = mean, type = "double")
+    testthat::expect_true(all(is.finite(mean)))
     testthat::expect_length(object = mean, n = n)
     cor <- stats::cor(mean, eta, method = "spearman")
     testthat::expect_equal(object = cor, expected = 1)
@@ -194,6 +218,13 @@ testthat::test_that("mean function works", {
 set.seed(1)
 truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
+
+testthat::test_that("precision is finite scalar", {
+  prec <- calc_sign_prec(truth = truth, estim = estim)
+  testthat::expect_type(object = prec, type = "double")
+  testthat::expect_length(object = prec, n = 1)
+  testthat::expect_true(all(is.finite(deviance)))
+})
 
 testthat::test_that("precision equals zero if all signs are inverted", {
   prec <- calc_sign_prec(truth = truth, estim = -truth)
@@ -237,6 +268,11 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     index <- y[, "status"]
   }
   foldid <- .folds(y = y, family = family, nfolds = 10)
+  testthat::test_that("fold identifiers are in finite vector", {
+    testthat::expect_type(object = foldid, type = "integer")
+    testthat::expect_length(object = foldid, n = n)
+    testthat::expect_true(all(is.finite(foldid)))
+  })
   diff <- tapply(X = foldid,
                  INDEX = index,
                  FUN = function(x) diff(range(table(x))))
