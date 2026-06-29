@@ -312,9 +312,9 @@ for (family in c("gaussian", "binomial", "cox")) {
       testthat::expect_equal(object = temp, expected = y_hat)
     }
   })
-  refit <- multiridge(x = x[cond, ], y = y[cond], z = z,
+  testthat::test_that("refit with penalties is identical", {
+    refit <- multiridge(x = x[cond, ], y = y[cond], z = z,
                       family = family, penalties = object$penalties)
-  testthat::test_that("refit wight penalties is identical", {
     testthat::expect_identical(object = refit, expected = object)
   })
   testthat::test_that("multiridge-fit rejects wrong matrices", {

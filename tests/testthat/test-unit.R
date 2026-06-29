@@ -42,7 +42,12 @@ testthat::test_that("forescale and backscale work", {
   testthat::expect_true(all(is.finite(temp)))
   testthat::expect_type(object = temp, type = "double")
   testthat::expect_length(object = temp, n = p)
+  testthat::expect_error(.forescale(x = x, y = y))
+  testthat::expect_error(.forescale(x = x, y = y, family = family, pars = pars))
 })
+
+
+
 
 ## function ".type" ------------------------------------------------------------
 
