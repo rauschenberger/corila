@@ -135,14 +135,19 @@
 #'
 #' @keywords internal
 #'
-.validate <- function(x, y, group, primary, family, hyper, alpha_init,
-                      alpha_final, cor, foldid, nfolds, lambda_init) {
+.validate <- function(na_action, x, y, group, primary, family, hyper,
+                      alpha_init, alpha_final, cor,
+                      foldid, nfolds, lambda_init) {
+  #--- na action ---
+  .assert(x = na_action, type = "nominal",
+          support = c("error", "complete_cases"))
+  na.rm <- identical(na_action, "complete_cases")
   # --- feature matrix ---
-  .assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = na.rm)
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
   # --- target vector ---
-  .assert(x = y, type = "numeric", dim = n)
+  .assert(x = y, type = "numeric", dim = n, na.rm = na.rm)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   if (identical(family, "gaussian")) {
@@ -807,7 +812,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
                       nfolds = 10, cor = "spearman", tune = "weight",
-                      foldid = NULL) {
+                      foldid = NULL, na_action = "error") {
   # match arguments
   family <- match.arg(arg = tolower(family),
                       choices = c("gaussian", "binomial", "poisson", "cox"))
@@ -815,7 +820,26 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
     cor <- match.arg(arg = tolower(cor),
                      choices = c("pearson", "spearman", "kendall"))
   }
-  #.validate(x = x, y = y, group = group, family = family)
+  args <- .validate(
+    na_action = na_action,
+    x = x,
+    y = y,
+    group = group,
+    primary = primary,
+    family = family,
+    alpha_init = alpha_init,
+    alpha_final = alpha_final,
+    cor = cor,
+    foldid = foldid,
+    nfolds = nfolds,
+    lambda_init = lambda_init
+  )
+  if(identical(na_action, "complete_cases")){
+    complete <- stats::complete.cases(x = x, y = y)
+    x <- x[complete, ]
+    y <- y[complete]
+    foldid <- foldid[complete]
+  }
   # set default parameters
   if (is.null(primary)) {
     primary <- rep(x = TRUE, times = ncol(x))
