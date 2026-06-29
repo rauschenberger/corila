@@ -220,10 +220,10 @@ truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 
 testthat::test_that("precision is finite scalar", {
-  prec <- calc_sign_prec(truth = truth, estim = estim)
-  testthat::expect_type(object = prec, type = "double")
-  testthat::expect_length(object = prec, n = 1)
-  testthat::expect_true(all(is.finite(deviance)))
+  precision <- calc_sign_prec(truth = truth, estim = estim)
+  testthat::expect_type(object = precision, type = "double")
+  testthat::expect_length(object = precision, n = 1)
+  testthat::expect_true(all(is.finite(precision)))
 })
 
 testthat::test_that("precision equals zero if all signs are inverted", {
