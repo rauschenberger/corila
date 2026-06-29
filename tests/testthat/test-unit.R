@@ -79,6 +79,18 @@ set.seed(1)
 x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
 primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
 x_primary <- x[, primary]
+testthat::test_that("incompatible dimensions are rejected", {
+  testthat::expect_error(
+    .expand_auxiliary(x = x_primary, primary = primary[-1])
+  )
+  testthat::expect_error(
+    .expand_auxiliary(x = x_primary, primary = c(primary, TRUE))
+  )
+})
+testthat::test_that("nothing happens if there are primary features only", {
+  x_expanded <- .expand_auxiliary(x = x, primary = rep(TRUE, times = p))
+  testthat::expect_identical(object = x_expanded, expected = x)
+})
 x_expanded <- .expand_auxiliary(x = x_primary, primary = primary)
 testthat::test_that("primary predictors are equal", {
   testthat::expect_identical(object = x_expanded[, primary],
