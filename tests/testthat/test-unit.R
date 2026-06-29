@@ -313,6 +313,14 @@ testthat::test_that("adjacency is detected", {
          FUN = testthat::expect_equal,
          expected = cond[[1]],
          check.attributes = FALSE)
+  factor_vector <- as.factor(group$label_vector)
+  testthat::expect_error(
+    .is_adjacent(group = factor_vector, j = 1, p = p, names = NULL)
+  )
+  factor_list <- lapply(group$label_list, function(x) as.factor(x))
+  testthat::expect_error(
+    .is_adjacent(group = factor_list, j = 1, p = p, names = NULL)
+  )
 })
 
 ## function ".simulate_outcome" ------------------------------------------------
@@ -330,7 +338,7 @@ testthat::test_that("outcomes are simulated", {
     testthat::expect_error(
       .simulate_outcome(family = family[i], x = x, beta = beta, n = n)
     )
-    for(j in 1:2){
+    for (j in 1:2){
       if (j == 1) {
         y <- .simulate_outcome(family = family[i], x = x, beta = beta)
       } else {

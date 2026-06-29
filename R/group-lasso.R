@@ -201,7 +201,7 @@
   slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
   .assert(x = names(hyper), type = "nominal", dim = length(slots),
           support = slots)
-  if(!is.null(hyper)){
+  if (!is.null(hyper)) {
     hyper <- as.matrix(hyper)
   }
   .assert(x = hyper, type = "numeric", dim = c(Inf, length(slots)), min = 0)
@@ -284,7 +284,7 @@
       )
       names %in% unlist(group[group_cond])
     } else {
-      stop("Invalid type.")
+      stop("The list 'group' should have slots of type numeric or character.")
     }
   } else if (is.matrix(group)) {
     group[, j] == 1
@@ -1261,7 +1261,8 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   beta_negative <- beta[(length(beta) / 2 + 1):(length(beta))]
   eps <- 1e-06
   if (any(beta_positive > eps & beta_negative > eps)) {
-    stop("The coefficient for a predictor cannot be positive and negative.")
+    stop("A predictor must not have ",
+         "a positive and a negative coefficient.") # EXCLUDE COVERAGE
   }
   beta_combined <- beta_positive  - beta_negative
   c(alpha, beta_combined)
@@ -1301,7 +1302,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   if (identical(s, "lambda.min")) {
     s <- object$lambda.min
   } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
-    stop("Set s='lambda.min' or provide numeric value.")
+    stop("Set s='lambda.min' or provide non-negative scalar.")
   }
   coef_stand <- as.numeric(
     stats::coef(object = object$model[[object$id_hyper]], s = s)
@@ -1317,7 +1318,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   if (any(coef[c(FALSE[object$scale$family != "cox"],
                  !object$args$primary)] != 0)) {
-    stop("Excluded coefs must equal zero.")
+    stop("Excluded coefficients must equal zero.") # EXCLUDE COVERAGE
   }
   coef[c(TRUE[object$scale$family != "cox"], object$args$primary)]
 }

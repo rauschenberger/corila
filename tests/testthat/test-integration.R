@@ -128,6 +128,8 @@ for (glmnet in c(FALSE, TRUE)) {
 data <- simulate(family = "gaussian", n1 = 50, n_group = 3,
                  size_group = c(3, 2))
 object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group)
+testthat::expect_error(object = coef(object, s = "lambda.1se"))
+testthat::expect_error(object = coef(object, s = -1))
 print <- print(object)
 testthat::test_that("print returns object",
                     {testthat::expect_equal(object, print)})
