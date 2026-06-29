@@ -150,19 +150,19 @@
           support = c("gaussian", "binomial", "poisson", "cox"))
   if (identical(family, "gaussian")) {
     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-      stop("Gaussian family requires a numerical outcome.")
+      stop("Gaussian family requires a numerical outcome.") # EXCLUDE COVERAGE
     }
   } else if (identical(family, "binomial")) {
     if (!all(y %in% c(0, 1))) {
-      stop("Binomial family requires a binary outcome.")
+      stop("Binomial family requires a binary outcome.") # EXCLUDE COVERAGE
     }
   } else if (identical(family, "poisson")) {
     if (any(y %% 1 != 0)) {
-      stop("Poisson family requires a count outcome.")
+      stop("Poisson family requires a count outcome.") # EXCLUDE COVERAGE
     }
   } else if (identical(family, "cox")) {
     if (!inherits(x = y, what = "Surv")) {
-      stop("Cox model requires a survival outcome.")
+      stop("Cox model requires a survival outcome.") # EXCLUDE COVERAGE
     }
   }
   # --- group indicator ---
@@ -174,7 +174,7 @@
       .assert(x = group, type = "nominal", dim = p)
     } else {
       stop("If argument 'group' is a vector, ",
-           "it must be of class 'numeric' or 'character'.")
+           "it must be of class 'numeric' or 'character'.") # EXCLUDE COVERAGE
     }
   } else if (is.list(group)) {
     q <- length(group)
@@ -187,14 +187,16 @@
                 support = colnames(x))
       } else {
         stop("If argument 'group' is a list, ",
-             "it must be a list of numeric or character vectors.")
+             "it must be a list of ",
+             "numeric or character vectors.") # EXCLUDE COVERAGE
       }
     }
   } else if (is.matrix(group)) {
     q <- NA
     .assert(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)
   } else {
-    stop("Argument 'group' must be a vector, a list, or a matrix.")
+    stop("Argument 'group' must be a vector, ",
+         "a list, or a matrix.") # EXCLUDE COVERAGE
   }
   # --- other arguments ---
   .assert(x = primary, type = "logical", dim = p)

@@ -206,6 +206,7 @@ for (tune in c("none", "weight", "exponent", "bivariate", "factorial")) {
     testthat::expect_identical(object = hyper, expected = unique(hyper))
     testthat::expect_identical(object = rownames(hyper),
                                expected = as.character(seq_len(nrow(hyper))))
+    testthat::expect_error(.set_candidates(tune = "random"))
   })
 }
 
