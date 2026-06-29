@@ -15,7 +15,8 @@ cv.corila(
   nfolds = 10,
   cor = "spearman",
   tune = "weight",
-  foldid = NULL
+  foldid = NULL,
+  na_action = "error"
 )
 }
 \arguments{
@@ -94,6 +95,11 @@ tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
 \code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global})}
 
 \item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
+
+\item{na_action}{character \code{"error"} to trigger an error
+if any observation has a missing predictor or a missing response
+or \code{"complete_cases"} to omit observations
+with a missing predictor or a missing response}
 }
 \value{
 Returns an object of class \code{"cv.corila"},

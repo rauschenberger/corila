@@ -457,7 +457,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     cor = cor,
     foldid = foldid,
     nfolds = nfolds,
-    lambda_init = lambda_init
+    lambda_init = lambda_init,
+    na_action = "error"
   )
   #args <- as.list(match.call())[-1]
   #do.call(what = .validate, args = args)
@@ -697,6 +698,12 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' (to implement: list with slots
 #' `wgt_local`, `exp_local`, `wgt_global`, and `exp_global`)
 #'
+#' @param na_action
+#' character `"error"` to trigger an error
+#' if any observation has a missing predictor or a missing response
+#' or `"complete_cases"` to omit observations
+#' with a missing predictor or a missing response
+#'
 #' @inherit corila details
 #'
 #' @return
@@ -808,6 +815,9 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 #' @srrstats {G2.3b} *uses tolower() for arguments family and cor*
 #' @srrstats {RE4.0} *returns a "model" object (see @return)*
+#' @srrstats {G2.14} *uses argument na_action*
+#' @srrstats {G2.14a} *to trigger an error on missing data*
+#' @srrstats {G2.14b} *to ignore observations with missing data*
 #'
 cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
@@ -820,26 +830,6 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
     cor <- match.arg(arg = tolower(cor),
                      choices = c("pearson", "spearman", "kendall"))
   }
-  args <- .validate(
-    na_action = na_action,
-    x = x,
-    y = y,
-    group = group,
-    primary = primary,
-    family = family,
-    alpha_init = alpha_init,
-    alpha_final = alpha_final,
-    cor = cor,
-    foldid = foldid,
-    nfolds = nfolds,
-    lambda_init = lambda_init
-  )
-  if(identical(na_action, "complete_cases")){
-    complete <- stats::complete.cases(x = x, y = y)
-    x <- x[complete, ]
-    y <- y[complete]
-    foldid <- foldid[complete]
-  }
   # set default parameters
   if (is.null(primary)) {
     primary <- rep(x = TRUE, times = ncol(x))
@@ -848,6 +838,30 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
     foldid <- .folds(y = y, family = family, nfolds = nfolds)
   }
   hyper <- .set_candidates(tune = tune)
+  .validate(
+    x = x,
+    y = y,
+    group = group,
+    primary = primary,
+    family = family,
+    na_action = na_action,
+    alpha_init = alpha_init,
+    alpha_final = alpha_final,
+    cor = cor,
+    foldid = foldid,
+    nfolds = nfolds,
+    lambda_init = NULL,
+    hyper = hyper
+  )
+  if (identical(na_action, "complete_cases")) {
+    complete <- stats::complete.cases(x = x, y = y)
+    warning("Ingoring ",
+            sum(!complete),
+            " observations with missing data.")
+    x <- x[complete, ]
+    y <- y[complete]
+    foldid <- foldid[complete]
+  }
   # fit model on all folds
   object_ext <- corila(x = x,
                        y = y,

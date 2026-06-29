@@ -24,10 +24,8 @@
 #' @srrstatsTODO {G2.11} *Software should ensure that `data.frame`-like tabular objects which have columns which do not themselves have standard class attributes (typically, `vector`) are appropriately processed, and do not error without reason. This behaviour should be tested. Again, columns created by the [`units` package](https://github.com/r-quantities/units/) provide a good test case.*
 #' @srrstatsTODO {G2.12} *Software should ensure that `data.frame`-like tabular objects which have list columns should ensure that those columns are appropriately pre-processed either through being removed, converted to equivalent vector columns where appropriate, or some other appropriate treatment such as an informative error. This behaviour should be tested.* 
 
-#' @srrstats {G2.14} *Where possible, all functions should provide options for users to specify how to handle missing (`NA`) data, with options minimally including:*
-#' @srrstats {G2.14a} *error on missing data*
-#' @srrstats {G2.14b} *ignore missing data with default warnings or messages issued*
-#' @srrstatsNA {G2.14c} *replace missing data with appropriately imputed values*
+
+
 
 
 #' @srrstatsTODO {G2.16} *All functions should also provide options to handle undefined values (e.g., `NaN`, `Inf` and `-Inf`), including potentially ignoring or removing such values.* 
@@ -199,11 +197,13 @@ NULL
 #' NA_standards
 #'
 #' @srrstatsNA {G2.5} *no function has a factor argument*
+#' @srrstatsNA {G2.14c} *Missing data are not replaced by imputed values, because the type of imputation can have a major impact on the model.*
 #' @srrstatsNA {RE2.4} *high-dimensional data are always perfectly collinear*
 #' @srrstatsNA {RE2.4a} *idem*
 #' @srrstatsNA {RE2.4b} *idem*
 #' @srrstatsNA {RE3.3} *convergence thresholds are set internally by the glmnet-package* 
 #' @srrstatsNA {RE4.1} *As this package extends the glmnet-package, it cannot generate a model object without fitting the model.*
 #' @srrstatsNA {RE6.3} *As this package is not about time series, there is no difference between interpolation and extrapolation.*
+
 #' @noRd
 NULL
