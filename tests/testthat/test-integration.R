@@ -336,6 +336,15 @@ for (family in c("gaussian", "binomial", "cox")) {
       stats::predict(object, newx = x[!cond, -ncol(x)])
     )
   })
+  testthat::test_that("refit with given folds is identical", {
+    foldid <- rep(x = NA, times = sum(cond))
+    for (i in seq_along(object$indices)) {
+      foldid[object$indices[[i]]] <- i
+    }
+    refit <- multiridge(x = x[cond, ], y = y[cond], z = z,
+                        family = family, foldid = foldid)
+    testthat::expect_identical(object = refit, expected = object)
+  })
 }
 
 ## privileged information ------------------------------------------------------

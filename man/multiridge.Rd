@@ -44,9 +44,12 @@ with value \code{"gaussian"} (also for \code{"linear"}),
 \code{"binomial"} (also for \code{"logistic"}), or \code{"cox"}
 \item \eqn{q}-dimensional vector \code{penalties}
 containing optimised regularisation hyperparameters
-(one for each variable group)
+(one for each predictor group)
+\item list \code{indices}
+with \code{nfolds} slots (one for each cross-validation fold),
+each containing the indices of the observations
 \item list \code{datablocks}
-with \eqn{q} slots (one for each variable group),
+with \eqn{q} slots (one for each predictor group),
 each containing an \eqn{n_0 \times p_k} matrix,
 where \eqn{k \in \{1, \ldots, q\}}
 \item \eqn{p}-dimensional group vector \code{z} (see argument)

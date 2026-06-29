@@ -58,9 +58,12 @@
 #' `"binomial"` (also for `"logistic"`), or `"cox"`
 #' - \eqn{q}-dimensional vector `penalties`
 #' containing optimised regularisation hyperparameters
-#' (one for each variable group)
+#' (one for each predictor group)
+#' - list `indices`
+#' with `nfolds` slots (one for each cross-validation fold),
+#' each containing the indices of the observations
 #' - list `datablocks`
-#' with \eqn{q} slots (one for each variable group),
+#' with \eqn{q} slots (one for each predictor group),
 #' each containing an \eqn{n_0 \times p_k} matrix,
 #' where \eqn{k \in \{1, \ldots, q\}}
 #' - \eqn{p}-dimensional group vector `z` (see argument)
@@ -234,6 +237,7 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
                                       no = family))
   object$penalties <- penalties
   object$datablocks <- xx
+  object$indices <- indices
   object$z <- z
   object$pars <- scale$pars
   class(object) <- "multiridge"
