@@ -392,3 +392,26 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_equal(object = y_hat[[2]], expected = y_hat[[1]])
   })
 }
+
+## complete case analysis ------------------------------------------------------
+
+testthat::test_that("complete case analysis works", {
+  family <- "gaussian"
+  data <- simulate(family = family)
+  foldid <- .folds(y = data$y_train, family = family, nfolds = 10)
+  missing <- stats::rbinom(n = nrow(data$x_train), size = 1, prob = 0.2) == 1
+  data$x_train[missing, 1] <- NA
+  object0 <- cv.corila(x = data$x_train[!missing, ],
+                       y = data$y_train[!missing],
+                       group = data$group,
+                       family = family,
+                       foldid = foldid[!missing],
+                       na_action = "error")
+  object1 <- cv.corila(x = data$x_train,
+                       y = data$y_train,
+                       group = data$group,
+                       family = family,
+                       foldid = foldid,
+                       na_action = "complete_cases")
+  testthat::expect_identical(object = object0, expected = object1)
+})
