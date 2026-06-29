@@ -314,7 +314,7 @@ for (family in c("gaussian", "binomial", "cox")) {
   })
   testthat::test_that("refit with penalties is identical", {
     refit <- multiridge(x = x[cond, ], y = y[cond], z = z,
-                      family = family, penalties = object$penalties)
+                        family = family, penalties = object$penalties)
     testthat::expect_identical(object = refit, expected = object)
   })
   testthat::test_that("multiridge-fit rejects wrong matrices", {
@@ -359,9 +359,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 ## noise susceptibility --------------------------------------------------------
 
-#' @srrstats {G5.9} *noise susceptibility test*
-#' @srrstats {G5.9a} *additing trivial noise*
-#' @srrstats {G5.9b} *running under different random seeds*
+#' @srrstats {G5.9} *noise susceptibility test:*
+#' @srrstats {G5.9a} *- adding trivial noise*
+#' @srrstats {G5.9b} *- running under different random seeds*
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   # simulate data

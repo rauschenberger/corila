@@ -315,6 +315,10 @@ testthat::test_that("adjacency is detected", {
          check.attributes = FALSE)
 })
 
+## function ".simulate_outcome" ------------------------------------------------
+
+# Test with x/beta and with n!
+
 ## function ".estim_initial_coefs" ---------------------------------------------
 
 testthat::test_that("initial coefficients are estimated", {
