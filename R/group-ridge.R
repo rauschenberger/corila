@@ -163,17 +163,6 @@
 multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
                        penalties = NULL) {
   # --- check arguments ---
-  .assert(x = x, type = "numeric", dim = c(Inf, Inf))
-  .assert(x = y, type = "numeric", dim = nrow(x))
-  .assert(x = z, type = "integer", dim = ncol(x),
-          min = 1, max = length(unique(z)))
-  .assert(x = family, type = "nominal",
-          support = c("gaussian", "binomial", "cox"))
-  .assert(x = foldid, type = "integer", dim = nrow(x),
-          min = 1, max = nrow(x))
-  .assert(x = nfolds, type = "integer", min = 2, max = nrow(x))
-  .assert(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
-  #.validate(x = x, y = y, group = NULL, family = family)
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop(paste(
       "For each variable,",
@@ -186,6 +175,17 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
   if (cond) {
     stop("Argument 'penalties' must have one entry for each group.")
   }
+  .assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  .assert(x = y, type = "numeric", dim = nrow(x))
+  .assert(x = z, type = "integer", dim = ncol(x),
+          min = 1, max = length(unique(z)))
+  .assert(x = family, type = "nominal",
+          support = c("gaussian", "binomial", "cox"))
+  .assert(x = foldid, type = "integer", dim = nrow(x),
+          min = 1, max = nrow(x))
+  .assert(x = nfolds, type = "integer", min = 2, max = nrow(x))
+  .assert(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
+  #.validate(x = x, y = y, group = NULL, family = family)
   # --- initial regression ---
   scale <- .forescale(x = x, y = y, family = family)
   model <- ifelse(identical(family, "gaussian"),
@@ -270,13 +270,13 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
 #' @export
 predict.multiridge <- function(object, newx, ...) {
   # --- check arguments ---
-  .assert(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
   if (length(object$z) != ncol(newx)) {
     stop(paste(
       "Argument 'newx' must have one column",
       "for each variable used in model fitting."
     ))
   }
+  .assert(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
   # --- make predictions ---
   scale <- .forescale(x = newx, pars = object$pars)
   newxx <- lapply(X = unique(object$z),
