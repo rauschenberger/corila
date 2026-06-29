@@ -218,6 +218,8 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
                                           folds = indices)
     ))
     penalties <- final$optpen
+  } else {
+    indices <- NULL
   }
   # --- refit ---
   xxt <- multiridge::SigmaFromBlocks(XXblocks = xxblocks,
