@@ -336,3 +336,33 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_equal(object = y_hat2, expected = y_hat3)
   })
 }
+
+## noise susceptibility --------------------------------------------------------
+
+for (family in c("gaussian", "binomial", "poisson", "cox")) {
+  # simulate data
+  data <- simulate(family = family)
+  foldid <- .folds(y = data$y_train, family = family, nfolds = 10)
+  object <- y_hat <- coef <- list()
+  for(i in 1:2) {
+    set.seed(i)
+    x <- data$x_train + stats::rnorm(n = length(data$x_train),
+                                    sd = .Machine$double.eps)
+    if(family == "gaussian"){
+      y <- data$y_train + stats::rnorm(n = length(data$y_train),
+                                       sd = .Machine$double.eps)
+    } else {
+      y <- data$y_train
+    }
+    object[[i]] <- cv.corila(x = x, y = y, group = data$group, family = family, foldid = foldid)
+    coef[[i]] <- coef(object[[i]])
+    y_hat[[i]] <- predict(object[[i]], newx = data$x_test)
+  }
+  testthat::test_that("coefficients do not change", {
+    testthat::expect_equal(object = coef[[2]], expected = coef[[1]])
+  })
+  
+  testthat::test_that("prediction do not change", {
+    testthat::expect_equal(object = y_hat[[2]], expected = y_hat[[1]])
+  })
+}
