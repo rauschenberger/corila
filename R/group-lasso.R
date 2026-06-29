@@ -150,19 +150,19 @@
           support = c("gaussian", "binomial", "poisson", "cox"))
   if (identical(family, "gaussian")) {
     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-      stop("Gaussian family requires a numerical outcome.") # EXCLUDE COVERAGE
+      stop("Gaussian family requires a numerical outcome.") # nocov
     }
   } else if (identical(family, "binomial")) {
     if (!all(y %in% c(0, 1))) {
-      stop("Binomial family requires a binary outcome.") # EXCLUDE COVERAGE
+      stop("Binomial family requires a binary outcome.") # nocov
     }
   } else if (identical(family, "poisson")) {
     if (any(y %% 1 != 0)) {
-      stop("Poisson family requires a count outcome.") # EXCLUDE COVERAGE
+      stop("Poisson family requires a count outcome.") # nocov
     }
   } else if (identical(family, "cox")) {
     if (!inherits(x = y, what = "Surv")) {
-      stop("Cox model requires a survival outcome.") # EXCLUDE COVERAGE
+      stop("Cox model requires a survival outcome.") # nocov
     }
   }
   # --- group indicator ---
@@ -174,7 +174,7 @@
       .assert(x = group, type = "nominal", dim = p)
     } else {
       stop("If argument 'group' is a vector, ",
-           "it must be of class 'numeric' or 'character'.") # EXCLUDE COVERAGE
+           "it must be of class 'numeric' or 'character'.") # nocov
     }
   } else if (is.list(group)) {
     q <- length(group)
@@ -188,7 +188,7 @@
       } else {
         stop("If argument 'group' is a list, ",
              "it must be a list of ",
-             "numeric or character vectors.") # EXCLUDE COVERAGE
+             "numeric or character vectors.") # nocov
       }
     }
   } else if (is.matrix(group)) {
@@ -196,7 +196,7 @@
     .assert(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)
   } else {
     stop("Argument 'group' must be a vector, ",
-         "a list, or a matrix.") # EXCLUDE COVERAGE
+         "a list, or a matrix.") # nocov
   }
   # --- other arguments ---
   .assert(x = primary, type = "logical", dim = p)
@@ -1264,7 +1264,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   eps <- 1e-06
   if (any(beta_positive > eps & beta_negative > eps)) {
     stop("A predictor must not have ",
-         "a positive and a negative coefficient.") # EXCLUDE COVERAGE
+         "a positive and a negative coefficient.") # nocov
   }
   beta_combined <- beta_positive  - beta_negative
   c(alpha, beta_combined)
@@ -1320,7 +1320,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   if (any(coef[c(FALSE[object$scale$family != "cox"],
                  !object$args$primary)] != 0)) {
-    stop("Excluded coefficients must equal zero.") # EXCLUDE COVERAGE
+    stop("Excluded coefficients must equal zero.") # nocov
   }
   coef[c(TRUE[object$scale$family != "cox"], object$args$primary)]
 }
