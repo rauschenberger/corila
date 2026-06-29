@@ -309,10 +309,10 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
   .assert(x = beta, type = "numeric", dim = ncol(x))
   .assert(x = n, type = "integer", min = 1)
   .assert(x = factor, type = "numeric", min = 0)
-  if (!is.null(x) && !is.null(beta)) {
+  if (!is.null(x) && !is.null(beta) && is.null(n)) {
     eta <- as.numeric(scale(x %*% as.vector(beta))) # was without scale
     n <- nrow(x)
-  } else if (!is.null(n)) {
+  } else if (is.null(x) && is.null(beta) && !is.null(n)) {
     eta <- rep(x = 0, times = n)
   } else {
     stop("Provide either `x` and `beta` or `n`.")
