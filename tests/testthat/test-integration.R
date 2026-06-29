@@ -268,8 +268,6 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 ## function "multiridge" -------------------------------------------------------
 
-# fix bug in Cox model
-
 for (family in c("gaussian", "binomial", "cox")) {
   # simulate
   set.seed(1)
@@ -313,6 +311,28 @@ for (family in c("gaussian", "binomial", "cox")) {
     } else {
       testthat::expect_equal(object = temp, expected = y_hat)
     }
+  })
+  refit <- multiridge(x = x[cond, ], y = y[cond], z = z,
+                      family = family, penalties = object$penalties)
+  testthat::test_that("refit wight penalties is identical", {
+    testthat::expect_identical(object = refit, expected = object)
+  })
+  testthat::test_that("multiridge-fit rejects wrong matrices", {
+    testthat::expect_error(
+      multiridge(x = x[cond, ], y = y[cond], z = z[-1], family = family)
+    )
+    testthat::expect_error(
+      multiridge(x = x[cond, ], y = y[cond], z = z, family = family,
+                 penalties = rep(1, times = length(p) + 1))
+    )
+  })
+  testthat::test_that("multiridge-predict rejects wrong matrices", {
+    testthat::expect_error(
+      stats::predict(object, newx = cbind(x[!cond, ], x[!cond, ]))
+    )
+    testthat::expect_error(
+      stats::predict(object, newx = x[!cond, -ncol(x)])
+    )
   })
 }
 
