@@ -317,7 +317,7 @@ testthat::test_that("adjacency is detected", {
 
 ## function ".simulate_outcome" ------------------------------------------------
 
-testthat::test_that("outcoemes are simulated", {
+testthat::test_that("outcomes are simulated", {
   family <- c("gaussian", "binomial", "poisson", "cox")
   n <- 10
   p <- 5
@@ -336,6 +336,14 @@ testthat::test_that("outcoemes are simulated", {
       } else {
         y <- .simulate_outcome(family = family[i], n = n)
       }
+      .validate(na_action = NULL,
+                x = matrix(data = 0, nrow = n, ncol = p),
+                y = y,
+                group = rep(x = 1, times = p),
+                primary = NULL,
+                family = family[i], hyper = NULL, alpha_init = NULL,
+                alpha_final = NULL, cor = NULL, foldid = NULL,
+                nfolds = NULL, lambda_init = NULL)
       testthat::expect_length(object = y, n = n)
     }
   }
@@ -392,5 +400,20 @@ testthat::test_that("initial coefficients are estimated", {
       }
       testthat::expect_length(object = init[[1]]$lambda, n = length)
     }
+  }
+  alpha <- list(-1, Inf, "A")
+  for (i in seq_along(alpha)) {
+    testthat::expect_error(
+      .estim_initial_coefs(
+        x = x,
+        y = stats::rnorm(n),
+        family = "gaussian",
+        alpha_init = alpha[[i]],
+        group = group,
+        foldid = NULL,
+        nfolds = 10,
+        lambda = lambda
+      )
+    )
   }
 })

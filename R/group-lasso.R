@@ -107,8 +107,6 @@
                               alpha = alpha_init)
       coef <- stats::coef(object = model, s = lambda)[is_slope]
     }
-  } else {
-    stop("Invalid value for argument 'alpha_init'.")
   }
   list(coef = drop(coef), lambda = lambda)
 }
@@ -203,8 +201,10 @@
   slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
   .assert(x = names(hyper), type = "nominal", dim = length(slots),
           support = slots)
-  .assert(x = as.matrix(hyper), type = "numeric",
-          dim = c(Inf, length(slots)), min = 0)
+  if(!is.null(hyper)){
+    hyper <- as.matrix(hyper)
+  }
+  .assert(x = hyper, type = "numeric", dim = c(Inf, length(slots)), min = 0)
   if (is.character(alpha_init)) {
     .assert(x = alpha_init, type = "nominal",
             support = c("pearson", "spearman", "kendall", "multiridge"))
