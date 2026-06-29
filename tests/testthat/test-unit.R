@@ -317,7 +317,30 @@ testthat::test_that("adjacency is detected", {
 
 ## function ".simulate_outcome" ------------------------------------------------
 
-# Test with x/beta and with n!
+testthat::test_that("outcoemes are simulated", {
+  family <- c("gaussian", "binomial", "poisson", "cox")
+  n <- 10
+  p <- 5
+  x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
+  beta <- stats::rnorm(n = p)
+  for (i in seq_along(family)) {
+    testthat::expect_error(
+      .simulate_outcome(family = family[i])
+    )
+    testthat::expect_error(
+      .simulate_outcome(family = family[i], x = x, beta = beta, n = n)
+    )
+    for(j in 1:2){
+      if (j == 1) {
+        y <- .simulate_outcome(family = family[i], x = x, beta = beta)
+      } else {
+        y <- .simulate_outcome(family = family[i], n = n)
+      }
+      testthat::expect_length(object = y, n = n)
+    }
+  }
+})
+
 
 ## function ".estim_initial_coefs" ---------------------------------------------
 
