@@ -726,6 +726,8 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' optimised regularisation hyperparameter
 #' - `scale`:
 #' output from [.forescale()]
+#' - `y_hat`:
+#' \eqn{n}-dimensional vector of fitted values
 #'
 #' @inherit corila-package references
 #'
@@ -931,6 +933,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   object$id_hyper <- id_hyper
   object$lambda.min <- lambda.min
   class(object) <- "cv.corila"
+  object$y_hat <- predict(object = object, newx = x)
   object
 }
 
@@ -1022,6 +1025,8 @@ nobs.cv.corila <- function(object, ...) {
 #' [print.cv.corila()]
 #'
 #' @export
+#'
+#' @srrstats{RE4.18} *summary method*
 #'
 summary.cv.corila <- function(object, ...) {
   list <- list()

@@ -63,9 +63,9 @@
 #' @srrstatsTODO {RE3.1} *Enable such messages to be optionally suppressed, yet should ensure that the resultant model object nevertheless includes sufficient data to identify lack of convergence.*
 #' @srrstats {RE3.2} *See glmnet-package for convergence thresholds*
 #' @srrstats {RE4.3} *confidence intervals are not available for penalised regression*
-#' @srrstatsTODO {RE4.4} *The specification of the model, generally as a formula (via `formula()`)*
+#' @srrstats {RE4.4} *formula is not useful for high-dimensional settings*
 #' @srrstatsTODO {RE4.6} *The variance-covariance matrix of the model parameters (via `vcov()`)*
-#' @srrstatsTODO {RE4.7} *Where appropriate, convergence statistics* 
+#' @srrstats {RE4.7} *convergence statistics are in the returned glmnet object* 
 #' @srrstatsTODO {RE4.8} *Response variables, and associated "metadata" where applicable.*
 #' @srrstatsTODO {RE4.9} *Modelled values of response variables.*
 #' @srrstatsTODO {RE4.10} *Model Residuals, including sufficient documentation to enable interpretation of residuals, and to enable users to submit residuals to their own tests.*
@@ -74,8 +74,6 @@
 #' @srrstatsTODO {RE4.13} *Predictor variables, and associated "metadata" where applicable.* 
 #' @srrstatsTODO {RE4.14} *Where possible, values should also be provided for extrapolation or forecast *errors*.*
 #' @srrstatsTODO {RE4.15} *Sufficient documentation and/or testing should be provided to demonstrate that forecast errors, confidence intervals, or equivalent values increase with forecast horizons.* 
-#' @srrstatsTODO {RE4.16} *Regression Software which models distinct responses for different categorical groups should include the ability to submit new groups to `predict()` methods.*
-#' @srrstatsTODO {RE4.18} *Regression Software may also implement `summary` methods for model objects, and in particular should implement distinct `summary` methods for any cases in which calculation of summary statistics is computationally non-trivial (for example, for bootstrapped estimates of confidence intervals).* 
 #' @srrstatsTODO {RE5.0} *Scaling relationships between sizes of input data (numbers of observations, with potential extension to numbers of variables/columns) and speed of algorithm.* 
 #' @srrstatsTODO {RE6.0} *Model objects returned by Regression Software (see* **RE4***) should have default `plot` methods, either through explicit implementation, extension of methods for existing model objects, or through ensuring default methods work appropriately.*
 #' @srrstatsTODO {RE6.1} *Where the default `plot` method is **NOT** a generic `plot` method dispatched on the class of return objects (that is, through an S3-type `plot.<myclass>` function or equivalent), that method dispatch (or equivalent) should nevertheless exist in order to explicitly direct users to the appropriate function.*
@@ -101,8 +99,7 @@ NULL
 #' @srrstatsNA {RE2.4b} *idem*
 #' @srrstatsNA {RE3.3} *convergence thresholds are set internally by the glmnet-package* 
 #' @srrstatsNA {RE4.1} *As this package extends the glmnet-package, it cannot generate a model object without fitting the model.*
+#' @srrstatsNA {RE4.16} *method models same responses for all groups*
 #' @srrstatsNA {RE6.3} *As this package is not about time series, there is no difference between interpolation and extrapolation.*
-
-
 #' @noRd
 NULL

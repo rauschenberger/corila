@@ -120,6 +120,8 @@ leading to the lowest cross-validated loss
 optimised regularisation hyperparameter
 \item \code{scale}:
 output from \code{\link[=.forescale]{.forescale()}}
+\item \code{y_hat}:
+\eqn{n}-dimensional vector of fitted values
 }
 }
 \description{
