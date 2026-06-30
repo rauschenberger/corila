@@ -37,4 +37,8 @@ y_hat <- rexp(n)
 corila:::.deviance(y = y , y_hat = y_hat, family = "poisson")
 
 }
+\seealso{
+The function \code{\link[=deviance.cv.corila]{deviance.cv.corila()}}
+extracts the deviance from a fitted model.
+}
 \keyword{internal}

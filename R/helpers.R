@@ -493,6 +493,10 @@
 #' @return
 #' Returns the deviance (a numeric scalar).
 #'
+#' @seealso
+#' The function [deviance.cv.corila()]
+#' extracts the deviance from a fitted model.
+#'
 #' @examples
 #' n <- 10
 #'

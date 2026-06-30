@@ -1004,42 +1004,47 @@ nobs.cv.corila <- function(object, ...) {
 #' @details
 #' Returns the deviance calculated by [glmnet::deviance.glmnet()]
 #' for the model with the optimised mixing and regularisation hyperparameters.
-#' 
+#'
+#' @seealso
+#' The internal function [.deviance()] calculates
+#' the deviance from fitted and observed values.
+#'
 #' @export
-#' 
+#'
 deviance.cv.corila <- function(object, ...) {
   model <- object$model[[object$id_hyper]]
   stats::deviance(model)[model$lambda == object$lambda.min]
 }
 
-if(TRUE){ # move this to unit tests
+if (TRUE) { # move this to unit tests
   # general
   n <- 100
   x <- rnorm(n)
   # gaussian
   y <- x + rnorm(n)
-  lm <- lm(y~x)
+  lm <- stats::lm(y ~ x)
   y_hat <- fitted(lm)
-  resid <- y-y_hat
-  all.equal(resid,residuals(lm))
+  resid <- y - y_hat
+  plot(x = residuals(lm), y = resid)
   # binomial
   y <- rbinom(n = n, size = 1, prob = 0.5)
-  lm <- glm(y ~ x, family = "binomial")
+  lm <- stats::glm(y ~ x, family = "binomial")
   y_hat <- fitted(lm)
   eps <- 1e-06
+  resid <- y - y_hat
   resid <-  - y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
   plot(x = residuals(lm), y = resid)
   # poisson
   y <- rpois(n = n, lambda = 4)
-  lm <- glm(y ~ x, family = "poisson")
+  lm <- stats::glm(y ~ x, family = "poisson")
   y_hat <- fitted(lm)
-  resid <- 2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat)
+  resid <- y - y_hat
+  resid <- (2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
   plot(x = residuals(lm), y = resid)
-  
 }
 
 residuals.cv.corila <- function(object, ...) {
-  if(object$args$family=="gaussian") {
+  if (object$args$family == "gaussian") {
     object$y_obs - object$y_fit
   } else {
     stop("Not implemented.")
