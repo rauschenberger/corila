@@ -972,6 +972,23 @@ print.cv.corila <- function(x, ...) {
 }
 
 #' @title
+#' Observation Count
+#'
+#' @description
+#' Extracts the number of observations.
+#'
+#' @param object
+#' object of class `cv.corila`
+#'
+#' @export
+#'
+#' @srrstats {RE4.5} *number of observations (via `nobs()`)*
+#'
+nobs.cv.corila <- function(object, ...) {
+  object$args$n
+}
+
+#' @title
 #' Summarising sparse group lasso (S3 method)
 #'
 #' @description
@@ -1009,7 +1026,7 @@ print.cv.corila <- function(x, ...) {
 summary.cv.corila <- function(object, ...) {
   list <- list()
   list$family <- object$args$family
-  #list$n <- object$n
+  list$n <- object$args$n
   list$p <- object$args$p
   list$p_primary <- sum(object$args$primary)
   list$p_auxiliary <- sum(!object$args$primary)

@@ -64,7 +64,6 @@
 #' @srrstats {RE3.2} *See glmnet-package for convergence thresholds*
 #' @srrstats {RE4.3} *confidence intervals are not available for penalised regression*
 #' @srrstatsTODO {RE4.4} *The specification of the model, generally as a formula (via `formula()`)*
-#' @srrstatsTODO {RE4.5} *Numbers of observations submitted to model (via `nobs()`)*
 #' @srrstatsTODO {RE4.6} *The variance-covariance matrix of the model parameters (via `vcov()`)*
 #' @srrstatsTODO {RE4.7} *Where appropriate, convergence statistics* 
 #' @srrstatsTODO {RE4.8} *Response variables, and associated "metadata" where applicable.*
@@ -75,8 +74,7 @@
 #' @srrstatsTODO {RE4.13} *Predictor variables, and associated "metadata" where applicable.* 
 #' @srrstatsTODO {RE4.14} *Where possible, values should also be provided for extrapolation or forecast *errors*.*
 #' @srrstatsTODO {RE4.15} *Sufficient documentation and/or testing should be provided to demonstrate that forecast errors, confidence intervals, or equivalent values increase with forecast horizons.* 
-#' @srrstatsTODO {RE4.16} *Regression Software which models distinct responses for different categorical groups should include the ability to submit new groups to `predict()` methods.* 
-
+#' @srrstatsTODO {RE4.16} *Regression Software which models distinct responses for different categorical groups should include the ability to submit new groups to `predict()` methods.*
 #' @srrstatsTODO {RE4.18} *Regression Software may also implement `summary` methods for model objects, and in particular should implement distinct `summary` methods for any cases in which calculation of summary statistics is computationally non-trivial (for example, for bootstrapped estimates of confidence intervals).* 
 #' @srrstatsTODO {RE5.0} *Scaling relationships between sizes of input data (numbers of observations, with potential extension to numbers of variables/columns) and speed of algorithm.* 
 #' @srrstatsTODO {RE6.0} *Model objects returned by Regression Software (see* **RE4***) should have default `plot` methods, either through explicit implementation, extension of methods for existing model objects, or through ensuring default methods work appropriately.*
