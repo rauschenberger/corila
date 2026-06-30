@@ -959,10 +959,15 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #' @keywords internal
 #'
 #' @export
+#'
+#' @srrstats {RE4.17} *print method returns number of (selected) predictors*
+#'
 print.cv.corila <- function(x, ...) {
   cat("object of class", sQuote("cv.corila"), "\n")
   content <- ifelse(length(x$model) == 1, "an object", "multiple objects")
-  cat("(contains ", content, " of class ", sQuote("cv.glmnet"), ")", sep = "")
+  cat("(contains ", content, " of class ", sQuote("cv.glmnet"), ")\n", sep = "")
+  nzero <- sum(stats::coef(x, s = "lambda.min")[-1] != 0)
+  cat("selected", nzero, "from", x$args$p, "predictors")
   invisible(x)
 }
 
