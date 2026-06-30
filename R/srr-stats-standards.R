@@ -8,8 +8,6 @@
 #' @srrstats {G1.4a} *internal functions are documented and have the keyword "internal" (see files in folder R)*
 #' @srrstatsTODO {G1.5} *Software should include all code necessary to reproduce results which form the basis of performance claims made in associated publications.* 
 #' @srrstatsTODO {G1.6} *Software should include code necessary to compare performance claims with alternative implementations in other R packages.*
-#' @srrstatsTODO {G2.0a} Provide explicit secondary documentation of any expectations on lengths of inputs*
-#' @srrstatsTODO {G2.1a} *Provide explicit secondary documentation of expectations on data types of all vector inputs.*
 #' @srrstatsTODO {G2.4} *Provide appropriate mechanisms to convert between different data types, potentially including:*
 #' @srrstatsTODO {G2.4a} *explicit conversion to `integer` via `as.integer()`*
 #' @srrstatsTODO {G2.4b} *explicit conversion to continuous via `as.numeric()`*
