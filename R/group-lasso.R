@@ -991,6 +991,12 @@ nobs.cv.corila <- function(object, ...) {
   object$args$n
 }
 
+# deviance from glmnet, calculated for the model with the optimised mixing and regularisation hyperparameters, include link to glmnet::deviance.glmnet
+deviance.cv.corila <- function(object, ...) {
+  model <- object$model[[object$id_hyper]]
+  stats::deviance(model)[model$lambda == object$lambda.min]
+}
+
 #' @title
 #' Summarising sparse group lasso (S3 method)
 #'
