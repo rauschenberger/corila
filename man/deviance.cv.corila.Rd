@@ -7,7 +7,9 @@
 \method{deviance}{cv.corila}(object, ...)
 }
 \arguments{
-\item{object}{object of class \code{cv.corila}}
+\item{object}{object of class \code{"cv.corila"}}
+
+\item{...}{(not used)}
 }
 \description{
 Calculates the deviance.

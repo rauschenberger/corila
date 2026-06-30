@@ -25,7 +25,7 @@
 #' @srrstatsTODO {G3.0} *Statistical software should never compare floating point numbers for equality. All numeric equality comparisons should either ensure that they are made between integers, or use appropriate tolerances for approximate equality.* 
 #' @srrstatsTODO {G3.1} *Statistical software which relies on covariance calculations should enable users to choose between different algorithms for calculating covariances, and should not rely solely on covariances from the `stats::cov` function.*
 #' @srrstatsTODO {G3.1a} *The ability to use arbitrarily specified covariance methods should be documented (typically in examples or vignettes).* 
-#' @srrstatsTODO {G4.0} *Statistical Software which enables outputs to be written to local files should parse parameters specifying file names to ensure appropriate file suffixes are automatically generated where not provided.* 
+#' @srrstatsTODO {G4.0} *Statistical Software which enables outputs to be written to local files should parse parameters specifying file names to ensure appropriate file suffixes are automatically generated where not provided.*
 #' @srrstatsTODO {G5.0} *Where applicable or practicable, tests should use standard data sets with known properties (for example, the [NIST Standard Reference Datasets](https://www.itl.nist.gov/div898/strd/), or data sets provided by other widely-used R packages).*
 #' @srrstatsTODO {G5.1} *Data sets created within, and used to test, a package should be exported (or otherwise made generally available) so that users can confirm tests and run examples.* 
 #' @srrstatsTODO {G5.2} *Appropriate error and warning behaviour of all functions should be explicitly demonstrated through tests. In particular,*
@@ -62,22 +62,12 @@
 #' @srrstats {RE3.0} *The function glmnet from the glmnet-package issues warnings if the model fails to converge.*
 #' @srrstatsTODO {RE3.1} *Enable such messages to be optionally suppressed, yet should ensure that the resultant model object nevertheless includes sufficient data to identify lack of convergence.*
 #' @srrstats {RE3.2} *See glmnet-package for convergence thresholds*
-#' @srrstats {RE4.3} *confidence intervals are not available for penalised regression*
-#' @srrstats {RE4.4} *formula is not useful for high-dimensional settings*
-#' @srrstatsTODO {RE4.6} *The variance-covariance matrix of the model parameters (via `vcov()`)*
 #' @srrstats {RE4.7} *convergence statistics are in the returned glmnet object* 
-#' @srrstatsTODO {RE4.8} *Response variables, and associated "metadata" where applicable.*
-#' @srrstatsTODO {RE4.9} *Modelled values of response variables.*
-#' @srrstatsTODO {RE4.10} *Model Residuals, including sufficient documentation to enable interpretation of residuals, and to enable users to submit residuals to their own tests.*
 #' @srrstatsTODO {RE4.11} *Goodness-of-fit and other statistics associated such as effect sizes with model coefficients.*
 #' @srrstatsTODO {RE4.12} *Where appropriate, functions used to transform input data, and associated inverse transform functions.* 
-#' @srrstatsTODO {RE4.13} *Predictor variables, and associated "metadata" where applicable.* 
 #' @srrstatsTODO {RE4.14} *Where possible, values should also be provided for extrapolation or forecast *errors*.*
 #' @srrstatsTODO {RE4.15} *Sufficient documentation and/or testing should be provided to demonstrate that forecast errors, confidence intervals, or equivalent values increase with forecast horizons.* 
 #' @srrstatsTODO {RE5.0} *Scaling relationships between sizes of input data (numbers of observations, with potential extension to numbers of variables/columns) and speed of algorithm.* 
-#' @srrstatsTODO {RE6.0} *Model objects returned by Regression Software (see* **RE4***) should have default `plot` methods, either through explicit implementation, extension of methods for existing model objects, or through ensuring default methods work appropriately.*
-#' @srrstatsTODO {RE6.1} *Where the default `plot` method is **NOT** a generic `plot` method dispatched on the class of return objects (that is, through an S3-type `plot.<myclass>` function or equivalent), that method dispatch (or equivalent) should nevertheless exist in order to explicitly direct users to the appropriate function.*
-#' @srrstatsTODO {RE6.2} *The default `plot` method should produce a plot of the `fitted` values of the model, with optional visualisation of confidence intervals or equivalent.* 
 #' @srrstatsTODO {RE7.0} *Tests with noiseless, exact relationships between predictor (independent) data.*
 #' @srrstatsTODO {RE7.0a} In particular, these tests should confirm ability to reject perfectly noiseless input data.
 #' @srrstatsTODO {RE7.1} *Tests with noiseless, exact relationships between predictor (independent) and response (dependent) data.*
@@ -99,7 +89,12 @@ NULL
 #' @srrstatsNA {RE2.4b} *idem*
 #' @srrstatsNA {RE3.3} *convergence thresholds are set internally by the glmnet-package* 
 #' @srrstatsNA {RE4.1} *As this package extends the glmnet-package, it cannot generate a model object without fitting the model.*
+#' @srrstatsNA {RE4.3} *confidence intervals are not available for penalised regression*
+#' @srrstatsNA {RE4.4} *formula is not useful for high-dimensional settings*
+#' @srrstatsNA {RE4.6} *variance-covariance matrix of coefficients is not available for this high-dimensional approach*
+#' @srrstatsNA {RE4.13} *predictors cannot be extracted to save memory* 
 #' @srrstatsNA {RE4.16} *method models same responses for all groups*
+#' @srrstatsNA {RE6.1} *default plot method is generic*
 #' @srrstatsNA {RE6.3} *As this package is not about time series, there is no difference between interpolation and extrapolation.*
 #' @noRd
 NULL

@@ -817,13 +817,14 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 #' @export
 #'
+#' @srrstats {G2.0a} *lengths of vector inputs are documented*
+#' @srrstats {G2.1a} *data types of vector inputs are documented*
 #' @srrstats {G2.3b} *uses tolower() for arguments family and cor*
-#' @srrstats {RE4.0} *returns a "model" object (see @return)*
 #' @srrstats {G2.14} *uses argument na_action*
 #' @srrstats {G2.14a} *to trigger an error on missing data*
 #' @srrstats {G2.14b} *to ignore observations with missing data*
-#' @srrstats {G2.0a} *lengths of vector inputs are documented*
-#' @srrstats {G2.1a} *data types of vector inputs are documented*
+#' @srrstats {RE4.0} *returns a "model" object (see @return)*
+#' @srrstats {RE4.8} *returns response variable in slot "y_obs"*
 #'
 cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
@@ -982,11 +983,16 @@ print.cv.corila <- function(x, ...) {
 #' Extracts the number of observations.
 #'
 #' @param object
-#' object of class `cv.corila`
+#' object of class `"cv.corila"`
+#'
+#' @param ...
+#' (not used)
+#'
+#' @importFrom stats nobs
 #'
 #' @export
 #'
-#' @srrstats {RE4.5} *number of observations (via `nobs()`)*
+#' @srrstats {RE4.5} *number of observations*
 #'
 nobs.cv.corila <- function(object, ...) {
   object$args$n
@@ -999,7 +1005,10 @@ nobs.cv.corila <- function(object, ...) {
 #' Calculates the deviance.
 #'
 #' @param object
-#' object of class \code{cv.corila}
+#' object of class `"cv.corila"`
+#'
+#' @param ...
+#' (not used)
 #'
 #' @details
 #' Returns the deviance calculated by [glmnet::deviance.glmnet()]
@@ -1016,38 +1025,98 @@ deviance.cv.corila <- function(object, ...) {
   stats::deviance(model)[model$lambda == object$lambda.min]
 }
 
-if (TRUE) { # move this to unit tests
-  # general
-  n <- 100
-  x <- rnorm(n)
-  # gaussian
-  y <- x + rnorm(n)
-  lm <- stats::lm(y ~ x)
-  y_hat <- fitted(lm)
-  resid <- y - y_hat
-  plot(x = residuals(lm), y = resid)
-  # binomial
-  y <- rbinom(n = n, size = 1, prob = 0.5)
-  lm <- stats::glm(y ~ x, family = "binomial")
-  y_hat <- fitted(lm)
-  eps <- 1e-06
-  resid <- y - y_hat
-  resid <-  - y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
-  plot(x = residuals(lm), y = resid)
-  # poisson
-  y <- rpois(n = n, lambda = 4)
-  lm <- stats::glm(y ~ x, family = "poisson")
-  y_hat <- fitted(lm)
-  resid <- y - y_hat
-  resid <- (2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
-  plot(x = residuals(lm), y = resid)
+#' @title
+#' Fitted values
+#'
+#' @description
+#' Extracts fitted values.
+#'
+#' @param object
+#' object of class `"cv.corila"`
+#'
+#' @param ...
+#' (not used)
+#'
+#' @export
+#'
+#' @srrstats {RE4.9} *access fitted values*
+#'
+fitted.cv.corila <- function(object, ...) {
+  object$y_fit
 }
 
+#' @title
+#' Residuals
+#'
+#' @param object
+#' object of class `"cv.corila"`
+#'
+#' @param ...
+#' (not used)
+#'
+#' @details
+#' This function extracts the observed and fitted values from the fitted model
+#' and calls the internal function [.residuals()] to calculate the residuals.
+#'
+#' @export
+#'
+#' @srrstats {RE4.10} *model residuals*
+#'
 residuals.cv.corila <- function(object, ...) {
-  if (object$args$family == "gaussian") {
-    object$y_obs - object$y_fit
-  } else {
-    stop("Not implemented.")
+  .residuals(y_obs = object$y_obs,
+             y_fit = object$y_fit,
+             family = object$args$family)
+}
+
+#' @title
+#' Deviance Residuals
+#'
+#' @description
+#' Calculates the deviance residuals.
+#'
+#' @param y_obs
+#' \eqn{n}-dimensional vector of observed values
+#'
+#' @param y_fit
+#' \eqn{n}-dimensional vector of fitted values or probabilities
+#'
+#' @param family
+#' character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
+#'
+#' @details
+#' This function is called by [residuals.cv.corila()].
+#'
+#' @examples
+#' n <- 10
+#' y_obs <- stats::rbinom(n = n, size = 1, prob = 0.2)
+#' y_fit <- stats::runif(n = n)
+#' corila:::.residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
+#'
+#' @keywords internal
+#'
+.residuals <- function(y_obs, y_fit, family) {
+  if (identical(family, "gaussian")) {
+    .assert(x = y_obs, type = "numeric", dim = Inf)
+    .assert(x = y_fit, type = "numeric", dim = length(y_obs))
+    y_obs - y_fit
+  } else if (identical(family, "binomial")) {
+    .assert(x = y_obs, type = "integer", dim = Inf, min = 0, max = 1)
+    .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0, max = 1)
+    eps <- 1e-06
+    y_fit <- pmax(eps, pmin(y_fit, 1 - eps))
+    sign(y_obs - y_fit) * sqrt(2) *
+      sqrt(- y_obs * log(y_fit) - (1 - y_obs) * log(1 - y_fit))
+  } else if (identical(family, "poisson")) {
+    .assert(x = y_obs, type = "integer", dim = Inf, min = 0)
+    .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0)
+    sign(y_obs - y_fit) *
+      sqrt((2 * (ifelse(test = y_obs == 0,
+                        yes = 0,
+                        no = y_obs * log(y_obs / y_fit)) - y_obs + y_fit)))
+  } else if (identical(family, "cox")) {
+    .assert(x = y_obs, type = "numeric", dim = Inf)
+    .assert(x = y_fit, type = "numeric", dim = length(y_obs))
+    stop("not implemented for Cox model")
   }
 }
 
@@ -1186,29 +1255,47 @@ print.summary.cv.corila <- function(x, ...) {
   invisible(NULL)
 }
 
-# @title
-# Plot Sparse Group Lasso (S3 method)
-#
-# @description
-# Plot method for class `"cv.corila"`.
-#
-# @param x
-# object of class `"cv.corila"`
-#
-# @param ...
-# (not used)
-#
-# @return
-# Returns `NULL` (invisible).
-#
-# @inherit summary.cv.corila examples
-#
-# plot.cv.corila <- function(x, ...) {
-#  # observed vs fitted values
-#  # estimated coefficient per group (if vector)
-#  # cvm as a functions of weights and exponents
-#  invisible(NULL)
-#}
+#' @title
+#' Plot Sparse Group Lasso (S3 method)
+#'
+#' @description
+#' Plot method for class `"cv.corila"`.
+#'
+#' @param x
+#' object of class `"cv.corila"`
+#'
+#' @param ...
+#' (not used)
+#'
+#' @return
+#' Returns `NULL` (invisible).
+#'
+#' @inherit summary.cv.corila examples
+#'
+#' @srrstats {RE6.0} *default plot method*
+#' @srrstats {RE6.2} *plot fitted values*
+#'
+plot.cv.corila <- function(x, ...) {
+  y_obs <- x$y_obs
+  y_fit <- x$y_fit
+  beta <- coef(x, s = "lambda.min")[-1]
+  graphics::par(mfrow = c(1, 2))
+  max <- max(abs(c(y_obs, y_fit)))
+  lim <- c(-max, max)
+  graphics::plot(x = y_obs,
+                 y = y_fit,
+                 xlab = "observed values",
+                 ylab = "fitted values",
+                 xlim = lim, ylim = lim)
+  graphics::abline(a = 0, b = 1, lty = 2)
+  max <- max(abs(beta))
+  lim <- c(-max, max)
+  graphics::plot(y = beta,
+                 x = seq_along(beta),
+                 xlab = "predictor",
+                 ylab = "coefficient", type = "h", lwd = 2, ylim = lim)
+  invisible(NULL)
+}
 
 #' @title
 #' Expand auxiliary features

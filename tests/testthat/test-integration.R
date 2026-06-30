@@ -130,7 +130,7 @@ data <- simulate(family = "gaussian", n0 = n, n1 = n, n_group = 3,
                  size_group = c(3, 2))
 object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group)
 testthat::test_that("S3 methods work as expected", {
-  testthat::expect_identical(object = nobs(object), expected = n)
+  testthat::expect_identical(object = stats::nobs(object), expected = n)
   testthat::expect_error(object = coef(object, s = "lambda.1se"))
   testthat::expect_error(object = coef(object, s = -1))
 })

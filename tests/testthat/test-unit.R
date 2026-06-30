@@ -317,10 +317,10 @@ testthat::test_that("adjacency is detected", {
   p <- length(group$index_vector)
   cond <- list()
   for (i in seq_along(group)) {
-    cond[[i]] <- corila:::.is_adjacent(group = group[[i]],
-                                       j = 1,
-                                       p = p,
-                                       names = names(group$index_vector))
+    cond[[i]] <- .is_adjacent(group = group[[i]],
+                              j = 1,
+                              p = p,
+                              names = names(group$index_vector))
   }
   lapply(X = cond[-1],
          FUN = testthat::expect_equal,
@@ -436,5 +436,28 @@ testthat::test_that("initial coefficients are estimated", {
         lambda = lambda
       )
     )
+  }
+})
+
+## function .residuals ---------------------------------------------------------
+
+testthat::test_that("residuals match those from stats::residuals", {
+  n <- 100
+  x <- rnorm(n)
+  for (family in c("gaussian", "binomial", "poisson")) {
+    if (family == "gaussian") {
+      y <- stats::rnorm(n)
+    } else if (family == "binomial") {
+      y <- stats::rbinom(n = n, size = 1, prob = 0.5)
+    } else if (family == "poisson") {
+      y <- stats::rpois(n = n, lambda = 4)
+    } else {
+      stop()
+    }
+    glm <- stats::glm(y ~ x, family = family)
+    y_hat <- fitted(glm)
+    resid <- .residuals(y_obs = y, y_fit = y_hat, family = family)
+    names(resid) <- seq_len(n)
+    testthat::expect_equal(object = resid, expected = residuals(glm))
   }
 })
