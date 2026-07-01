@@ -49,6 +49,7 @@ object <- cv.corila(x = x, y = y, group = group, primary = primary)
 print(object)
 #> object of class ‘cv.corila’ 
 #> (contains multiple objects of class ‘cv.glmnet’)
+#> selected 0 from 20 predictors
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 

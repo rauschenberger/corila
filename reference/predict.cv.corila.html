@@ -99,8 +99,9 @@ allowing for privileged information".
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Fit models with <code><a href="cv.corila.html">cv.corila()</a></code>
-and extract coefficients with <a href="coef.cv.corila.html">coef()</a>.</p></div>
+    <div class="dont-index"><p>Fit models with <code><a href="cv.corila.html">cv.corila()</a></code>,
+extract coefficients with <a href="coef.cv.corila.html">coef()</a>,
+and extract fitted values with <a href="fitted.cv.corila.html">fitted()</a>.</p></div>
     </div>
 
     <div class="section level2">
@@ -114,6 +115,7 @@ and extract coefficients with <a href="coef.cv.corila.html">coef()</a>.</p></div
 <span class="r-in"><span><span class="fu"><a href="cv.corila.html">cv.corila</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, group <span class="op">=</span> <span class="va">group</span>, primary <span class="op">=</span> <span class="va">primary</span>, tune <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> object of class ‘cv.corila’ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (contains an object of class ‘cv.glmnet’)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected 0 from 20 predictors</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># simulation</span></span></span>
@@ -142,7 +144,7 @@ and extract coefficients with <a href="coef.cv.corila.html">coef()</a>.</p></div
 <span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="va">coef</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># standard lasso regression</span></span></span>
-<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">glmnet</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="va">cond</span>, <span class="op">]</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="va">cond</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">glmnet</span><span class="fu">::</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="va">cond</span>, <span class="op">]</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="va">cond</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>                            family <span class="op">=</span> <span class="va">family</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">coef</span><span class="op">$</span><span class="va">glmnet</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">object</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y_hat</span><span class="op">$</span><span class="va">glmnet</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">!</span><span class="va">cond</span>, <span class="op">]</span>,</span></span>

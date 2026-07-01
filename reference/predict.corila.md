@@ -81,6 +81,5 @@ object <- corila:::corila(x = x,
                           lambda_init = NULL)
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
-#> Error in UseMethod("predict"): no applicable method for 'predict' applied to an object of class "corila"
 # }
 ```

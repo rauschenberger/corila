@@ -57,7 +57,9 @@
 <span>  nfolds <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  cor <span class="op">=</span> <span class="st">"spearman"</span>,</span>
 <span>  tune <span class="op">=</span> <span class="st">"weight"</span>,</span>
-<span>  foldid <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  foldid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  na_action <span class="op">=</span> <span class="st">"error"</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -156,6 +158,18 @@ tuning <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, 
 <dt id="arg-foldid">foldid<a class="anchor" aria-label="anchor" href="#arg-foldid"></a></dt>
 <dd><p>\(n_0\)-dimensional vector containing the fold identifiers</p></dd>
 
+
+<dt id="arg-na-action">na_action<a class="anchor" aria-label="anchor" href="#arg-na-action"></a></dt>
+<dd><p>character <code>"error"</code> to trigger an error
+if any observation has a missing predictor or a missing response
+or <code>"complete_cases"</code> to omit observations
+with a missing predictor or a missing response</p></dd>
+
+
+<dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
+<dd><p>Should messages from <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
+be suppressed? logical</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -175,6 +189,8 @@ leading to the lowest cross-validated loss</p></li>
 optimised regularisation hyperparameter</p></li>
 <li><p><code>scale</code>:
 output from <code><a href="dot-forescale.html">.forescale()</a></code></p></li>
+<li><p><code>y_hat</code>:
+\(n\)-dimensional vector of fitted values</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -216,6 +232,7 @@ with different values for the regularisation and mixing hyperparameters.</p></di
 <span class="r-in"><span><span class="fu">cv.corila</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, group <span class="op">=</span> <span class="va">group</span>, primary <span class="op">=</span> <span class="va">primary</span>, tune <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> object of class ‘cv.corila’ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (contains an object of class ‘cv.glmnet’)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected 1 from 20 predictors</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># simulation</span></span></span>
@@ -244,7 +261,7 @@ with different values for the regularisation and mixing hyperparameters.</p></di
 <span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="va">coef</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># standard lasso regression</span></span></span>
-<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">glmnet</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="va">cond</span>, <span class="op">]</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="va">cond</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">glmnet</span><span class="fu">::</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="va">cond</span>, <span class="op">]</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="va">cond</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>                            family <span class="op">=</span> <span class="va">family</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">coef</span><span class="op">$</span><span class="va">glmnet</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">object</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y_hat</span><span class="op">$</span><span class="va">glmnet</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">!</span><span class="va">cond</span>, <span class="op">]</span>,</span></span>

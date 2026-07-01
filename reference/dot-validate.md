@@ -9,6 +9,7 @@ and
 
 ``` r
 .validate(
+  na_action,
   x,
   y,
   group,
@@ -20,11 +21,18 @@ and
   cor,
   foldid,
   nfolds,
-  lambda_init
+  lambda_init,
+  silent
 )
 ```
 
 ## Arguments
+
+- na_action:
+
+  character `"error"` to trigger an error if any observation has a
+  missing predictor or a missing response or `"complete_cases"` to omit
+  observations with a missing predictor or a missing response
 
 - x:
 
@@ -100,6 +108,14 @@ and
 - lambda_init:
 
   regularisation hyperparameter(s), or `NULL` (cross-validation)
+
+- silent:
+
+  Should messages from
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  and
+  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
+  be suppressed? logical
 
 ## Value
 

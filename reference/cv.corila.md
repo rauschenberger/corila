@@ -17,7 +17,9 @@ cv.corila(
   nfolds = 10,
   cor = "spearman",
   tune = "weight",
-  foldid = NULL
+  foldid = NULL,
+  na_action = "error",
+  silent = FALSE
 )
 ```
 
@@ -111,6 +113,20 @@ cv.corila(
 
   \\n_0\\-dimensional vector containing the fold identifiers
 
+- na_action:
+
+  character `"error"` to trigger an error if any observation has a
+  missing predictor or a missing response or `"complete_cases"` to omit
+  observations with a missing predictor or a missing response
+
+- silent:
+
+  Should messages from
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  and
+  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
+  be suppressed? logical
+
 ## Value
 
 Returns an object of class `"cv.corila"`, a list with the following
@@ -131,6 +147,8 @@ slots:
 
 - `scale`: output from
   [`.forescale()`](https://rauschenberger.github.io/corila/reference/dot-forescale.md)
+
+- `y_hat`: \\n\\-dimensional vector of fitted values
 
 ## Details
 
@@ -173,6 +191,7 @@ primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 cv.corila(x = x, y = y, group = group, primary = primary, tune = "none")
 #> object of class ‘cv.corila’ 
 #> (contains an object of class ‘cv.glmnet’)
+#> selected 1 from 20 predictors
 
 # \donttest{
 # simulation

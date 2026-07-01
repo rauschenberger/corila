@@ -701,6 +701,38 @@ and make predictions with <a href="predict.multiridge.html">predict()</a>.</p></
 <span class="r-out co"><span class="r-pr">#&gt;</span> [50,] -2.02158478  1.47546615  0.525283860 -1.818681e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  4 13 21 46 50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[2]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  5  7 18 20 26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[3]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10 28 32 33 44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[4]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 12 17 27 31 34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[5]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  8 16 29 38 42</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[6]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  1  3  9 23 24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[7]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 25 30 37 40 41</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[8]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  6 11 14 45 48</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[9]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  2 15 22 35 49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $indices[[10]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 19 36 39 43 47</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $z</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -756,7 +788,7 @@ and make predictions with <a href="predict.multiridge.html">predict()</a>.</p></
 <span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="va">coef</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># standard ridge regression</span></span></span>
-<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">glmnet</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="va">cond</span>, <span class="op">]</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="va">cond</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu">glmnet</span><span class="fu">::</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="va">cond</span>, <span class="op">]</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="va">cond</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>                           family <span class="op">=</span> <span class="va">family</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">coef</span><span class="op">$</span><span class="va">glmnet</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">object</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y_hat</span><span class="op">$</span><span class="va">glmnet</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">!</span><span class="va">cond</span>, <span class="op">]</span>,</span></span>

@@ -20,6 +20,7 @@ corila(
   foldid,
   nfolds,
   lambda_init,
+  silent = FALSE,
   threshold = 0
 )
 ```
@@ -101,6 +102,14 @@ corila(
 
   regularisation hyperparameter(s), or `NULL` (cross-validation)
 
+- silent:
+
+  Should messages from
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  and
+  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
+  be suppressed? logical
+
 - threshold:
 
   threshold for absolute correlation coefficients: numeric in unit
@@ -148,9 +157,10 @@ for splitting samples into folds,
 for obtaining initial coefficients,
 [`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/dot-is_adjacent.md)
 for identifying adjacent predictors, and
-[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
-and [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
-adaptive lasso regression.
+[`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
+and
+[`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+for adaptive lasso regression.
 
 ## Examples
 
@@ -181,6 +191,5 @@ object <- corila:::corila(x = x,
                           lambda_init = NULL)
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
-#> Error in UseMethod("predict"): no applicable method for 'predict' applied to an object of class "corila"
 # }
 ```

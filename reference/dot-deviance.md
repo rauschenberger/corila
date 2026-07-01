@@ -26,6 +26,12 @@ Calculates the deviance.
 
 Returns the deviance (a numeric scalar).
 
+## See also
+
+The function
+[`deviance.cv.corila()`](https://rauschenberger.github.io/corila/reference/deviance.cv.corila.md)
+extracts the deviance from a fitted model.
+
 ## Examples
 
 ``` r

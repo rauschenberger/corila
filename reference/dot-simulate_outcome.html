@@ -89,8 +89,8 @@ an effect vector, and an outcome vector.</p></div>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># simulate independent outcome</span></span></span>
 <span class="r-in"><span><span class="fu">corila</span><span class="fu">:::</span><span class="fu">.simulate_outcome</span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.14457084 -0.91107471  0.48129531  0.43516490 -0.04162846 -0.20415504</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.05402925 -0.76406361 -0.69892937 -0.63471855</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.22223493  0.20199028  0.12426070  0.31747511  0.18880526  2.49608775</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  1.00040265  0.01060549 -1.42152204 -1.30521156</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># simulate dependent outcome</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
@@ -98,8 +98,8 @@ an effect vector, and an outcome vector.</p></div>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">corila</span><span class="fu">:::</span><span class="fu">.simulate_outcome</span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>, x <span class="op">=</span> <span class="va">x</span>, beta <span class="op">=</span> <span class="va">beta</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.6618132 -0.1856400 -1.3569514 -1.2114130 -2.2969133  0.3021709</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  2.3079562  1.8628679 -1.4648566  1.8779476</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.7249821 -0.2947392 -0.0939813  0.3663215  1.9130457  0.5715634</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.5294206 -1.1678636  1.7544299 -1.1663178</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

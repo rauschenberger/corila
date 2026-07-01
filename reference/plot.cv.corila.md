@@ -1,19 +1,19 @@
-# print (S3 method)
+# Plot Sparse Group Lasso (S3 method)
 
-Print method for class `"cv.corila"`.
+Plot method for class `"cv.corila"`.
 
 ## Usage
 
 ``` r
 # S3 method for class 'cv.corila'
-print(x, ...)
+plot(x, ...)
 ```
 
 ## Arguments
 
 - x:
 
-  object of class `"cv.corila"`.
+  object of class `"cv.corila"`
 
 - ...:
 
@@ -21,12 +21,7 @@ print(x, ...)
 
 ## Value
 
-Prints `"object of class 'cv.corila'"` to the console (with a note on
-the number of cross-validated models). Returns `x` invisibly.
-
-## See also
-
-[summary()](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
+Returns `NULL` (invisible).
 
 ## Examples
 
