@@ -312,11 +312,17 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_error(.folds(y = y, family = family, nfolds = 1))
     testthat::expect_error(.folds(y = y, family = family, nfolds = n + 1))
   })
-  foldid <- .folds(y = y, family = family, nfolds = 10)
+  nfolds <- 10
+  testthat::test_that(paste("function '.folds' throws an error",
+                            "for invalid family"), {
+    testthat::expect_error(.folds(y = y, family = "gamma", nfolds = nfolds))
+  })
+  foldid <- .folds(y = y, family = family, nfolds = nfolds)
   testthat::test_that("fold identifiers are in finite vector", {
     testthat::expect_type(object = foldid, type = "integer")
     testthat::expect_length(object = foldid, n = n)
     testthat::expect_true(all(is.finite(foldid)))
+    testthat::expect_setequal(object = foldid, expected = seq_len(nfolds))
   })
   diff <- tapply(X = foldid,
                  INDEX = index,
@@ -324,6 +330,15 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that("folds are stratified and balanced", {
     testthat::expect_true(all(diff <= 1))
   })
+}
+
+for(i in c(0,1)){
+  n <- 10
+  nfolds <- 5
+  foldid <- .folds(y = rep(i, times = n), family = "binomial", nfolds = nfolds)
+  testthat::expect_type(object = foldid, type = "integer")
+  testthat::expect_length(object = foldid, n = n)
+  testthat::expect_setequal(object = foldid, expected = seq_len(nfolds))
 }
 
 ## function ".is_adjacent" -----------------------------------------------------
@@ -518,10 +533,19 @@ testthat::test_that("function 'predict.cv.corila' returns finite n-vector", {
   testthat::expect_type(object = y_hat, type = "double")
   testthat::expect_length(object = y_hat, n = n)
   testthat::expect_true(all(is.finite(y_hat)))
-  testthat::expect_error(object = predict(object, newx = data$x_train,
-                                          s = "lambda.1se"))
-  testthat::expect_error(object = predict(object, newx = data$x_train,
-                                          s = -1))
+  testthat::expect_error(predict(object, newx = data$x_train[, -1],
+                                 s = "lambda.min"))
+  testthat::expect_error(predict(object, newx = data$x_train, s = "lambda.1se"))
+  testthat::expect_error(predict(object, newx = data$x_train, s = -1))
+})
+
+testthat::test_that("function 'fitted.cv.corila' returns finite n-vector", {
+  y_hat <- fitted(object)
+  testthat::expect_type(object = y_hat, type = "double")
+  testthat::expect_length(object = y_hat, n = n)
+  testthat::expect_true(all(is.finite(y_hat)))
+  y_pred <- predict(object, newx = data$x_train, s = "lambda.min")
+  testthat::expect_equal(object = y_hat, expected = y_pred)
 })
 
 testthat::test_that("function 'nobs.cv.corila' returns the correct integer", {
