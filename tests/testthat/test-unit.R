@@ -491,3 +491,73 @@ testthat::test_that("residuals match those from stats::residuals", {
     testthat::expect_equal(object = resid, expected = stats::residuals(glm)) # !
   }
 })
+
+## S3 methods for class "cv.corila" --------------------------------------------
+
+n <- as.integer(10)
+data <- simulate(family = "gaussian", n0 = n, n1 = n, n_group = 3,
+                 size_group = c(3, 2))
+p <- data$info$p
+object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group)
+
+testthat::test_that("function 'cv.corila' returns a list", {
+  testthat::expect_type(object = object, type = "list")
+})
+
+testthat::test_that("function 'coef.cv.corila' returns finite p-vector", {
+  beta_hat <- coef(object, s = "lambda.min")
+  testthat::expect_type(object = beta_hat, type = "double")
+  testthat::expect_length(object = beta_hat, n = p + 1)
+  testthat::expect_true(all(is.finite(beta_hat)))
+  testthat::expect_error(object = coef(object, s = "lambda.1se"))
+  testthat::expect_error(object = coef(object, s = -1))
+})
+
+testthat::test_that("function 'predict.cv.corila' returns finite n-vector", {
+  y_hat <- predict(object, newx = data$x_train, s = "lambda.min")
+  testthat::expect_type(object = y_hat, type = "double")
+  testthat::expect_length(object = y_hat, n = n)
+  testthat::expect_true(all(is.finite(y_hat)))
+  testthat::expect_error(object = predict(object, newx = data$x_train,
+                                          s = "lambda.1se"))
+  testthat::expect_error(object = predict(object, newx = data$x_train,
+                                          s = -1))
+})
+
+testthat::test_that("function 'nobs.cv.corila' returns the correct integer", {
+  n_obs <- stats::nobs(object)
+  testthat::expect_type(object = n_obs, type = "integer")
+  testthat::expect_length(object = n_obs, n = 1)
+  testthat::expect_true(is.finite(n_obs))
+  testthat::expect_identical(object = n_obs, expected = n)
+})
+
+testthat::test_that("function 'plot.cv.corila' returns NULL invisibly", {
+  testthat::expect_invisible(call = plot(object))
+  testthat::expect_identical(object = plot(object), expected = NULL)
+})
+
+testthat::test_that("function 'print.cv.corila' returns object invisibly", {
+  testthat::expect_invisible(call = print(object))
+  testthat::expect_equal(object = print(object), expected = object)
+})
+
+testthat::test_that("function 'print.cv.corila' prints a string", {
+  string <- capture.output(print(object))
+  testthat::expect_type(object = string, type = "character")
+  testthat::expect_length(object = string, n = 3)
+  testthat::expect_true(object = any(grepl(pattern = "cv.corila", x = string)))
+})
+
+testthat::test_that(paste("function 'summary.cv.corila' returns a list",
+                          "with 13 named slots"), {
+  testthat::expect_type(object = summary(object), type = "list")
+  testthat::expect_length(object = summary(object), n = 13)
+  testthat::expect_type(object = names(summary(object)), type = "character")
+})
+
+testthat::test_that(paste("function 'print.summary.cv.corila'",
+                          "returns NULL invisibly"), {
+  testthat::expect_invisible(call = print(summary(object)))
+  testthat::expect_identical(object = print(summary(object)), expected = NULL)
+})
