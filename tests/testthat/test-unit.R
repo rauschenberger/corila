@@ -5,31 +5,43 @@
 
 n <- 5
 p <- 10
-testthat::test_that("forescale and backscale work", {
-  set.seed(1)
-  sd <- seq(from = 0, to = 1, length.out = p)
-  x <- vapply(X = sd,
-              FUN = function(x) stats::rnorm(n = n, sd = x),
-              FUN.VALUE = numeric(n))
-  for (family in c("gaussian", "binomial", "poisson", "cox")) {
-    if (identical(family, "gaussian")) {
-      y <- stats::rnorm(n)
-    } else if (identical(family, "binomial")) {
-      y <- stats::rbinom(n = n, size = 1, prob = 0.5)
-    } else if (identical(family, "poisson")) {
-      y <- stats::rpois(n = n, lambda = 4)
-    } else if (identical(family, "cox")) {
-      time_survival <- stats::rexp(n = n, rate = 1)
-      time_censoring <- stats::rexp(n = n, rate = 1)
-      time <- pmin(time_survival, time_censoring)
-      event <- 1 * (time_survival <= time_censoring)
-      y <- survival::Surv(time = time, event = event)
-    }
-    scale <- .forescale(x = x, y = y, family = family, pars = NULL)
-    y_back <- .backscale(pars = scale$pars, y = scale$y)
-    testthat::expect_equal(object = y_back$y, expected = y)
+
+set.seed(1)
+sd <- seq(from = 0, to = 1, length.out = p)
+x <- vapply(X = sd,
+            FUN = function(x) stats::rnorm(n = n, sd = x),
+            FUN.VALUE = numeric(n))
+for (family in c("gaussian", "binomial", "poisson", "cox")) {
+  # response
+  if (identical(family, "gaussian")) {
+    y <- stats::rnorm(n)
+  } else if (identical(family, "binomial")) {
+    y <- stats::rbinom(n = n, size = 1, prob = 0.5)
+  } else if (identical(family, "poisson")) {
+    y <- stats::rpois(n = n, lambda = 4)
+  } else if (identical(family, "cox")) {
+    time_survival <- stats::rexp(n = n, rate = 1)
+    time_censoring <- stats::rexp(n = n, rate = 1)
+    time <- pmin(time_survival, time_censoring)
+    event <- 1 * (time_survival <= time_censoring)
+    y <- survival::Surv(time = time, event = event)
   }
-  coef <- stats::rnorm(p)
+  scale <- .forescale(x = x, y = y, family = family, pars = NULL)
+  y_back <- .backscale(pars = scale$pars, y = scale$y)$y
+  testthat::test_that("func '.backscale' returns finite n-vector y", {
+    type <- ifelse(family %in% c("binomial", "poisson"), "integer", "double")
+    testthat::expect_type(object = y_back, type = type)
+    testthat::expect_length(object = y_back, n= n)
+    testthat::expect_true(all(is.finite(y_back)))
+  })
+  testthat::test_that("func '.backscale' recovers original response", {
+    testthat::expect_equal(object = y_back, expected = y) # !!!
+  })
+  testthat::test_that("func '.backscale' errors under wrong arg 'pars'", {
+    testthat::expect_error(.backscale(pars = scale$pars[-1], y = scale$y))
+  })
+  # coefficients
+  beta <- stats::rnorm(p + (family!="cox"))
   mu_x <- rep(x = 0, times = p)
   sd_x <- rep(x = 1, times = p)
   mu_y <- 0
@@ -37,17 +49,22 @@ testthat::test_that("forescale and backscale work", {
   pars <- list(mu.x = mu_x, sd.x = sd_x,
                mu.y = mu_y, sd.y = sd_y,
                family = family)
-  temp <- .backscale(pars = pars, coef = coef)$coef
-  testthat::expect_equal(object = temp, expected = coef)
-  testthat::expect_true(all(is.finite(temp)))
-  testthat::expect_type(object = temp, type = "double")
-  testthat::expect_length(object = temp, n = p)
-  testthat::expect_error(.forescale(x = x, y = y))
-  testthat::expect_error(.forescale(x = x, y = y, family = family, pars = pars))
-})
-
-
-
+  coef <- .backscale(pars = pars, coef = beta)$coef
+  testthat::test_that("func '.backscale' returns finite n-vector coef", {
+    testthat::expect_type(object = coef, type = "double")
+    testthat::expect_length(object = coef, n = p + (family!="cox"))
+    testthat::expect_true(all(is.finite(coef)))
+  })
+  testthat::test_that("func '.backscale' recovers original coefficients", {
+    testthat::expect_equal(object = coef, expected = beta) # !!!
+  })
+  testthat::test_that(paste("func '.forescale' errors unless",
+                            "either arg 'family' or arg 'pars' is provided"), {
+    testthat::expect_error(.forescale(x = x, y = y))
+    testthat::expect_error(.forescale(x = x, y = y, family = family,
+                                      pars = pars))
+  })
+}
 
 ## function ".type" ------------------------------------------------------------
 
@@ -61,10 +78,12 @@ expect <- list("ridge" = 0,
                "multi-penalty" = "multiridge")
 testthat::test_that("initial coefficients are named correctly", {
   for (i in seq_along(expect)) {
-    object <- tolower(strsplit(x = .type(alpha = expect[[i]]),
-                               split = " ")[[1]])
-    testthat::expect_contains(object = object,
-                              expected = names(expect)[i])
+    string <- .type(alpha = expect[[i]])
+    testthat::expect_type(object = string, type = "character")
+    testthat::expect_length(object = string, n = 1)
+    testthat::expect_true(!is.na(string))
+    split <- tolower(strsplit(x = string, split = " ")[[1]])
+    testthat::expect_contains(object = split, expected = names(expect)[i]) # !!!
   }
   testthat::expect_error(object = .type(alpha = -0.1))
   testthat::expect_error(object = .type(alpha = 1.1))
@@ -73,8 +92,8 @@ testthat::test_that("initial coefficients are named correctly", {
 
 ## function ".expand_auxiliary" ------------------------------------------------
 
-n <- 5
-p <- 10
+n <- as.integer(5)
+p <- as.integer(10)
 set.seed(1)
 x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
 primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
@@ -99,10 +118,12 @@ testthat::test_that("primary predictors are equal", {
 testthat::test_that("auxiliary features are zero", {
   testthat::expect_setequal(object = x_expanded[, !primary], expected = 0)
 })
-testthat::test_that("expanded features are finite", {
+testthat::test_that("expanded features are in a finite n x p matrix", {
   testthat::expect_type(object = x_expanded, type = "double")
-  testthat::expect_true(all(is.finite(x_expanded)))
   testthat::expect_length(object = x_expanded, n = n * p)
+  testthat::expect_identical(object = nrow(x_expanded), expected = n)
+  testthat::expect_identical(object = ncol(x_expanded), expected = p)
+  testthat::expect_true(all(is.finite(x_expanded)))
 })
 
 ## function ".combine_slopes" --------------------------------------------------
@@ -113,10 +134,10 @@ alpha <- stats::rnorm(1)
 temp <- stats::rnorm(p)
 beta <- pmax(c(temp, -temp), 0)
 coef <- .combine_slopes(alpha = alpha, beta = beta)
-testthat::test_that("coefficients are finite", {
+testthat::test_that("coefficients are in finite p + 1 vector", {
   testthat::expect_type(object = coef, type = "double")
-  testthat::expect_true(all(is.finite(coef)))
   testthat::expect_length(object = coef, n = p + 1)
+  testthat::expect_true(all(is.finite(coef)))
 })
 testthat::test_that("intercept does not change", {
   testthat::expect_identical(object = coef[1], expected = alpha)
@@ -458,6 +479,9 @@ testthat::test_that("residuals match those from stats::residuals", {
     y_hat <- fitted(glm)
     resid <- .residuals(y_obs = y, y_fit = y_hat, family = family)
     names(resid) <- seq_len(n)
-    testthat::expect_equal(object = resid, expected = residuals(glm))
+    testthat::expect_type(object = resid, type = "double")
+    testthat::expect_length(object = resid, n = n)
+    testthat::expect_true(all(is.finite(resid)))
+    testthat::expect_equal(object = resid, expected = stats::residuals(glm)) # !
   }
 })

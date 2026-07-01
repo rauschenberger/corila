@@ -129,18 +129,24 @@ n <- as.integer(50)
 data <- simulate(family = "gaussian", n0 = n, n1 = n, n_group = 3,
                  size_group = c(3, 2))
 object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group)
+
 testthat::test_that("S3 methods work as expected", {
   testthat::expect_identical(object = stats::nobs(object), expected = n)
   testthat::expect_error(object = coef(object, s = "lambda.1se"))
   testthat::expect_error(object = coef(object, s = -1))
 })
-print <- print(object)
-testthat::test_that("print returns object",
-                    {testthat::expect_equal(object, print)})
-string <- capture.output(print)
+
+testthat::test_that("print returns object invisibly", {
+  testthat::expect_invisible(call = print(object))
+  testthat::expect_equal(object = print(object), expected = object)
+})
+
 testthat::test_that("corila prints a string", {
+  string <- capture.output(print)
+  testthat::expect_true(object = any(grepl(pattern = "cv.corila", x = string)))
   testthat::expect_type(object = string, type = "character")
 })
+
 list <- summary(object)
 cond <- vapply(X = list, FUN = is.null, FUN.VALUE = logical(1))
 testthat::test_that("summary does not contain NULL",

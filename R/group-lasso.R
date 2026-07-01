@@ -1272,6 +1272,8 @@ print.summary.cv.corila <- function(x, ...) {
 #'
 #' @inherit summary.cv.corila examples
 #'
+#' @export
+#'
 #' @srrstats {RE6.0} *default plot method*
 #' @srrstats {RE6.2} *plot fitted values*
 #'
