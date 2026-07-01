@@ -2,9 +2,9 @@
 #'
 #' @srrstatsVerbose TRUE
 #'
-#' @srrstats {G1.2} *README.md contains a life cycle badge.* 
-#' @srrstatsTODO {G1.3} *All statistical terminology should be clarified and unambiguously defined.* 
-#' @srrstats {G1.4} *roxygen2 is used (see DESCRIPTION and files in folder R).*
+#' @srrstats {G1.2} *README.md contains a life cycle badge* 
+#' @srrstats {G1.3} *statistical terminology is defined (see files in folder R)* 
+#' @srrstats {G1.4} *roxygen2 is used (see DESCRIPTION and files in folder R)*
 #' @srrstats {G1.4a} *internal functions are documented and have the keyword "internal" (see files in folder R)*
 #' @srrstatsTODO {G1.5} *Software should include all code necessary to reproduce results which form the basis of performance claims made in associated publications.* 
 #' @srrstatsTODO {G1.6} *Software should include code necessary to compare performance claims with alternative implementations in other R packages.*
@@ -24,7 +24,6 @@
 #' @srrstatsTODO {G2.16} *All functions should also provide options to handle undefined values (e.g., `NaN`, `Inf` and `-Inf`), including potentially ignoring or removing such values.* 
 #' @srrstatsTODO {G3.0} *Statistical software should never compare floating point numbers for equality. All numeric equality comparisons should either ensure that they are made between integers, or use appropriate tolerances for approximate equality.* 
 #' @srrstatsTODO {G3.1} *Statistical software which relies on covariance calculations should enable users to choose between different algorithms for calculating covariances, and should not rely solely on covariances from the `stats::cov` function.*
-#' @srrstatsTODO {G3.1a} *The ability to use arbitrarily specified covariance methods should be documented (typically in examples or vignettes).* 
 #' @srrstatsTODO {G4.0} *Statistical Software which enables outputs to be written to local files should parse parameters specifying file names to ensure appropriate file suffixes are automatically generated where not provided.*
 #' @srrstatsTODO {G5.0} *Where applicable or practicable, tests should use standard data sets with known properties (for example, the [NIST Standard Reference Datasets](https://www.itl.nist.gov/div898/strd/), or data sets provided by other widely-used R packages).*
 #' @srrstatsTODO {G5.1} *Data sets created within, and used to test, a package should be exported (or otherwise made generally available) so that users can confirm tests and run examples.* 
@@ -64,9 +63,7 @@
 #' @srrstats {RE3.2} *See glmnet-package for convergence thresholds*
 #' @srrstats {RE4.7} *convergence statistics are in the returned glmnet object* 
 #' @srrstatsTODO {RE4.11} *Goodness-of-fit and other statistics associated such as effect sizes with model coefficients.*
-#' @srrstatsTODO {RE4.12} *Where appropriate, functions used to transform input data, and associated inverse transform functions.* 
-#' @srrstatsTODO {RE4.14} *Where possible, values should also be provided for extrapolation or forecast *errors*.*
-#' @srrstatsTODO {RE4.15} *Sufficient documentation and/or testing should be provided to demonstrate that forecast errors, confidence intervals, or equivalent values increase with forecast horizons.* 
+#' @srrstatsTODO {RE4.12} *Where appropriate, functions used to transform input data, and associated inverse transform functions.*
 #' @srrstatsTODO {RE5.0} *Scaling relationships between sizes of input data (numbers of observations, with potential extension to numbers of variables/columns) and speed of algorithm.* 
 #' @srrstatsTODO {RE7.0} *Tests with noiseless, exact relationships between predictor (independent) data.*
 #' @srrstatsTODO {RE7.0a} In particular, these tests should confirm ability to reject perfectly noiseless input data.
@@ -82,6 +79,7 @@ NULL
 #'
 #' @srrstatsNA {G2.5} *no function has a factor argument*
 #' @srrstatsNA {G2.14c} *Missing data are not replaced by imputed values, because the type of imputation can have a major impact on the model.*
+#' @srrstatsNA {G3.1a} *covariance methods cannot arbitrarily be specified* 
 #' @srrstatsNA {RE1.0} *As this is a regression method for high-dimensional data, using the formula interface is not practical*
 #' @srrstatsNA {RE1.1} *idem*
 #' @srrstatsNA {RE2.4} *high-dimensional data are always perfectly collinear*
@@ -92,7 +90,9 @@ NULL
 #' @srrstatsNA {RE4.3} *confidence intervals are not available for penalised regression*
 #' @srrstatsNA {RE4.4} *formula is not useful for high-dimensional settings*
 #' @srrstatsNA {RE4.6} *variance-covariance matrix of coefficients is not available for this high-dimensional approach*
-#' @srrstatsNA {RE4.13} *predictors cannot be extracted to save memory* 
+#' @srrstatsNA {RE4.13} *predictors cannot be extracted to save memory*
+#' @srrstatsNA {RE4.14} *no closed-form prediction intervals are available for penalised regression*
+#' @srrstatsNA {RE4.15} *this method is not about forecasting for multiple time-points* 
 #' @srrstatsNA {RE4.16} *method models same responses for all groups*
 #' @srrstatsNA {RE6.1} *default plot method is generic*
 #' @srrstatsNA {RE6.3} *As this package is not about time series, there is no difference between interpolation and extrapolation.*
