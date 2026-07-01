@@ -75,6 +75,7 @@
 #' @noRd
 NULL
 
+
 #' NA_standards
 #'
 #' @srrstatsNA {G2.5} *no function has a factor argument*

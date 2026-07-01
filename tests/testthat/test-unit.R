@@ -85,9 +85,9 @@ testthat::test_that("initial coefficients are named correctly", {
     split <- tolower(strsplit(x = string, split = " ")[[1]])
     testthat::expect_contains(object = split, expected = names(expect)[i]) # !!!
   }
-  testthat::expect_error(object = .type(alpha = -0.1))
-  testthat::expect_error(object = .type(alpha = 1.1))
-  testthat::expect_error(object = .type(alpha = "blabla"))
+  testthat::expect_error(.type(alpha = -0.1))
+  testthat::expect_error(.type(alpha = 1.1))
+  testthat::expect_error(.type(alpha = "blabla"))
 })
 
 ## function ".expand_auxiliary" ------------------------------------------------
@@ -306,6 +306,12 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     y <- survival::Surv(time = time, event = status)
     index <- y[, "status"]
   }
+  testthat::test_that(paste("function '.folds' throws an error",
+                            "if nfolds < 2 or nfolds > n"), {
+    testthat::expect_error(.folds(y = y, family = family, nfolds = 0))
+    testthat::expect_error(.folds(y = y, family = family, nfolds = 1))
+    testthat::expect_error(.folds(y = y, family = family, nfolds = n + 1))
+  })
   foldid <- .folds(y = y, family = family, nfolds = 10)
   testthat::test_that("fold identifiers are in finite vector", {
     testthat::expect_type(object = foldid, type = "integer")
