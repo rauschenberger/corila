@@ -111,7 +111,6 @@
   list(coef = drop(coef), lambda = lambda)
 }
 
-# --- check arguments ---
 #' @title
 #' Argument check
 #'
@@ -379,7 +378,7 @@
 #'                           hyper = hyper,
 #'                           lambda_init = NULL)
 #'
-#' y_hat <- predict(object, newx = x, index = 1, s = 0)
+#' y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 #' }
 #'
 #' @keywords internal
@@ -935,9 +934,56 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   object$lambda.min <- lambda.min
   class(object) <- "cv.corila"
   object$y_obs <- y
-  object$y_fit <- predict(object = object, newx = x)
+  object$y_fit <- stats::predict(object = object, newx = x)
   object
 }
+
+#' @title
+#' List of methods for class `"cv.corila"`
+#'
+#' @description
+#' Lists implemented S3 methods for objects of class `"cv.corila"`.
+#'
+#' - [coef()][coef.cv.corila]:
+#'   extract estimated coefficients
+#' - [predict()][predict.cv.corila]:
+#'   calculate predicted values
+#' - [fitted()][fitted.cv.corila]:
+#'   extract fitted values
+#' - [residuals()][residuals.cv.corila]:
+#'   calculate deviance residuals
+#' - [plot()][plot.cv.corila]:
+#'   visualise observed vs fitted values and estimated coefficients
+#' - [print()][print.cv.corila]:
+#'   print information to the console
+#' - [summary()][summary.cv.corila]:
+#'   summarise the fitted model
+#'
+#' @seealso
+#' Use [cv.corila()] to fit the model.
+#'
+#' @examples
+#' # listing S3 methods
+#' methods(class = "cv.corila")
+#'
+#' # using S3 methods
+#' n <- 10; p <- 20; q <- 5
+#' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
+#' y <- rnorm(n)
+#' group <- rep(seq_len(q), length.out = p)
+#' primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+#' object <- cv.corila(x = x, y = y, group = group, primary = primary)
+#'
+#' coef(object)
+#' predict(object, newx = x)
+#' fitted(object)
+#' residuals(object)
+#' plot(object)
+#' print(object)
+#' summary(object)
+#'
+#' @name methods
+NULL
 
 #' @title
 #' print (S3 method)
@@ -988,6 +1034,9 @@ print.cv.corila <- function(x, ...) {
 #' @param ...
 #' (not used)
 #'
+#' @return
+#' Returns a positive integer.
+#'
 #' @importFrom stats nobs
 #'
 #' @export
@@ -1014,6 +1063,9 @@ nobs.cv.corila <- function(object, ...) {
 #' Returns the deviance calculated by [glmnet::deviance.glmnet()]
 #' for the model with the optimised mixing and regularisation hyperparameters.
 #'
+#' @return
+#' Returns a scalar.
+#'
 #' @seealso
 #' The internal function [.deviance()] calculates
 #' the deviance from fitted and observed values.
@@ -1037,6 +1089,14 @@ deviance.cv.corila <- function(object, ...) {
 #' @param ...
 #' (not used)
 #'
+#' @return
+#' Returns a numeric vector of length \eqn{n_0}
+#' (one entry for each training observation).
+#'
+#' @seealso
+#' Use [predict()][predict.cv.corila] to obtain predicted values
+#' (i.e., for testing observations).
+#'
 #' @export
 #'
 #' @srrstats {RE4.9} *access fitted values*
@@ -1058,13 +1118,19 @@ fitted.cv.corila <- function(object, ...) {
 #' This function extracts the observed and fitted values from the fitted model
 #' and calls the internal function [.residuals()] to calculate the residuals.
 #'
+#' @importFrom stats residuals
+#'
 #' @export
+#'
+#' @return
+#' Returns a numeric vector of length \eqn{n_0}
+#' (one entry for each training observation).
 #'
 #' @srrstats {RE4.10} *model residuals*
 #'
 residuals.cv.corila <- function(object, ...) {
   .residuals(y_obs = object$y_obs,
-             y_fit = object$y_fit,
+             y_fit = as.numeric(object$y_fit),
              family = object$args$family)
 }
 
@@ -1280,7 +1346,7 @@ print.summary.cv.corila <- function(x, ...) {
 plot.cv.corila <- function(x, ...) {
   y_obs <- x$y_obs
   y_fit <- x$y_fit
-  beta <- coef(x, s = "lambda.min")[-1]
+  beta <- stats::coef(x, s = "lambda.min")[-1]
   graphics::par(mfrow = c(1, 2))
   max <- max(abs(c(y_obs, y_fit)))
   lim <- c(-max, max)
@@ -1369,8 +1435,9 @@ plot.cv.corila <- function(x, ...) {
 #' @inherit corila-package references
 #'
 #' @seealso
-#' Fit models with [cv.corila()]
-#' and extract coefficients with [coef()][coef.cv.corila].
+#' Fit models with [cv.corila()],
+#' extract coefficients with [coef()][coef.cv.corila],
+#' and extract fitted values with [fitted()][fitted.cv.corila].
 #'
 #' @details
 #' This function calls
@@ -1402,7 +1469,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
                                 newx = x_all,
                                 s = s,
                                 type = "response")
-  .backscale(y = y_hat_stand, pars = object$scale)$y
+  .backscale(y = as.numeric(y_hat_stand), pars = object$scale)$y
 }
 
 #' @title

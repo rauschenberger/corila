@@ -119,7 +119,8 @@ allowing for privileged information".
 \emph{In preparation}.
 }
 \seealso{
-Fit models with \code{\link[=cv.corila]{cv.corila()}}
-and extract coefficients with \link[=coef.cv.corila]{coef()}.
+Fit models with \code{\link[=cv.corila]{cv.corila()}},
+extract coefficients with \link[=coef.cv.corila]{coef()},
+and extract fitted values with \link[=fitted.cv.corila]{fitted()}.
 }
 \keyword{methods}

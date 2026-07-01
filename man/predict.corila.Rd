@@ -54,7 +54,7 @@ object <- corila:::corila(x = x,
                           hyper = hyper,
                           lambda_init = NULL)
 
-y_hat <- predict(object, newx = x, index = 1, s = 0)
+y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 }
 
 }

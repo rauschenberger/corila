@@ -11,6 +11,10 @@
 
 \item{...}{(not used)}
 }
+\value{
+Returns a numeric vector of length \eqn{n_0}
+(one entry for each training observation).
+}
 \description{
 Residuals
 }

@@ -11,6 +11,9 @@
 
 \item{...}{(not used)}
 }
+\value{
+Returns a scalar.
+}
 \description{
 Calculates the deviance.
 }

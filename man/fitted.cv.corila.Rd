@@ -11,6 +11,14 @@
 
 \item{...}{(not used)}
 }
+\value{
+Returns a numeric vector of length \eqn{n_0}
+(one entry for each training observation).
+}
 \description{
 Extracts fitted values.
+}
+\seealso{
+Use \link[=predict.cv.corila]{predict()} to obtain predicted values
+(i.e., for testing observations).
 }

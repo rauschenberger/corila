@@ -11,6 +11,9 @@
 
 \item{...}{(not used)}
 }
+\value{
+Returns a positive integer.
+}
 \description{
 Extracts the number of observations.
 }
