@@ -161,6 +161,7 @@
 #' @keywords internal
 #'
 #' @srrstats {RE2.3} *data are centred internally*
+#' @srrstats {RE4.12} *function to transform input data, and inverse function*
 #'
 .forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   # --- check arguments ---

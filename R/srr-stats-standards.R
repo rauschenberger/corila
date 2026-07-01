@@ -6,14 +6,6 @@
 #' @srrstats {G1.3} *statistical terminology is defined (see files in folder R)* 
 #' @srrstats {G1.4} *roxygen2 is used (see DESCRIPTION and files in folder R)*
 #' @srrstats {G1.4a} *internal functions are documented and have the keyword "internal" (see files in folder R)*
-#' @srrstatsTODO {G1.5} *Software should include all code necessary to reproduce results which form the basis of performance claims made in associated publications.* 
-#' @srrstatsTODO {G1.6} *Software should include code necessary to compare performance claims with alternative implementations in other R packages.*
-#' @srrstatsTODO {G2.4} *Provide appropriate mechanisms to convert between different data types, potentially including:*
-#' @srrstatsTODO {G2.4a} *explicit conversion to `integer` via `as.integer()`*
-#' @srrstatsTODO {G2.4b} *explicit conversion to continuous via `as.numeric()`*
-#' @srrstatsTODO {G2.4c} *explicit conversion to character via `as.character()` (and not `paste` or `paste0`)*
-#' @srrstatsTODO {G2.4d} *explicit conversion to factor via `as.factor()`*
-#' @srrstatsTODO {G2.4e} *explicit conversion from factor via `as...()` functions*
 #' @srrstatsTODO {G2.6} *Software which accepts one-dimensional input should ensure values are appropriately pre-processed regardless of class structures.* 
 #' @srrstatsTODO {G2.7} *Software should accept as input as many of the above standard tabular forms as possible, including extension to domain-specific forms.*
 #' @srrstatsTODO {G2.8} *Software should provide appropriate conversion or dispatch routines as part of initial pre-processing to ensure that all other sub-functions of a package receive inputs of a single defined class or type.*
@@ -30,12 +22,10 @@
 #' @srrstatsTODO {G5.2} *Appropriate error and warning behaviour of all functions should be explicitly demonstrated through tests. In particular,*
 #' @srrstatsTODO {G5.2a} *Every message produced within R code by `stop()`, `warning()`, `message()`, or equivalent should be unique*
 #' @srrstatsTODO {G5.2b} *Explicit tests should demonstrate conditions which trigger every one of those messages, and should compare the result with expected values.*
-#' @srrstatsTODO {G5.3} *For functions which are expected to return objects containing no missing (`NA`) or undefined (`NaN`, `Inf`) values, the absence of any such values in return objects should be explicitly tested.* 
 #' @srrstatsTODO {G5.4} **Correctness tests** *to test that statistical algorithms produce expected results to some fixed test data sets (potentially through comparisons using binding frameworks such as [RStata](https://github.com/lbraglia/RStata)).*
 #' @srrstatsTODO {G5.4a} *For new methods, it can be difficult to separate out correctness of the method from the correctness of the implementation, as there may not be reference for comparison. In this case, testing may be implemented against simple, trivial cases or against multiple implementations such as an initial R implementation compared with results from a C/C++ implementation.*
 #' @srrstatsTODO {G5.4b} *For new implementations of existing methods, correctness tests should include tests against previous implementations. Such testing may explicitly call those implementations in testing, preferably from fixed-versions of other software, or use stored outputs from those where that is not possible.*
 #' @srrstatsTODO {G5.4c} *Where applicable, stored values may be drawn from published paper outputs when applicable and where code from original implementations is not available*
-#' @srrstatsTODO {G5.5} *Correctness tests should be run with a fixed random seed*
 #' @srrstatsTODO {G5.6} **Parameter recovery tests** *to test that the implementation produce expected results given data with known properties. For instance, a linear regression algorithm should return expected coefficient values for a simulated data set generated from a linear model.*
 #' @srrstatsTODO {G5.6a} *Parameter recovery tests should generally be expected to succeed within a defined tolerance rather than recovering exact values.*
 #' @srrstatsTODO {G5.6b} *Parameter recovery tests should be run with multiple random seeds when either data simulation or the algorithm contains a random component. (When long-running, such tests may be part of an extended, rather than regular, test suite; see G5.10-4.12, below).* 
@@ -59,11 +49,9 @@
 #' @srrstatsTODO {RE2.1} *Regression Software should implement explicit parameters controlling the processing of missing values, ideally distinguishing `NA` or `NaN` values from `Inf` values (for example, through use of `na.omit()` and related functions from the `stats` package).* 
 #' @srrstatsTODO {RE2.2} *Regression Software should provide different options for processing missing values in predictor and response data. For example, it should be possible to fit a model with no missing predictor data in order to generate values for all associated response points, even where submitted response values may be missing.*
 #' @srrstats {RE3.0} *The function glmnet from the glmnet-package issues warnings if the model fails to converge.*
-#' @srrstatsTODO {RE3.1} *Enable such messages to be optionally suppressed, yet should ensure that the resultant model object nevertheless includes sufficient data to identify lack of convergence.*
 #' @srrstats {RE3.2} *See glmnet-package for convergence thresholds*
 #' @srrstats {RE4.7} *convergence statistics are in the returned glmnet object* 
 #' @srrstatsTODO {RE4.11} *Goodness-of-fit and other statistics associated such as effect sizes with model coefficients.*
-#' @srrstatsTODO {RE4.12} *Where appropriate, functions used to transform input data, and associated inverse transform functions.*
 #' @srrstatsTODO {RE5.0} *Scaling relationships between sizes of input data (numbers of observations, with potential extension to numbers of variables/columns) and speed of algorithm.* 
 #' @srrstatsTODO {RE7.0} *Tests with noiseless, exact relationships between predictor (independent) data.*
 #' @srrstatsTODO {RE7.0a} In particular, these tests should confirm ability to reject perfectly noiseless input data.
@@ -75,9 +63,10 @@
 #' @noRd
 NULL
 
-
 #' NA_standards
 #'
+#' @srrstatsNA {G2.4d} *method does not use factors*
+#' @srrstatsNA {G2.4e} *idem*
 #' @srrstatsNA {G2.5} *no function has a factor argument*
 #' @srrstatsNA {G2.14c} *Missing data are not replaced by imputed values, because the type of imputation can have a major impact on the model.*
 #' @srrstatsNA {G3.1a} *covariance methods cannot arbitrarily be specified* 

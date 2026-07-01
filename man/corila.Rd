@@ -17,6 +17,7 @@ corila(
   foldid,
   nfolds,
   lambda_init,
+  silent = FALSE,
   threshold = 0
 )
 }
@@ -82,6 +83,9 @@ or \eqn{p \times p} correlation matrix}
 
 \item{lambda_init}{regularisation hyperparameter(s),
 or \code{NULL} (cross-validation)}
+
+\item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
+be suppressed? logical}
 
 \item{threshold}{threshold for absolute correlation coefficients:
 numeric in unit interval}

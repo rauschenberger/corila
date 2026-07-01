@@ -4,7 +4,17 @@
 \alias{.estim_initial_coefs}
 \title{Initial coefficients}
 \usage{
-.estim_initial_coefs(x, y, family, alpha_init, group, foldid, nfolds, lambda)
+.estim_initial_coefs(
+  x,
+  y,
+  family,
+  alpha_init,
+  group,
+  foldid,
+  nfolds,
+  lambda,
+  silent
+)
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix,
@@ -49,6 +59,9 @@ from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 
 \item{lambda}{numeric scalar, or \code{NULL}
 (determined by cross-validation)}
+
+\item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
+be suppressed? logical}
 }
 \description{
 Estimate initial coefficients.

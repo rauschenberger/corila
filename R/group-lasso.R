@@ -39,7 +39,7 @@
 #' @keywords internal
 #'
 .estim_initial_coefs <- function(x, y, family, alpha_init, group,
-                                 foldid, nfolds, lambda) {
+                                 foldid, nfolds, lambda, silent) {
   # --- check arguments ---
   methods <- c("pearson", "spearman", "kendall", "multiridge")
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
@@ -92,19 +92,21 @@
     coef[is.na(coef)] <- 0
   } else if (is.numeric(alpha_init) && alpha_init >= 0 && alpha_init <= 1) {
     if (is.null(lambda)) {
-      model <- glmnet::cv.glmnet(x = x,
-                                 y = y,
-                                 family = family,
-                                 alpha = alpha_init,
-                                 foldid = foldid,
-                                 nfolds = nfolds)
+      model <- suppressMessages(glmnet::cv.glmnet(x = x,
+                                                  y = y,
+                                                  family = family,
+                                                  alpha = alpha_init,
+                                                  foldid = foldid,
+                                                  nfolds = nfolds),
+                                classes = "message"[silent])
       coef <- stats::coef(object = model, s = "lambda.min")[is_slope]
       lambda <- model$lambda.min
     } else {
-      model <- glmnet::glmnet(x = x,
-                              y = y,
-                              family = family,
-                              alpha = alpha_init)
+      model <- suppressMessages(glmnet::glmnet(x = x,
+                                               y = y,
+                                               family = family,
+                                               alpha = alpha_init),
+                                classes = "message"[silent])
       coef <- stats::coef(object = model, s = lambda)[is_slope]
     }
   }
@@ -132,9 +134,14 @@
 #'
 #' @keywords internal
 #'
+#' @srrstats {G2.4} *verifying data types:*
+#' @srrstats {G2.4a} *- integer*
+#' @srrstats {G2.4b} *- numeric*
+#' @srrstats {G2.4c} *- character*
+#'
 .validate <- function(na_action, x, y, group, primary, family, hyper,
                       alpha_init, alpha_final, cor,
-                      foldid, nfolds, lambda_init) {
+                      foldid, nfolds, lambda_init, silent) {
   #--- na action ---
   .assert(x = na_action, type = "nominal",
           support = c("error", "complete_cases"))
@@ -149,19 +156,19 @@
           support = c("gaussian", "binomial", "poisson", "cox"))
   if (identical(family, "gaussian")) {
     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-      stop("Gaussian family requires a numerical outcome.") # nocov
+      stop("Gaussian family requires a numerical outcome.")
     }
   } else if (identical(family, "binomial")) {
     if (!all(y %in% c(0, 1))) {
-      stop("Binomial family requires a binary outcome.") # nocov
+      stop("Binomial family requires a binary outcome.")
     }
   } else if (identical(family, "poisson")) {
     if (any(y %% 1 != 0)) {
-      stop("Poisson family requires a count outcome.") # nocov
+      stop("Poisson family requires a count outcome.")
     }
   } else if (identical(family, "cox")) {
     if (!inherits(x = y, what = "Surv")) {
-      stop("Cox model requires a survival outcome.") # nocov
+      stop("Cox model requires a survival outcome.")
     }
   }
   # --- group indicator ---
@@ -173,7 +180,7 @@
       .assert(x = group, type = "nominal", dim = p)
     } else {
       stop("If argument 'group' is a vector, ",
-           "it must be of class 'numeric' or 'character'.") # nocov
+           "it must be of class 'numeric' or 'character'.")
     }
   } else if (is.list(group)) {
     q <- length(group)
@@ -187,7 +194,7 @@
       } else {
         stop("If argument 'group' is a list, ",
              "it must be a list of ",
-             "numeric or character vectors.") # nocov
+             "numeric or character vectors.")
       }
     }
   } else if (is.matrix(group)) {
@@ -195,7 +202,7 @@
     .assert(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)
   } else {
     stop("Argument 'group' must be a vector, ",
-         "a list, or a matrix.") # nocov
+         "a list, or a matrix.")
   }
   # --- other arguments ---
   .assert(x = primary, type = "logical", dim = p)
@@ -222,6 +229,7 @@
   .assert(x = foldid, type = "integer", dim = n, min = 1, max = n)
   .assert(x = nfolds, type = "integer", min = 1, max = n)
   .assert(x = lambda_init, type = "numeric", min = 0)
+  .assert(x = silent, type = "logical")
   list(n = n, p = p, q = q)
 }
 
@@ -385,7 +393,7 @@
 #'
 corila <- function(x, y, group, primary, family, hyper, alpha_init,
                    alpha_final, cor, foldid,
-                   nfolds, lambda_init, threshold = 0) {
+                   nfolds, lambda_init, silent = FALSE, threshold = 0) {
   args <- .validate(
     x = x,
     y = y,
@@ -399,7 +407,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     foldid = foldid,
     nfolds = nfolds,
     lambda_init = lambda_init,
-    na_action = "error"
+    na_action = "error",
+    silent = silent
   )
   #args <- as.list(match.call())[-1]
   #do.call(what = .validate, args = args)
@@ -475,12 +484,15 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     #  stop(paste0("negative pf:", min(pf_ext)))
     #}
     .assert(x = pf_ext, type = "numeric", dim = 2 * p, min = 0)
-    model[[i]] <- glmnet::glmnet(x = cbind(scale$x, -scale$x),
-                                 y = scale$y,
-                                 family = family,
-                                 penalty.factor = pf_ext,
-                                 lower.limits = 0,
-                                 alpha = alpha_final)
+    model[[i]] <- suppressMessages(
+      glmnet::glmnet(x = cbind(scale$x, -scale$x),
+                     y = scale$y,
+                     family = family,
+                     penalty.factor = pf_ext,
+                     lower.limits = 0,
+                     alpha = alpha_final),
+      classes = "message"[silent]
+    )
   }
   structure(
     list(
@@ -525,6 +537,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' with [cv.corila()].
 #'
 #' @inherit corila examples
+#'
+#' @keywords internal
 #'
 #' @export
 #'
@@ -705,6 +719,10 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' or `"complete_cases"` to omit observations
 #' with a missing predictor or a missing response
 #'
+#' @param silent
+#' Should messages from [glmnet::glmnet()] and [glmnet::cv.glmnet()]
+#' be suppressed? logical
+#'
 #' @inherit corila details
 #'
 #' @return
@@ -822,13 +840,14 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' @srrstats {G2.14} *uses argument na_action*
 #' @srrstats {G2.14a} *to trigger an error on missing data*
 #' @srrstats {G2.14b} *to ignore observations with missing data*
-#' @srrstats {RE4.0} *returns a "model" object (see @return)*
+#' @srrstats {RE3.1} *convergence messages can be suppressed (@param silent)*
+#' @srrstats {RE4.0} *returns a "model" object (@return)*
 #' @srrstats {RE4.8} *returns response variable in slot "y_obs"*
 #'
 cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
                       nfolds = 10, cor = "spearman", tune = "weight",
-                      foldid = NULL, na_action = "error") {
+                      foldid = NULL, na_action = "error", silent = FALSE) {
   # match arguments
   family <- match.arg(arg = tolower(family),
                       choices = c("gaussian", "binomial", "poisson", "cox"))
@@ -857,7 +876,8 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
     foldid = foldid,
     nfolds = nfolds,
     lambda_init = NULL,
-    hyper = hyper
+    hyper = hyper,
+    silent = silent
   )
   if (identical(na_action, "complete_cases")) {
     complete <- stats::complete.cases(x = x, y = y)
@@ -880,7 +900,8 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                        foldid = foldid,
                        nfolds = NULL,
                        hyper = hyper,
-                       lambda_init = NULL)
+                       lambda_init = NULL,
+                       silent = silent)
   lambda <- lapply(X = object_ext$model, FUN = function(x) x$lambda)
   # initialise matrices for predictions
   pred <- list()
@@ -903,7 +924,8 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                          foldid = NULL,
                          nfolds = NULL,
                          hyper = hyper,
-                         lambda_init = object_ext$lambda_init)
+                         lambda_init = object_ext$lambda_init,
+                         silent = silent)
     for (j in seq_len(nrow(hyper))) {
       pred[[j]][foldid == i, ] <- stats::predict(
         object = object_int,
@@ -1509,7 +1531,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   eps <- 1e-06
   if (any(beta_positive > eps & beta_negative > eps)) {
     stop("A predictor must not have ",
-         "a positive and a negative coefficient.") # nocov
+         "a positive and a negative coefficient.") # nocov (not reachable)
   }
   beta_combined <- beta_positive  - beta_negative
   c(alpha, beta_combined)
@@ -1565,7 +1587,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   if (any(coef[c(FALSE[object$scale$family != "cox"],
                  !object$args$primary)] != 0)) {
-    stop("Excluded coefficients must equal zero.") # nocov
+    stop("Excluded coefficients must equal zero.") # nocov (not reachable)
   }
   coef[c(TRUE[object$scale$family != "cox"], object$args$primary)]
 }

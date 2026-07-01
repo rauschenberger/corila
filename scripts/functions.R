@@ -1,4 +1,6 @@
 
+#' @srrstats {G1.5} *code for reproducing results in manuscript*
+#' @srrstatsTODO {G1.6} *code for comparing with other methods*
 
 #' @title
 #' Correlation Plot

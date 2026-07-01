@@ -16,7 +16,8 @@ cv.corila(
   cor = "spearman",
   tune = "weight",
   foldid = NULL,
-  na_action = "error"
+  na_action = "error",
+  silent = FALSE
 )
 }
 \arguments{
@@ -100,6 +101,9 @@ tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
 if any observation has a missing predictor or a missing response
 or \code{"complete_cases"} to omit observations
 with a missing predictor or a missing response}
+
+\item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
+be suppressed? logical}
 }
 \value{
 Returns an object of class \code{"cv.corila"},

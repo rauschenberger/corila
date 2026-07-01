@@ -27,7 +27,12 @@ reference:
   - cv.corila
   - coef.cv.corila
   - predict.cv.corila
-  - print.cv.corila
+  - fitted.cv.corila
+  - residuals.cv.corila
+  - nobs.cv.corila
+  - plot.cv.corila
+  - deviance.cv.corila
+  - methods
 - title: "Multi-penalty ridge regression"
   contents:
   - multiridge

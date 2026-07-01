@@ -1,5 +1,7 @@
 
 # Unit tests -------------------------------------------------------------------
+#' @srrstats {G5.5} *correctness tests are run with a fixed random seed*
+#' @srrstats {G5.3} *absence of NA, NaN, -Inf, and Inf in return is tested*
 
 ## functions ".forescale" and ".backscale" -------------------------------------
 
@@ -425,7 +427,7 @@ testthat::test_that("outcomes are simulated", {
                 primary = NULL,
                 family = family[i], hyper = NULL, alpha_init = NULL,
                 alpha_final = NULL, cor = NULL, foldid = NULL,
-                nfolds = NULL, lambda_init = NULL)
+                nfolds = NULL, lambda_init = NULL, silent = FALSE)
       testthat::expect_length(object = y, n = n)
     }
   }

@@ -70,3 +70,4 @@ Estimate parameters with \code{\link[=corila]{corila()}},
 or estimate parameters and tune hyperparameters
 with \code{\link[=cv.corila]{cv.corila()}}.
 }
+\keyword{internal}

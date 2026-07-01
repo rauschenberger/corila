@@ -17,7 +17,8 @@
   cor,
   foldid,
   nfolds,
-  lambda_init
+  lambda_init,
+  silent
 )
 }
 \arguments{
@@ -87,6 +88,9 @@ or \eqn{p \times p} correlation matrix}
 
 \item{lambda_init}{regularisation hyperparameter(s),
 or \code{NULL} (cross-validation)}
+
+\item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
+be suppressed? logical}
 }
 \value{
 Returns a list with slots \code{n}, \code{p}, and \code{q} or an error message.
