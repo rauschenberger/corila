@@ -31,7 +31,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that("func '.backscale' returns finite n-vector y", {
     type <- ifelse(family %in% c("binomial", "poisson"), "integer", "double")
     testthat::expect_type(object = y_back, type = type)
-    testthat::expect_length(object = y_back, n= n)
+    testthat::expect_length(object = y_back, n = n)
     testthat::expect_true(all(is.finite(y_back)))
   })
   testthat::test_that("func '.backscale' recovers original response", {
@@ -41,7 +41,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_error(.backscale(pars = scale$pars[-1], y = scale$y))
   })
   # coefficients
-  beta <- stats::rnorm(p + (family!="cox"))
+  beta <- stats::rnorm(p + (family != "cox"))
   mu_x <- rep(x = 0, times = p)
   sd_x <- rep(x = 1, times = p)
   mu_y <- 0
@@ -52,18 +52,21 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   coef <- .backscale(pars = pars, coef = beta)$coef
   testthat::test_that("func '.backscale' returns finite n-vector coef", {
     testthat::expect_type(object = coef, type = "double")
-    testthat::expect_length(object = coef, n = p + (family!="cox"))
+    testthat::expect_length(object = coef, n = p + (family != "cox"))
     testthat::expect_true(all(is.finite(coef)))
   })
   testthat::test_that("func '.backscale' recovers original coefficients", {
     testthat::expect_equal(object = coef, expected = beta) # !!!
   })
-  testthat::test_that(paste("func '.forescale' errors unless",
-                            "either arg 'family' or arg 'pars' is provided"), {
-    testthat::expect_error(.forescale(x = x, y = y))
-    testthat::expect_error(.forescale(x = x, y = y, family = family,
-                                      pars = pars))
-  })
+  testthat::test_that(
+    desc = paste("func '.forescale' errors unless",
+                 "either arg 'family' or arg 'pars' is provided"),
+    code = {
+      testthat::expect_error(.forescale(x = x, y = y))
+      testthat::expect_error(.forescale(x = x, y = y, family = family,
+                                        pars = pars))
+    }
+  )
 }
 
 ## function ".type" ------------------------------------------------------------
@@ -222,7 +225,7 @@ for (tune in c("none", "weight", "exponent", "bivariate", "factorial")) {
   testthat::test_that("candidate values", {
     labels <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
     testthat::expect_type(object = hyper, type = "list")
-    testthat::expect_equal(object = names(hyper), expected = labels)
+    testthat::expect_named(object = hyper, expected = labels)
     testthat::expect_gte(object = min(hyper), expected = 0)
     testthat::expect_identical(object = hyper, expected = unique(hyper))
     testthat::expect_identical(object = rownames(hyper),
@@ -255,8 +258,9 @@ testthat::test_that("mean function works", {
 ## function "calc_sign_prec" ---------------------------------------------------
 
 set.seed(1)
-truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
-estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
+n <- 10
+truth <- sample(x = c(-1, 0, 1), size = n, replace = TRUE)
+estim <- sample(x = c(-1, 0, 1), size = n, replace = TRUE)
 
 testthat::test_that("precision is finite scalar", {
   precision <- calc_sign_prec(truth = truth, estim = estim)
@@ -286,6 +290,17 @@ testthat::test_that("precision is not influenced by estimated zeros", {
   testthat::expect_identical(object = prec1, expected = prec2)
 })
 
+testthat::test_that("precision equals zero if all true signs are zero", {
+  prec <- calc_sign_prec(truth = rep(x = 0, times = n), estim = estim)
+  testthat::expect_identical(object = prec, expected = 0)
+})
+
+testthat::test_that("error if different lengths", {
+  truth <- sample(x = c(-1, 0, 1), size = n, replace = TRUE)
+  estim <- sample(x = c(-1, 0, 1), size = n - 1, replace = TRUE)
+  testthat::expect_error(calc_sign_prec(truth = truth, estim = estim))
+})
+
 ## function ".folds" -----------------------------------------------------------
 
 set.seed(1)
@@ -306,17 +321,21 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     y <- survival::Surv(time = time, event = status)
     index <- y[, "status"]
   }
-  testthat::test_that(paste("function '.folds' throws an error",
-                            "if nfolds < 2 or nfolds > n"), {
-    testthat::expect_error(.folds(y = y, family = family, nfolds = 0))
-    testthat::expect_error(.folds(y = y, family = family, nfolds = 1))
-    testthat::expect_error(.folds(y = y, family = family, nfolds = n + 1))
-  })
+  testthat::test_that(
+    desc = "function '.folds' throws an error if nfolds < 2 or nfolds > n",
+    code = {
+      for (nfolds in c(-1, 0, 1, n + 1, Inf)) {
+        testthat::expect_error(.folds(y = y, family = family, nfolds = nfolds))
+      }
+    }
+  )
   nfolds <- 10
-  testthat::test_that(paste("function '.folds' throws an error",
-                            "for invalid family"), {
-    testthat::expect_error(.folds(y = y, family = "gamma", nfolds = nfolds))
-  })
+  testthat::test_that(
+    desc = "function '.folds' throws an error for gamma family",
+    code = {
+      testthat::expect_error(.folds(y = y, family = "gamma", nfolds = nfolds))
+    }
+  )
   foldid <- .folds(y = y, family = family, nfolds = nfolds)
   testthat::test_that("fold identifiers are in finite vector", {
     testthat::expect_type(object = foldid, type = "integer")
@@ -332,7 +351,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   })
 }
 
-for(i in c(0,1)){
+for (i in c(0, 1)){
   n <- 10
   nfolds <- 5
   foldid <- .folds(y = rep(i, times = n), family = "binomial", nfolds = nfolds)
@@ -517,6 +536,10 @@ object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group)
 
 testthat::test_that("function 'cv.corila' returns a list", {
   testthat::expect_type(object = object, type = "list")
+  names <- c("model", "lambda_init", "scale", "args", "hyper",
+             "id_hyper", "lambda.min", "y_obs", "y_fit")
+  testthat::expect_length(object = object, n = length(names))
+  testthat::expect_named(object = object, expected = names)
 })
 
 testthat::test_that("function 'coef.cv.corila' returns finite p-vector", {
@@ -573,15 +596,22 @@ testthat::test_that("function 'print.cv.corila' prints a string", {
   testthat::expect_true(object = any(grepl(pattern = "cv.corila", x = string)))
 })
 
-testthat::test_that(paste("function 'summary.cv.corila' returns a list",
-                          "with 13 named slots"), {
-  testthat::expect_type(object = summary(object), type = "list")
-  testthat::expect_length(object = summary(object), n = 13)
-  testthat::expect_type(object = names(summary(object)), type = "character")
-})
+testthat::test_that(
+  desc = "function 'summary.cv.corila' returns a list with named slots",
+  code = {
+    testthat::expect_type(object = summary(object), type = "list")
+    names <- c("family", "n", "p", "p_primary", "p_auxiliary",
+               "alpha_init", "alpha_final", "lambda.min", "wgt_local",
+               "wgt_global", "exp_local", "exp_global", "nzero")
+    testthat::expect_length(object = summary(object), n = length(names))
+    testthat::expect_named(object = summary(object), expected = names)
+  }
+)
 
-testthat::test_that(paste("function 'print.summary.cv.corila'",
-                          "returns NULL invisibly"), {
-  testthat::expect_invisible(call = print(summary(object)))
-  testthat::expect_identical(object = print(summary(object)), expected = NULL)
-})
+testthat::test_that(
+  desc = "function 'print.summary.cv.corila' returns NULL invisibly",
+  code = {
+    testthat::expect_invisible(call = print(summary(object)))
+    testthat::expect_identical(object = print(summary(object)), expected = NULL)
+  }
+)
