@@ -141,17 +141,27 @@ testthat::test_that("print returns object invisibly", {
   testthat::expect_equal(object = print(object), expected = object)
 })
 
-testthat::test_that("corila prints a string", {
-  string <- capture.output(print)
-  testthat::expect_true(object = any(grepl(pattern = "cv.corila", x = string)))
+testthat::test_that("function 'print.cv.corila' prints a string", {
+  string <- capture.output(print(object))
   testthat::expect_type(object = string, type = "character")
+  testthat::expect_length(object = string, n = 3)
+  testthat::expect_true(object = any(grepl(pattern = "cv.corila", x = string)))
 })
 
-list <- summary(object)
-cond <- vapply(X = list, FUN = is.null, FUN.VALUE = logical(1))
-testthat::test_that("summary does not contain NULL",
-                    {testthat::expect_all_false(cond)})
-testthat::test_that("print.summary.cv.corila returns NULL invisibly", {
+testthat::test_that(paste("function 'summary.cv.corila' returns a list",
+                          "with 13 named slots"), {
+  testthat::expect_type(object = summary(object), type = "list")
+  testthat::expect_length(object = summary(object), n = 13)
+  testthat::expect_type(object = names(summary(object)), type = "character")
+})
+
+testthat::test_that("function 'plot.cv.corila' returns NULL invisibly", {
+  testthat::expect_invisible(call = plot(object))
+  testthat::expect_identical(object = plot(object), expected = NULL)
+})
+
+testthat::test_that(paste("function 'print.summary.cv.corila'",
+                          "returns NULL invisibly"), {
   testthat::expect_invisible(call = print(summary(object)))
   testthat::expect_identical(object = print(summary(object)), expected = NULL)
 })
