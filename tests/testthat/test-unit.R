@@ -594,6 +594,7 @@ testthat::test_that("function 'nobs.cv.corila' returns the correct integer", {
   testthat::expect_type(object = n_obs, type = "integer")
   testthat::expect_length(object = n_obs, n = 1)
   testthat::expect_true(is.finite(n_obs))
+  testthat::expect_gte(object = n_obs, expected = 1)
   testthat::expect_identical(object = n_obs, expected = n)
 })
 
@@ -631,5 +632,15 @@ testthat::test_that(
   code = {
     testthat::expect_invisible(call = print(summary(object)))
     testthat::expect_identical(object = print(summary(object)), expected = NULL)
+  }
+)
+
+testthat::test_that(
+  desc = "function 'deviance.cv.corila' returns a non-negative scalar",
+  code = {
+    dev <- deviance(object)
+    testthat::expect_type(object = dev, type = "double")
+    testthat::expect_length(object = dev, n = 1)
+    testthat::expect_gte(object = dev, expected = 0)
   }
 )
