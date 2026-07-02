@@ -531,9 +531,9 @@ testthat::test_that("residuals match those from stats::residuals", {
 ## S3 methods for class "cv.corila" --------------------------------------------
 
 n <- as.integer(10)
-for(family in c("gaussian", "binomial", "poisson", "cox")) {
+for (family in c("gaussian", "binomial", "poisson", "cox")) {
   set.seed(1)
-  data <- simulate(family = family, n0 = n, n1 = n, n_group = 5,
+  data <- simulate(family = family, n0 = n, n1 = n, n_group = 3,
                    size_group = c(3, 2))
   p <- data$info$p
   object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group,
@@ -560,7 +560,8 @@ for(family in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_true(all(is.finite(y_hat)))
     testthat::expect_error(predict(object, newx = data$x_train[, -1],
                                    s = "lambda.min"))
-    testthat::expect_error(predict(object, newx = data$x_train, s = "lambda.1se"))
+    testthat::expect_error(predict(object, newx = data$x_train,
+                                   s = "lambda.1se"))
     testthat::expect_error(predict(object, newx = data$x_train, s = -1))
   })
   testthat::test_that("function 'fitted.cv.corila' returns finite n-vector", {
@@ -571,12 +572,15 @@ for(family in c("gaussian", "binomial", "poisson", "cox")) {
     y_pred <- predict(object, newx = data$x_train, s = "lambda.min")
     testthat::expect_equal(object = y_hat, expected = y_pred)
   })
-  testthat::test_that("function 'residuals.cv.corila' returns finite n-vector", {
-    resid <- residuals(object)
-    testthat::expect_type(object = resid, type = "double")
-    testthat::expect_length(object = resid, n = n)
-    testthat::expect_true(all(is.finite(resid)))
-  })
+  testthat::test_that(
+    desc = "function 'residuals.cv.corila' returns finite n-vector",
+    code = {
+      resid <- residuals(object)
+      testthat::expect_type(object = resid, type = "double")
+      testthat::expect_length(object = resid, n = n)
+      testthat::expect_true(all(is.finite(resid)))
+    }
+  )
   testthat::test_that("observed minus fitted values equal residuals", {
     testthat::skip_if(family != "gaussian")
     y_hat <- fitted(object)
@@ -603,7 +607,8 @@ for(family in c("gaussian", "binomial", "poisson", "cox")) {
     string <- capture.output(print(object))
     testthat::expect_type(object = string, type = "character")
     testthat::expect_length(object = string, n = 3)
-    testthat::expect_true(object = any(grepl(pattern = "cv.corila", x = string)))
+    testthat::expect_true(object = any(grepl(pattern = "cv.corila",
+                                             x = string)))
   })
   testthat::test_that(
     desc = "function 'summary.cv.corila' returns a list with named slots",
@@ -620,7 +625,8 @@ for(family in c("gaussian", "binomial", "poisson", "cox")) {
     desc = "function 'print.summary.cv.corila' returns NULL invisibly",
     code = {
       testthat::expect_invisible(call = print(summary(object)))
-      testthat::expect_identical(object = print(summary(object)), expected = NULL)
+      testthat::expect_identical(object = print(summary(object)),
+                                 expected = NULL)
     }
   )
   testthat::test_that(
