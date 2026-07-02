@@ -62,6 +62,8 @@ notes <- autotest::autotest_package(test=TRUE)
 #devtools::install()
 .rs.restartR()
 devtools::load_all()
+
+usethis::use_data_raw("example.R")
 ```
 
 # Some notes on sparse correlation matrices

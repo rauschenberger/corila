@@ -15,3 +15,4 @@ _development.Rmd
 .lintr
 CITATION.cff
 ^scripts$
+^data-raw$
