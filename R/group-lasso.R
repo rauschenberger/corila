@@ -1360,8 +1360,17 @@ print.summary.cv.corila <- function(x, ...) {
 #' @param ...
 #' (not used)
 #'
+#' @details
+#' This function generates two figures:
+#' - a scatter plot of fitted versus observed values
+#' for the Gaussian and the Poisson families,
+#' a box plot of predicted probabilities for the two classes
+#' for the binomial family,
+#' or a histogram of fitted relative risks for the Cox model
+#' - estimated coefficients versus indices of predictors
+#'
 #' @return
-#' Returns `NULL` (invisible).
+#' Returns `NULL` invisibly.
 #'
 #' @inherit summary.cv.corila examples
 #'
@@ -1375,9 +1384,7 @@ plot.cv.corila <- function(x, ...) {
   y_fit <- x$y_fit
   beta <- stats::coef(x, s = "lambda.min")[-1]
   graphics::par(mfrow = c(1, 2))
-  if (x$args$family == "cox") {
-    graphics::plot.new()
-  } else {
+  if (x$args$family %in% c("gaussian", "poisson")) {
     max <- max(abs(c(y_obs, y_fit)))
     lim <- c(-max, max)
     graphics::plot(x = y_obs,
@@ -1386,6 +1393,15 @@ plot.cv.corila <- function(x, ...) {
                    ylab = "fitted values",
                    xlim = lim, ylim = lim)
     graphics::abline(a = 0, b = 1, lty = 2)
+  } else if (identical(x$args$family, "binomial")) {
+    graphics::boxplot(y_fit ~ y_obs,
+                      xlab = "observed class",
+                      ylab = "fitted probabilities", ylim = c(0, 1))
+  } else if (identical(x$args$family, "cox")) {
+    graphics::hist(y_fit,
+                   xlab = "fitted relative risks",
+                   ylab = "frequency",
+                   main = "")
   }
   max <- max(abs(beta))
   lim <- c(-max, max)

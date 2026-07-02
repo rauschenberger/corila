@@ -12,10 +12,21 @@
 \item{...}{(not used)}
 }
 \value{
-Returns \code{NULL} (invisible).
+Returns \code{NULL} invisibly.
 }
 \description{
 Plot method for class \code{"cv.corila"}.
+}
+\details{
+This function generates two figures:
+\itemize{
+\item a scatter plot of fitted versus observed values
+for the Gaussian and the Poisson families,
+a box plot of predicted probabilities for the two classes
+for the binomial family,
+or a histogram of fitted relative risks for the Cox model
+\item estimated coefficients versus indices of predictors
+}
 }
 \examples{
 n <- 12 # decrease to 10 to check LOOCV
