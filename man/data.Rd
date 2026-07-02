@@ -22,6 +22,9 @@ integer vector indicating the group of the predictors
 logical vector indicating
 primary (\code{TRUE}) and auxiliary (\code{FALSE}) predictors
 (length \eqn{p})
+\item \code{beta}:
+numeric vector of the effects of the predictors on the response
+(length \eqn{p})
 \item \code{x_test}:
 \eqn{n_1 \times p} predictor matrix for the test observations
 \item \code{y_test}:
@@ -35,5 +38,12 @@ data
 \description{
 This is example data for modelling a response based on
 grouped and correlated primary and auxiliary predictors.
+}
+\details{
+Use the objects \code{x_train}, \code{y_train}, \code{group}, and \code{primary}
+for model training.
+Estimated coefficients can be compared with \code{beta}.
+Use the object \code{x_test} for model testing.
+Predicted values can be compared with \code{y_test}.
 }
 \keyword{datasets}

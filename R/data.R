@@ -21,9 +21,19 @@
 #'   logical vector indicating
 #'   primary (`TRUE`) and auxiliary (`FALSE`) predictors
 #'   (length \eqn{p})
+#' - `beta`:
+#'    numeric vector of the effects of the predictors on the response
+#'    (length \eqn{p})
 #' - `x_test`:
 #'   \eqn{n_1 \times p} predictor matrix for the test observations
 #' - `y_test`:
 #'   response vector for the test observations of length \eqn{n_1}
+#'
+#' @details
+#' Use the objects `x_train`, `y_train`, `group`, and `primary`
+#' for model training.
+#' Estimated coefficients can be compared with `beta`.
+#' Use the object `x_test` for model testing.
+#' Predicted values can be compared with `y_test`.
 #'
 "data"
