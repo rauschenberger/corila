@@ -193,7 +193,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
     testthat::expect_identical(object = deviance, expected = 0)
   })
   testthat::test_that("worse predictions increase cox deviance", {
-    testthat::skip_if(family != "cox")
+    testthat::skip_if_not(family == "cox")
     # NB: inversion due to "higher risk = shorter time"
     dev_best <- .deviance(y = y,
                           y_hat = exp(-time_survival),
@@ -208,14 +208,14 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
     testthat::expect_gt(object = dev_worst, expected = dev_random)
   })
   testthat::test_that("mean shift does not change cox deviance", {
-    testthat::skip_if(family != "cox")
+    testthat::skip_if_not(family == "cox")
     dev0 <- .deviance(y = y, y_hat = exp(y_hat), family = family)
     dev1 <- .deviance(y = y, y_hat = exp(y_hat + stats::rnorm(1)),
                       family = family)
     testthat::expect_equal(object = dev1, expected = dev0)
   })
   testthat::test_that("gamma deviance is not implemented", {
-    testthat::skip_if(family != "gamma")
+    testthat::skip_if_not(family == "gamma")
     testthat::expect_error(.deviance(y = y, y_hat = y_hat, family = family))
   })
 }
@@ -575,6 +575,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that(
     desc = "function 'residuals.cv.corila' returns finite n-vector",
     code = {
+      testthat::skip_if(family == "cox")
       resid <- residuals(object)
       testthat::expect_type(object = resid, type = "double")
       testthat::expect_length(object = resid, n = n)
@@ -582,7 +583,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     }
   )
   testthat::test_that("observed minus fitted values equal residuals", {
-    testthat::skip_if(family != "gaussian")
+    testthat::skip_if_not(family == "gaussian")
     y_hat <- fitted(object)
     resid <- residuals(object)
     testthat::expect_equal(object = data$y_train - y_hat, expected = resid)

@@ -226,6 +226,13 @@
   } else {
     .assert(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
   }
+  #if (family %in% c("gaussian", "poisson")){
+  #  max <- n
+  #} else if (identical(family, "binomial")) {
+  #  max <- max(table(y))
+  #} else if (identical(family, "cox")) {
+  #  max <- max(table(y[ ,"status"]))
+  #}
   .assert(x = foldid, type = "integer", dim = n, min = 1, max = n)
   .assert(x = nfolds, type = "integer", min = 1, max = n)
   .assert(x = lambda_init, type = "numeric", min = 0)
@@ -1185,6 +1192,7 @@ residuals.cv.corila <- function(object, ...) {
 .residuals <- function(y_obs, y_fit, family) {
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson"))
+  eps <- 1e-06
   if (identical(family, "gaussian")) {
     .assert(x = y_obs, type = "numeric", dim = Inf)
     .assert(x = y_fit, type = "numeric", dim = length(y_obs))
@@ -1192,7 +1200,6 @@ residuals.cv.corila <- function(object, ...) {
   } else if (identical(family, "binomial")) {
     .assert(x = y_obs, type = "integer", dim = Inf, min = 0, max = 1)
     .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0, max = 1)
-    eps <- 1e-06
     y_fit <- pmax(eps, pmin(y_fit, 1 - eps))
     sign(y_obs - y_fit) * sqrt(2) *
       sqrt(- y_obs * log(y_fit) - (1 - y_obs) * log(1 - y_fit))
@@ -1368,14 +1375,18 @@ plot.cv.corila <- function(x, ...) {
   y_fit <- x$y_fit
   beta <- stats::coef(x, s = "lambda.min")[-1]
   graphics::par(mfrow = c(1, 2))
-  max <- max(abs(c(y_obs, y_fit)))
-  lim <- c(-max, max)
-  graphics::plot(x = y_obs,
-                 y = y_fit,
-                 xlab = "observed values",
-                 ylab = "fitted values",
-                 xlim = lim, ylim = lim)
-  graphics::abline(a = 0, b = 1, lty = 2)
+  if (x$args$family == "cox") {
+    graphics::plot.new()
+  } else {
+    max <- max(abs(c(y_obs, y_fit)))
+    lim <- c(-max, max)
+    graphics::plot(x = y_obs,
+                   y = y_fit,
+                   xlab = "observed values",
+                   ylab = "fitted values",
+                   xlim = lim, ylim = lim)
+    graphics::abline(a = 0, b = 1, lty = 2)
+  }
   max <- max(abs(beta))
   lim <- c(-max, max)
   graphics::plot(y = beta,
