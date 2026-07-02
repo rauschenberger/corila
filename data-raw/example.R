@@ -11,7 +11,8 @@ p <- 50
 q <- 10
 
 # group membership
-group <- sort(sample(x = seq_len(q), size = p, replace = TRUE))
+group <- sort(c(seq_len(q),
+                sample(x = seq_len(q), size = p - q, replace = TRUE)))
 
 # primary/auxiliary predictors
 primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
@@ -21,17 +22,21 @@ holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
 
 # predictor matrix
 mu <- rep(x = 0, times = p)
-rho <- 0.8
+rho <- 0.9
 sigma <- rho * outer(X = group, Y = group, FUN = "==") +
-  (1 - rho) * diag(rep(0.5, times = p))
+  (1 - rho) * diag(rep(x = 1, times = p))
 x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
 count <- sapply(seq_len(p), function(i) sum(group[1:i] == group[i]))
 
 # effect vector
-beta <- stats::rnorm(n = p) * stats::rbinom(n = p, size = 1, prob = 0.2)
+beta_group <- sign(stats::rnorm(n = q)) *
+  stats::rbinom(n = q, size = 1, prob = 0.5)
+beta <- rep(x = beta_group, times = table(group)) *
+  abs(stats::rnorm(n = p)) *
+  stats::rbinom(n = p, size = 1, prob = 0.8)
 
 # response vector
-y <- stats::rnorm(n = n, mean = x %*% beta, sd = 1)
+y <- stats::rnorm(n = n, mean = x %*% beta, sd = 2)
 
 # names of predictors
 colnames <- paste0(group, ".", count)
@@ -59,6 +64,30 @@ data <- list(x_train = x_train,
              x_test = x_test,
              y_test = y_test)
 
-print(object.size(data),units="Mb")
+print(object.size(data), units = "Mb")
 
 usethis::use_data(data, overwrite = TRUE)
+
+coef <- y_hat <- list()
+
+# standard lasso regression
+object <- glmnet::cv.glmnet(x = data$x_train[, data$primary], y = data$y_train)
+coef$glmnet <- stats::coef(object = object, s = "lambda.min")
+y_hat$glmnet <- stats::predict(object = object,
+                               newx = data$x_test[, data$primary],
+                               type = "response",
+                               s = "lambda.min")
+
+# flexible group lasso regression
+object <- cv.corila(x = data$x_train, y = data$y_train,
+                    group = data$group, primary = data$primary)
+coef$corila <- stats::coef(object = object)
+y_hat$corila <- stats::predict(object = object,
+                               newx = data$x_test[, data$primary])
+
+# selection performance
+#sapply(coef, function(x) calc_sign_prec(truth = sign(data$beta),
+#                                        estim = sign(x[-1])))
+
+# predictive performance
+sapply(X = y_hat, FUN = function(x) mean((x - data$y_test)^2))
