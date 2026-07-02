@@ -1,11 +1,11 @@
 
 #' @title
 #' Example data
-#' 
+#'
 #' @description
 #' This is example data for modelling a response based on
 #' grouped and correlated primary and auxiliary predictors.
-#' 
+#'
 #' @format ## `example`
 #' A list with multiple slots:
 #' - `x_train`:
@@ -19,7 +19,7 @@
 #'   (length \eqn{p})
 #' - `primary`:
 #'   logical vector indicating
-#'   primary (`TRUE`) and auxiliary (`FALSE`) predictors 
+#'   primary (`TRUE`) and auxiliary (`FALSE`) predictors
 #'   (length \eqn{p})
 #' - `x_test`:
 #'   \eqn{n_1 \times p} predictor matrix for the test observations

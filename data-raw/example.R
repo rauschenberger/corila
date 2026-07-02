@@ -17,12 +17,13 @@ primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
 
 # predictor matrix
 mu <- rep(x = 0, times = p)
-sigma <- 0.8*outer(X = group, Y = group, FUN = "==") + diag(rep(0.5, times = p))
+sigma <- 0.8 * outer(X = group, Y = group, FUN = "==") +
+  diag(rep(0.5, times = p))
 x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
-count <- sapply(seq_len(p), function(i) sum(group[1:i]==group[i]))
+count <- sapply(seq_len(p), function(i) sum(group[1:i] == group[i]))
 colnames(x) <- paste0(group, ".", count)
-colnames(x)[primary] <- paste0("pri_",colnames(x)[primary])
-colnames(x)[!primary] <- paste0("aux_",colnames(x)[!primary])
+colnames(x)[primary] <- paste0("pri_", colnames(x)[primary])
+colnames(x)[!primary] <- paste0("aux_", colnames(x)[!primary])
 
 # effect vector
 beta <- stats::rnorm(n = p) * stats::rbinom(n = p, size = 1, prob = 0.2)
