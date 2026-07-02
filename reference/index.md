@@ -46,6 +46,11 @@
 - [`predict(`*`<multiridge>`*`)`](https://rauschenberger.github.io/corila/reference/predict.multiridge.md)
   : Make predictions
 
+## Example dataset
+
+- [`data`](https://rauschenberger.github.io/corila/reference/lupi_data.md)
+  : Example data
+
 ## Internal functions
 
 - [`calc_sign_prec()`](https://rauschenberger.github.io/corila/reference/calc_sign_prec.md)
