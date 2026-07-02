@@ -11,7 +11,7 @@
 
 \item{y_fit}{\eqn{n}-dimensional vector of fitted values or probabilities}
 
-\item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+\item{family}{character \code{"gaussian"}, \code{"binomial"}, or \code{"poisson"}}
 }
 \description{
 Calculates the deviance residuals.
