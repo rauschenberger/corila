@@ -1169,7 +1169,7 @@ residuals.cv.corila <- function(object, ...) {
 #' \eqn{n}-dimensional vector of fitted values or probabilities
 #'
 #' @param family
-#' character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
+#' character `"gaussian"`, `"binomial"`, or `"poisson"`
 #'
 #' @details
 #' This function is called by [residuals.cv.corila()].
@@ -1183,6 +1183,8 @@ residuals.cv.corila <- function(object, ...) {
 #' @keywords internal
 #'
 .residuals <- function(y_obs, y_fit, family) {
+  .assert(x = family, type = "nominal",
+          support = c("gaussian", "binomial", "poisson"))
   if (identical(family, "gaussian")) {
     .assert(x = y_obs, type = "numeric", dim = Inf)
     .assert(x = y_fit, type = "numeric", dim = length(y_obs))
@@ -1201,10 +1203,6 @@ residuals.cv.corila <- function(object, ...) {
       sqrt((2 * (ifelse(test = y_obs == 0,
                         yes = 0,
                         no = y_obs * log(y_obs / y_fit)) - y_obs + y_fit)))
-  } else if (identical(family, "cox")) {
-    .assert(x = y_obs, type = "numeric", dim = Inf)
-    .assert(x = y_fit, type = "numeric", dim = length(y_obs))
-    stop("not implemented for Cox model")
   }
 }
 
