@@ -170,7 +170,7 @@ for adaptive lasso regression.
 n <- 100
 p <- 50
 group <- rep(x = 1:10, each = 5)
-primary <- NULL
+primary <- rep(x = TRUE, times = p)
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
 
@@ -189,9 +189,7 @@ object <- corila:::corila(x = x,
                           nfolds = 10,
                           hyper = hyper,
                           lambda_init = NULL)
-#> Error in !c(primary, primary): invalid argument type
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
-#> Error: object 'object' not found
 # }
 ```
