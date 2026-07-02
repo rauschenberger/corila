@@ -1446,6 +1446,7 @@ plot.cv.corila <- function(x, ...) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
   .assert(x = primary, type = "logical", dim = Inf)
   if (ncol(x) == length(primary)) {
+    x[, !primary] <- 0
     x
   } else if (ncol(x) == sum(primary)) {
     full <- matrix(data = 0, nrow = nrow(x), ncol = length(primary))
@@ -1619,5 +1620,5 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
     # (invariant check)
     # nocov end
   }
-  coef[c(TRUE[object$scale$family != "cox"], object$args$primary)]
+  coef[c(TRUE[object$scale$family != "cox"], object$args$primary)] # ?
 }
