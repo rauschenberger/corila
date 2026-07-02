@@ -531,10 +531,12 @@ testthat::test_that("residuals match those from stats::residuals", {
 ## S3 methods for class "cv.corila" --------------------------------------------
 
 n <- as.integer(10)
-data <- simulate(family = "gaussian", n0 = n, n1 = n, n_group = 3,
+family <- "gaussian"
+data <- simulate(family = family, n0 = n, n1 = n, n_group = 3,
                  size_group = c(3, 2))
 p <- data$info$p
-object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group)
+object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group,
+                    family = family)
 
 testthat::test_that("function 'cv.corila' returns a list", {
   testthat::expect_type(object = object, type = "list")
@@ -571,6 +573,20 @@ testthat::test_that("function 'fitted.cv.corila' returns finite n-vector", {
   testthat::expect_true(all(is.finite(y_hat)))
   y_pred <- predict(object, newx = data$x_train, s = "lambda.min")
   testthat::expect_equal(object = y_hat, expected = y_pred)
+})
+
+testthat::test_that("function 'residuals.cv.corila' returns finite n-vector", {
+  resid <- residuals(object)
+  testthat::expect_type(object = resid, type = "double")
+  testthat::expect_length(object = resid, n = n)
+  testthat::expect_true(all(is.finite(resid)))
+})
+
+testthat::test_that("observed minus fitted values equal residuals", {
+  testthat::skip_if(family != "gaussian")
+  y_hat <- fitted(object)
+  resid <- residuals(object)
+  testthat::expect_equal(object = data$y_train - y_hat, expected = resid)
 })
 
 testthat::test_that("function 'nobs.cv.corila' returns the correct integer", {
