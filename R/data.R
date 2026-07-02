@@ -6,7 +6,7 @@
 #' This is example data for modelling a response based on
 #' grouped and correlated primary and auxiliary predictors.
 #'
-#' @format ## `example`
+#' @format ## `data`
 #' A list with multiple slots:
 #' - `x_train`:
 #'   predictor matrix of the training observations
@@ -26,4 +26,4 @@
 #' - `y_test`:
 #'   response vector for the test observations of length \eqn{n_1}
 #'
-"example"
+"data"

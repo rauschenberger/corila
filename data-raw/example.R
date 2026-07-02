@@ -1,4 +1,5 @@
-## code to prepare `example.R` dataset goes here
+
+# code for preparing example dataset
 
 set.seed(1)
 
@@ -39,11 +40,11 @@ x_test <- x[fold == 1, ]
 x_test[, !primary] <- NA
 y_test <- y[fold == 1]
 
-example <- list(x_train = x_train,
-                y_train = y_train,
-                group = group,
-                primary = primary,
-                x_test = x_test,
-                y_test = y_test)
+data <- list(x_train = x_train,
+             y_train = y_train,
+             group = group,
+             primary = primary,
+             x_test = x_test,
+             y_test = y_test)
 
-usethis::use_data(example, overwrite = TRUE)
+usethis::use_data(data, overwrite = TRUE)
