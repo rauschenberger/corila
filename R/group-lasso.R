@@ -413,23 +413,23 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   #args <- as.list(match.call())[-1]
   #do.call(what = .validate, args = args)
   p <- args$p
-  if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
-    warning("Setting alpha_init=0 due to family='poisson'.")
-    alpha_init <- 0
-  }
-  if (is.null(group)) {
-    group <- seq_len(p)
-  }
-  if (is.null(primary)) {
-    primary <- rep(x = TRUE, times = p)
-  }
+  #if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
+  #  warning("Setting alpha_init=0 due to family='poisson'.")
+  #  alpha_init <- 0
+  #}
+  #if (is.null(group)) {
+  #  group <- seq_len(p)
+  #}
+  #if (is.null(primary)) {
+  #  primary <- rep(x = TRUE, times = p)
+  #}
   args <- c(args, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
   # --- fold identifiers ---
-  if (is.null(lambda_init) && is.null(foldid)) {
-    foldid <- .folds(y = scale$y, family = family, nfolds = nfolds)
-  }
+  #if (is.null(lambda_init) && is.null(foldid)) {
+  #  foldid <- .folds(y = scale$y, family = family, nfolds = nfolds)
+  #}
   # --- initial coefficients ---
   init <- .estim_initial_coefs(x = scale$x,
                                y = scale$y,
