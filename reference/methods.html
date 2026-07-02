@@ -113,34 +113,33 @@ summarise the fitted model</p></li>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.05399003  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13]  0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.10978670  0.00000000 -0.23122594 -0.13002684  0.00000000 -0.04111522</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.00000000  0.07875981 -0.02046811  0.12369290  0.00000000</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.05399003 -0.05399003 -0.05399003 -0.05399003 -0.05399003 -0.05399003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.05399003 -0.05399003 -0.05399003 -0.05399003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.09926603  0.42161457  0.95068360  0.43627218  0.31049695 -0.04566780</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.85527265  0.75918734  0.20435338  0.25650187</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.05399003 -0.05399003 -0.05399003 -0.05399003 -0.05399003 -0.05399003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.05399003 -0.05399003 -0.05399003 -0.05399003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.09926603  0.42161457  0.95068360  0.43627218  0.31049695 -0.04566780</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.85527265  0.75918734  0.20435338  0.25650187</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.06718629  0.75422162  0.78452109 -0.40187775 -0.45572066 -0.41279919</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.57563233 -1.03902697  0.81218256  0.60131791</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.14487701 -0.14115095  0.07226668  0.14535193  0.29639958  0.03748645</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.18488309 -0.08963054 -0.21939662  0.22843357</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="methods-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> object of class ‘cv.corila’ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (contains multiple objects of class ‘cv.glmnet’)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selected 0 from 20 predictors</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected 6 from 20 predictors</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- object of class “cv.corila” --- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> generalised linear model with gaussian family </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20 features (12 primary and 8 auxiliary features)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 features (10 primary and 10 auxiliary features)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> initial coefficients: ridge regression </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> final coefficients: adaptive lasso regression </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> optimised regularisation parameter: lambda.min = 1.328 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selected weights: local = 1, global = 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selected exponents: local = 0, global = Inf</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 non-zero coefficients (including intercept)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> optimised regularisation parameter: lambda.min = 0.2222 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected weights: local = 0, global = 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected exponents: local = Inf, global = 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 non-zero coefficients (including intercept)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
