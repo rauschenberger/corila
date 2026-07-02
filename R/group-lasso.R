@@ -1620,5 +1620,6 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
     # (invariant check)
     # nocov end
   }
-  coef[c(TRUE[object$scale$family != "cox"], object$args$primary)] # ?
+  #coef[c(TRUE[object$scale$family != "cox"], object$args$primary)] # ?
+  coef
 }
