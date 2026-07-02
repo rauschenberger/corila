@@ -28,6 +28,7 @@ setwd("C:/Users/arauschenberger/Desktop/corila/package")
 #usethis::use_github_action("lint")
 #usethis::use_spell_check(lang = "en-GB")
 #usethis::use_gpl3_license()
+#usethis::use_data_raw("data")
 ```
 
 # Checks
@@ -62,8 +63,6 @@ notes <- autotest::autotest_package(test=TRUE)
 #devtools::install()
 .rs.restartR()
 devtools::load_all()
-
-usethis::use_data_raw("example.R")
 ```
 
 # Some notes on sparse correlation matrices

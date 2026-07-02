@@ -4,10 +4,10 @@
 set.seed(1)
 
 # number of training/test observations, predictors, and predictor groups
-n0 <- 100
-n1 <- 1000
+n0 <- 50
+n1 <- 20
 n <- n0 + n1
-p <- 50
+p <- 30
 q <- 10
 
 # group membership
@@ -15,14 +15,14 @@ group <- sort(c(seq_len(q),
                 sample(x = seq_len(q), size = p - q, replace = TRUE)))
 
 # primary/auxiliary predictors
-primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
+primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 1))
 
 # hold-out data
 holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
 
 # predictor matrix
 mu <- rep(x = 0, times = p)
-rho <- 0.9
+rho <- 0.5
 sigma <- rho * outer(X = group, Y = group, FUN = "==") +
   (1 - rho) * diag(rep(x = 1, times = p))
 x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
@@ -72,7 +72,8 @@ coef <- y_hat <- list()
 
 # standard lasso regression
 object <- glmnet::cv.glmnet(x = data$x_train[, data$primary], y = data$y_train)
-coef$glmnet <- stats::coef(object = object, s = "lambda.min")
+temp <- stats::coef(object = object, s = "lambda.min")[-1]
+coef$glmnet <- c(temp[1], ifelse(primary, temp[-1], 0))
 y_hat$glmnet <- stats::predict(object = object,
                                newx = data$x_test[, data$primary],
                                type = "response",
@@ -86,8 +87,8 @@ y_hat$corila <- stats::predict(object = object,
                                newx = data$x_test[, data$primary])
 
 # selection performance
-#sapply(coef, function(x) calc_sign_prec(truth = sign(data$beta),
-#                                        estim = sign(x[-1])))
+sapply(coef, function(x) calc_sign_prec(truth = sign(data$beta),
+                                        estim = sign(x[-1])))
 
 # predictive performance
 sapply(X = y_hat, FUN = function(x) mean((x - data$y_test)^2))

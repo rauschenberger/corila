@@ -6,8 +6,8 @@
 #' This is example data for modelling a response based on
 #' grouped and correlated primary and auxiliary predictors.
 #'
-#' @format ## `data`
-#' A list with multiple slots:
+#' @format
+#' The object `data` contains a list with multiple slots:
 #' - `x_train`:
 #'   predictor matrix of the training observations
 #'   (\eqn{n_0} rows, \eqn{p} columns)
@@ -28,6 +28,11 @@
 #'   \eqn{n_1 \times p} predictor matrix for the test observations
 #' - `y_test`:
 #'   response vector for the test observations of length \eqn{n_1}
+#'
+#' @name lupi_data
+#' @aliases data
+#' @docType data
+#' @keywords datasets
 #'
 #' @details
 #' Use the objects `x_train`, `y_train`, `group`, and `primary`
