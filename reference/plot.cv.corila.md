@@ -21,7 +21,18 @@ plot(x, ...)
 
 ## Value
 
-Returns `NULL` (invisible).
+Returns `NULL` invisibly.
+
+## Details
+
+This function generates two figures:
+
+- a scatter plot of fitted versus observed values for the Gaussian and
+  the Poisson families, a box plot of predicted probabilities for the
+  two classes for the binomial family, or a histogram of fitted relative
+  risks for the Cox model
+
+- estimated coefficients versus indices of predictors
 
 ## Examples
 
