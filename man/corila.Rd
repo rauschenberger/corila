@@ -117,7 +117,7 @@ with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 n <- 100
 p <- 50
 group <- rep(x = 1:10, each = 5)
-primary <- NULL
+primary <- rep(x = TRUE, times = p)
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
 
