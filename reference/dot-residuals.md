@@ -20,7 +20,7 @@ Calculates the deviance residuals.
 
 - family:
 
-  character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
+  character `"gaussian"`, `"binomial"`, or `"poisson"`
 
 ## Details
 
