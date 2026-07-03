@@ -26,7 +26,9 @@ rho <- 0.5
 sigma <- rho * outer(X = group, Y = group, FUN = "==") +
   (1 - rho) * diag(rep(x = 1, times = p))
 x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
-count <- sapply(seq_len(p), function(i) sum(group[1:i] == group[i]))
+count <- vapply(seq_len(p),
+                function(i) sum(group[1:i] == group[i]),
+                numeric(1))
 
 # effect vector
 beta_group <- sign(stats::rnorm(n = q)) *
