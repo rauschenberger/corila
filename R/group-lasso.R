@@ -154,9 +154,17 @@
   .assert(x = y, type = "numeric", dim = n, na.rm = na.rm)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
-  if (identical(family, "gaussian")) {
+  if (!identical(family, "cox")) {
+    if (inherits(x = y, what = "Surv")) {
+      stop("Survival response requires Cox model.")
+    }
+  } else if (!identical(family, "binomial")) {
     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-      stop("Gaussian family requires a numerical outcome.")
+      warning("Response might require binomial family.")
+    }
+  } else if (!identical(family, "poisson")) {
+    if (all(y %% 1 == 0)) {
+      warning("Response might require Poisson family.")
     }
   } else if (identical(family, "binomial")) {
     if (!all(y %in% c(0, 1))) {

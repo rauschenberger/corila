@@ -420,18 +420,24 @@ testthat::test_that("outcomes are simulated", {
       } else {
         y <- .simulate_outcome(family = family[i], n = n)
       }
-      .validate(na_action = NULL,
-                x = matrix(data = 0, nrow = n, ncol = p),
-                y = y,
-                group = rep(x = 1, times = p),
-                primary = NULL,
-                family = family[i], hyper = NULL, alpha_init = NULL,
-                alpha_final = NULL, cor = NULL, foldid = NULL,
-                nfolds = NULL, lambda_init = NULL, silent = FALSE)
       testthat::expect_length(object = y, n = n)
+      testthat::expect_no_error(
+        object = {
+          .validate(na_action = NULL,
+                    x = matrix(data = 0, nrow = n, ncol = p),
+                    y = y,
+                    group = rep(x = 1, times = p),
+                    primary = NULL,
+                    family = family[i], hyper = NULL, alpha_init = NULL,
+                    alpha_final = NULL, cor = NULL, foldid = NULL,
+                    nfolds = NULL, lambda_init = NULL, silent = FALSE)
+        }
+      )
     }
   }
 })
+
+
 
 
 ## function ".estim_initial_coefs" ---------------------------------------------
@@ -525,6 +531,47 @@ testthat::test_that("residuals match those from stats::residuals", {
     testthat::expect_length(object = resid, n = n)
     testthat::expect_true(all(is.finite(resid)))
     testthat::expect_equal(object = resid, expected = stats::residuals(glm)) # !
+  }
+})
+
+
+## function "cv.corila" --------------------------------------------------------
+
+testthat::test_that("function 'cv.corila' rejects wrong family", {
+  n <- as.integer(10)
+  for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
+    set.seed(1)
+    data <- simulate(family = family_data, n0 = n, n1 = n, n_group = 3,
+                     size_group = c(3, 2))
+    for (family_model in c("gaussian", "binomial", "poisson", "cox")) {
+      if (family_data == family_model) {
+        next
+      }
+      if (identical(family_data, "cox") || identical(family_model, "cox")) {
+        testthat::expect_error(
+          cv.corila(x = data$x_train, y = data$y_train, group = data$group,
+                    family = family_model)
+        )
+      } else if (identical(family_model, "binomial") ||
+                   (identical(family_data, "gaussian") &&
+                      identical(family_model, "poisson"))) {
+        testthat::expect_error(
+          cv.corila(x = data$x_train, y = data$y_train, group = data$group,
+                    family = family_model)
+        )
+      } else if (identical(family_data, "poisson") ||
+                   (identical(family_data, "binomial") &&
+                      identical(family_model, "gaussian")) ||
+                   (identical(family_data, "binomial") &&
+                      identical(family_model, "poisson"))) {
+        testthat::expect_warning(
+          cv.corila(x = data$x_train, y = data$y_train, group = data$group,
+                    family = family_model)
+        )
+      } else {
+        stop("Implement missing tests!")
+      }
+    }
   }
 })
 
