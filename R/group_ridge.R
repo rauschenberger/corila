@@ -195,11 +195,11 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
                               no = family))
   xx <- lapply(X = unique(z), FUN = function(i) scale$x[, z == i])
   xxblocks <- multiridge::createXXblocks(datablocks = xx)
-  invisible(utils::capture.output(
+  invisible(utils::capture.output({
     init <- multiridge::fastCV2(XXblocks = xxblocks,
                                 Y = scale$y,
                                 model = model)
-  ))
+  }))
   # --- cross-validation ---
   if (is.null(penalties)) {
     if (is.null(foldid)) {
@@ -208,12 +208,12 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
       indices <- lapply(X = seq_len(nfolds),
                         FUN = function(x) which(foldid == x))
     }
-    invisible(utils::capture.output(
+    invisible(utils::capture.output({
       final <- multiridge::optLambdasWrap(penaltiesinit = init$lambdas,
                                           XXblocks = xxblocks,
                                           Y = scale$y,
                                           folds = indices)
-    ))
+    }))
     penalties <- final$optpen
   } else {
     indices <- NULL
