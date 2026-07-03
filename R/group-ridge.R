@@ -167,11 +167,8 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
                        penalties = NULL) {
   # --- check arguments ---
   if (is.matrix(x) && ncol(x) != length(z)) {
-    stop(paste(
-      "For each variable,",
-      "'x' should have one column",
-      "and 'z' should have one entry."
-    ))
+    stop("For each variable, 'x' should have one column, ",
+         "and 'z' should have one entry.")
   }
   cond <- !is.null(penalties) && !is.null(z) &&
     length(unique(z)) != length(penalties)
@@ -277,10 +274,8 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
 predict.multiridge <- function(object, newx, ...) {
   # --- check arguments ---
   if (length(object$z) != ncol(newx)) {
-    stop(paste(
-      "Argument 'newx' must have one column",
-      "for each variable used in model fitting."
-    ))
+    stop("Argument 'newx' must have one column",
+         "for each variable used in model fitting.")
   }
   .assert(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
   # --- make predictions ---
