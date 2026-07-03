@@ -4,7 +4,16 @@
 \alias{.assert}
 \title{Assertions}
 \usage{
-.assert(x, type, dim = 1, na.rm = FALSE, support = NULL, min = -Inf, max = Inf)
+.assert(
+  x,
+  type,
+  dim = 1,
+  na.rm = FALSE,
+  support = NULL,
+  family = NULL,
+  min = -Inf,
+  max = Inf
+)
 }
 \arguments{
 \item{x}{scalar, vector, matrix, or array to be checked}
@@ -25,6 +34,8 @@
 \code{TRUE}: missing values are allowed}
 
 \item{support}{character vector (only used for \code{type = "nominal"})}
+
+\item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
 \item{min}{numerical value (not used for \code{type = "nominal"})}
 
