@@ -80,7 +80,6 @@ cor <- as.matrix(fit)
 image(cor)
 ```
 
-
 # Setting up a private GitLab mirror of a private GitHub repository:
 
 - Generate fine-grained personal access token (PAT) in GitHub developer settings (repository access: specific repository; repository permissions: read-access to content, i.e., code and metadata).

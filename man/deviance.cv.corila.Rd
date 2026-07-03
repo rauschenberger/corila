@@ -21,6 +21,27 @@ Calculates the deviance.
 Returns the deviance calculated by \code{\link[glmnet:deviance.glmnet]{glmnet::deviance.glmnet()}}
 for the model with the optimised mixing and regularisation hyperparameters.
 }
+\examples{
+# listing S3 methods
+methods(class = "cv.corila")
+
+# using S3 methods
+n <- 10; p <- 20; q <- 5
+x <- matrix(rnorm(n * p), nrow = n , ncol = p)
+y <- rnorm(n)
+group <- rep(seq_len(q), length.out = p)
+primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+object <- cv.corila(x = x, y = y, group = group, primary = primary)
+
+coef(object)
+predict(object, newx = x)
+fitted(object)
+residuals(object)
+plot(object)
+print(object)
+summary(object)
+
+}
 \seealso{
 The internal function \code{\link[=.deviance]{.deviance()}} calculates
 the deviance from fitted and observed values.

@@ -68,27 +68,28 @@ print(object.size(data), units = "Mb")
 
 usethis::use_data(data, overwrite = TRUE)
 
-coef <- y_hat <- list()
-
-# standard lasso regression
-object <- glmnet::cv.glmnet(x = data$x_train[, data$primary], y = data$y_train)
-temp <- stats::coef(object = object, s = "lambda.min")[-1]
-coef$glmnet <- c(temp[1], ifelse(primary, temp[-1], 0))
-y_hat$glmnet <- stats::predict(object = object,
-                               newx = data$x_test[, data$primary],
-                               type = "response",
-                               s = "lambda.min")
-
-# flexible group lasso regression
-object <- cv.corila(x = data$x_train, y = data$y_train,
-                    group = data$group, primary = data$primary)
-coef$corila <- stats::coef(object = object)
-y_hat$corila <- stats::predict(object = object,
-                               newx = data$x_test[, data$primary])
-
-# selection performance
-sapply(coef, function(x) calc_sign_prec(truth = sign(data$beta),
-                                        estim = sign(x[-1])))
-
-# predictive performance
-sapply(X = y_hat, FUN = function(x) mean((x - data$y_test)^2))
+# coef <- y_hat <- list()
+#
+# # standard lasso regression
+# object <- glmnet::cv.glmnet(x = data$x_train[, data$primary],
+# y = data$y_train)
+# temp <- stats::coef(object = object, s = "lambda.min")[-1]
+# coef$glmnet <- c(temp[1], ifelse(primary, temp[-1], 0))
+# y_hat$glmnet <- stats::predict(object = object,
+#                                newx = data$x_test[, data$primary],
+#                                type = "response",
+#                                s = "lambda.min")
+#
+# # flexible group lasso regression
+# object <- cv.corila(x = data$x_train, y = data$y_train,
+#                     group = data$group, primary = data$primary)
+# coef$corila <- stats::coef(object = object)
+# y_hat$corila <- stats::predict(object = object,
+#                                newx = data$x_test[, data$primary])
+#
+# # selection performance
+# sapply(coef, function(x) calc_sign_prec,truth = sign(data$beta),
+#        estim = sign(x[-1])))
+#
+# # predictive performance
+# sapply(X = y_hat, FUN = function(x) mean((x - data$y_test)^2))

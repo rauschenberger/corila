@@ -3,6 +3,13 @@
 \name{methods}
 \alias{methods}
 \title{List of methods for class \code{"cv.corila"}}
+\value{
+\link[=coef.cv.corila]{coef()} returns a \eqn{(1 +) p}-dimensional vector,
+\link[=predict.cv.corila]{predict()} returns an \eqn{n_1}-dimensional vector,
+\link[=fitted.cv.corila]{fitted()} and \link[=residuals.cv.corila]{residuals()}
+return an \eqn{n_0}-dimensional vector.
+See individual methods for details.
+}
 \description{
 Lists implemented S3 methods for objects of class \code{"cv.corila"}.
 \itemize{

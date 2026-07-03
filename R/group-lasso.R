@@ -988,6 +988,13 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #' - [summary()][summary.cv.corila]:
 #'   summarise the fitted model
 #'
+#' @return
+#' [coef()][coef.cv.corila] returns a \eqn{(1 +) p}-dimensional vector,
+#' [predict()][predict.cv.corila] returns an \eqn{n_1}-dimensional vector,
+#' [fitted()][fitted.cv.corila] and [residuals()][residuals.cv.corila]
+#' return an \eqn{n_0}-dimensional vector.
+#' See individual methods for details.
+#'
 #' @seealso
 #' Use [cv.corila()] to fit the model.
 #'
@@ -1066,6 +1073,8 @@ print.cv.corila <- function(x, ...) {
 #' @return
 #' Returns a positive integer.
 #'
+#' @inherit methods examples
+#'
 #' @importFrom stats nobs
 #'
 #' @export
@@ -1099,6 +1108,8 @@ nobs.cv.corila <- function(object, ...) {
 #' The internal function [.deviance()] calculates
 #' the deviance from fitted and observed values.
 #'
+#' @inherit methods examples
+#'
 #' @export
 #'
 deviance.cv.corila <- function(object, ...) {
@@ -1126,6 +1137,8 @@ deviance.cv.corila <- function(object, ...) {
 #' Use [predict()][predict.cv.corila] to obtain predicted values
 #' (i.e., for testing observations).
 #'
+#' @inherit methods examples
+#'
 #' @export
 #'
 #' @srrstats {RE4.9} *access fitted values*
@@ -1146,6 +1159,8 @@ fitted.cv.corila <- function(object, ...) {
 #' @details
 #' This function extracts the observed and fitted values from the fitted model
 #' and calls the internal function [.residuals()] to calculate the residuals.
+#'
+#' @inherit methods examples
 #'
 #' @importFrom stats residuals
 #'
