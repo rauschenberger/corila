@@ -188,11 +188,8 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
   #.validate(x = x, y = y, group = NULL, family = family)
   # --- initial regression ---
   scale <- .forescale(x = x, y = y, family = family)
-  model <- ifelse(identical(family, "gaussian"),
-                  yes = "linear",
-                  no = ifelse(identical(family, "binomial"),
-                              yes = "logistic",
-                              no = family))
+  table <- c(gaussian = "linear", binomial = "logistic")
+  model <- if (family %in% names(table)) table[[family]] else family
   xx <- lapply(X = unique(z), FUN = function(i) scale$x[, z == i])
   xxblocks <- multiridge::createXXblocks(datablocks = xx)
   invisible(utils::capture.output({
@@ -229,11 +226,7 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
                                     Y = scale$y,
                                     model = model)
   }
-  object$family <- ifelse(identical(family, "linear"),
-                          yes = "gaussian",
-                          no = ifelse(identical(family, "logistic"),
-                                      yes = "binomial",
-                                      no = family))
+  object$family <- family
   object$penalties <- penalties
   object$datablocks <- xx
   object$indices <- indices
