@@ -191,9 +191,10 @@
     #} else {
     cond <- rep(x = TRUE, times = length(y))
     #}
-    pars$mu.x <- apply(X = x[cond, ],
-                       MARGIN = 2,
-                       FUN = base::mean, na.rm = TRUE)
+    #pars$mu.x <- apply(X = x[cond, ],
+    #                   MARGIN = 2,
+    #                   FUN = base::mean, na.rm = TRUE)
+    pars$mu.x <- colMeans(x = x[cond, ], na.rm = TRUE)
     pars$sd.x <- apply(X = x[cond, ],
                        MARGIN = 2,
                        FUN = stats::sd, na.rm = TRUE)
