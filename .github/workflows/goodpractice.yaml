@@ -26,5 +26,7 @@ jobs:
           checks <- setdiff(goodpractice::all_checks(), c("covr", "cyclocomp"))
           checks <- checks[!grepl(pattern="rcmdcheck_", x = checks)]
           x <- goodpractice::gp(checks = checks)
-          if(length(goodpractice::failed_checks(x))!=0){stop("failed")}
+          print(x)
+          fails <- goodpractice::failed_checks(x)
+          if(length(fails)>0){print(fails); stop("failed goodpractice tests")}
         shell: Rscript {0}
