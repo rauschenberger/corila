@@ -158,28 +158,29 @@
     if (inherits(x = y, what = "Surv")) {
       stop("Survival response requires Cox model.")
     }
-  }
-  if (!identical(family, "binomial")) {
-    if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-      warning("Response might require binomial family.")
-    }
-  }
-  if (!identical(family, "poisson")) {
-    if (all(y %% 1 == 0)) {
-      warning("Response might require Poisson family.")
-    }
-  }
-  if (identical(family, "binomial")) {
-    if (!all(y %in% c(0, 1))) {
-      stop("Binomial family requires a binary outcome.")
-    }
-  } else if (identical(family, "poisson")) {
-    if (any(y %% 1 != 0)) {
-      stop("Poisson family requires a count outcome.")
-    }
   } else if (identical(family, "cox")) {
     if (!inherits(x = y, what = "Surv")) {
       stop("Cox model requires a survival outcome.")
+    }
+  } else {
+    if (!identical(family, "binomial")) {
+      if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
+        warning("Response might require binomial family.")
+      }
+    }
+    if (!identical(family, "poisson")) {
+      if (all(y %% 1 == 0)) {
+        warning("Response might require Poisson family.")
+      }
+    }
+    if (identical(family, "binomial")) {
+      if (!all(y %in% c(0, 1))) {
+        stop("Binomial family requires a binary outcome.")
+      }
+    } else if (identical(family, "poisson")) {
+      if (any(y %% 1 != 0)) {
+        stop("Poisson family requires a count outcome.")
+      }
     }
   }
   # --- group indicator ---
