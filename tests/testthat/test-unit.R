@@ -86,7 +86,7 @@ testthat::test_that("initial coefficients are named correctly", {
     string <- .type(alpha = expect[[i]])
     testthat::expect_type(object = string, type = "character")
     testthat::expect_length(object = string, n = 1)
-    testthat::expect_true(!is.na(string))
+    testthat::expect_false(is.na(string))
     split <- tolower(strsplit(x = string, split = " ")[[1]])
     testthat::expect_contains(object = split, expected = names(expect)[i]) # !!!
   }
@@ -97,8 +97,8 @@ testthat::test_that("initial coefficients are named correctly", {
 
 ## function ".expand_auxiliary" ------------------------------------------------
 
-n <- as.integer(5)
-p <- as.integer(10)
+n <- 5L
+p <- 10L
 set.seed(1)
 x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
 primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
@@ -393,7 +393,7 @@ testthat::test_that("adjacency is detected", {
   testthat::expect_error(
     .is_adjacent(group = factor_vector, j = 1, p = p, names = NULL)
   )
-  factor_list <- lapply(group$label_list, function(x) as.factor(x))
+  factor_list <- lapply(group$label_list, as.factor)
   testthat::expect_error(
     .is_adjacent(group = factor_list, j = 1, p = p, names = NULL)
   )
@@ -538,7 +538,7 @@ testthat::test_that("residuals match those from stats::residuals", {
 ## function "cv.corila" --------------------------------------------------------
 
 testthat::test_that("function 'cv.corila' rejects wrong family", {
-  n <- as.integer(10)
+  n <- 10L
   for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
     set.seed(1)
     data <- simulate(family = family_data, n0 = n, n1 = n, n_group = 3,
@@ -577,7 +577,7 @@ testthat::test_that("function 'cv.corila' rejects wrong family", {
 
 ## S3 methods for class "cv.corila" --------------------------------------------
 
-n <- as.integer(10)
+n <- 10L
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   set.seed(1)
   data <- simulate(family = family, n0 = n, n1 = n, n_group = 3,
@@ -645,7 +645,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   })
   testthat::test_that("function 'plot.cv.corila' returns NULL invisibly", {
     testthat::expect_invisible(call = plot(object))
-    testthat::expect_identical(object = plot(object), expected = NULL)
+    testthat::expect_null(object = plot(object))
   })
   testthat::test_that("function 'print.cv.corila' returns object invisibly", {
     testthat::expect_invisible(call = print(object))
@@ -673,8 +673,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     desc = "function 'print.summary.cv.corila' returns NULL invisibly",
     code = {
       testthat::expect_invisible(call = print(summary(object)))
-      testthat::expect_identical(object = print(summary(object)),
-                                 expected = NULL)
+      testthat::expect_null(object = print(summary(object)))
     }
   )
   testthat::test_that(

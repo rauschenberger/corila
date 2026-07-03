@@ -126,7 +126,7 @@ for (glmnet in c(FALSE, TRUE)) {
 ## function "cv.corila" --------------------------------------------------------
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
-  message(paste0("family=\"", family, "\""))
+  message("family=\"", family, "\"")
   data <- simulate(family = family, n1 = 50, n_group = 3,
                    size_group = c(3, 2))
   colnames(data$x_train) <- LETTERS[seq_len(ncol(data$x_train))]
@@ -182,8 +182,8 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       "as feature matrix times coef"
     ),
     code = {
-      eta <- cbind(c(1)[family != "cox"], data$x_test) %*% coef$vector
-      if (family %in% c("gaussian")) {
+      eta <- cbind(1[family != "cox"], data$x_test) %*% coef$vector
+      if (family == "gaussian") {
         pred <- eta
       } else if (family == "binomial") {
         pred <- 1 / (1 + exp(-eta))
@@ -206,7 +206,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 }
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
-  message(paste0("family=\"", family, "\""))
+  message("family=\"", family, "\"")
   n <- 100
   p <- 50
   sd <- abs(stats::rnorm(n = p))
