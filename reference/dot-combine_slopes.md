@@ -25,6 +25,11 @@ coefficients for negative effects.
 
 Returns a numeric vector of length \\1 + p\\.
 
+## See also
+
+This function is called by
+[coef()](https://rauschenberger.github.io/corila/reference/coef.cv.corila.md).
+
 ## Examples
 
 ``` r

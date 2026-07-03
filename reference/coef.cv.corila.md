@@ -29,6 +29,14 @@ Returns an \\(1 + p)\\-dimensional vector of the estimated coefficients.
 The first entry is the estimated intercept, and the other \\p\\ entries
 are the estimated slopes.
 
+## Details
+
+This function calls
+[`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/dot-combine_slopes.md)
+to combine positive and negative coefficients and
+[`.backscale()`](https://rauschenberger.github.io/corila/reference/dot-backscale.md)
+to bring coefficients back to the original scale.
+
 ## References
 
 [Armin Rauschenberger](https://orcid.org/0000-0001-6498-4801) (2026).

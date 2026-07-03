@@ -32,7 +32,7 @@ methods(class = "cv.corila")
 #> [8] residuals summary  
 #> see '?methods' for accessing help and source code
 
-# using S3 methods
+# fitting the model
 n <- 10; p <- 20; q <- 5
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
@@ -41,6 +41,7 @@ primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
 
+# using S3 methods
 coef(object)
 #>  [1] -0.09030563  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000
 #>  [7]  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000

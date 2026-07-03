@@ -39,6 +39,11 @@ Returns a data frame with the slots `"wgt_local"` and `"exp_local"` for
 the local prior information and the slots `"wgt_global"` and
 `"exp_global"` for the global prior information.
 
+## See also
+
+This function is called by
+[`cv.corila()`](https://rauschenberger.github.io/corila/reference/cv.corila.md).
+
 ## Examples
 
 ``` r

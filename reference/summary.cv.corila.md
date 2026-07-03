@@ -30,6 +30,14 @@ print(x, ...)
 
 Returns an invisible list with multiple slots.
 
+## Details
+
+`print.summary.cv.corila()` uses the output from `summary.cv.corila()`
+to print readable information to the console. It calls the helper
+function
+[`.type()`](https://rauschenberger.github.io/corila/reference/dot-type.md)
+to name the methods used to estimate initial and final coefficients.
+
 ## See also
 
 [`print.cv.corila()`](https://rauschenberger.github.io/corila/reference/print.cv.corila.md)

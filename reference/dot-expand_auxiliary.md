@@ -24,6 +24,11 @@ Add empty columns for auxiliary features.
 
 Returns a matrix with \\n\\ rows and \\p_0 + p_1\\ columns.
 
+## See also
+
+This function is called by
+[predict()](https://rauschenberger.github.io/corila/reference/predict.cv.corila.md).
+
 ## Examples
 
 ``` r
