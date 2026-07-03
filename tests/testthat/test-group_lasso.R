@@ -7,6 +7,7 @@ testthat::test_that("function '.validate' rejects wrong family", {
     set.seed(1)
     data <- simulate(family = family_data, n0 = n, n1 = n, n_group = 3,
                      size_group = c(3, 2))
+    p <- ncol(data$x_train)
     for (family_model in c("gaussian", "binomial", "poisson", "cox")) {
       expect_error <-
         identical(family_data, "cox") ||
@@ -37,6 +38,22 @@ testthat::test_that("function '.validate' rejects wrong family", {
       }
     }
   }
+  group <- list(
+    A = as.factor(data$group),
+    B = array(data = 1 * outer(data$group, data$group, "=="), dim = c(p, p, 1)),
+    C = lapply(X = unique(data$group),
+               FUN = function(x) as.factor(which(data$group == x)))
+  )
+  for (k in seq_along(group)) {
+    testthat::expect_error(
+      cv.corila(x = data$x_train, y = data$y_train, group = group[[k]],
+                family = family_data)
+    )
+  }
+  testthat::expect_error(
+    cv.corila(x = data$x_train, y = data$y_train, group = data$group,
+              family = family_data, alpha_init = "elastic-net")
+  )
 })
 
 ## function ".estim_initial_coefs" ---------------------------------------------
