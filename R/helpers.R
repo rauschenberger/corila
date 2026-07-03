@@ -178,14 +178,13 @@
 #'
 .forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   # --- check arguments ---
-  families <- c("gaussian", "binomial", "poisson", "cox")
-  slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
-  .assert(x = y, type = "numeric", dim = nrow(x))
   if (is.null(family) == is.null(pars)) {
     stop('Expect either "family" or "pars".')
   }
+  families <- c("gaussian", "binomial", "poisson", "cox")
   .assert(x = family, type = "nominal", support = families)
+  slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
   .assert(x = names(pars), type = "nominal", dim = length(slots),
           support = slots)
   .assert(x = pars$family, type = "nominal", support = families)
@@ -193,6 +192,8 @@
   .assert(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0)
   .assert(x = pars$mu.y, type = "numeric")
   .assert(x = pars$sd.y, type = "numeric", min = 0)
+  .assert(x = y, type = "numeric", dim = nrow(x),
+          family = c(family, pars$family))
   # --- estimate parameters ---
   if (is.null(family)) {
     family <- pars$family
@@ -533,6 +534,7 @@
   # --- check arguments ---
   support <- c("gaussian", "binomial", "poisson", "cox")
   .assert(x = family, type = "nominal", support = support)
+  .assert(x = y, type = "numeric", dim = Inf, family = family)
   if (identical(family, "binomial")) {
     .assert(x = y, type = "integer", dim = Inf, min = 0, max = 1)
     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)

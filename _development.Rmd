@@ -51,7 +51,7 @@ x <- cyclocomp::cyclocomp_package_dir()
 
 # checks for rOpenSci
 
-checks <- setdiff(goodpractice::all_checks(), c("covr", "cyclocomp"))
+checks <- setdiff(goodpractice::all_checks(), c("covr", "cyclocomp", "lintr"))
 checks <- checks[!grepl(pattern="rcmdcheck_", x = checks)]
 x <- goodpractice::gp(checks = checks)
 

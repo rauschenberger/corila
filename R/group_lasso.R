@@ -305,7 +305,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                          lambda_init = object_ext$lambda_init,
                          silent = silent)
     for (j in seq_len(nrow(hyper))) {
-      pred[[j]][foldid == i, ] <- stats::predict(
+      pred[[j]][foldid == i, ] <- predict.corila(
         object = object_int,
         newx = x[foldid == i, , drop = FALSE],
         index = j,
@@ -339,6 +339,59 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 }
 
 #--- model fitting without cross-validation -----
+
+#' @title
+#' predict (S3 method)
+#'
+#' @description
+#' Makes prediction from an object of class `"corila"`.
+#'
+#' @inheritParams predict.cv.corila
+#'
+#' @param object
+#' object of class `"corila"`
+#'
+#' @param index
+#' integer scalar specifying the index of the mixing hyperparameter(s)
+#'
+#' @param s
+#' numeric vector specifying the values of the regularisation hyperparameter
+#'
+#' @param ... (not used)
+#'
+#' @return
+#' Returns fitted or predicted values in an
+#' \eqn{n_0 \times m}-dimensional or
+#' \eqn{n_1 \times m}-dimensional matrix, respectively.
+#'
+#' @inherit corila-package references
+#'
+#' @seealso
+#' Estimate parameters with [corila()],
+#' or estimate parameters and tune hyperparameters
+#' with [cv.corila()].
+#'
+#' @inherit corila examples
+#'
+#' @keywords internal
+#'
+#' @export
+#'
+predict.corila <- function(object, newx, index, s, ...) {
+  # --- check arguments ---
+  .assert(x = newx, type = "numeric",
+          dim = c(Inf, length(object$scale$mu.x)))
+  .assert(x = index, type = "integer", min = 1, max = length(object$model))
+  .assert(x = s, type = "numeric", dim = Inf, min = 0)
+  # --- make predictions ---
+  newx_stand <- .forescale(x = newx, pars = object$scale)$x
+  y_hat_stand <- stats::predict(object = object$model[[index]],
+                                newx = cbind(newx_stand, -newx_stand),
+                                s = s,
+                                type = "response")
+  y_hat <- .backscale(y = y_hat_stand, pars = object$scale)$y
+  y_hat
+}
 
 #' @title
 #' Sparse group lasso regression (without cross-validation)
@@ -541,59 +594,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   )
 }
 
-#' @title
-#' predict (S3 method)
-#'
-#' @description
-#' Makes prediction from an object of class `"corila"`.
-#'
-#' @inheritParams predict.cv.corila
-#'
-#' @param object
-#' object of class `"corila"`
-#'
-#' @param index
-#' integer scalar specifying the index of the mixing hyperparameter(s)
-#'
-#' @param s
-#' numeric vector specifying the values of the regularisation hyperparameter
-#'
-#' @param ... (not used)
-#'
-#' @return
-#' Returns fitted or predicted values in an
-#' \eqn{n_0 \times m}-dimensional or
-#' \eqn{n_1 \times m}-dimensional matrix, respectively.
-#'
-#' @inherit corila-package references
-#'
-#' @seealso
-#' Estimate parameters with [corila()],
-#' or estimate parameters and tune hyperparameters
-#' with [cv.corila()].
-#'
-#' @inherit corila examples
-#'
-#' @keywords internal
-#'
-#' @export
-#'
-predict.corila <- function(object, newx, index, s, ...) {
-  # --- check arguments ---
-  .assert(x = newx, type = "numeric",
-          dim = c(Inf, length(object$scale$mu.x)))
-  .assert(x = index, type = "integer", min = 1, max = length(object$model))
-  .assert(x = s, type = "numeric", dim = Inf, min = 0)
-  # --- make predictions ---
-  newx_stand <- .forescale(x = newx, pars = object$scale)$x
-  y_hat_stand <- stats::predict(object = object$model[[index]],
-                                newx = cbind(newx_stand, -newx_stand),
-                                s = s,
-                                type = "response")
-  y_hat <- .backscale(y = y_hat_stand, pars = object$scale)$y
-  y_hat
-}
-
 #----- class-specific helper functions -----
 
 #' @title
@@ -634,37 +634,37 @@ predict.corila <- function(object, newx, index, s, ...) {
   n <- nrow(x) # sample size
   p <- ncol(x) # number of features
   # --- target vector ---
-  .assert(x = y, type = "numeric", dim = n, na.rm = na.rm)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
-  if (identical(family, "cox")) {
-    if (!inherits(x = y, what = "Surv")) {
-      stop("Cox model requires a survival outcome.")
-    }
-  } else {
-    if (inherits(x = y, what = "Surv")) {
-      stop("Survival response requires Cox model.")
-    }
-    if (!identical(family, "binomial")) {
-      if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-        warning("Response might require binomial family.")
-      }
-    }
-    if (!identical(family, "poisson")) {
-      if (all(y %% 1 == 0)) {
-        warning("Response might require Poisson family.")
-      }
-    }
-    if (identical(family, "binomial")) {
-      if (!all(y %in% c(0, 1))) {
-        stop("Binomial family requires a binary outcome.")
-      }
-    } else if (identical(family, "poisson")) {
-      if (any(y %% 1 != 0)) {
-        stop("Poisson family requires a count outcome.")
-      }
-    }
-  }
+  .assert(x = y, type = "numeric", dim = n, na.rm = na.rm, family = family)
+  # if (identical(family, "cox")) {
+  #   if (!inherits(x = y, what = "Surv")) {
+  #     stop("Cox model requires a survival outcome.")
+  #   }
+  # } else {
+  #   if (inherits(x = y, what = "Surv")) {
+  #     stop("Survival response requires Cox model.")
+  #   }
+  #   if (!identical(family, "binomial")) {
+  #     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
+  #       warning("Response might require binomial family.")
+  #     }
+  #   }
+  #   if (!identical(family, "poisson")) {
+  #     if (all(y %% 1 == 0)) {
+  #       warning("Response might require Poisson family.")
+  #     }
+  #   }
+  #   if (identical(family, "binomial")) {
+  #     if (!all(y %in% c(0, 1))) {
+  #       stop("Binomial family requires a binary outcome.")
+  #     }
+  #   } else if (identical(family, "poisson")) {
+  #     if (any(y %% 1 != 0)) {
+  #       stop("Poisson family requires a count outcome.")
+  #     }
+  #   }
+  # }
   # --- group indicator ---
   if (is.vector(group) && is.atomic(group)) {
     q <- length(unique(group))
