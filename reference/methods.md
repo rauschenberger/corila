@@ -23,6 +23,12 @@ Implemented S3 methods for objects of class `"cv.corila"`:
 - [summary()](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md):
   summarises the fitted model
 
+- [deviance()](https://rauschenberger.github.io/corila/reference/deviance.cv.corila.md):
+  extracts the deviance
+
+- [nobs()](https://rauschenberger.github.io/corila/reference/nobs.cv.corila.md):
+  extracts the number of observations
+
 ## Value
 
 [coef()](https://rauschenberger.github.io/corila/reference/coef.cv.corila.md)

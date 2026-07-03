@@ -46,7 +46,16 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.assert</span><span class="op">(</span><span class="va">x</span>, <span class="va">type</span>, dim <span class="op">=</span> <span class="fl">1</span>, na.rm <span class="op">=</span> <span class="cn">FALSE</span>, support <span class="op">=</span> <span class="cn">NULL</span>, min <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>, max <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.assert</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">type</span>,</span>
+<span>  dim <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  support <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  family <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  min <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
+<span>  max <span class="op">=</span> <span class="cn">Inf</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -80,6 +89,10 @@
 
 <dt id="arg-support">support<a class="anchor" aria-label="anchor" href="#arg-support"></a></dt>
 <dd><p>character vector (only used for <code>type = "nominal"</code>)</p></dd>
+
+
+<dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
+<dd><p>character <code>"gaussian"</code>, <code>"binomial"</code>, <code>"poisson"</code>, or <code>"cox"</code></p></dd>
 
 
 <dt id="arg-min">min<a class="anchor" aria-label="anchor" href="#arg-min"></a></dt>

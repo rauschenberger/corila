@@ -5,7 +5,16 @@ Check whether provided arguments satisfy expectations.
 ## Usage
 
 ``` r
-.assert(x, type, dim = 1, na.rm = FALSE, support = NULL, min = -Inf, max = Inf)
+.assert(
+  x,
+  type,
+  dim = 1,
+  na.rm = FALSE,
+  support = NULL,
+  family = NULL,
+  min = -Inf,
+  max = Inf
+)
 ```
 
 ## Arguments
@@ -34,6 +43,10 @@ Check whether provided arguments satisfy expectations.
 - support:
 
   character vector (only used for `type = "nominal"`)
+
+- family:
+
+  character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 
 - min:
 
