@@ -22,7 +22,7 @@
 #' - [summary()][summary.cv.corila]:
 #'   summarises the fitted model
 #' - [deviance()][deviance.cv.corila]:
-#'   extracts the deviance 
+#'   extracts the deviance
 #' - [nobs()][nobs.cv.corila]:
 #'   extracts the number of observations
 #'
