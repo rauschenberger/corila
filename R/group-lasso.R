@@ -1603,9 +1603,8 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   beta_negative <- beta[(length(beta) / 2 + 1):(length(beta))]
   eps <- 1e-06
   if (any(beta_positive > eps & beta_negative > eps)) {
-    # nocov start
+    # nocov start (invariant check)
     stop("No predictor may have a positive and a negative coefficient.")
-    # (invariant check)
     # nocov end
   }
   beta_combined <- beta_positive  - beta_negative
@@ -1667,9 +1666,8 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   is_primary <- c(FALSE[object$scale$family != "cox"], !object$args$primary)
   if (any(coef[is_primary] != 0)) {
-    # nocov start
+    # nocov start (invariant check)
     stop("Excluded coefficients must equal zero.")
-    # (invariant check)
     # nocov end
   }
   #coef[c(TRUE[object$scale$family != "cox"], object$args$primary)] # ?
