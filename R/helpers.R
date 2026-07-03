@@ -30,6 +30,9 @@
 #' @param support
 #' character vector (only used for `type = "nominal"`)
 #'
+#' @param family
+#' character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
+#'
 #' @param min
 #' numerical value (not used for `type = "nominal"`)
 #'
@@ -61,12 +64,14 @@
 #' @srrstats {G2.13} *checks for missing data*
 #'
 .assert <- function(x, type, dim = 1, na.rm = FALSE,
-                    support = NULL, min = -Inf, max = Inf) {
+                    support = NULL, family = NULL, min = -Inf, max = Inf) {
   if (is.null(x)) {
     return(invisible(NULL))
   }
   type <- match.arg(arg = type,
                     choices = c("numeric", "integer", "nominal", "logical"))
+  family <- match.arg(arg = family,
+                      choices = c("gaussian", "binomial", "poisson", "cox"))
   stopifnot(
     "expected argument support to be of type character" =
       is.null(support) || is.character(support),
@@ -100,7 +105,15 @@
     "expected values greater than or equal to minimum" =
       type == "nominal" || min == -Inf || all(x >= min, na.rm = TRUE),
     "expected values less than or equal to maximum" =
-      type == "nominal" || max == Inf || all(x <= max, na.rm = TRUE)
+      type == "nominal" || max == Inf || all(x <= max, na.rm = TRUE),
+    "expected binary variable" =
+      is.null(family) || family != "binomial" ||
+      all(x %in% c(0, 1), na.rm = TRUE),
+    "expected count varaible" =
+      is.null(family) || family != "poisson" ||
+      (all(x %% 1 == 0, na.rm = TRUE) && all(x >= 0)),
+    "expected survival object" =
+      is.null(family) || family != "cox" || inherits(x = x, what = "Surv")
   )
   invisible(NULL)
 }
@@ -414,9 +427,9 @@
 #'
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
-  .assert(x = y, type = "numeric", dim = Inf)
   support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
   .assert(x = family, type = "nominal", support = support)
+  .assert(x = y, type = "numeric", dim = Inf, family = family)
   #if(identical(family, "cox") && !inherits(y, "Surv")){
   #  stop("Require object of class 'Surv'.")
   #}
