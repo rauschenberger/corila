@@ -544,26 +544,26 @@ testthat::test_that("function 'cv.corila' rejects wrong family", {
     data <- simulate(family = family_data, n0 = n, n1 = n, n_group = 3,
                      size_group = c(3, 2))
     for (family_model in c("gaussian", "binomial", "poisson", "cox")) {
+      expect_error <-
+        identical(family_data, "cox") ||
+        identical(family_model, "cox")  ||
+        identical(family_model, "binomial") ||
+        (identical(family_data, "gaussian") &&
+           identical(family_model, "poisson"))
+      expect_warning <-
+        identical(family_data, "poisson") ||
+        (identical(family_data, "binomial") &&
+           identical(family_model, "gaussian")) ||
+        (identical(family_data, "binomial") &&
+           identical(family_model, "poisson"))
       if (family_data == family_model) {
         next
-      }
-      if (identical(family_data, "cox") || identical(family_model, "cox")) {
+      } else if (expect_error) {
         testthat::expect_error(
           cv.corila(x = data$x_train, y = data$y_train, group = data$group,
                     family = family_model)
         )
-      } else if (identical(family_model, "binomial") ||
-                   (identical(family_data, "gaussian") &&
-                      identical(family_model, "poisson"))) {
-        testthat::expect_error(
-          cv.corila(x = data$x_train, y = data$y_train, group = data$group,
-                    family = family_model)
-        )
-      } else if (identical(family_data, "poisson") ||
-                   (identical(family_data, "binomial") &&
-                      identical(family_model, "gaussian")) ||
-                   (identical(family_data, "binomial") &&
-                      identical(family_model, "poisson"))) {
+      } else if (expect_warning) {
         testthat::expect_warning(
           cv.corila(x = data$x_train, y = data$y_train, group = data$group,
                     family = family_model)
