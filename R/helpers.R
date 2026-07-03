@@ -68,9 +68,9 @@
   type <- match.arg(arg = type,
                     choices = c("numeric", "integer", "nominal", "logical"))
   stopifnot(
-    "invalid argument 'support'" =
+    "expected argument support to be of type character" =
       is.null(support) || is.character(support),
-    "invalid argument 'support'" =
+    "expect support = NULL if type = 'nominal'" =
       type == "nominal" || is.null(support),
     "expected vector"  =
       length(dim) != 1 || is.vector(x) || inherits(x = x, what = "Surv"),
@@ -80,7 +80,7 @@
       length(dim) <= 2 || is.array(x),
     "expected vector with other length" =
       length(dim) != 1 || dim == Inf || length(x) == dim,
-    "expected matrix/array with other dimensions" =
+    "expected matrix/array with other number of dimensions" =
       length(dim) == 1 || length(dim) == length(dim(x)),
     "expected matrix/array with other dimensions" =
       length(dim) == 1 || all((dim == Inf | dim(x) == dim)),
