@@ -72,7 +72,7 @@ primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 cv.corila(x = x, y = y, group = group, primary = primary, tune = "none")
 #> object of class ‘cv.corila’ 
 #> (contains an object of class ‘cv.glmnet’)
-#> selected 3 from 20 predictors
+#> selected 0 from 20 predictors
 
 # \donttest{
 # simulation

@@ -91,6 +91,14 @@ summarise the fitted model</p></li>
 
 
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p><a href="coef.cv.corila.html">coef()</a> returns a \((1 +) p\)-dimensional vector,
+<a href="predict.cv.corila.html">predict()</a> returns an \(n_1\)-dimensional vector,
+<a href="fitted.cv.corila.html">fitted()</a> and <a href="residuals.cv.corila.html">residuals()</a>
+return an \(n_0\)-dimensional vector.
+See individual methods for details.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Use <code><a href="cv.corila.html">cv.corila()</a></code> to fit the model.</p></div>
     </div>
@@ -113,35 +121,34 @@ summarise the fitted model</p></li>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.10978670  0.00000000  0.00000000  0.00000000 -0.23122594 -0.13002684</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.00000000  0.00000000 -0.04111522  0.00000000  0.00000000  0.00000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13]  0.00000000  0.07875981  0.00000000  0.00000000 -0.02046811  0.00000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19]  0.00000000  0.12369290  0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.3156285 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.09926603  0.42161457  0.95068360  0.43627218  0.31049695 -0.04566780</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.85527265  0.75918734  0.20435338  0.25650187</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.3156285 0.3156285 0.3156285</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.09926603  0.42161457  0.95068360  0.43627218  0.31049695 -0.04566780</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.85527265  0.75918734  0.20435338  0.25650187</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.3156285 0.3156285 0.3156285</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.14487701 -0.14115095  0.07226668  0.14535193  0.29639958  0.03748645</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.18488309 -0.08963054 -0.21939662  0.22843357</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1.26471634  0.54842700 -0.37158022  0.09390859  2.04230119 -0.81544995</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.51263457 -0.26691716 -2.11699746  0.13422623</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="methods-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> object of class ‘cv.corila’ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (contains multiple objects of class ‘cv.glmnet’)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selected 6 from 20 predictors</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected 0 from 20 predictors</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- object of class “cv.corila” --- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> generalised linear model with gaussian family </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 20 features (10 primary and 10 auxiliary features)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> initial coefficients: ridge regression </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> final coefficients: adaptive lasso regression </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> optimised regularisation parameter: lambda.min = 0.2222 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selected weights: local = 0, global = 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selected exponents: local = Inf, global = 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7 non-zero coefficients (including intercept)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> optimised regularisation parameter: lambda.min = 1.188 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected weights: local = 0.9, global = 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected exponents: local = 0, global = 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 non-zero coefficients (including intercept)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

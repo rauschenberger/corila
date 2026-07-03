@@ -73,6 +73,56 @@
 (i.e., for testing observations).</p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># listing S3 methods</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="methods.html">methods</a></span><span class="op">(</span>class <span class="op">=</span> <span class="st">"cv.corila"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] coef      deviance  fitted    nobs      plot      predict   print    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [8] residuals summary  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> see '?methods' for accessing help and source code</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># using S3 methods</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10</span>; <span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">20</span>; <span class="va">q</span> <span class="op">&lt;-</span> <span class="fl">5</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n</span> , ncol <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">q</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">primary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">p</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.corila.html">cv.corila</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, group <span class="op">=</span> <span class="va">group</span>, primary <span class="op">=</span> <span class="va">primary</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.05752680  0.00000000 -0.64792795 -0.07879337 -0.20975336  0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13]  0.00000000  0.00000000  0.00000000  0.47249021  0.20404356  0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19]  0.00000000  0.00000000  0.66532042</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.80032044 -0.40982787  1.70471326  0.36985147  1.36077075 -0.48432243</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.29995985  0.08166795  2.11920544 -0.28119109</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.80032044 -0.40982787  1.70471326  0.36985147  1.36077075 -0.48432243</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.29995985  0.08166795  2.11920544 -0.28119109</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.070983080  0.123554540  0.005582696 -0.159285543 -0.016391158</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] -0.290471664 -0.269100262  0.445668941  0.164305549  0.067119980</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="fitted.cv.corila-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> object of class ‘cv.corila’ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (contains multiple objects of class ‘cv.glmnet’)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected 6 from 20 predictors</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --- object of class “cv.corila” --- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> generalised linear model with gaussian family </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 features (10 primary and 10 auxiliary features)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> initial coefficients: ridge regression </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> final coefficients: adaptive lasso regression </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> optimised regularisation parameter: lambda.min = 0.02372 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected weights: local = 0, global = 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected exponents: local = Inf, global = 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 non-zero coefficients (including intercept)</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

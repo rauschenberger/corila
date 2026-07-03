@@ -53,8 +53,8 @@ foldid <- corila:::.folds(y = y, family = "binomial", nfolds = 10)
 table(y, foldid)
 #>    foldid
 #> y   1 2 3 4 5 6 7 8 9 10
-#>   0 9 8 8 8 8 8 8 8 8  8
-#>   1 1 2 2 2 2 2 2 2 2  2
+#>   0 8 8 8 8 8 8 8 8 7  7
+#>   1 2 2 2 2 2 2 2 2 3  3
 
 # \donttest{
 # Cox model
@@ -65,7 +65,7 @@ foldid <- corila:::.folds(y = y, family = "cox", nfolds = 10)
 table(y[, "status"], foldid)
 #>    foldid
 #>     1 2 3 4 5 6 7 8 9 10
-#>   0 9 9 9 9 9 8 8 8 8  8
-#>   1 1 1 1 1 1 2 2 2 2  2
+#>   0 9 9 8 8 8 8 8 8 8  8
+#>   1 1 1 2 2 2 2 2 2 2  2
 # }
 ```

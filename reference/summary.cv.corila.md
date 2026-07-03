@@ -53,11 +53,11 @@ print(object)
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (7 primary and 13 auxiliary features)
+#> 20 features (9 primary and 11 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 0.5673 
-#> selected weights: local = 0.5, global = 0.5
-#> selected exponents: local = 0, global = 1
+#> optimised regularisation parameter: lambda.min = 0.986 
+#> selected weights: local = 1, global = 0
+#> selected exponents: local = 0, global = Inf
 #> 1 non-zero coefficients (including intercept)
 ```

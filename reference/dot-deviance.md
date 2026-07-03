@@ -40,15 +40,15 @@ n <- 10
 y <- rnorm(n)
 y_hat <- rnorm(n)
 corila:::.deviance(y = y , y_hat = y_hat, family = "gaussian")
-#> [1] 1.41056
+#> [1] 5.879539
 
 y <- rbinom(n = n, size = 1, prob = 0.5)
 y_hat <- runif(n)
 corila:::.deviance(y = y , y_hat = y_hat, family = "binomial")
-#> [1] 1.093534
+#> [1] 1.064941
 
 y <- rpois(n = n, lambda = 4)
 y_hat <- rexp(n)
 corila:::.deviance(y = y , y_hat = y_hat, family = "poisson")
-#> [1] 6.062777
+#> [1] 11.74024
 ```
