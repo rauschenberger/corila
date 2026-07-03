@@ -39,7 +39,7 @@ testthat::test_that("function '.validate' rejects wrong family", {
     }
   }
   group <- list(
-    A = as.factor(data$group),
+    A = data$group > 5,
     B = array(data = 1 * outer(data$group, data$group, "=="), dim = c(p, p, 1)),
     C = lapply(X = unique(data$group),
                FUN = function(x) as.factor(which(data$group == x)))
