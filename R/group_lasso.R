@@ -496,10 +496,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       temp <-  cor_trans * init$coef * adjacent
       weight$local[j] <- sum(pmax(0, temp)[adjacent]) / sum(adjacent)
       weight$local[p + j] <- sum(pmax(0, -temp)[adjacent]) / sum(adjacent)
-      
       # ad-hoc solution for features that are in no group:
       weight$local[is.na(weight$local)] <- 0 # Consider 0 and weight$ind
-      
       # all features
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * init$coef
       weight$global[j] <- sum(pmax(0, temp)) / p
