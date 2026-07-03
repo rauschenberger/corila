@@ -87,9 +87,8 @@ testthat::test_that("initial coefficients are named correctly", {
     testthat::expect_type(object = string, type = "character")
     testthat::expect_length(object = string, n = 1)
     testthat::expect_false(is.na(string))
-    split <- tolower(strsplit(x = string, split = " ")[[1]])
-    #testthat::expect_contains(object = split, expected = names(expect)[i])
-    testthat::expect_true(tolower(names(expect)[i]) %in% split) # !!!
+    split <- tolower(strsplit(x = string, split = " ", fixed = TRUE)[[1]])
+    testthat::expect_contains(object = split, expected = names(expect)[i])
   }
   testthat::expect_error(.type(alpha = -0.1))
   testthat::expect_error(.type(alpha = 1.1))
