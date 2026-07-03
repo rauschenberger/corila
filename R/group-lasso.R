@@ -580,6 +580,9 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' and the slots `"wgt_global"` and `"exp_global"`
 #' for the global prior information.
 #'
+#' @seealso
+#' This function is called by [cv.corila()].
+#'
 #' @examples
 #' corila:::.set_candidates(tune = "none")
 #'
@@ -967,26 +970,28 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   object
 }
 
+#----- list of S3 methods -----
+
 #' @title
 #' List of methods for class `"cv.corila"`
 #'
 #' @description
-#' Lists implemented S3 methods for objects of class `"cv.corila"`.
+#' Implemented S3 methods for objects of class `"cv.corila"`:
 #'
 #' - [coef()][coef.cv.corila]:
-#'   extract estimated coefficients
+#'   extracts estimated coefficients
 #' - [predict()][predict.cv.corila]:
-#'   calculate predicted values
+#'   calculates predicted values
 #' - [fitted()][fitted.cv.corila]:
-#'   extract fitted values
+#'   extracts fitted values
 #' - [residuals()][residuals.cv.corila]:
-#'   calculate deviance residuals
+#'   calculates deviance residuals
 #' - [plot()][plot.cv.corila]:
-#'   visualise observed vs fitted values and estimated coefficients
+#'   visualises observed vs fitted values and estimated coefficients
 #' - [print()][print.cv.corila]:
-#'   print information to the console
+#'   prints information to the console
 #' - [summary()][summary.cv.corila]:
-#'   summarise the fitted model
+#'   summarises the fitted model
 #'
 #' @return
 #' [coef()][coef.cv.corila] returns a \eqn{(1 +) p}-dimensional vector,
@@ -1002,7 +1007,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #' # listing S3 methods
 #' methods(class = "cv.corila")
 #'
-#' # using S3 methods
+#' # fitting the model
 #' n <- 10; p <- 20; q <- 5
 #' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 #' y <- rnorm(n)
@@ -1010,6 +1015,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #' primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 #' object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #'
+#' # using S3 methods
 #' coef(object)
 #' predict(object, newx = x)
 #' fitted(object)
@@ -1020,6 +1026,8 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #'
 #' @name methods
 NULL
+
+#----- other S3 methods -----
 
 #' @title
 #' print (S3 method)
@@ -1261,6 +1269,12 @@ residuals.cv.corila <- function(object, ...) {
 #' @seealso
 #' [print.cv.corila()]
 #'
+#' @details
+#' [print.summary.cv.corila()] uses the output from [summary.cv.corila()]
+#' to print readable information to the console.
+#' It calls the helper function [.type()] to name
+#' the methods used to estimate initial and final coefficients.
+#'
 #' @export
 #'
 #' @srrstats{RE4.18} *summary method*
@@ -1427,6 +1441,8 @@ plot.cv.corila <- function(x, ...) {
   invisible(NULL)
 }
 
+#----- predict.cv.corila -----
+
 #' @title
 #' Expand auxiliary features
 #'
@@ -1444,6 +1460,9 @@ plot.cv.corila <- function(x, ...) {
 #'
 #' @return
 #' Returns a matrix with \eqn{n} rows and \eqn{p_0 + p_1} columns.
+#'
+#' @seealso
+#' This function is called by [predict()][predict.cv.corila()].
 #'
 #' @examples
 #' n <- 5
@@ -1535,6 +1554,8 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   .backscale(y = as.numeric(y_hat_stand), pars = object$scale)$y
 }
 
+#----- coef.cv.corila -----
+
 #' @title
 #' Combine coefficients
 #'
@@ -1554,6 +1575,9 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #'
 #' @return
 #' Returns a numeric vector of length \eqn{1 + p}.
+#'
+#' @seealso
+#' This function is called by [coef()][coef.cv.corila].
 #'
 #' @examples
 #' p <- 10
@@ -1601,6 +1625,11 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' @seealso
 #' Fit models with [cv.corila()]
 #' and make predictions with [predict()][predict.cv.corila].
+#'
+#' @details
+#' This function calls [.combine_slopes()]
+#' to combine positive and negative coefficients
+#' and [.backscale()] to bring coefficients back to the original scale.
 #'
 #' @inherit cv.corila examples
 #'

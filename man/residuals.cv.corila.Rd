@@ -26,7 +26,7 @@ and calls the internal function \code{\link[=.residuals]{.residuals()}} to calcu
 # listing S3 methods
 methods(class = "cv.corila")
 
-# using S3 methods
+# fitting the model
 n <- 10; p <- 20; q <- 5
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
@@ -34,6 +34,7 @@ group <- rep(seq_len(q), length.out = p)
 primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 
+# using S3 methods
 coef(object)
 predict(object, newx = x)
 fitted(object)

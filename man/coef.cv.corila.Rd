@@ -21,6 +21,11 @@ and the other \eqn{p} entries are the estimated slopes.
 \description{
 Extracts coefficients from an object of class \code{"cv.corila"}.
 }
+\details{
+This function calls \code{\link[=.combine_slopes]{.combine_slopes()}}
+to combine positive and negative coefficients
+and \code{\link[=.backscale]{.backscale()}} to bring coefficients back to the original scale.
+}
 \examples{
 # minimal example
 n <- 50; p <- 20; q <- 5

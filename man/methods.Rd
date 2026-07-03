@@ -11,29 +11,29 @@ return an \eqn{n_0}-dimensional vector.
 See individual methods for details.
 }
 \description{
-Lists implemented S3 methods for objects of class \code{"cv.corila"}.
+Implemented S3 methods for objects of class \code{"cv.corila"}:
 \itemize{
 \item \link[=coef.cv.corila]{coef()}:
-extract estimated coefficients
+extracts estimated coefficients
 \item \link[=predict.cv.corila]{predict()}:
-calculate predicted values
+calculates predicted values
 \item \link[=fitted.cv.corila]{fitted()}:
-extract fitted values
+extracts fitted values
 \item \link[=residuals.cv.corila]{residuals()}:
-calculate deviance residuals
+calculates deviance residuals
 \item \link[=plot.cv.corila]{plot()}:
-visualise observed vs fitted values and estimated coefficients
+visualises observed vs fitted values and estimated coefficients
 \item \link[=print.cv.corila]{print()}:
-print information to the console
+prints information to the console
 \item \link[=summary.cv.corila]{summary()}:
-summarise the fitted model
+summarises the fitted model
 }
 }
 \examples{
 # listing S3 methods
 methods(class = "cv.corila")
 
-# using S3 methods
+# fitting the model
 n <- 10; p <- 20; q <- 5
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
@@ -41,6 +41,7 @@ group <- rep(seq_len(q), length.out = p)
 primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 
+# using S3 methods
 coef(object)
 predict(object, newx = x)
 fitted(object)

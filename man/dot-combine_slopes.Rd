@@ -30,4 +30,7 @@ beta <- pmax(c(temp, -temp), 0)
 corila:::.combine_slopes(alpha = alpha, beta = beta)
 
 }
+\seealso{
+This function is called by \link[=coef.cv.corila]{coef()}.
+}
 \keyword{internal}

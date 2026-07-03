@@ -43,4 +43,7 @@ Sets candidate values for hyperparameters.
 corila:::.set_candidates(tune = "none")
 
 }
+\seealso{
+This function is called by \code{\link[=cv.corila]{cv.corila()}}.
+}
 \keyword{internal}

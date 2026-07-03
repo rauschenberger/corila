@@ -31,4 +31,7 @@ all(x_expanded[, primary] == x[, primary])
 all(x_expanded[, !primary] == 0)
 
 }
+\seealso{
+This function is called by \link[=predict.cv.corila]{predict()}.
+}
 \keyword{internal}

@@ -22,6 +22,12 @@ Returns an invisible list with multiple slots.
 \description{
 Summary method for class \code{"cv.corila"}.
 }
+\details{
+\code{\link[=print.summary.cv.corila]{print.summary.cv.corila()}} uses the output from \code{\link[=summary.cv.corila]{summary.cv.corila()}}
+to print readable information to the console.
+It calls the helper function \code{\link[=.type]{.type()}} to name
+the methods used to estimate initial and final coefficients.
+}
 \examples{
 n <- 12 # decrease to 10 to check LOOCV
 p <- 20
