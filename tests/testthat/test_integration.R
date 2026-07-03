@@ -241,7 +241,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     "corila returns same predictions",
     "without and with standardisation"
   ), {
-    testthat::expect_equal(y_hat[[1]], y_hat[[2]])
+    testthat::expect_equal(y_hat[[1]], y_hat[[2]]) # objects are not identical!
   })
 }
 

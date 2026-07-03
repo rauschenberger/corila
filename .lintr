@@ -1,2 +1,2 @@
 linters: linters_with_defaults(return_linter = return_linter(return_style = "implicit"), commented_code_linter = NULL, object_name_linter = object_name_linter(styles="snake_case", regexes=c("cv.corila", "lambda.min", "cex.main", "na.rm")))
-exclusions: list("R/srr-stats-standards.R")
+exclusions: list("R/srr_stats_standards.R")
