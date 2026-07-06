@@ -8,8 +8,7 @@
 [![pkgcheck](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml/badge.svg)](https://github.com/rauschenberger/corila/actions/workflows/pkgcheck.yaml)
 [![Codecov test coverage](https://codecov.io/gh/rauschenberger/corila/graph/badge.svg)](https://app.codecov.io/gh/rauschenberger/corila)
 [![life cycle: experimental](https://img.shields.io/badge/lifecycle-experimental-lightgray.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN status](https://img.shields.io/badge/CRAN-not%20yet%20published-lightgray)](https://CRAN.R-project.org/package=corila)
-<!--[![CRAN status](https://www.r-pkg.org/badges/version/corila)](https://CRAN.R-project.org/package=corila)-->
+[![CRAN status](https://img.shields.io/badge/CRAN-not%20yet%20published-lightgray)](https://github.com/rauschenberger/corila)
 <!-- badges: end -->
 
 # Sparse modelling with grouped and correlated features
