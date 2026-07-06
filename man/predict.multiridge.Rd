@@ -100,7 +100,7 @@ and
 "Fast cross-validation for multi-penalty high-dimensional ridge regression"
 \emph{Journal of Computational and Graphical Statistics}
 30(4):835-847.
-\href{https://doi.org/10.1080/10618600.2021.1904962}{doi: 10.1080/10618600.2021.1904962}. # nolint: line_length_linter.
+\doi{10.1080/10618600.2021.1904962}.
 }
 \seealso{
 Fit models with \code{\link[=multiridge]{multiridge()}}
