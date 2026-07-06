@@ -27,8 +27,8 @@ testthat::test_that("data have same number of rows (observations)", {
 testthat::test_that("data have same number of columns (predictors)", {
   testthat::expect_identical(object = ncol(data$x_test),
                              expected = ncol(data$x_train))
-  testthat::expect_identical(object = length(data$primary),
-                             expected = ncol(data$x_train))
-  testthat::expect_identical(object = length(data$group),
-                             expected = ncol(data$x_train))
+  testthat::expect_length(object = data$primary,
+                          n = ncol(data$x_train))
+  testthat::expect_length(object = data$group,
+                          n = ncol(data$x_train))
 })
