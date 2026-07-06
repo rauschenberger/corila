@@ -17,7 +17,8 @@ residuals(object, ...)
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [stats::residuals](https://rdrr.io/r/stats/residuals.html))
 
 ## Value
 

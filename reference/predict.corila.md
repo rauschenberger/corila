@@ -32,7 +32,8 @@ predict(object, newx, index, s, ...)
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [stats::predict](https://rdrr.io/r/stats/predict.html))
 
 ## Value
 

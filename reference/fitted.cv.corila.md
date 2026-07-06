@@ -17,7 +17,8 @@ fitted(object, ...)
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [stats::fitted](https://rdrr.io/r/stats/fitted.values.html))
 
 ## Value
 

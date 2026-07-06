@@ -17,7 +17,8 @@ plot(x, ...)
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [base::plot](https://rdrr.io/r/base/plot.html))
 
 ## Value
 

@@ -20,7 +20,8 @@ print(x, ...)
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [base::summary](https://rdrr.io/r/base/summary.html))
 
 - x:
 

@@ -15,13 +15,10 @@ coef(object, s = "lambda.min", ...)
 
   object of class `"cv.corila"`
 
-- s:
-
-  character `"lambda.min"` or numeric value
-
 - ...:
 
-  (not used)
+  (for compatibility with
+  [stats::coef](https://rdrr.io/r/stats/coef.html))
 
 ## Value
 

@@ -13,11 +13,12 @@ coef(object, ...)
 
 - object:
 
-  object of class `"multiridge"`
+  object of type `"multiridge"`
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [stats::coef](https://rdrr.io/r/stats/coef.html))
 
 ## Value
 

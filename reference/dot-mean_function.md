@@ -16,7 +16,7 @@ Transform the linear predictor to predicted values/probabilities.
 
 - family:
 
-  character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
+  character string `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 
 ## Value
 

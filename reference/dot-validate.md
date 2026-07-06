@@ -70,12 +70,6 @@ and
 
   character string `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 
-- hyper:
-
-  list of \\m\\-dimensional vectors or a data frame with \\m\\ rows
-  containing candidate values for the regularisation and mixing
-  hyperparameters
-
 - alpha_init:
 
   elastic net mixing parameter (\\0 \leq\\ `alpha_init` \\\leq 1\\) for
@@ -104,10 +98,6 @@ and
 - nfolds:
 
   integer specifying the number of folds
-
-- lambda_init:
-
-  regularisation hyperparameter(s), or `NULL` (cross-validation)
 
 - silent:
 

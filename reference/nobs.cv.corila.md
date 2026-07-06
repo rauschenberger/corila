@@ -17,7 +17,8 @@ nobs(object, ...)
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [stats::nobs](https://rdrr.io/r/stats/nobs.html))
 
 ## Value
 

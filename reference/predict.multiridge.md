@@ -13,7 +13,7 @@ predict(object, newx, ...)
 
 - object:
 
-  object of class `"multiridge"`
+  object of type `"multiridge"`
 
 - newx:
 
@@ -23,7 +23,8 @@ predict(object, newx, ...)
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [stats::predict](https://rdrr.io/r/stats/predict.html))
 
 ## Value
 

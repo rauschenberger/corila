@@ -17,7 +17,8 @@ deviance(object, ...)
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [stats::deviance](https://rdrr.io/r/stats/deviance.html))
 
 ## Value
 

@@ -13,11 +13,12 @@ print(x, ...)
 
 - x:
 
-  object of class `"cv.corila"`.
+  object of class `"cv.corila"`
 
 - ...:
 
-  (not used)
+  (for compatibility with
+  [base::print](https://rdrr.io/r/base/print.html))
 
 ## Value
 
