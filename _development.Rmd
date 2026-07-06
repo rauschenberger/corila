@@ -56,6 +56,8 @@ checks <- checks[!grepl(pattern="rcmdcheck_", x = checks)]
 x <- goodpractice::gp(checks = checks)
 print(x, positions_limit = 20)
 
+urlchecker::url_check()
+
 x <- pkgcheck::pkgcheck(goodpractice=FALSE)
 notes <- autotest::autotest_package(exclude=c("F1","F2"),test=TRUE)
 notes <- autotest::autotest_package(test=TRUE)
