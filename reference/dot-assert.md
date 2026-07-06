@@ -46,7 +46,7 @@ Check whether provided arguments satisfy expectations.
 
 - family:
 
-  character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
+  character string `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 
 - min:
 

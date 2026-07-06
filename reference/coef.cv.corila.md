@@ -15,6 +15,10 @@ coef(object, s = "lambda.min", ...)
 
   object of class `"cv.corila"`
 
+- s:
+
+  character `"lambda.min"` or numeric value
+
 - ...:
 
   (for compatibility with
