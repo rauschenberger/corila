@@ -7,9 +7,9 @@
 \method{coef}{multiridge}(object, ...)
 }
 \arguments{
-\item{object}{object of class \code{"multiridge"}}
+\item{object}{object of type \code{"multiridge"}}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[stats:coef]{stats::coef})}
 }
 \value{
 Returns an \eqn{(1 + p)}-dimensional vector of estimated coefficients

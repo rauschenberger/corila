@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{object of class \code{"cv.corila"}}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[stats:residuals]{stats::residuals})}
 }
 \value{
 Returns a numeric vector of length \eqn{n_0}

@@ -68,10 +68,10 @@ NULL
 #' @description
 #' Extracts coefficients from an object of class `"cv.corila"`.
 #'
-#' @inheritParams predict.cv.corila
+#' @inheritParams predict.cv.corila object
 #'
 #' @param ...
-#' (not used)
+#' (for compatibility with [stats::coef])
 #'
 #' @return
 #' Returns an \eqn{(1 + p)}-dimensional vector of the estimated coefficients.
@@ -146,7 +146,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
 #' character `"lambda.min"` or numeric value
 #'
 #' @param ...
-#' (not used)
+#' (for compatibility with [stats::predict])
 #'
 #' @inherit predict.corila return
 #'
@@ -199,11 +199,10 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' @description
 #' Extracts fitted values.
 #'
-#' @param object
-#' object of class `"cv.corila"`
+#' @inheritParams predict.cv.corila object
 #'
 #' @param ...
-#' (not used)
+#' (for compatibility with [stats::fitted])
 #'
 #' @return
 #' Returns a numeric vector of length \eqn{n_0}
@@ -226,11 +225,10 @@ fitted.cv.corila <- function(object, ...) {
 #' @title
 #' Residuals
 #'
-#' @param object
-#' object of class `"cv.corila"`
+#' @inheritParams predict.cv.corila object
 #'
 #' @param ...
-#' (not used)
+#' (for compatibility with [stats::residuals])
 #'
 #' @details
 #' This function extracts the observed and fitted values from the fitted model
@@ -264,7 +262,7 @@ residuals.cv.corila <- function(object, ...) {
 #' object of class `"cv.corila"`
 #'
 #' @param ...
-#' (not used)
+#' (for compatibility with [base::plot])
 #'
 #' @details
 #' This function generates two figures:
@@ -324,11 +322,10 @@ plot.cv.corila <- function(x, ...) {
 #' @description
 #' Print method for class `"cv.corila"`.
 #'
-#' @param x
-#' object of class `"cv.corila"`.
+#' @inheritParams plot.cv.corila x
 #'
 #' @param ...
-#' (not used)
+#' (for compatibility with [base::print])
 #'
 #' @return
 #' Prints `"object of class 'cv.corila'"` to the console
@@ -361,14 +358,13 @@ print.cv.corila <- function(x, ...) {
 #' @description
 #' Summary method for class `"cv.corila"`.
 #'
-#' @param object
-#' object of class `"cv.corila"`
+#' @inheritParams predict.cv.corila object
 #'
 #' @param x
 #' object of class `"summary.cv.corila"`
 #'
 #' @param ...
-#' (not used)
+#' (for compatibility with [base::summary])
 #'
 #' @return
 #' Returns an invisible list with multiple slots.
@@ -448,11 +444,10 @@ print.summary.cv.corila <- function(x, ...) {
 #' @description
 #' Calculates the deviance.
 #'
-#' @param object
-#' object of class `"cv.corila"`
+#' @inheritParams predict.cv.corila object
 #'
 #' @param ...
-#' (not used)
+#' (for compatibility with [stats::deviance])
 #'
 #' @details
 #' Returns the deviance calculated by [glmnet::deviance.glmnet()]
@@ -480,11 +475,10 @@ deviance.cv.corila <- function(object, ...) {
 #' @description
 #' Extracts the number of observations.
 #'
-#' @param object
-#' object of class `"cv.corila"`
+#' @inheritParams predict.cv.corila object
 #'
 #' @param ...
-#' (not used)
+#' (for compatibility with [stats::nobs])
 #'
 #' @return
 #' Returns a positive integer.

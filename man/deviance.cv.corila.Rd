@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{object of class \code{"cv.corila"}}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[stats:deviance]{stats::deviance})}
 }
 \value{
 Returns a scalar.

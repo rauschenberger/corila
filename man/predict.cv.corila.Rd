@@ -16,7 +16,7 @@ to obtain predicted values}
 
 \item{s}{character \code{"lambda.min"} or numeric value}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[stats:predict]{stats::predict})}
 }
 \value{
 Returns fitted or predicted values in an

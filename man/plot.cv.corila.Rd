@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{object of class \code{"cv.corila"}}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[base:plot]{base::plot})}
 }
 \value{
 Returns \code{NULL} invisibly.

@@ -18,7 +18,7 @@ to obtain predicted values}
 
 \item{s}{numeric vector specifying the values of the regularisation hyperparameter}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[stats:predict]{stats::predict})}
 }
 \value{
 Returns fitted or predicted values in an

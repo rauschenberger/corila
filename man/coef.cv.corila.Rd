@@ -9,9 +9,7 @@
 \arguments{
 \item{object}{object of class \code{"cv.corila"}}
 
-\item{s}{character \code{"lambda.min"} or numeric value}
-
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[stats:coef]{stats::coef})}
 }
 \value{
 Returns an \eqn{(1 + p)}-dimensional vector of the estimated coefficients.

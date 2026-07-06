@@ -7,14 +7,14 @@
 \method{predict}{multiridge}(object, newx, ...)
 }
 \arguments{
-\item{object}{object of class \code{"multiridge"}}
+\item{object}{object of type \code{"multiridge"}}
 
 \item{newx}{\eqn{n_0 \times p} predictor matrix (training data)
 to obtain fitted values,
 \eqn{n_1 \times p} predictor matrix (testing data)
 to obtain predicted values}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[stats:predict]{stats::predict})}
 }
 \value{
 Returns an \eqn{n_0}-dimensional vector of fitted values

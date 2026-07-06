@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{object of class \code{"cv.corila"}}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[stats:nobs]{stats::nobs})}
 }
 \value{
 Returns a positive integer.

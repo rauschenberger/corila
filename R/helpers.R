@@ -6,6 +6,8 @@
 #' @description
 #' Check whether provided arguments satisfy expectations.
 #'
+#' @inheritParams cv.corila family
+#'
 #' @param x
 #' scalar, vector, matrix, or array to be checked
 #'
@@ -124,7 +126,7 @@
 #' @description
 #' Transforms variables to mean 0 and variance 1.
 #'
-#' @inheritParams corila
+#' @inheritParams cv.corila x
 #'
 #' @param y
 #' response vector
@@ -390,7 +392,7 @@
 #' @description
 #' Splits observations into balanced and stratified folds.
 #'
-#' @inheritParams cv.corila
+#' @inheritParams cv.corila y family nfolds
 #'
 #' @return
 #' Returns an \eqn{n_0}-dimensional vector
@@ -458,11 +460,10 @@
 #' @description
 #' Transform the linear predictor to predicted values/probabilities.
 #'
+#' @inheritParams cv.corila family
+#'
 #' @param x
 #' numeric vector of length \eqn{n}
-#'
-#' @param family
-#' character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 #'
 #' @return
 #' Returns a numeric vector of length \eqn{n}.

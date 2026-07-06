@@ -51,9 +51,10 @@ x <- cyclocomp::cyclocomp_package_dir()
 
 # checks for rOpenSci
 
-checks <- setdiff(goodpractice::all_checks(), c("covr", "cyclocomp", "lintr"))
+checks <- setdiff(goodpractice::all_checks(), c("covr", "cyclocomp"))
 checks <- checks[!grepl(pattern="rcmdcheck_", x = checks)]
 x <- goodpractice::gp(checks = checks)
+print(x, positions_limit = 20)
 
 x <- pkgcheck::pkgcheck(goodpractice=FALSE)
 notes <- autotest::autotest_package(exclude=c("F1","F2"),test=TRUE)

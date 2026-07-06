@@ -346,7 +346,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #' @description
 #' Makes prediction from an object of class `"corila"`.
 #'
-#' @inheritParams predict.cv.corila
+#' @inheritParams predict.cv.corila newx
 #'
 #' @param object
 #' object of class `"corila"`
@@ -357,7 +357,8 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #' @param s
 #' numeric vector specifying the values of the regularisation hyperparameter
 #'
-#' @param ... (not used)
+#' @param ...
+#' (for compatibility with [stats::predict])
 #'
 #' @return
 #' Returns fitted or predicted values in an
@@ -602,7 +603,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @description
 #' Checks arguments of functions [corila()] and [cv.corila()].
 #'
-#' @inheritParams corila
 #' @inheritParams cv.corila
 #'
 #' @details
@@ -740,7 +740,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @description
 #' Sets candidate values for hyperparameters.
 #'
-#' @inheritParams cv.corila
+#' @inheritParams cv.corila tune
 #'
 #' @return
 #' Returns a data frame with
@@ -809,7 +809,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @description
 #' Estimate initial coefficients.
 #'
-#' @inheritParams corila
+#' @inheritParams cv.corila
 #'
 #' @param lambda
 #' numeric scalar, or `NULL`
@@ -920,7 +920,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @description
 #' Identifies adjacent predictors.
 #'
-#' @inheritParams corila
+#' @inheritParams cv.corila group
 #'
 #' @param j
 #' index of predictor

@@ -7,9 +7,9 @@
 \method{print}{cv.corila}(x, ...)
 }
 \arguments{
-\item{x}{object of class \code{"cv.corila"}.}
+\item{x}{object of class \code{"cv.corila"}}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[base:print]{base::print})}
 }
 \value{
 Prints \code{"object of class 'cv.corila'"} to the console

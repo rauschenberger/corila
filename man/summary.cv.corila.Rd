@@ -12,7 +12,7 @@
 \arguments{
 \item{object}{object of class \code{"cv.corila"}}
 
-\item{...}{(not used)}
+\item{...}{(for compatibility with \link[base:summary]{base::summary})}
 
 \item{x}{object of class \code{"summary.cv.corila"}}
 }

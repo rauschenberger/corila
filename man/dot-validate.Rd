@@ -56,11 +56,6 @@ or must be excluded from the final model
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
 
-\item{hyper}{list of \eqn{m}-dimensional vectors
-or a data frame with \eqn{m} rows
-containing candidate values
-for the regularisation and mixing hyperparameters}
-
 \item{alpha_init}{elastic net mixing parameter
 (\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
 for initial regression
@@ -85,9 +80,6 @@ or \eqn{p \times p} correlation matrix}
 \item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
 
 \item{nfolds}{integer specifying the number of folds}
-
-\item{lambda_init}{regularisation hyperparameter(s),
-or \code{NULL} (cross-validation)}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
 be suppressed? logical}

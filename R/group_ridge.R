@@ -13,6 +13,8 @@
 #'
 #' @srrstats {G1.1} *simplified interface for an implemented algorithm*
 #'
+#' @inheritParams corila foldid nfolds
+#'
 #' @param x
 #' predictors:
 #' \eqn{n \times p} matrix
@@ -31,8 +33,6 @@
 #' @param penalties
 #' \eqn{q}-dimensional vector of penalty parameters,
 #' or `NULL` (cross-validation)
-#'
-#' @inheritParams corila
 #'
 #' @inherit corila details
 #'
@@ -242,12 +242,10 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
 #' @description
 #' Makes predictions from a multi-penalty ridge regression model.
 #'
-#' @inheritParams coef.multiridge
+#' @inheritParams predict.cv.corila
 #'
-#' @inheritParams predict.corila
-#'
-#' @param ...
-#' (not used)
+#' @param object
+#' object of type `"multiridge"`
 #'
 #' @inherit multiridge references
 #'
@@ -294,11 +292,9 @@ predict.multiridge <- function(object, newx, ...) {
 #' @description
 #' Extracts coefficients from a multi-penalty ridge regression model.
 #'
-#' @param object
-#' object of class `"multiridge"`
-#'
-#' @param ...
-#' (not used)
+#' @inheritParams predict.multiridge object
+#' 
+#' @inheritParams coef.cv.corila
 #'
 #' @inherit multiridge references
 #'
