@@ -45,7 +45,7 @@
 #' "Fast cross-validation for multi-penalty high-dimensional ridge regression"
 #' *Journal of Computational and Graphical Statistics*
 #' 30(4):835-847.
-#' [doi: 10.1080/10618600.2021.1904962](https://doi.org/10.1080/10618600.2021.1904962). # nolint: line_length_linter.
+#' \doi{10.1080/10618600.2021.1904962}.
 #' @srrstats {G1.0} *primary reference*
 #'
 #' @return
