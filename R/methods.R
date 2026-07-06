@@ -68,7 +68,7 @@ NULL
 #' @description
 #' Extracts coefficients from an object of class `"cv.corila"`.
 #'
-#' @inheritParams predict.cv.corila object
+#' @inheritParams predict.cv.corila object s
 #'
 #' @param ...
 #' (for compatibility with [stats::coef])

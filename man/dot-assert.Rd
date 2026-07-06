@@ -35,7 +35,8 @@
 
 \item{support}{character vector (only used for \code{type = "nominal"})}
 
-\item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"}}
 
 \item{min}{numerical value (not used for \code{type = "nominal"})}
 

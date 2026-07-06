@@ -32,9 +32,6 @@
 #' @param support
 #' character vector (only used for `type = "nominal"`)
 #'
-#' @param family
-#' character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
-#'
 #' @param min
 #' numerical value (not used for `type = "nominal"`)
 #'

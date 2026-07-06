@@ -293,7 +293,7 @@ predict.multiridge <- function(object, newx, ...) {
 #' Extracts coefficients from a multi-penalty ridge regression model.
 #'
 #' @inheritParams predict.multiridge object
-#' 
+#'
 #' @inheritParams coef.cv.corila
 #'
 #' @inherit multiridge references

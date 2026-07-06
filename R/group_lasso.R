@@ -346,7 +346,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #' @description
 #' Makes prediction from an object of class `"corila"`.
 #'
-#' @inheritParams predict.cv.corila newx
+#' @inheritParams predict.cv.corila
 #'
 #' @param object
 #' object of class `"corila"`
@@ -356,9 +356,6 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
 #'
 #' @param s
 #' numeric vector specifying the values of the regularisation hyperparameter
-#'
-#' @param ...
-#' (for compatibility with [stats::predict])
 #'
 #' @return
 #' Returns fitted or predicted values in an
