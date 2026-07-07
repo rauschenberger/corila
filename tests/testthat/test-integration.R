@@ -129,7 +129,12 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   message("family=\"", family, "\"")
   data <- simulate(family = family, n1 = 50, n_group = 3,
                    size_group = c(3, 2))
-  colnames(data$x_train) <- LETTERS[seq_len(ncol(data$x_train))]
+  names_train <- paste0("train_", seq_len(data$info$n0))
+  rownames(data$x_train) <- names(data$y_train) <- names_train
+  names_test <- paste0("train_", seq_len(data$info$n1))
+  rownames(data$x_test) <- names(data$y_test) <- names_test
+  names_covs <- LETTERS[seq_len(ncol(data$x_train))]
+  colnames(data$x_train) <- colnames(data$x_test) <- names_covs
   group <- list()
   group$vector <- data$group
   group$vector_char <- LETTERS[data$group]
@@ -153,6 +158,14 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   y_hat <- lapply(X = model,
                   FUN = function(x) predict(object = x, newx = data$x_test))
   testthat::test_that(
+    desc = "corila preserves names of predictors",
+    code = {
+      lapply(X = coef[-1],
+             FUN = testthat::expect_named,
+             expected = names_covs)
+    }
+  )
+  testthat::test_that(
     desc = paste0(
       "corila returns same coefficients ",
       "with argument group as vector, list, or matrix"
@@ -161,7 +174,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       lapply(X = coef[-1],
              FUN = testthat::expect_equal,
              expected = coef[[1]],
-             check.attributes = FALSE)
+             check.attributes = TRUE)
     }
   )
   testthat::test_that(
@@ -173,7 +186,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       lapply(X = y_hat[-1],
              FUN = testthat::expect_equal,
              expected = y_hat[[1]],
-             check.attributes = FALSE)
+             check.attributes = TRUE)
     }
   )
   testthat::test_that(
@@ -182,7 +195,11 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       "as feature matrix times coef"
     ),
     code = {
-      eta <- cbind(1[family != "cox"], data$x_test) %*% coef$vector
+      if (family == "cox") {
+        eta <- data$x_test %*% coef$vector
+      } else {
+        eta <- cbind(1, data$x_test) %*% coef$vector
+      }
       if (family == "gaussian") {
         pred <- eta
       } else if (family == "binomial") {
