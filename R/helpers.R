@@ -215,7 +215,7 @@
   }
   # --- standardise variables ---
   x_scaled <- t((t(x) - pars$mu.x) / pars$sd.x)
-  x_scaled[, pars$sd.x == 0] <- 0
+  x_scaled[, pars$sd.x < .Machine$double.eps] <- 0
   if (!is.null(y) && identical(family, "gaussian")) {
     y_scaled <- (y - pars$mu.y) / pars$sd.y
   } else if (!is.null(y)) {
@@ -333,7 +333,7 @@
 #' }
 #'
 #' @keywords internal
-#' 
+#'
 .backscale <- function(pars, y = NULL, coef = NULL) {
   # --- check arguments ---
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
@@ -360,15 +360,15 @@
   if (!is.null(coef)) {
     if (identical(pars$family, "cox")) {
       alpha <- NULL
-      beta <- coef * ifelse(test = pars$sd.x == 0,
+      beta <- coef * ifelse(test = pars$sd.x < .Machine$double.eps,
                             yes = 0,
                             no = pars$sd.y / pars$sd.x)
     } else {
-      factor <- ifelse(test = pars$sd.x == 0,
+      factor <- ifelse(test = pars$sd.x < .Machine$double.eps,
                        yes = 0,
                        no = pars$mu.x / pars$sd.x)
       alpha <- pars$mu.y + pars$sd.y * (coef[1] - sum(coef[-1] * factor))
-      beta <- coef[-1] * ifelse(test = pars$sd.x == 0,
+      beta <- coef[-1] * ifelse(test = pars$sd.x < .Machine$double.eps,
                                 yes = 0,
                                 no = pars$sd.y / pars$sd.x)
     }
@@ -546,7 +546,11 @@
       -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
     )
   } else if (identical(family, "poisson")) {
-    mean(2 * (ifelse(y == 0, 0, y * log(y / y_hat)) - y + y_hat))
+    mean(
+      2 * (ifelse(test = abs(y) < .Machine$double.eps,
+                  yes = 0,
+                  no = y * log(y / y_hat)) - y + y_hat)
+    )
   } else if (identical(family, "cox")) {
     glmnet::coxnet.deviance(pred = log(y_hat), y = y)
   }

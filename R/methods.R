@@ -466,7 +466,10 @@ print.summary.cv.corila <- function(x, ...) {
 #'
 deviance.cv.corila <- function(object, ...) {
   model <- object$model[[object$id_hyper]]
-  stats::deviance(model)[model$lambda == object$lambda.min]
+  id_lambda_min <- which(
+    abs(model$lambda - object$lambda.min) < .Machine$double.eps
+  )
+  stats::deviance(model)[id_lambda_min]
 }
 
 #' @title
@@ -636,7 +639,7 @@ nobs.cv.corila <- function(object, ...) {
     .assert(x = y_obs, type = "integer", dim = Inf, min = 0)
     .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0)
     sign(y_obs - y_fit) *
-      sqrt((2 * (ifelse(test = y_obs == 0,
+      sqrt((2 * (ifelse(test = abs(y_obs) < .Machine$double.eps,
                         yes = 0,
                         no = y_obs * log(y_obs / y_fit)) - y_obs + y_fit)))
   }

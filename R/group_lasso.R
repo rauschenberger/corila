@@ -218,6 +218,8 @@
 #' @srrstats {G2.14} *uses argument na_action*
 #' @srrstats {G2.14a} *to trigger an error on missing data*
 #' @srrstats {G2.14b} *to ignore observations with missing data*
+#' @srrstatsTODO {G2.16} *provides option to handle undefined values* 
+#' @srrstats {G3.0} *equality comparisons between integers, or approximate* 
 #' @srrstats {RE3.1} *convergence messages can be suppressed (@param silent)*
 #' @srrstats {RE4.0} *returns a "model" object (@return)*
 #' @srrstats {RE4.8} *returns response variable in slot "y_obs"*
@@ -538,7 +540,10 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       weight$global[j] <- sum(pmax(0, temp)) / p
       weight$global[p + j] <- sum(pmax(0, -temp)) / p
     }
-    weight <- lapply(weight, function(x) p * ifelse(x == 0, 0, x / sum(x)))
+    weight <- lapply(
+      X = weight,
+      FUN = function(x) p * ifelse(x < .Machine$double.eps, 0, x / sum(x))
+    )
     pf_ext <- 1 / (weight$local * hyper$wgt_local[i] +
                      weight$global * hyper$wgt_global[i])
     pf_ext[!c(primary, primary)] <- Inf # exclude auxiliary features
@@ -730,8 +735,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   } else {
     stop("Invalid value for argument 'tune'.")
   }
-  hyper$exp_local[hyper$wgt_local == 0] <- Inf
-  hyper$exp_global[hyper$wgt_global == 0] <- Inf
+  hyper$exp_local[hyper$wgt_local < .Machine$double.eps] <- Inf
+  hyper$exp_global[hyper$wgt_global < .Machine$double.eps] <- Inf
   hyper <- unique(hyper)
   rownames(hyper) <- seq_len(nrow(hyper))
   hyper
