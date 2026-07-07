@@ -7,7 +7,7 @@
 .assert(
   x,
   type,
-  dim = 1,
+  dim = 1L,
   na.rm = FALSE,
   support = NULL,
   family = NULL,

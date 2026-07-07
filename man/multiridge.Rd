@@ -10,7 +10,7 @@ multiridge(
   z,
   family = "gaussian",
   foldid = NULL,
-  nfolds = 10,
+  nfolds = 10L,
   penalties = NULL
 )
 }
