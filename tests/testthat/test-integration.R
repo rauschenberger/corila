@@ -157,6 +157,8 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
                  FUN = stats::coef)
   y_hat <- lapply(X = model,
                   FUN = function(x) predict(object = x, newx = data$x_test))
+  #' @srrstats {RE7.2} output objects retain aspects of input data
+  #' (names of observations and names of predictors)
   testthat::test_that(
     desc = "corila preserves names of predictors",
     code = {
@@ -166,8 +168,6 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
                                                       expected = names_covs))
     }
   )
-  #' @srrstats {RE7.2} output objects retain aspects of input data
-  #' (names of observations and names of predictors)
   testthat::test_that(
     desc = "corila preserves names of predictors",
     code = {
