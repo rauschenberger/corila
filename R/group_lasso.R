@@ -502,23 +502,9 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   #args <- as.list(match.call())[-1]
   #do.call(what = .validate, args = args)
   p <- args$p
-  #if (identical(alpha_init, "multiridge") && identical(family, "poisson")) {
-  #  warning("Setting alpha_init=0 due to family='poisson'.")
-  #  alpha_init <- 0
-  #}
-  #if (is.null(group)) {
-  #  group <- seq_len(p)
-  #}
-  #if (is.null(primary)) {
-  #  primary <- rep(x = TRUE, times = p)
-  #}
   args <- c(args, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
-  # --- fold identifiers ---
-  #if (is.null(lambda_init) && is.null(foldid)) {
-  #  foldid <- .folds(y = scale$y, family = family, nfolds = nfolds)
-  #}
   # --- initial coefficients ---
   init <- .estim_initial_coefs(x = scale$x,
                                y = scale$y,
@@ -539,7 +525,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   for (i in seq_len(nrow(hyper))) {
     weight <- list()
     weight$global <- weight$local <- rep(x = NA, times = p)
-    # rename to weight$local and weight$global
     for (j in seq_len(p)) {
       adjacent <- .is_adjacent(group = group, j = j, p = p,
                                names = colnames(scale$x))
@@ -547,29 +532,16 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       temp <-  cor_trans * init$coef * adjacent
       weight$local[j] <- sum(pmax(0, temp)[adjacent]) / sum(adjacent)
       weight$local[p + j] <- sum(pmax(0, -temp)[adjacent]) / sum(adjacent)
-      # ad-hoc solution for features that are in no group:
-      weight$local[is.na(weight$local)] <- 0 # Consider 0 and weight$ind
-      # all features
+      # ad-hoc solution for features that are in no group (unreachable?)
+      # weight$local[is.na(weight$local)] <- 0
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * init$coef
       weight$global[j] <- sum(pmax(0, temp)) / p
       weight$global[p + j] <- sum(pmax(0, -temp)) / p
     }
-    # # temporary code with beta distribution:
-    # temp <- sign(cor[, j]) *
-    # stats::qbeta(p = abs(cor[, j]),
-    # shape1 = hyper$alpha[i],
-    # shape2 = hyper$beta[i]) * init$coef * adjacent
     weight <- lapply(weight, function(x) p * ifelse(x == 0, 0, x / sum(x)))
     pf_ext <- 1 / (weight$local * hyper$wgt_local[i] +
                      weight$global * hyper$wgt_global[i])
-    # To obtain standard lasso set pf_ext equal to 1.
-    pf_ext[!c(primary, primary)] <- Inf # excluded features
-    #if (any(is.na(pf_ext))) {
-    #  stop("missing pf: ", sum(is.na(pf_ext)))
-    #}
-    #if (any(pf_ext < 0)) {
-    #  stop(paste0("negative pf:", min(pf_ext)))
-    #}
+    pf_ext[!c(primary, primary)] <- Inf # exclude auxiliary features
     .assert(x = pf_ext, type = "numeric", dim = 2 * p, min = 0)
     model[[i]] <- suppressMessages(
       glmnet::glmnet(x = cbind(scale$x, -scale$x),
@@ -634,34 +606,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   .assert(x = y, type = "numeric", dim = n, na.rm = na.rm, family = family)
-  # if (identical(family, "cox")) {
-  #   if (!inherits(x = y, what = "Surv")) {
-  #     stop("Cox model requires a survival outcome.")
-  #   }
-  # } else {
-  #   if (inherits(x = y, what = "Surv")) {
-  #     stop("Survival response requires Cox model.")
-  #   }
-  #   if (!identical(family, "binomial")) {
-  #     if (all(y %in% c(0, 1)) || all(y %in% c(-1, 1))) {
-  #       warning("Response might require binomial family.")
-  #     }
-  #   }
-  #   if (!identical(family, "poisson")) {
-  #     if (all(y %% 1 == 0)) {
-  #       warning("Response might require Poisson family.")
-  #     }
-  #   }
-  #   if (identical(family, "binomial")) {
-  #     if (!all(y %in% c(0, 1))) {
-  #       stop("Binomial family requires a binary outcome.")
-  #     }
-  #   } else if (identical(family, "poisson")) {
-  #     if (any(y %% 1 != 0)) {
-  #       stop("Poisson family requires a count outcome.")
-  #     }
-  #   }
-  # }
   # --- group indicator ---
   if (is.vector(group) && is.atomic(group)) {
     q <- length(unique(group))
@@ -717,13 +661,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   } else {
     .assert(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
   }
-  #if (family %in% c("gaussian", "poisson")){
-  #  max <- n
-  #} else if (identical(family, "binomial")) {
-  #  max <- max(table(y))
-  #} else if (identical(family, "cox")) {
-  #  max <- max(table(y[ ,"status"]))
-  #}
   .assert(x = foldid, type = "integer", dim = n, min = 1, max = n)
   .assert(x = nfolds, type = "integer", min = 1, max = n)
   .assert(x = lambda_init, type = "numeric", min = 0)

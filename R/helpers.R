@@ -199,14 +199,8 @@
   } else {
     pars <- list()
     pars$family <- family
-    #if (identical(family, "cox")) {
-    #  cond <- y[, 2] == 1
-    #} else {
     cond <- rep(x = TRUE, times = length(y))
-    #}
-    #pars$mu.x <- apply(X = x[cond, ],
-    #                   MARGIN = 2,
-    #                   FUN = base::mean, na.rm = TRUE)
+    # scaling with uncensored observations only: cond <- y[, 2] == 1
     pars$mu.x <- colMeans(x = x[cond, ], na.rm = TRUE)
     pars$sd.x <- apply(X = x[cond, ],
                        MARGIN = 2,
@@ -339,7 +333,7 @@
 #' }
 #'
 #' @keywords internal
-#'
+#' 
 .backscale <- function(pars, y = NULL, coef = NULL) {
   # --- check arguments ---
   slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
