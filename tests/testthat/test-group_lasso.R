@@ -61,8 +61,8 @@ testthat::test_that("function '.validate' rejects wrong family", {
 testthat::test_that("initial coefficients are estimated", {
   family <- c("gaussian", "binomial", "poisson", "cox")
   alpha <- list(0, 0.5, 1, "pearson", "spearman", "kendall", "multiridge", NA)
-  n <- 20
-  p <- 10
+  n <- 20L
+  p <- 10L
   x <- matrix(rnorm(n * p), nrow = n, ncol = p)
   group <- rep(1:4, times = c(3, 3, 2, 2))
   beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
@@ -165,7 +165,7 @@ testthat::test_that("adjacency is detected", {
 ## function ".combine_slopes" --------------------------------------------------
 
 set.seed(1)
-p <- 10
+p <- 10L
 alpha <- stats::rnorm(1)
 temp <- stats::rnorm(p)
 beta <- pmax(c(temp, -temp), 0)

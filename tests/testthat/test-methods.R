@@ -4,8 +4,8 @@
 
 ## functions ".forescale" and ".backscale" -------------------------------------
 
-n <- 5
-p <- 10
+n <- 5L
+p <- 10L
 
 set.seed(1)
 sd <- seq(from = 0, to = 1, length.out = p)
@@ -97,7 +97,7 @@ testthat::test_that("initial coefficients are named correctly", {
 ## function ".deviance" --------------------------------------------------------
 
 for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
-  n <- 10
+  n <- 10L
   set.seed(1)
   if (family == "gaussian") {
     y <- stats::rnorm(n = n)
@@ -166,7 +166,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
 ## function ".mean_function" ---------------------------------------------------
 
 testthat::test_that("mean function works", {
-  n <- 10
+  n <- 10L
   eta <- stats::rnorm(n = n)
   for (family in c("gaussian", "binomial", "poisson", "cox")) {
     mean <- .mean_function(x = eta, family = family)
@@ -187,7 +187,7 @@ testthat::test_that("mean function works", {
 ## function "calc_sign_prec" ---------------------------------------------------
 
 set.seed(1)
-n <- 10
+n <- 10L
 truth <- sample(x = c(-1, 0, 1), size = n, replace = TRUE)
 estim <- sample(x = c(-1, 0, 1), size = n, replace = TRUE)
 
@@ -258,7 +258,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       }
     }
   )
-  nfolds <- 10
+  nfolds <- 10L
   testthat::test_that(
     desc = "function '.folds' throws an error for gamma family",
     code = {
@@ -281,8 +281,8 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 }
 
 for (i in c(0, 1)){
-  n <- 10
-  nfolds <- 5
+  n <- 10L
+  nfolds <- 5L
   foldid <- .folds(y = rep(i, times = n), family = "binomial", nfolds = nfolds)
   testthat::expect_type(object = foldid, type = "integer")
   testthat::expect_length(object = foldid, n = n)
@@ -293,8 +293,8 @@ for (i in c(0, 1)){
 
 testthat::test_that("outcomes are simulated", {
   family <- c("gaussian", "binomial", "poisson", "cox")
-  n <- 10
-  p <- 5
+  n <- 10L
+  p <- 5L
   x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
   beta <- stats::rnorm(n = p)
   for (i in seq_along(family)) {
@@ -330,7 +330,7 @@ testthat::test_that("outcomes are simulated", {
 ## function .residuals ---------------------------------------------------------
 
 testthat::test_that("residuals match those from stats::residuals", {
-  n <- 100
+  n <- 100L
   x <- rnorm(n)
   for (family in c("gaussian", "binomial", "poisson")) {
     if (family == "gaussian") {
