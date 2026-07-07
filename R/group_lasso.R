@@ -135,6 +135,7 @@
 #'
 #' @examples
 #' # minimal example
+#' set.seed(1)
 #' n <- 50; p <- 20; q <- 5
 #' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 #' y <- rnorm(n)
@@ -218,8 +219,8 @@
 #' @srrstats {G2.14} *uses argument na_action*
 #' @srrstats {G2.14a} *to trigger an error on missing data*
 #' @srrstats {G2.14b} *to ignore observations with missing data*
-#' @srrstatsTODO {G2.16} *provides option to handle undefined values* 
-#' @srrstats {G3.0} *equality comparisons between integers, or approximate* 
+#' @srrstatsTODO {G2.16} *provides option to handle undefined values*
+#' @srrstats {G3.0} *equality comparisons between integers, or approximate*
 #' @srrstats {RE3.1} *convergence messages can be suppressed (@param silent)*
 #' @srrstats {RE4.0} *returns a "model" object (@return)*
 #' @srrstats {RE4.8} *returns response variable in slot "y_obs"*
@@ -381,7 +382,7 @@ predict.corila <- function(object, newx, index, s, ...) {
   # --- check arguments ---
   .assert(x = newx, type = "numeric",
           dim = c(Inf, length(object$scale$mu.x)))
-  .assert(x = index, type = "integer", min = 1, max = length(object$model))
+  .assert(x = index, type = "integer", min = 1L, max = length(object$model))
   .assert(x = s, type = "numeric", dim = Inf, min = 0)
   # --- make predictions ---
   newx_stand <- .forescale(x = newx, pars = object$scale)$x
@@ -542,7 +543,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     }
     weight <- lapply(
       X = weight,
-      FUN = function(x) p * ifelse(x < .Machine$double.eps, 0, x / sum(x))
+      FUN = function(x) p * ifelse(test = x == 0, yes = 0, no = x / sum(x))
     )
     pf_ext <- 1 / (weight$local * hyper$wgt_local[i] +
                      weight$global * hyper$wgt_global[i])
@@ -639,7 +640,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     }
   } else if (is.matrix(group)) {
     q <- NA
-    .assert(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)
+    .assert(x = group, type = "integer", dim = c(p, p), min = 0L, max = 1L)
   } else {
     stop("Argument 'group' must be a vector, ",
          "a list, or a matrix.")
@@ -666,8 +667,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   } else {
     .assert(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
   }
-  .assert(x = foldid, type = "integer", dim = n, min = 1, max = n)
-  .assert(x = nfolds, type = "integer", min = 1, max = n)
+  .assert(x = foldid, type = "integer", dim = n, min = 1L, max = n)
+  .assert(x = nfolds, type = "integer", min = 1L, max = n)
   .assert(x = lambda_init, type = "numeric", min = 0)
   .assert(x = silent, type = "logical")
   list(n = n, p = p, q = q)
@@ -795,7 +796,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   }
   .assert(x = foldid, type = "integer", dim = n,
           min = 1, max = n)
-  .assert(x = nfolds, type = "integer", min = 2, max = n)
+  .assert(x = nfolds, type = "integer", min = 2L, max = n)
   if (identical(alpha_init, "multiridge")) {
     dim <- length(unique(group))
   } else {
@@ -894,7 +895,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @keywords internal
 #'
 .is_adjacent <- function(group, j, p, names) {
-  .assert(x = j, type = "integer", min = 1)
+  .assert(x = j, type = "integer", min = 1L)
   .assert(x = p, type = "integer", min = j)
   .assert(x = names, type = "nominal", dim = p)
   if (is.vector(group) && is.atomic(group)) {
@@ -903,7 +904,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     if (is.numeric(unlist(group))) {
       group_cond <- vapply(X = group,
                            FUN = function(slot) j %in% slot,
-                           FUN.VALUE = logical(1))
+                           FUN.VALUE = logical(1L))
       seq_len(p) %in% unlist(group[group_cond])
     } else if (is.character(unlist(group))) {
       group_cond <- vapply(

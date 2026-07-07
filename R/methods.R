@@ -100,7 +100,7 @@ NULL
 coef.cv.corila <- function(object, s = "lambda.min", ...) {
   if (identical(s, "lambda.min")) {
     s <- object$lambda.min
-  } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
+  } else if (!is.numeric(s) || length(s) != 1L || s < 0) {
     stop("Set s='lambda.min' or provide non-negative scalar.")
   }
   coef_stand <- as.numeric(
@@ -175,7 +175,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   # --- check arguments ---
   if (identical(s, "lambda.min")) {
     s <- object$lambda.min
-  } else if (!is.numeric(s) || length(s) != 1 || s < 0) {
+  } else if (!is.numeric(s) || length(s) != 1L || s < 0) {
     stop("Set s='lambda.min' or provide non-negative value.")
   }
   # --- handle auxiliary predictors ---
@@ -287,7 +287,7 @@ plot.cv.corila <- function(x, ...) {
   y_obs <- x$y_obs
   y_fit <- x$y_fit
   beta <- stats::coef(x, s = "lambda.min")[-1]
-  graphics::par(mfrow = c(1, 2))
+  graphics::par(mfrow = c(1L, 2L))
   if (x$args$family %in% c("gaussian", "poisson")) {
     max <- max(abs(c(y_obs, y_fit)))
     lim <- c(-max, max)
@@ -345,7 +345,7 @@ plot.cv.corila <- function(x, ...) {
 #'
 print.cv.corila <- function(x, ...) {
   cat("object of class", sQuote("cv.corila"), "\n")
-  content <- ifelse(length(x$model) == 1, "an object", "multiple objects")
+  content <- ifelse(length(x$model) == 1L, "an object", "multiple objects")
   cat("(contains ", content, " of class ", sQuote("cv.glmnet"), ")\n", sep = "")
   nzero <- sum(stats::coef(x, s = "lambda.min")[-1] != 0)
   cat("selected", nzero, "from", x$args$p, "predictors")
@@ -428,7 +428,7 @@ print.summary.cv.corila <- function(x, ...) {
   cat("initial coefficients:", .type(alpha = x$alpha_init), "\n")
   cat("final coefficients: adaptive", .type(alpha = x$alpha_final), "\n")
   cat("optimised regularisation parameter: lambda.min =",
-      signif(x$lambda.min, digits = 4), "\n")
+      signif(x$lambda.min, digits = 4L), "\n")
   cat("selected weights: local = ", x$wgt_local,
       ", global = ", x$wgt_global, "\n", sep = "")
   cat("selected exponents: local = ", x$exp_local,
@@ -466,9 +466,7 @@ print.summary.cv.corila <- function(x, ...) {
 #'
 deviance.cv.corila <- function(object, ...) {
   model <- object$model[[object$id_hyper]]
-  id_lambda_min <- which(
-    abs(model$lambda - object$lambda.min) < .Machine$double.eps
-  )
+  id_lambda_min <- which.min(abs(model$lambda - object$lambda.min))
   stats::deviance(model)[id_lambda_min]
 }
 
@@ -630,13 +628,13 @@ nobs.cv.corila <- function(object, ...) {
     .assert(x = y_fit, type = "numeric", dim = length(y_obs))
     y_obs - y_fit
   } else if (identical(family, "binomial")) {
-    .assert(x = y_obs, type = "integer", dim = Inf, min = 0, max = 1)
+    .assert(x = y_obs, type = "integer", dim = Inf, min = 0L, max = 1L)
     .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0, max = 1)
     y_fit <- pmax(eps, pmin(y_fit, 1 - eps))
     sign(y_obs - y_fit) * sqrt(2) *
       sqrt(- y_obs * log(y_fit) - (1 - y_obs) * log(1 - y_fit))
   } else if (identical(family, "poisson")) {
-    .assert(x = y_obs, type = "integer", dim = Inf, min = 0)
+    .assert(x = y_obs, type = "integer", dim = Inf, min = 0L)
     .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0)
     sign(y_obs - y_fit) *
       sqrt((2 * (ifelse(test = abs(y_obs) < .Machine$double.eps,

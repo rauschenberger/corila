@@ -163,8 +163,8 @@
 #' @keywords methods models regression classif
 #'
 #' @export
-multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
-                       penalties = NULL) {
+multiridge <- function(x, y, z, family = "gaussian", foldid = NULL,
+                       nfolds = 10L, penalties = NULL) {
   # --- check arguments ---
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop("For each variable, 'x' should have one column, ",
@@ -183,7 +183,7 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL, nfolds = 10,
           support = c("gaussian", "binomial", "cox"))
   .assert(x = foldid, type = "integer", dim = nrow(x),
           min = 1, max = nrow(x))
-  .assert(x = nfolds, type = "integer", min = 2, max = nrow(x))
+  .assert(x = nfolds, type = "integer", min = 2L, max = nrow(x))
   .assert(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
   #.validate(x = x, y = y, group = NULL, family = family)
   # --- initial regression ---

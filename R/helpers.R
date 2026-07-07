@@ -62,7 +62,7 @@
 #' @srrstats {G2.3a} *rejects unexpected values*
 #' @srrstats {G2.13} *checks for missing data*
 #'
-.assert <- function(x, type, dim = 1, na.rm = FALSE,
+.assert <- function(x, type, dim = 1L, na.rm = FALSE,
                     support = NULL, family = NULL, min = -Inf, max = Inf) {
   if (is.null(x)) {
     return(invisible(NULL))
@@ -77,24 +77,24 @@
     "expect support = NULL if type = 'nominal'" =
       type == "nominal" || is.null(support),
     "expected vector"  =
-      length(dim) != 1 || is.vector(x) || inherits(x = x, what = "Surv"),
+      length(dim) != 1L || is.vector(x) || inherits(x = x, what = "Surv"),
     "expected matrix" =
-      length(dim) != 2 || is.matrix(x),
+      length(dim) != 2L || is.matrix(x),
     "expected array" =
-      length(dim) <= 2 || is.array(x),
+      length(dim) <= 2L || is.array(x),
     "expected vector with other length" =
-      length(dim) != 1 || dim == Inf || length(x) == dim,
+      length(dim) != 1L || dim == Inf || length(x) == dim,
     "expected matrix/array with other number of dimensions" =
-      length(dim) == 1 || length(dim) == length(dim(x)),
+      length(dim) == 1L || length(dim) == length(dim(x)),
     "expected matrix/array with other dimensions" =
-      length(dim) == 1 || all((dim == Inf | dim(x) == dim)),
+      length(dim) == 1L || all((dim == Inf | dim(x) == dim)),
     "expected no missing values" =
       na.rm || !anyNA(x),
     "expected numeric values" =
       !type %in% c("numeric", "integer") ||
       is.numeric(x) || (na.rm && all(is.na(x))),
     "expected integer values" =
-      type != "integer" || all(x %% 1 == 0, na.rm = TRUE),
+      type != "integer" || all(x %% 1L == 0L, na.rm = TRUE),
     "expected nominal values" =
       type != "nominal" || is.character(x),
     "expected logical values" =
@@ -110,7 +110,7 @@
       all(x %in% c(0, 1), na.rm = TRUE),
     "expected count varaible" =
       is.null(family) || family != "poisson" ||
-      (all(x %% 1 == 0, na.rm = TRUE) && all(x >= 0)),
+      (all(x %% 1L == 0L, na.rm = TRUE) && all(x >= 0)),
     "expected survival object" =
       is.null(family) || family != "cox" || inherits(x = x, what = "Surv")
   )
@@ -427,7 +427,7 @@
   #if(identical(family, "cox") && !inherits(y, "Surv")){
   #  stop("Require object of class 'Surv'.")
   #}
-  .assert(x = nfolds, type = "integer", min = 2, max = length(y))
+  .assert(x = nfolds, type = "integer", min = 2L, max = length(y))
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
     if (identical(family, "cox")) {
@@ -531,7 +531,7 @@
     .assert(x = y, type = "integer", dim = Inf, min = 0, max = 1)
     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
   } else if (identical(family, "poisson")) {
-    .assert(x = y, type = "integer", dim = Inf, min = 0)
+    .assert(x = y, type = "integer", dim = Inf, min = 0L)
     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0)
   } else {
     .assert(x = y, type = "numeric", dim = Inf)
