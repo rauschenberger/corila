@@ -49,14 +49,11 @@
 #' @srrstats {RE3.0} *The function glmnet from the glmnet-package issues warnings if the model fails to converge.*
 #' @srrstats {RE3.2} *See glmnet-package for convergence thresholds*
 #' @srrstats {RE4.7} *convergence statistics are in the returned glmnet object* 
-#' @srrstatsTODO {RE4.11} *Goodness-of-fit and other statistics associated such as effect sizes with model coefficients.*
 #' @srrstatsTODO {RE5.0} *Scaling relationships between sizes of input data (numbers of observations, with potential extension to numbers of variables/columns) and speed of algorithm.* 
 #' @srrstatsTODO {RE7.0} *Tests with noiseless, exact relationships between predictor (independent) data.*
 #' @srrstatsTODO {RE7.0a} In particular, these tests should confirm ability to reject perfectly noiseless input data.
 #' @srrstatsTODO {RE7.1} *Tests with noiseless, exact relationships between predictor (independent) and response (dependent) data.*
-#' @srrstatsTODO {RE7.1a} *In particular, these tests should confirm that model fitting is at least as fast or (preferably) faster than testing with equivalent noisy data (see RE2.4b).* 
-#' @srrstatsTODO {RE7.3} Demonstrate and test expected behaviour when objects returned from regression software are submitted to the accessor methods of **RE4.2**--**RE4.7**.
-#' @srrstatsTODO {RE7.4} Extending directly from **RE4.15**, where appropriate, tests should demonstrate and confirm that forecast errors, confidence intervals, or equivalent values increase with forecast horizons.
+#' @srrstatsTODO {RE7.1a} *In particular, these tests should confirm that model fitting is at least as fast or (preferably) faster than testing with equivalent noisy data (see RE2.4b).*
 #' @noRd
 NULL
 
@@ -84,5 +81,6 @@ NULL
 #' @srrstatsNA {RE4.16} *method models same responses for all groups*
 #' @srrstatsNA {RE6.1} *default plot method is generic*
 #' @srrstatsNA {RE6.3} *As this package is not about time series, there is no difference between interpolation and extrapolation.*
+#' @srrstatsNA {RE7.4} *method is not about forecasting*
 #' @noRd
 NULL

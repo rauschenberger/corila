@@ -464,6 +464,8 @@ print.summary.cv.corila <- function(x, ...) {
 #'
 #' @export
 #'
+#' @srrstats {RE4.11} *extract goodness-of-fit*
+#'
 deviance.cv.corila <- function(object, ...) {
   model <- object$model[[object$id_hyper]]
   id_lambda_min <- which.min(abs(model$lambda - object$lambda.min))

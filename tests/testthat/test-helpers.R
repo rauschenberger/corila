@@ -1,6 +1,8 @@
 
 ## S3 methods for class "cv.corila" --------------------------------------------
 
+#' @srrstats {RE7.3} test S3 methods
+
 n <- 10L
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   set.seed(1)
