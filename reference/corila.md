@@ -189,9 +189,7 @@ object <- corila:::corila(x = x,
                           nfolds = 10,
                           hyper = hyper,
                           lambda_init = NULL)
-#> Error: from glmnet C++ code (error code 7777); All used predictors have zero variance
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
-#> Error: object 'object' not found
 # }
 ```

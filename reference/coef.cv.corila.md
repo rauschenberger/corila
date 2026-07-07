@@ -55,13 +55,16 @@ and make predictions with
 
 ``` r
 # minimal example
+set.seed(1)
 n <- 50; p <- 20; q <- 5
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
 group <- rep(seq_len(q), length.out = p)
 primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 cv.corila(x = x, y = y, group = group, primary = primary, tune = "none")
-#> Error: from glmnet C++ code (error code 7777); All used predictors have zero variance
+#> object of class ‘cv.corila’ 
+#> (contains an object of class ‘cv.glmnet’)
+#> selected 0 from 20 predictors
 
 # \donttest{
 # simulation

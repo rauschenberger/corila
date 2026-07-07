@@ -8,7 +8,7 @@ Check whether provided arguments satisfy expectations.
 .assert(
   x,
   type,
-  dim = 1,
+  dim = 1L,
   na.rm = FALSE,
   support = NULL,
   family = NULL,

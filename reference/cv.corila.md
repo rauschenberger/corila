@@ -183,6 +183,7 @@ with different values for the regularisation and mixing hyperparameters.
 
 ``` r
 # minimal example
+set.seed(1)
 n <- 50; p <- 20; q <- 5
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)

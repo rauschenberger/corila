@@ -64,21 +64,35 @@ group <- rep(seq_len(q), length.out = p)
 primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
-#> Error: from glmnet C++ code (error code 7777); All used predictors have zero variance
 
 # using S3 methods
 coef(object)
-#> Error: object 'object' not found
+#>  [1] 0.3156285 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
+#>  [8] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
+#> [15] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
 predict(object, newx = x)
-#> Error: object 'object' not found
+#>  [1] 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285
+#>  [8] 0.3156285 0.3156285 0.3156285
 fitted(object)
-#> Error: object 'object' not found
+#>  [1] 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285
+#>  [8] 0.3156285 0.3156285 0.3156285
 residuals(object)
-#> Error: object 'object' not found
+#>  [1]  1.26471634  0.54842700 -0.37158022  0.09390859  2.04230119 -0.81544995
+#>  [7] -0.51263457 -0.26691716 -2.11699746  0.13422623
 plot(object)
-#> Error: object 'object' not found
+
 print(object)
-#> Error: object 'object' not found
+#> object of class ‘cv.corila’ 
+#> (contains multiple objects of class ‘cv.glmnet’)
+#> selected 0 from 20 predictors
 summary(object)
-#> Error: object 'object' not found
+#> --- object of class “cv.corila” --- 
+#> generalised linear model with gaussian family 
+#> 20 features (10 primary and 10 auxiliary features)
+#> initial coefficients: ridge regression 
+#> final coefficients: adaptive lasso regression 
+#> optimised regularisation parameter: lambda.min = 1.188 
+#> selected weights: local = 0.9, global = 0.1
+#> selected exponents: local = 0, global = 1
+#> 1 non-zero coefficients (including intercept)
 ```
