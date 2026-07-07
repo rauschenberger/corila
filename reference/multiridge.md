@@ -96,9 +96,9 @@ groups.
 M. van Nee](https://orcid.org/0000-0001-7715-1446) and [Armin
 Rauschenberger](https://orcid.org/0000-0001-6498-4801) (2021). "Fast
 cross-validation for multi-penalty high-dimensional ridge regression"
-*Journal of Computational and Graphical Statistics* 30(4):835-847. [doi:
-10.1080/10618600.2021.1904962](https://doi.org/10.1080/10618600.2021.1904962).
-\# nolint: line_length_linter.
+*Journal of Computational and Graphical Statistics* 30(4):835-847.
+[doi:10.1080/10618600.2021.1904962](https://doi.org/10.1080/10618600.2021.1904962)
+.
 
 ## See also
 
@@ -329,7 +329,7 @@ multiridge(x = x, y = y, z = z)
 #> [24,]  0.243399062
 #> [25,] -0.290727089
 #> [26,] -0.089736465
-#> [27,] -0.403869142
+#> [27,] -0.403869141
 #> [28,] -0.462184544
 #> [29,]  0.261108955
 #> [30,] -0.275271479

@@ -51,10 +51,10 @@ Rome, Italy, on 25 June 2026.)
 
 This public repository is on a personal GitHub account, but it has
 private pull mirrors on two institutional GitLab instances (see
-[LIH](https://git.lih.lu/arauschenberger/corila) and
-[LCSB](https://gitlab.com/uniluxembourg/Personalfolders/armin.rauschenberger/corila)).
+https://git.lih.lu/arauschenberger/corila and
+https://gitlab.com/uniluxembourg/Personalfolders/armin.rauschenberger/corila)).
 
-Large-language models (mainly Claude Sonnet 4.6 and GTP-5.4) were used
+Large-language models (mainly Claude Sonnet 4.6 and GPT-5.4) were used
 for reviewing R code and documentation and for adapting configuration
 files (`.yaml`).
 

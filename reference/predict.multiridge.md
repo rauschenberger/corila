@@ -37,9 +37,9 @@ Returns an \\n_0\\-dimensional vector of fitted values or an
 M. van Nee](https://orcid.org/0000-0001-7715-1446) and [Armin
 Rauschenberger](https://orcid.org/0000-0001-6498-4801) (2021). "Fast
 cross-validation for multi-penalty high-dimensional ridge regression"
-*Journal of Computational and Graphical Statistics* 30(4):835-847. [doi:
-10.1080/10618600.2021.1904962](https://doi.org/10.1080/10618600.2021.1904962).
-\# nolint: line_length_linter.
+*Journal of Computational and Graphical Statistics* 30(4):835-847.
+[doi:10.1080/10618600.2021.1904962](https://doi.org/10.1080/10618600.2021.1904962)
+.
 
 ## See also
 
