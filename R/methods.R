@@ -187,7 +187,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
                                 newx = x_all,
                                 s = s,
                                 type = "response")
-  .backscale(y = as.numeric(y_hat_stand), pars = object$scale)$y
+  .backscale(y = drop(y_hat_stand), pars = object$scale)$y
 }
 
 
