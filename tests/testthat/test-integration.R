@@ -160,9 +160,29 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that(
     desc = "corila preserves names of predictors",
     code = {
-      lapply(X = coef[-1],
+      testthat::skip_if(family == "cox")
+      lapply(X = coef,
+             FUN = function(x) testthat::expect_named(object = x[-1],
+                                                      expected = names_covs))
+    }
+  )
+  #' @srrstats {RE7.2} output objects retain aspects of input data
+  #' (names of observations and names of predictors)
+  testthat::test_that(
+    desc = "corila preserves names of predictors",
+    code = {
+      testthat::skip_if_not(family == "cox")
+      lapply(X = coef,
+             FUN = function(x) testthat::expect_named(object = x,
+                                                      expected = names_covs))
+    }
+  )
+  testthat::test_that(
+    desc = "corila preserves names of observations",
+    code = {
+      lapply(X = y_hat,
              FUN = testthat::expect_named,
-             expected = names_covs)
+             expected = names_test)
     }
   )
   testthat::test_that(
