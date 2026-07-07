@@ -50,8 +50,14 @@ Armin Rauschenberger
 
 ## Disclaimer
 
-This public repository is on a personal GitHub account, but it has private pull mirrors on two institutional GitLab instances (see [LIH](https://git.lih.lu/arauschenberger/corila) and [LCSB](https://gitlab.com/uniluxembourg/Personalfolders/armin.rauschenberger/corila)).
+This public repository is on a personal GitHub account, but it has private pull mirrors on two institutional GitLab instances (see https<wbr>://<wbr>git.<wbr>lih.<wbr>lu/<wbr>arauschenberger/<wbr>corila and https<wbr>://<wbr>gitlab.<wbr>com/<wbr>uniluxembourg/<wbr>Personalfolders/<wbr>armin.<wbr>rauschenberger/<wbr>corila)).
 
-Large-language models (mainly Claude Sonnet 4.6 and GTP-5.4) were used for reviewing R code and documentation and for adapting configuration files (`.yaml`).
+<!--
+These links are not clickable because urlchecker would complain about forbidden access:
+https://git.lih.lu/arauschenberger/corila
+https://gitlab.com/uniluxembourg/Personalfolders/armin.rauschenberger/corila
+--->
+
+Large-language models (mainly Claude Sonnet 4.6 and GPT-5.4) were used for reviewing R code and documentation and for adapting configuration files (`.yaml`).
 
 **Copyright** &copy; 2025 Armin Rauschenberger; Luxembourg Institute of Health (LIH), Department of Medical Informatics (DMI), Bioinformatics and Artificial Intelligence (BioAI); University of Luxembourg, Luxembourg Centre for Systems Biomedicine (LCSB), Biomedical Data Science (BDS). This R package is distributed under a [GPL 3 license](LICENSE.md).
