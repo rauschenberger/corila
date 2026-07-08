@@ -7,7 +7,11 @@
 .folds(y, family, nfolds)
 }
 \arguments{
-\item{y}{\eqn{n_0}-dimensional response vector,
+\item{y}{response vector of length \eqn{n_0},
+containing numerical values (\code{family="gaussian"}),
+integer values (\code{family="poisson"}),
+binary values (\code{family="binomial"}),
+or a survival object created with \code{survival::Surv()} (\code{family="cox"}),
 where \eqn{n_0} is the number of observations used for model training}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},

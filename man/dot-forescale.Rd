@@ -8,8 +8,9 @@
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix,
+containing only numerical values (continuous, integer, or binary),
 where \eqn{n_0} is the number of observations used for model training
-and \eqn{p} is the number of variables}
+and \eqn{p} is the number of predictors}
 
 \item{y}{response vector
 (only required if \code{family="gaussian"})

@@ -1,4 +1,6 @@
 
+#' @srrstats {G5.1} *data set for tests and examples is exported* 
+
 #' @title
 #' Example data
 #'

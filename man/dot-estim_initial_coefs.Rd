@@ -18,10 +18,15 @@
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix,
+containing only numerical values (continuous, integer, or binary),
 where \eqn{n_0} is the number of observations used for model training
-and \eqn{p} is the number of variables}
+and \eqn{p} is the number of predictors}
 
-\item{y}{\eqn{n_0}-dimensional response vector,
+\item{y}{response vector of length \eqn{n_0},
+containing numerical values (\code{family="gaussian"}),
+integer values (\code{family="poisson"}),
+binary values (\code{family="binomial"}),
+or a survival object created with \code{survival::Surv()} (\code{family="cox"}),
 where \eqn{n_0} is the number of observations used for model training}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
