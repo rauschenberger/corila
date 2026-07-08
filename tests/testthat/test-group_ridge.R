@@ -13,15 +13,15 @@ for (family in c("gaussian", "binomial", "cox")) {
               FUN = function(x) stats::rnorm(n = n, sd = x),
               FUN.VALUE = numeric(length = n))
   beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
-    stats::rbinom(n = sum(p), size = 1, prob = 0.2)
+    stats::rbinom(n = sum(p), size = 1L, prob = 0.2)
   eta <- as.numeric(x %*% beta)
   if (family == "gaussian") {
     y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
   } else if (family == "binomial") {
-    y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+    y <- stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-eta)))
   } else if (family == "cox") {
     time <- stats::rexp(n = n, rate = exp(eta))
-    status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+    status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
     y <- survival::Surv(time = time, event = status)
   }
   cond <- rep(x = c(TRUE, FALSE), times = c(n0, n1))
@@ -32,7 +32,7 @@ for (family in c("gaussian", "binomial", "cox")) {
     temp <- exp(x[!cond, ] %*% stats::coef(object))
   } else {
     temp <- .mean_function(
-      x = drop(coef(object)[1] + x[!cond, ] %*% coef(object)[-1]),
+      x = drop(coef(object)[1L] + x[!cond, ] %*% coef(object)[-1]),
       family = family
     )
   }
@@ -57,7 +57,7 @@ for (family in c("gaussian", "binomial", "cox")) {
     )
     testthat::expect_error(
       multiridge(x = x[cond, ], y = y[cond], z = z, family = family,
-                 penalties = rep(1, times = length(p) + 1))
+                 penalties = rep(x = 1, times = length(p) + 1L))
     )
   })
   testthat::test_that("multiridge-predict rejects wrong matrices", {

@@ -1,21 +1,21 @@
 
 # code for preparing example dataset
 
-set.seed(1)
+set.seed(1L)
 
 # number of training/test observations, predictors, and predictor groups
-n0 <- 50
-n1 <- 20
+n0 <- 50L
+n1 <- 20L
 n <- n0 + n1
-p <- 30
-q <- 10
+p <- 30L
+q <- 10L
 
 # group membership
 group <- sort(c(seq_len(q),
                 sample(x = seq_len(q), size = p - q, replace = TRUE)))
 
 # primary/auxiliary predictors
-primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 1))
+primary <- as.logical(stats::rbinom(n = p, size = 1L, prob = 1))
 
 # hold-out data
 holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
@@ -26,16 +26,16 @@ rho <- 0.5
 sigma <- rho * outer(X = group, Y = group, FUN = "==") +
   (1 - rho) * diag(rep(x = 1, times = p))
 x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
-count <- vapply(seq_len(p),
-                function(i) sum(group[1:i] == group[i]),
-                numeric(1))
+count <- vapply(X = seq_len(p),
+                FUN = function(i) sum(group[1:i] == group[i]),
+                FUN.VALUE = numeric(1L))
 
 # effect vector
 beta_group <- sign(stats::rnorm(n = q)) *
-  stats::rbinom(n = q, size = 1, prob = 0.5)
+  stats::rbinom(n = q, size = 1L, prob = 0.5)
 beta <- rep(x = beta_group, times = table(group)) *
   abs(stats::rnorm(n = p)) *
-  stats::rbinom(n = p, size = 1, prob = 0.8)
+  stats::rbinom(n = p, size = 1L, prob = 0.8)
 
 # response vector
 y <- stats::rnorm(n = n, mean = x %*% beta, sd = 2)

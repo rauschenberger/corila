@@ -10,14 +10,14 @@ for (glmnet in c(FALSE, TRUE)) {
       ", family=\"", family, "\"\n"
     ))
     testthat::test_that("stats::glm without/with scale returns same results", {
-      set.seed(1)
+      set.seed(1L)
       #--- simulate data ---
-      n0 <- 100
-      n1 <- 50
-      p <- 3
+      n0 <- 100L
+      n1 <- 50L
+      p <- 3L
       n <- n0 + n1
-      fold <- rep(x = c(0, 1), times = c(n0, n1))
-      foldid <- sample(rep(seq_len(10), length.out = n0))
+      fold <- rep(x = c(0L, 1L), times = c(n0, n1))
+      foldid <- sample(rep(seq_len(10L), length.out = n0))
       sd <- stats::rpois(n = p, lambda = 5)
       x <- vapply(X = sd,
                   FUN = function(x) stats::rnorm(n = n, sd = x),
@@ -27,47 +27,48 @@ for (glmnet in c(FALSE, TRUE)) {
       if (family  ==  "gaussian") {
         y <- stats::rnorm(n = n, mean = eta)
       } else if (family == "binomial") {
-        y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+        y <- stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-eta)))
       } else if (family == "poisson") {
         y <- stats::rpois(n = n, lambda = exp(eta))
       } else if (family == "cox") {
         time <- stats::rexp(n = n, rate = exp(eta))
-        status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+        status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
         y <- survival::Surv(time = time, event = status)
       }
       data <- data.frame(x = x)
       #--- regression without standardisation ---
       # (NB: glmnet standardises internally for tuning lambda)
       if (glmnet) {
-        lm1 <- glmnet::cv.glmnet(x = x[fold == 0, ],
-                                 y = y[fold == 0],
+        lm1 <- glmnet::cv.glmnet(x = x[fold == 0L, ],
+                                 y = y[fold == 0L],
                                  family = family,
                                  foldid = foldid,
                                  lambda = c(99e99, 0),
                                  standardize = TRUE)
         y_hat1 <- as.numeric(stats::predict(object = lm1,
-                                            newx = x[fold == 1, ],
+                                            newx = x[fold == 1L, ],
                                             s = 0,
                                             type = "response"))
       } else {
         if (family == "cox") {
-          lm1 <- survival::coxph(y[fold == 0] ~ .,
-                                 data = data[fold == 0, ])
+          lm1 <- survival::coxph(y[fold == 0L] ~ .,
+                                 data = data[fold == 0L, ])
         } else {
-          lm1 <- stats::glm(formula = y[fold == 0] ~ .,
+          lm1 <- stats::glm(formula = y[fold == 0L] ~ .,
                             family = family,
-                            data = data[fold == 0, ])
+                            data = data[fold == 0L, ])
         }
         y_hat1 <- stats::predict(
           object = lm1,
-          newdata = data[fold == 1, ],
+          newdata = data[fold == 1L, ],
           type = ifelse(family == "cox", "risk", "response")
         )
       }
       coef1 <- as.numeric(stats::coef(object = lm1, s = 0))
       #--- regression with standardisation ---
-      scale <- .forescale(x = x[fold == 0, ], y = y[fold == 0], family = family)
-      newx <- .forescale(x = x[fold == 1, ], pars = scale$pars)$x
+      scale <- .forescale(x = x[fold == 0L, ], y = y[fold == 0L],
+                          family = family)
+      newx <- .forescale(x = x[fold == 1L, ], pars = scale$pars)$x
       if (glmnet) {
         lm2 <- glmnet::cv.glmnet(x = scale$x,
                                  y = scale$y,
@@ -114,8 +115,8 @@ for (glmnet in c(FALSE, TRUE)) {
                                expected = y_hat1,
                                check.attributes = FALSE)
       }
-      dev1 <- .deviance(y = y[fold == 1], y_hat = y_hat1, family = family)
-      dev2 <- .deviance(y = y[fold == 1], y_hat = y_hat2, family = family)
+      dev1 <- .deviance(y = y[fold == 1L], y_hat = y_hat1, family = family)
+      dev2 <- .deviance(y = y[fold == 1L], y_hat = y_hat2, family = family)
       testthat::expect_equal(object = dev1,
                              expected = dev2,
                              check.attributes = FALSE)
@@ -127,8 +128,8 @@ for (glmnet in c(FALSE, TRUE)) {
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   message("family=\"", family, "\"")
-  data <- simulate(family = family, n1 = 50, n_group = 3,
-                   size_group = c(3, 2))
+  data <- simulate(family = family, n1 = 50L, n_group = 3L,
+                   size_group = c(3L, 2L))
   names_train <- paste0("train_", seq_len(data$info$n0))
   rownames(data$x_train) <- names(data$y_train) <- names_train
   names_test <- paste0("train_", seq_len(data$info$n1))
@@ -164,9 +165,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     code = {
       testthat::skip_if(family == "cox")
       lapply(X = coef,
-             FUN = testthat::expect_named,
-             object = x[-1],
-             expected = names_covs)
+             FUN = function(x) {
+               testthat::expect_named(object = x[-1L], expected = names_covs)
+             })
     }
   )
   testthat::test_that(
@@ -193,9 +194,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       "with argument group as vector, list, or matrix"
     ),
     code = {
-      lapply(X = coef[-1],
+      lapply(X = coef[-1L],
              FUN = testthat::expect_equal,
-             expected = coef[[1]],
+             expected = coef[[1L]],
              check.attributes = TRUE)
     }
   )
@@ -205,9 +206,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       "with argument group as vector, list, or matrix"
     ),
     code = {
-      lapply(X = y_hat[-1],
+      lapply(X = y_hat[-1L],
              FUN = testthat::expect_equal,
-             expected = y_hat[[1]],
+             expected = y_hat[[1L]],
              check.attributes = TRUE)
     }
   )
@@ -246,24 +247,24 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   message("family=\"", family, "\"")
-  n <- 100
-  p <- 50
+  n <- 100L
+  p <- 50L
   sd <- abs(stats::rnorm(n = p))
   x <- y <- list()
   x$original <- vapply(X = sd,
                        FUN = function(x) stats::rnorm(n = n, mean = 0, sd = x),
                        FUN.VALUE = numeric(length = n))
-  beta <- stats::rbinom(n = p, size = 1, prob = 0.2) * stats::rnorm(n = p)
+  beta <- stats::rbinom(n = p, size = 1L, prob = 0.2) * stats::rnorm(n = p)
   eta <- as.numeric(scale(x$original %*% beta))
   if (family == "gaussian") {
     y <- eta + stats::rnorm(n = n, sd = 0.5)
   } else if (family == "binomial") {
-    y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+    y <- stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-eta)))
   } else if (family == "poisson") {
     y <- stats::rpois(n = n, lambda = exp(eta))
   } else if (family == "cox") {
     time <- stats::rexp(n = n, rate = exp(eta))
-    status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+    status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
     y <- survival::Surv(time = time, event = status)
   }
   x$scaled <- scale(x$original)
@@ -272,7 +273,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     set.seed(1)
     object <- cv.corila(x = x[[i]],
                         y = y,
-                        group = rep(1:5, each = 10),
+                        group = rep(1L:5L, each = 10L),
                         family = family)
     y_hat[[i]] <- predict(object = object, newx = x[[i]])
   }
@@ -281,7 +282,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     "without and with standardisation"
   ), {
     # values should be nearly equal, tiny differences are expected:
-    testthat::expect_equal(y_hat[[1]], y_hat[[2]]) # nolint
+    testthat::expect_equal(y_hat[[1L]], y_hat[[2L]]) # nolint
   })
 }
 
@@ -290,7 +291,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   # simulate data
   data <- simulate(family = family)
-  primary <- as.logical(stats::rbinom(n = data$info$p, size = 1, prob = 0.5))
+  primary <- as.logical(stats::rbinom(n = data$info$p, size = 1L, prob = 0.5))
   # fit model
   object <- cv.corila(x = data$x_train, y = data$y_train,
                       group = data$group, primary = primary, family = family)
@@ -315,9 +316,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   # simulate data
   data <- simulate(family = family)
-  foldid <- .folds(y = data$y_train, family = family, nfolds = 10)
+  foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
   object <- y_hat <- coef <- list()
-  for (i in 1:2) {
+  for (i in 1L:2L) {
     set.seed(i)
     x <- data$x_train + stats::rnorm(n = length(data$x_train),
                                      sd = .Machine$double.eps)
@@ -333,10 +334,10 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     y_hat[[i]] <- predict(object[[i]], newx = data$x_test)
   }
   testthat::test_that("coefficients do not change", {
-    testthat::expect_equal(object = coef[[2]], expected = coef[[1]])
+    testthat::expect_equal(object = coef[[2L]], expected = coef[[1L]])
   })
   testthat::test_that("prediction do not change", {
-    testthat::expect_equal(object = y_hat[[2]], expected = y_hat[[1]])
+    testthat::expect_equal(object = y_hat[[2L]], expected = y_hat[[1L]])
   })
 }
 
@@ -345,9 +346,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 testthat::test_that("complete case analysis works", {
   family <- "gaussian"
   data <- simulate(family = family)
-  foldid <- .folds(y = data$y_train, family = family, nfolds = 10)
-  missing <- stats::rbinom(n = nrow(data$x_train), size = 1, prob = 0.2) == 1
-  data$x_train[missing, 1] <- NA
+  foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
+  missing <- stats::rbinom(n = nrow(data$x_train), size = 1L, prob = 0.2) == 1L
+  data$x_train[missing, 1L] <- NA
   object0 <- cv.corila(x = data$x_train[!missing, ],
                        y = data$y_train[!missing],
                        group = data$group,

@@ -5,9 +5,9 @@
 
 n <- 10L
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
-  set.seed(1)
-  data <- simulate(family = family, n0 = n, n1 = n, n_group = 3,
-                   size_group = c(3, 2))
+  set.seed(1L)
+  data <- simulate(family = family, n0 = n, n1 = n, n_group = 3L,
+                   size_group = c(3L, 2L))
   p <- data$info$p
   object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group,
                       family = family)
@@ -31,7 +31,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_type(object = y_hat, type = "double")
     testthat::expect_length(object = y_hat, n = n)
     testthat::expect_true(all(is.finite(y_hat)))
-    testthat::expect_error(predict(object, newx = data$x_train[, -1],
+    testthat::expect_error(predict(object, newx = data$x_train[, -1L],
                                    s = "lambda.min"))
     testthat::expect_error(predict(object, newx = data$x_train,
                                    s = "lambda.1se"))
@@ -64,9 +64,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that("function 'nobs.cv.corila' returns the correct integer", {
     n_obs <- stats::nobs(object)
     testthat::expect_type(object = n_obs, type = "integer")
-    testthat::expect_length(object = n_obs, n = 1)
+    testthat::expect_length(object = n_obs, n = 1L)
     testthat::expect_true(is.finite(n_obs))
-    testthat::expect_gte(object = n_obs, expected = 1)
+    testthat::expect_gte(object = n_obs, expected = 1L)
     testthat::expect_identical(object = n_obs, expected = n)
   })
   testthat::test_that("function 'plot.cv.corila' returns NULL invisibly", {
@@ -80,7 +80,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that("function 'print.cv.corila' prints a string", {
     string <- capture.output(print(object))
     testthat::expect_type(object = string, type = "character")
-    testthat::expect_length(object = string, n = 3)
+    testthat::expect_length(object = string, n = 3L)
     testthat::expect_true(object = any(grepl(pattern = "cv.corila",
                                              x = string)))
   })
@@ -107,7 +107,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     code = {
       dev <- deviance(object)
       testthat::expect_type(object = dev, type = "double")
-      testthat::expect_length(object = dev, n = 1)
+      testthat::expect_length(object = dev, n = 1L)
       testthat::expect_gte(object = dev, expected = 0)
     }
   )

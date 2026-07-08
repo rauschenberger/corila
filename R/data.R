@@ -40,7 +40,7 @@
 #' Estimated coefficients can be compared with `beta`.
 #' Use the object `x_test` for model testing.
 #' Predicted values can be compared with `y_test`.
-#' 
+#'
 #' @srrstats {G5.1} *data set for tests and examples is exported*
 #'
 "data"

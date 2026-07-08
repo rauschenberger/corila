@@ -300,7 +300,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   }
   # repeatedly train without and test for held-out fold
   for (i in seq_len(nfolds)) {
-    object_int <- corila(x = x[foldid !=  i, ],
+    object_int <- corila(x = x[foldid != i, ],
                          y = y[foldid != i],
                          group = group,
                          primary = primary,
@@ -508,7 +508,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     na_action = "error",
     silent = silent
   )
-  #args <- as.list(match.call())[-1]
+  #args <- as.list(match.call())[-1L]
   #do.call(what = .validate, args = args)
   p <- args$p
   args <- c(args, mget(setdiff(names(formals(corila)), c("x", "y"))))
@@ -628,7 +628,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   if (is.vector(group) && is.atomic(group)) {
     q <- length(unique(group))
     if (is.numeric(group)) {
-      .assert(x = group, type = "integer", dim = p, min = 1, max = p)
+      .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
     } else if (is.character(group)) {
       .assert(x = group, type = "nominal", dim = p)
     } else {
@@ -640,7 +640,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     for (i in seq_along(group)) {
       if (is.numeric(group[[i]])) {
         .assert(x = group[[i]], type = "integer", dim = Inf,
-                min = 1, max = p)
+                min = 1L, max = p)
       } else if (is.character(group[[i]])) {
         .assert(x = group[[i]], type = "nominal", dim = Inf,
                 support = colnames(x))
@@ -807,7 +807,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     .assert(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
   }
   .assert(x = foldid, type = "integer", dim = n,
-          min = 1, max = n)
+          min = 1L, max = n)
   .assert(x = nfolds, type = "integer", min = 2L, max = n)
   if (identical(alpha_init, "multiridge")) {
     dim <- length(unique(group))
@@ -922,14 +922,14 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       group_cond <- vapply(
         X = group,
         FUN = function(slot) names[j] %in% slot,
-        FUN.VALUE = logical(1)
+        FUN.VALUE = logical(1L)
       )
       names %in% unlist(group[group_cond])
     } else {
       stop("The list 'group' should have slots of type numeric or character.")
     }
   } else if (is.matrix(group)) {
-    group[, j] == 1
+    group[, j] == 1L
   } else {
     stop("Argument 'group' should be a vector, a list, or a matrix.")
   }

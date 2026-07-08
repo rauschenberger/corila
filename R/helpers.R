@@ -200,10 +200,10 @@
     pars <- list()
     pars$family <- family
     cond <- rep(x = TRUE, times = length(y))
-    # scaling with uncensored observations only: cond <- y[, 2] == 1
+    # scaling with uncensored observations only: cond <- y[, 2L] == 1L
     pars$mu.x <- colMeans(x = x[cond, ], na.rm = TRUE)
     pars$sd.x <- apply(X = x[cond, ],
-                       MARGIN = 2,
+                       MARGIN = 2L,
                        FUN = stats::sd, na.rm = TRUE)
     if (!is.null(y) && identical(family, "gaussian")) {
       pars$mu.y <- mean(y, na.rm = TRUE)
@@ -367,10 +367,10 @@
       factor <- ifelse(test = pars$sd.x < .Machine$double.eps,
                        yes = 0,
                        no = pars$mu.x / pars$sd.x)
-      alpha <- pars$mu.y + pars$sd.y * (coef[1] - sum(coef[-1] * factor))
-      beta <- coef[-1] * ifelse(test = pars$sd.x < .Machine$double.eps,
-                                yes = 0,
-                                no = pars$sd.y / pars$sd.x)
+      alpha <- pars$mu.y + pars$sd.y * (coef[1L] - sum(coef[-1L] * factor))
+      beta <- coef[-1L] * ifelse(test = pars$sd.x < .Machine$double.eps,
+                                 yes = 0,
+                                 no = pars$sd.y / pars$sd.x)
     }
     list$coef <- c(alpha, beta)
   }
@@ -434,10 +434,10 @@
       y <- y[, "status"]
     }
     foldid <- rep(x = NA, times = length(y))
-    foldid[y == 0] <- sample(x = rep(x = seq_len(nfolds),
-                                     length.out = sum(y == 0)))
-    foldid[y == 1] <- sample(x = rep(x = rev(seq_len(nfolds)),
-                                     length.out = sum(y == 1)))
+    foldid[y == 0L] <- sample(x = rep(x = seq_len(nfolds),
+                                      length.out = sum(y == 0L)))
+    foldid[y == 1L] <- sample(x = rep(x = rev(seq_len(nfolds)),
+                                      length.out = sum(y == 1L)))
   } else {
     foldid <- sample(x = rep(x = sample(x = seq_len(nfolds)),
                              length.out = length(y)))
@@ -528,7 +528,7 @@
   .assert(x = family, type = "nominal", support = support)
   .assert(x = y, type = "numeric", dim = Inf, family = family)
   if (identical(family, "binomial")) {
-    .assert(x = y, type = "integer", dim = Inf, min = 0, max = 1)
+    .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
   } else if (identical(family, "poisson")) {
     .assert(x = y, type = "integer", dim = Inf, min = 0L)

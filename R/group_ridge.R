@@ -178,11 +178,11 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL,
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = y, type = "numeric", dim = nrow(x))
   .assert(x = z, type = "integer", dim = ncol(x),
-          min = 1, max = length(unique(z)))
+          min = 1L, max = length(unique(z)))
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "cox"))
   .assert(x = foldid, type = "integer", dim = nrow(x),
-          min = 1, max = nrow(x))
+          min = 1L, max = nrow(x))
   .assert(x = nfolds, type = "integer", min = 2L, max = nrow(x))
   .assert(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
   #.validate(x = x, y = y, group = NULL, family = family)
@@ -316,8 +316,8 @@ coef.multiridge <- function(object, ...) {
   coef <- multiridge::betasout(object,
                                Xblocks = xblocks,
                                penalties = object$penalties)
-  #if (identical(object$family, "cox") & is.null(coef[[1]])) {
-  #  coef[[1]] <- NA # was 0
+  #if (identical(object$family, "cox") & is.null(coef[[1L]])) {
+  #  coef[[1L]] <- NA # was 0
   #}
   .backscale(pars = object$pars, coef = unlist(coef))$coef
 }

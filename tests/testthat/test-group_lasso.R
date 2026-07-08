@@ -15,13 +15,13 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
         identical(family_model, "cox")  ||
         identical(family_model, "binomial") ||
         (identical(family_data, "gaussian") &&
-           identical(family_model, "poisson"))
+         identical(family_model, "poisson"))
       expect_warning <-
         identical(family_data, "poisson") ||
         (identical(family_data, "binomial") &&
-           identical(family_model, "gaussian")) ||
+         identical(family_model, "gaussian")) ||
         (identical(family_data, "binomial") &&
-           identical(family_model, "poisson"))
+         identical(family_model, "poisson"))
       if (family_data == family_model) {
         next
       } else if (expect_error) {
@@ -42,9 +42,10 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that(".validate rejects wrong group object", {
     group <- list(
       A = data$group > 5,
-      B = array(data = 1L * outer(data$group, data$group, "=="), dim = c(p, p, 1L)),
+      B = array(data = 1L * outer(data$group, data$group, "=="),
+                dim = c(p, p, 1L)),
       C = lapply(X = unique(data$group),
-                FUN = function(x) as.factor(which(data$group == x)))
+                 FUN = function(x) as.factor(which(data$group == x)))
     )
     for (k in seq_along(group)) {
       testthat::expect_error(
@@ -67,25 +68,33 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       regexp = "at least three observations"
     )
     testthat::expect_error(
-      object = cv.corila(x = data$x_train[1L, , drop = FALSE], y = data$y_train[1L],
-                         group = data$group, family = family_data),
+      object = cv.corila(x = data$x_train[1L, , drop = FALSE],
+                         y = data$y_train[1L],
+                         group = data$group,
+                         family = family_data),
       regexp = "at least three observations"
     )
     testthat::expect_error(
-      object = cv.corila(x = data$x_train[1:2, ], y = data$y_train[1:2],
-                         group = data$group, family = family_data),
+      object = cv.corila(x = data$x_train[1L:2L, ],
+                         y = data$y_train[1L:2L],
+                         group = data$group,
+                         family = family_data),
       regexp = "at least three observations"
     )
   })
   testthat::test_that("cv.corila rejects data with < 2 predictors", {
     testthat::expect_error(
-      object = cv.corila(x = data$x_train[, 0L, drop = FALSE], y = data$y_train,
-                         group = integer(), family = family_data),
+      object = cv.corila(x = data$x_train[, 0L, drop = FALSE],
+                         y = data$y_train,
+                         group = integer(),
+                         family = family_data),
       regexp = "at least two predictors"
     )
     testthat::expect_error(
-      object = cv.corila(x = data$x_train[, 1L, drop = FALSE], y = data$y_train,
-                group = 1L, family = family_data),
+      object = cv.corila(x = data$x_train[, 1L, drop = FALSE],
+                         y = data$y_train,
+                         group = 1L,
+                         family = family_data),
       regexp = "at least two predictors"
     )
   })
@@ -100,7 +109,7 @@ testthat::test_that("initial coefficients are estimated", {
   n <- 20L
   p <- 10L
   x <- matrix(rnorm(n * p), nrow = n, ncol = p)
-  group <- rep(1:4, times = c(3L, 3L, 2L, 2L))
+  group <- rep(1L:4L, times = c(3L, 3L, 2L, 2L))
   beta <- rbinom(n = p, size = 1L, prob = 0.5) * rnorm(p)
   for (i in seq_along(family)) {
     for (j in seq_along(alpha)) {
@@ -114,11 +123,11 @@ testthat::test_that("initial coefficients are estimated", {
       }
       y <- .simulate_outcome(family = family[i], x = x, beta = beta)
       init <- list()
-      for (k in 1:2) {
+      for (k in 1L:2L) {
         if (k == 1L) {
           lambda <- NULL
         } else {
-          lambda <- init[[1]]$lambda
+          lambda <- init[[1L]]$lambda
         }
         init[[k]] <- .estim_initial_coefs(
           x = x,
@@ -131,16 +140,16 @@ testthat::test_that("initial coefficients are estimated", {
           lambda = lambda
         )
       }
-      testthat::expect_identical(object = init[[1]], expected = init[[2]])
-      testthat::expect_length(object = init[[1]]$coef, n = p)
-      if (identical(alpha[[j]][1], "multiridge")) {
+      testthat::expect_identical(object = init[[1L]], expected = init[[2]])
+      testthat::expect_length(object = init[[1L]]$coef, n = p)
+      if (identical(alpha[[j]][1L], "multiridge")) {
         length <- length(unique(group))
-      } else if (is.character(alpha[[j]][1]) | is.na(alpha[[j]][1])) {
+      } else if (is.character(alpha[[j]][1L]) | is.na(alpha[[j]][1L])) {
         length <- 0L
       } else {
         length <- 1L
       }
-      testthat::expect_length(object = init[[1]]$lambda, n = length)
+      testthat::expect_length(object = init[[1L]]$lambda, n = length)
     }
   }
   alpha <- list(-1, Inf, "A")
@@ -173,9 +182,9 @@ testthat::test_that("adjacency is detected", {
   group$index_list <- lapply(X = setNames(nm = unique(group$label_vector)),
                              FUN = function(x) which(group$label_vector == x))
   group$label_list <- lapply(group$index_list, names)
-  group$matrix <- 1 * outer(X = group$index_vector,
-                            Y = group$index_vector,
-                            FUN = "==")
+  group$matrix <- 1L * outer(X = group$index_vector,
+                             Y = group$index_vector,
+                             FUN = "==")
   p <- length(group$index_vector)
   cond <- list()
   for (i in seq_along(group)) {
@@ -184,9 +193,9 @@ testthat::test_that("adjacency is detected", {
                               p = p,
                               names = names(group$index_vector))
   }
-  lapply(X = cond[-1],
+  lapply(X = cond[-1L],
          FUN = testthat::expect_equal,
-         expected = cond[[1]],
+         expected = cond[[1L]],
          check.attributes = FALSE)
   factor_vector <- as.factor(group$label_vector)
   testthat::expect_error(
@@ -200,9 +209,9 @@ testthat::test_that("adjacency is detected", {
 
 ## function ".combine_slopes" --------------------------------------------------
 
-set.seed(1)
+set.seed(1L)
 p <- 10L
-alpha <- stats::rnorm(1)
+alpha <- stats::rnorm(1L)
 temp <- stats::rnorm(p)
 beta <- pmax(c(temp, -temp), 0)
 coef <- .combine_slopes(alpha = alpha, beta = beta)
@@ -222,9 +231,9 @@ testthat::test_that("slopes do not change", {
 
 n <- 5L
 p <- 10L
-set.seed(1)
+set.seed(1L)
 x <- matrix(data = stats::rnorm(n * p), nrow = n, ncol = p)
-primary <- as.logical(stats::rbinom(n = p, size = 1, prob = 0.5))
+primary <- as.logical(stats::rbinom(n = p, size = 1L, prob = 0.5))
 x_primary <- x[, primary]
 testthat::test_that("incompatible dimensions are rejected", {
   testthat::expect_error(

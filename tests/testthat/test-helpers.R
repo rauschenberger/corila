@@ -8,7 +8,7 @@ n <- 5L
 p <- 10L
 
 set.seed(1)
-sd <- seq(from = 0, to = 1, length.out = p)
+sd <- seq(from = 0L, to = 1L, length.out = p)
 x <- vapply(X = sd,
             FUN = function(x) stats::rnorm(n = n, sd = x),
             FUN.VALUE = numeric(n))
@@ -17,7 +17,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   if (identical(family, "gaussian")) {
     y <- stats::rnorm(n)
   } else if (identical(family, "binomial")) {
-    y <- stats::rbinom(n = n, size = 1, prob = 0.5)
+    y <- stats::rbinom(n = n, size = 1L, prob = 0.5)
   } else if (identical(family, "poisson")) {
     y <- stats::rpois(n = n, lambda = 4)
   } else if (identical(family, "cox")) {
@@ -98,12 +98,12 @@ testthat::test_that("initial coefficients are named correctly", {
 
 for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
   n <- 10L
-  set.seed(1)
+  set.seed(1L)
   if (family == "gaussian") {
     y <- stats::rnorm(n = n)
     y_hat <- stats::rnorm(n = n)
   } else if (family == "binomial") {
-    y <- stats::rbinom(n = n, size = 1, prob = 0.5)
+    y <- stats::rbinom(n = n, size = 1L, prob = 0.5)
     y_hat <- stats::rbinom(n = n, size = 1, prob = 0.5)
   } else if (family == "poisson") {
     y <- stats::rpois(n = n, lambda = 4)
@@ -186,10 +186,10 @@ testthat::test_that("mean function works", {
 
 ## function "calc_sign_prec" ---------------------------------------------------
 
-set.seed(1)
+set.seed(1L)
 n <- 10L
-truth <- sample(x = c(-1, 0, 1), size = n, replace = TRUE)
-estim <- sample(x = c(-1, 0, 1), size = n, replace = TRUE)
+truth <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
+estim <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
 
 testthat::test_that("precision is finite scalar", {
   precision <- calc_sign_prec(truth = truth, estim = estim)
@@ -200,12 +200,12 @@ testthat::test_that("precision is finite scalar", {
 
 testthat::test_that("precision equals zero if all signs are inverted", {
   prec <- calc_sign_prec(truth = truth, estim = -truth)
-  testthat::expect_identical(object = prec, expected = 0)
+  testthat::expect_identical(object = prec, expected = 0L)
 })
 
 testthat::test_that("precision equals one if all signs are true", {
   prec <- calc_sign_prec(truth = truth, estim = truth)
-  testthat::expect_identical(object = prec, expected = 1)
+  testthat::expect_identical(object = prec, expected = 1L)
 })
 
 testthat::test_that("precision is not defined if all signs equal zero", {
@@ -215,38 +215,39 @@ testthat::test_that("precision is not defined if all signs equal zero", {
 
 testthat::test_that("precision is not influenced by estimated zeros", {
   prec1 <- calc_sign_prec(truth = truth, estim = estim)
-  prec2 <- calc_sign_prec(truth = truth[estim != 0], estim = estim[estim != 0])
+  prec2 <- calc_sign_prec(truth = truth[estim != 0L],
+                          estim = estim[estim != 0L])
   testthat::expect_identical(object = prec1, expected = prec2)
 })
 
 testthat::test_that("precision equals zero if all true signs are zero", {
-  prec <- calc_sign_prec(truth = rep(x = 0, times = n), estim = estim)
-  testthat::expect_identical(object = prec, expected = 0)
+  prec <- calc_sign_prec(truth = rep(x = 0L, times = n), estim = estim)
+  testthat::expect_identical(object = prec, expected = 0L)
 })
 
 testthat::test_that("error if different lengths", {
-  truth <- sample(x = c(-1, 0, 1), size = n, replace = TRUE)
-  estim <- sample(x = c(-1, 0, 1), size = n - 1, replace = TRUE)
+  truth <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
+  estim <- sample(x = c(-1L, 0L, 1L), size = n - 1L, replace = TRUE)
   testthat::expect_error(calc_sign_prec(truth = truth, estim = estim))
 })
 
 ## function ".folds" -----------------------------------------------------------
 
-set.seed(1)
-n <- stats::rpois(n = 1, lambda = 50)
+set.seed(1L)
+n <- stats::rpois(n = 1L, lambda = 50)
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   if (family == "gaussian") {
     y <- stats::rnorm(n = n)
-    index <- rep(x = 1, times = n)
+    index <- rep(x = 1L, times = n)
   } else if (family == "binomial") {
     y <- stats::rbinom(n = n, size = 1, prob = 0.2)
     index <- y
   } else if (family == "poisson") {
     y <- stats::rpois(n = n, lambda = 4)
-    index <- rep(x = 1, times = n)
+    index <- rep(x = 1L, times = n)
   } else if (family == "cox") {
     time <- stats::rexp(n = n, rate = 2)
-    status <- stats::rbinom(n = n, prob = 0.2, size = 1)
+    status <- stats::rbinom(n = n, size = 1L, prob = 0.2)
     y <- survival::Surv(time = time, event = status)
     index <- y[, "status"]
   }
@@ -276,11 +277,11 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
                  INDEX = index,
                  FUN = function(x) diff(range(table(x))))
   testthat::test_that("folds are stratified and balanced", {
-    testthat::expect_true(all(diff <= 1))
+    testthat::expect_true(all(diff <= 1L))
   })
 }
 
-for (i in c(0, 1)){
+for (i in c(0L, 1L)){
   n <- 10L
   nfolds <- 5L
   foldid <- .folds(y = rep(i, times = n), family = "binomial", nfolds = nfolds)
@@ -304,8 +305,8 @@ testthat::test_that("outcomes are simulated", {
     testthat::expect_error(
       .simulate_outcome(family = family[i], x = x, beta = beta, n = n)
     )
-    for (j in 1:2){
-      if (j == 1) {
+    for (j in 1L:2L){
+      if (j == 1L) {
         y <- .simulate_outcome(family = family[i], x = x, beta = beta)
       } else {
         y <- .simulate_outcome(family = family[i], n = n)
@@ -316,7 +317,7 @@ testthat::test_that("outcomes are simulated", {
           .validate(na_action = NULL,
                     x = matrix(data = 0, nrow = n, ncol = p),
                     y = y,
-                    group = rep(x = 1, times = p),
+                    group = rep(x = 1L, times = p),
                     primary = NULL,
                     family = family[i], hyper = NULL, alpha_init = NULL,
                     alpha_final = NULL, cor = NULL, foldid = NULL,
@@ -336,7 +337,7 @@ testthat::test_that("residuals match those from stats::residuals", {
     if (family == "gaussian") {
       y <- stats::rnorm(n)
     } else if (family == "binomial") {
-      y <- stats::rbinom(n = n, size = 1, prob = 0.5)
+      y <- stats::rbinom(n = n, size = 1L, prob = 0.5)
     } else if (family == "poisson") {
       y <- stats::rpois(n = n, lambda = 4)
     } else {

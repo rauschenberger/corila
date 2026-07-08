@@ -110,8 +110,8 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
     alpha <- NULL
     beta <- coef_stand
   } else {
-    alpha <- coef_stand[1]
-    beta <- coef_stand[-1]
+    alpha <- coef_stand[1L]
+    beta <- coef_stand[-1L]
   }
   coef <- .combine_slopes(alpha = alpha, beta = beta)
   coef <- .backscale(coef = coef, pars = object$scale)$coef
@@ -286,7 +286,7 @@ residuals.cv.corila <- function(object, ...) {
 plot.cv.corila <- function(x, ...) {
   y_obs <- x$y_obs
   y_fit <- x$y_fit
-  beta <- stats::coef(x, s = "lambda.min")[-1]
+  beta <- stats::coef(x, s = "lambda.min")[-1L]
   graphics::par(mfrow = c(1L, 2L))
   if (x$args$family %in% c("gaussian", "poisson")) {
     max <- max(abs(c(y_obs, y_fit)))
@@ -347,7 +347,7 @@ print.cv.corila <- function(x, ...) {
   cat("object of class", sQuote("cv.corila"), "\n")
   content <- ifelse(length(x$model) == 1L, "an object", "multiple objects")
   cat("(contains ", content, " of class ", sQuote("cv.glmnet"), ")\n", sep = "")
-  nzero <- sum(stats::coef(x, s = "lambda.min")[-1] != 0)
+  nzero <- sum(stats::coef(x, s = "lambda.min")[-1L] != 0)
   cat("selected", nzero, "from", x$args$p, "predictors")
   invisible(x)
 }
@@ -535,8 +535,8 @@ nobs.cv.corila <- function(object, ...) {
 .combine_slopes <- function(alpha, beta) {
   .assert(x = alpha, type = "numeric")
   .assert(x = beta, type = "numeric", dim = Inf, min = 0)
-  beta_positive <- beta[1:(length(beta) / 2)]
-  beta_negative <- beta[(length(beta) / 2 + 1):(length(beta))]
+  beta_positive <- beta[1L:(length(beta) / 2L)]
+  beta_negative <- beta[(length(beta) / 2L + 1L):(length(beta))]
   eps <- 1e-06
   if (any(beta_positive > eps & beta_negative > eps)) {
     # nocov start (invariant check)
@@ -688,8 +688,8 @@ nobs.cv.corila <- function(object, ...) {
     if (identical(alpha, "multiridge")) {
       "multi-penalty ridge regression"
     } else if (alpha %in% c("pearson", "spearman", "kendall")) {
-      paste0(toupper(substr(x = alpha, start = 1, stop = 1)),
-             tolower(substr(x = alpha, start = 2, stop = nchar(alpha))),
+      paste0(toupper(substr(x = alpha, start = 1L, stop = 1L)),
+             tolower(substr(x = alpha, start = 2L, stop = nchar(alpha))),
              " correlation")
     } else {
       stop("If argument 'alpha' is of type 'character', ",
