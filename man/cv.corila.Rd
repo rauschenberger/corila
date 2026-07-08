@@ -12,7 +12,7 @@ cv.corila(
   alpha_init = 0,
   alpha_final = 1,
   family = "gaussian",
-  nfolds = 10,
+  nfolds = 10L,
   cor = "spearman",
   tune = "weight",
   foldid = NULL,

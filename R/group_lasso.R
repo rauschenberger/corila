@@ -233,7 +233,7 @@
 #'
 cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
-                      nfolds = 10, cor = "spearman", tune = "weight",
+                      nfolds = 10L, cor = "spearman", tune = "weight",
                       foldid = NULL, na_action = "error", silent = FALSE) {
   # match arguments
   family <- match.arg(arg = tolower(family),
@@ -243,12 +243,6 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                      choices = c("pearson", "spearman", "kendall"))
   }
   # set default parameters
-  if (is.null(primary)) {
-    primary <- rep(x = TRUE, times = ncol(x))
-  }
-  if (is.null(foldid)) {
-    foldid <- .folds(y = y, family = family, nfolds = nfolds)
-  }
   hyper <- .set_candidates(tune = tune)
   .validate(
     x = x,
@@ -266,6 +260,12 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
     hyper = hyper,
     silent = silent
   )
+  if (is.null(primary)) {
+    primary <- rep(x = TRUE, times = ncol(x))
+  }
+  if (is.null(foldid)) {
+    foldid <- .folds(y = y, family = family, nfolds = nfolds)
+  }
   if (identical(na_action, "complete_cases")) {
     complete <- stats::complete.cases(x = x, y = y)
     warning("Ingoring ",
@@ -613,7 +613,13 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   # --- feature matrix ---
   .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = na.rm)
   n <- nrow(x) # sample size
+  if (n < 3L) {
+    stop("Provide at least three observations.")
+  }
   p <- ncol(x) # number of features
+  if (p < 2L) {
+    stop("Provide at least two predictors.")
+  }
   # --- target vector ---
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
@@ -674,7 +680,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     .assert(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
   }
   .assert(x = foldid, type = "integer", dim = n, min = 1L, max = n)
-  .assert(x = nfolds, type = "integer", min = 1L, max = n)
+  .assert(x = nfolds, type = "integer", min = 3L, max = n)
   .assert(x = lambda_init, type = "numeric", min = 0)
   .assert(x = silent, type = "logical")
   list(n = n, p = p, q = q)
