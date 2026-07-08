@@ -175,9 +175,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     code = {
       testthat::skip_if_not(family == "cox")
       lapply(X = coef,
-             FUN = testthat::expect_named,
-             object = x,
-             expected = names_covs)
+             FUN = function(x) {
+               testthat::expect_named(object = x, expected = names_covs)
+            })
     }
   )
   testthat::test_that(
