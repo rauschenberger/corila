@@ -227,6 +227,7 @@
 #' @srrstatsTODO {G2.16} *provides option to handle undefined values*
 #' @srrstats {G3.0} *equality comparisons between integers, or approximate*
 #' @srrstats {RE1.2} *documents expected format of predictors*
+#' @srrstatsTODO {RE1.3} *retains names of observations and predictors*
 #' @srrstats {RE3.1} *convergence messages can be suppressed (@param silent)*
 #' @srrstats {RE4.0} *returns a "model" object (@return)*
 #' @srrstats {RE4.8} *returns response variable in slot "y_obs"*
@@ -268,23 +269,26 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   }
   if (identical(na_action, "complete_cases")) {
     complete <- stats::complete.cases(x = x, y = y)
-    warning("Ingoring ",
-            sum(!complete),
-            " observations with missing data.")
-    x <- x[complete, ]
-    y <- y[complete]
-    foldid <- foldid[complete]
+    if (sum(complete) < 3) {
+      stop("Requires at least 3 complete observations.")
+    }
+    warning("Ingoring ", sum(!complete), " observations with missing data.")
+    #x <- x[complete, ]
+    #y <- y[complete]
+    #foldid <- foldid[complete]
+  } else {
+    complete <- rep(x = TRUE, times = nrow(x))
   }
   # fit model on all folds
-  object_ext <- corila(x = x,
-                       y = y,
+  object_ext <- corila(x = x[complete, ],
+                       y = y[complete],
                        group = group,
                        primary = primary,
                        family = family,
                        alpha_init = alpha_init,
                        alpha_final = alpha_final,
                        cor = cor,
-                       foldid = foldid,
+                       foldid = foldid[complete],
                        nfolds = NULL,
                        hyper = hyper,
                        lambda_init = NULL,
@@ -300,8 +304,8 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   }
   # repeatedly train without and test for held-out fold
   for (i in seq_len(nfolds)) {
-    object_int <- corila(x = x[foldid != i, ],
-                         y = y[foldid != i],
+    object_int <- corila(x = x[foldid != i & complete, ],
+                         y = y[foldid != i & complete],
                          group = group,
                          primary = primary,
                          family = family,
@@ -314,9 +318,9 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                          lambda_init = object_ext$lambda_init,
                          silent = silent)
     for (j in seq_len(nrow(hyper))) {
-      pred[[j]][foldid == i, ] <- predict.corila(
+      pred[[j]][foldid == i & complete, ] <- predict.corila(
         object = object_int,
-        newx = x[foldid == i, , drop = FALSE],
+        newx = x[foldid == i & complete, , drop = FALSE],
         index = j,
         s = lambda[[j]]
       )
@@ -326,9 +330,9 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   cvm <- list()
   for (l in seq_len(nrow(hyper))) {
     cvm[[l]] <- apply(
-      X = pred[[l]],
+      X = pred[[l]][complete, ],
       MARGIN = 2,
-      FUN = function(x) .deviance(y_hat = x, y =  y, family = family)
+      FUN = function(x) .deviance(y_hat = x, y =  y[complete], family = family)
     )
   }
   hyper$cvm <- cvm_min <- vapply(X = cvm,
@@ -343,7 +347,10 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   object$lambda.min <- lambda.min
   class(object) <- "cv.corila"
   object$y_obs <- y
-  object$y_fit <- stats::predict(object = object, newx = x)
+  complete_x <- stats::complete.cases(x = x)
+  object$y_fit <- rep(x = NA, times = n)
+  object$y_fit[complete_x] <- stats::predict(object = object,
+                                             newx = x[complete_x, ])
   object
 }
 
@@ -502,8 +509,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     alpha_init = alpha_init,
     alpha_final = alpha_final,
     cor = cor,
-    foldid = foldid,
-    nfolds = nfolds,
+    foldid = NULL,
+    nfolds = NULL,
     lambda_init = lambda_init,
     na_action = "error",
     silent = silent

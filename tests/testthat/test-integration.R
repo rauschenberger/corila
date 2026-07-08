@@ -177,7 +177,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       lapply(X = coef,
              FUN = function(x) {
                testthat::expect_named(object = x, expected = names_covs)
-            })
+             })
     }
   )
   testthat::test_that(
@@ -361,5 +361,10 @@ testthat::test_that("complete case analysis works", {
                        family = family,
                        foldid = foldid,
                        na_action = "complete_cases")
-  testthat::expect_identical(object = object0, expected = object1)
+  testthat::expect_identical(object = coef(object0),
+                             expected = coef(object1))
+  testthat::expect_identical(object = predict(object0, newx = data$x_test),
+                             expected = predict(object1, newx = data$x_test))
+  testthat::expect_identical(object = fitted(object0),
+                             expected = fitted(object1)[!missing])
 })

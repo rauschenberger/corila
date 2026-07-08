@@ -98,6 +98,17 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       regexp = "at least two predictors"
     )
   })
+  # testthat::test_that("cv.corila rejects NA response", {
+  #   data$x_train[1, 1] <- NA
+  #   testthat::expect_error(
+  #     object = cv.corila(x = data$x_train,
+  #                        y = data$y_train,
+  #                        group = data$group,
+  #                        family = family_data,
+  #                        na_action = "complete_cases"),
+  #     regexp = "missing"
+  #   )
+  # })
 }
 
 
@@ -114,11 +125,11 @@ testthat::test_that("initial coefficients are estimated", {
   for (i in seq_along(family)) {
     for (j in seq_along(alpha)) {
       if (identical(family[i], "poisson") &
-            identical(alpha[[j]][1], "multiridge")) {
+            identical(alpha[[j]][1L], "multiridge")) {
         next
       }
       if (identical(family[i], "cox")
-          & alpha[[j]][1] %in% c("pearson", "spearman", "kendall")) {
+          & alpha[[j]][1L] %in% c("pearson", "spearman", "kendall")) {
         next
       }
       y <- .simulate_outcome(family = family[i], x = x, beta = beta)
@@ -133,14 +144,14 @@ testthat::test_that("initial coefficients are estimated", {
           x = x,
           y = y,
           family = family[i],
-          alpha_init = alpha[[j]][1],
+          alpha_init = alpha[[j]][1L],
           group = group,
           foldid = NULL,
           nfolds = 10L,
           lambda = lambda
         )
       }
-      testthat::expect_identical(object = init[[1L]], expected = init[[2]])
+      testthat::expect_identical(object = init[[1L]], expected = init[[2L]])
       testthat::expect_length(object = init[[1L]]$coef, n = p)
       if (identical(alpha[[j]][1L], "multiridge")) {
         length <- length(unique(group))
@@ -237,7 +248,7 @@ primary <- as.logical(stats::rbinom(n = p, size = 1L, prob = 0.5))
 x_primary <- x[, primary]
 testthat::test_that("incompatible dimensions are rejected", {
   testthat::expect_error(
-    .expand_auxiliary(x = x_primary, primary = primary[-1])
+    .expand_auxiliary(x = x_primary, primary = primary[-1L])
   )
   testthat::expect_error(
     .expand_auxiliary(x = x_primary, primary = c(primary, TRUE))

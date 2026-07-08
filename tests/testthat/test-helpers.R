@@ -200,12 +200,12 @@ testthat::test_that("precision is finite scalar", {
 
 testthat::test_that("precision equals zero if all signs are inverted", {
   prec <- calc_sign_prec(truth = truth, estim = -truth)
-  testthat::expect_identical(object = prec, expected = 0L)
+  testthat::expect_identical(object = prec, expected = 0)
 })
 
 testthat::test_that("precision equals one if all signs are true", {
   prec <- calc_sign_prec(truth = truth, estim = truth)
-  testthat::expect_identical(object = prec, expected = 1L)
+  testthat::expect_identical(object = prec, expected = 1)
 })
 
 testthat::test_that("precision is not defined if all signs equal zero", {
@@ -222,7 +222,7 @@ testthat::test_that("precision is not influenced by estimated zeros", {
 
 testthat::test_that("precision equals zero if all true signs are zero", {
   prec <- calc_sign_prec(truth = rep(x = 0L, times = n), estim = estim)
-  testthat::expect_identical(object = prec, expected = 0L)
+  testthat::expect_identical(object = prec, expected = 0)
 })
 
 testthat::test_that("error if different lengths", {
