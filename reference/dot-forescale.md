@@ -12,9 +12,10 @@ Transforms variables to mean 0 and variance 1.
 
 - x:
 
-  \\n_0 \times p\\ predictor matrix, where \\n_0\\ is the number of
+  \\n_0 \times p\\ predictor matrix, containing only numerical values
+  (continuous, integer, or binary), where \\n_0\\ is the number of
   observations used for model training and \\p\\ is the number of
-  variables
+  predictors
 
 - y:
 

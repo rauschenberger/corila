@@ -12,8 +12,12 @@ Splits observations into balanced and stratified folds.
 
 - y:
 
-  \\n_0\\-dimensional response vector, where \\n_0\\ is the number of
-  observations used for model training
+  response vector of length \\n_0\\, containing numerical values
+  (`family="gaussian"`), integer values (`family="poisson"`), binary
+  values (`family="binomial"`), or a survival object created with
+  [`survival::Surv()`](https://rdrr.io/pkg/survival/man/Surv.html)
+  (`family="cox"`), where \\n_0\\ is the number of observations used for
+  model training
 
 - family:
 
