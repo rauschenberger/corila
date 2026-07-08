@@ -17,7 +17,6 @@
 #' @srrstatsTODO {G2.10} *Software should ensure that extraction or filtering of single columns from tabular inputs should not presume any particular default behaviour, and should ensure all column-extraction operations behave consistently regardless of the class of tabular data used as input.* 
 #' @srrstatsTODO {G2.11} *Software should ensure that `data.frame`-like tabular objects which have columns which do not themselves have standard class attributes (typically, `vector`) are appropriately processed, and do not error without reason. This behaviour should be tested. Again, columns created by the [`units` package](https://github.com/r-quantities/units/) provide a good test case.*
 #' @srrstatsTODO {G2.12} *Software should ensure that `data.frame`-like tabular objects which have list columns should ensure that those columns are appropriately pre-processed either through being removed, converted to equivalent vector columns where appropriate, or some other appropriate treatment such as an informative error. This behaviour should be tested.* 
-#' @srrstatsTODO {G4.0} *Statistical Software which enables outputs to be written to local files should parse parameters specifying file names to ensure appropriate file suffixes are automatically generated where not provided.*
 #' @srrstatsTODO {G5.0} *Where applicable or practicable, tests should use standard data sets with known properties (for example, the [NIST Standard Reference Datasets](https://www.itl.nist.gov/div898/strd/), or data sets provided by other widely-used R packages).*
 #' @srrstatsTODO {G5.2} *Appropriate error and warning behaviour of all functions should be explicitly demonstrated through tests. In particular,*
 #' @srrstatsTODO {G5.2a} *Every message produced within R code by `stop()`, `warning()`, `message()`, or equivalent should be unique*
@@ -66,7 +65,8 @@ NULL
 #' @srrstatsNA {G2.5} *no function has a factor argument*
 #' @srrstatsNA {G2.14c} *Missing data are not replaced by imputed values, because the type of imputation can have a major impact on the model.*
 #' @srrstatsNA {G3.1} *software does not rely on covariance calculation*
-#' @srrstatsNA {G3.1a} *covariance methods cannot arbitrarily be specified* 
+#' @srrstatsNA {G3.1a} *covariance methods cannot arbitrarily be specified*
+#' @srrstatsNA {G4.0} *package does not enable outputs to be written to local files*
 #' @srrstatsNA {RE1.0} *As this is a regression method for high-dimensional data, using the formula interface is not practical*
 #' @srrstatsNA {RE1.1} *idem*
 #' @srrstatsNA {RE2.4} *high-dimensional data are always perfectly collinear*
