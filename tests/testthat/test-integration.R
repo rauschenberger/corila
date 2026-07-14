@@ -368,3 +368,19 @@ testthat::test_that("complete case analysis works", {
   testthat::expect_identical(object = fitted(object0),
                              expected = fitted(object1)[!missing])
 })
+
+
+## parameter recovery tests ----------------------------------------------------
+
+set.seed(1)
+n <- 1000
+p <- 10
+x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
+alpha <- stats::rnorm(n = 1)
+beta <- stats::rnorm(n = p)
+y <- as.numeric(x %*% beta)
+testthat::test_that("parameters are recovered", {
+  model <- cv.corila(x = x, y = y, group = seq_len(p))
+  testthat::expect_true(all(abs(coef(model)[-1] - beta) < 0.1))
+})
+
