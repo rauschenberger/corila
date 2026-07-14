@@ -2,16 +2,16 @@
 family <- c("gaussian", "binomial", "poisson", "cox")
 n <- 10
 p <- 5
-for(i in seq_along(family)) {
-  for(j in 1:2) {
-    if(j == 1) {
+for (i in seq_along(family)) {
+  for (j in 1:2) {
+    if (j == 1) {
       y <- .simulate_outcome(n = n, family = family[i])
     } else {
       x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
       beta <- stats::rnorm(n = p)
       y <- .simulate_outcome(x = x, beta = beta, family = family[i])
     }
-    testthat::test_that("function errors as expected", {
+    testthat::test_that("function throws expected errors", {
       testthat::expect_error(object = .simulate_outcome(),
                              regexp = "is missing")
       testthat::expect_error(object = .simulate_outcome(family = "gamma"),
