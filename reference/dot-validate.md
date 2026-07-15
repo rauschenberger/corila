@@ -31,8 +31,10 @@ and
 - na_action:
 
   character `"error"` to trigger an error if any observation has a
-  missing predictor or a missing response or `"complete_cases"` to omit
-  observations with a missing predictor or a missing response
+  missing predictor or a missing response or `"complete_cases"` to
+  exclude observations with a missing predictor or a missing response
+  from model fitting (while providing fitted values for these
+  observations)
 
 - x:
 

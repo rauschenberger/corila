@@ -167,8 +167,9 @@ tuning <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, 
 <dt id="arg-na-action">na_action<a class="anchor" aria-label="anchor" href="#arg-na-action"></a></dt>
 <dd><p>character <code>"error"</code> to trigger an error
 if any observation has a missing predictor or a missing response
-or <code>"complete_cases"</code> to omit observations
-with a missing predictor or a missing response</p></dd>
+or <code>"complete_cases"</code> to exclude observations
+with a missing predictor or a missing response from model fitting
+(while providing fitted values for these observations)</p></dd>
 
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
