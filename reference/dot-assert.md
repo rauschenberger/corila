@@ -78,4 +78,7 @@ of samples and features).
 corila:::.assert(x = NULL)
 corila:::.assert(x = rnorm(1), type = "numeric")
 corila:::.assert(x = "A", type = "nominal", support = LETTERS)
+corila:::.assert(x = rexp(10), dim = Inf, type = "numeric", min = 0)
+corila:::.assert(x = c(NA, rpois(9, lambda = 4)), dim = 10,
+                 type = "integer", na.rm = TRUE)
 ```

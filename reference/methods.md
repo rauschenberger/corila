@@ -67,18 +67,19 @@ object <- cv.corila(x = x, y = y, group = group, primary = primary)
 
 # using S3 methods
 coef(object)
-#>  [1] 0.3156285 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
-#>  [8] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
-#> [15] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
+#>  [1] -0.8060842  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
+#>  [7]  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
+#> [13]  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
+#> [19]  0.0000000  0.0000000  0.0000000
 predict(object, newx = x)
-#>  [1] 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285
-#>  [8] 0.3156285 0.3156285 0.3156285
+#>  [1] -0.8060842 -0.8060842 -0.8060842 -0.8060842 -0.8060842 -0.8060842
+#>  [7] -0.8060842 -0.8060842 -0.8060842 -0.8060842
 fitted(object)
-#>  [1] 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285 0.3156285
-#>  [8] 0.3156285 0.3156285 0.3156285
+#>  [1] -0.8060842 -0.8060842 -0.8060842 -0.8060842 -0.8060842 -0.8060842
+#>  [7] -0.8060842 -0.8060842 -0.8060842 -0.8060842
 residuals(object)
-#>  [1]  1.26471634  0.54842700 -0.37158022  0.09390859  2.04230119 -0.81544995
-#>  [7] -0.51263457 -0.26691716 -2.11699746  0.13422623
+#>  [1]  0.4167022 -0.5986481 -0.1390526  0.5245383 -0.8345320 -0.8231321
+#>  [7]  0.3724785 -0.1203535 -0.1309522  1.3329514
 plot(object)
 
 print(object)
@@ -88,11 +89,11 @@ print(object)
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (10 primary and 10 auxiliary features)
+#> 20 features (9 primary and 11 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 1.188 
-#> selected weights: local = 0.9, global = 0.1
-#> selected exponents: local = 0, global = 1
+#> optimised regularisation parameter: lambda.min = 1.104 
+#> selected weights: local = 1, global = 0
+#> selected exponents: local = 0, global = Inf
 #> 1 non-zero coefficients (including intercept)
 ```

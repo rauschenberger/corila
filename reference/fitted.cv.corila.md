@@ -51,33 +51,33 @@ object <- cv.corila(x = x, y = y, group = group, primary = primary)
 
 # using S3 methods
 coef(object)
-#>  [1] -0.05752680  0.00000000 -0.64792795 -0.07879337 -0.20975336  0.00000000
-#>  [7]  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000
-#> [13]  0.00000000  0.00000000  0.00000000  0.47249021  0.20404356  0.00000000
-#> [19]  0.00000000  0.00000000  0.66532042
+#>  [1]  0.2854464  0.0000000  0.0000000  0.0000000  0.0000000  0.5787971
+#>  [7]  0.1614690  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
+#> [13]  0.0000000 -0.1137071  0.0000000  0.4729298  0.0000000  0.3853406
+#> [19] -0.6358562  0.0000000  0.2407236
 predict(object, newx = x)
-#>  [1] -0.80032044 -0.40982787  1.70471326  0.36985147  1.36077075 -0.48432243
-#>  [7] -0.29995985  0.08166795  2.11920544 -0.28119109
+#>  [1] -0.23051325 -0.15702890 -0.15425913  0.61597916  0.04372087  1.75889599
+#>  [7]  1.62855405  0.09542364 -0.19228939 -0.91483210
 fitted(object)
-#>  [1] -0.80032044 -0.40982787  1.70471326  0.36985147  1.36077075 -0.48432243
-#>  [7] -0.29995985  0.08166795  2.11920544 -0.28119109
+#>  [1] -0.23051325 -0.15702890 -0.15425913  0.61597916  0.04372087  1.75889599
+#>  [7]  1.62855405  0.09542364 -0.19228939 -0.91483210
 residuals(object)
-#>  [1] -0.070983080  0.123554540  0.005582696 -0.159285543 -0.016391158
-#>  [6] -0.290471664 -0.269100262  0.445668941  0.164305549  0.067119980
+#>  [1] -0.12845860  0.01377974  0.21239739  0.02410230 -0.19036856  0.07229898
+#>  [7]  0.02635743  0.11748997 -0.07589160 -0.07170707
 plot(object)
 
 print(object)
 #> object of class ‘cv.corila’ 
 #> (contains multiple objects of class ‘cv.glmnet’)
-#> selected 6 from 20 predictors
+#> selected 7 from 20 predictors
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (10 primary and 10 auxiliary features)
+#> 20 features (12 primary and 8 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 0.02372 
-#> selected weights: local = 0, global = 1
-#> selected exponents: local = Inf, global = 1
-#> 7 non-zero coefficients (including intercept)
+#> optimised regularisation parameter: lambda.min = 0.01632 
+#> selected weights: local = 0.3, global = 0.7
+#> selected exponents: local = 0, global = 1
+#> 8 non-zero coefficients (including intercept)
 ```

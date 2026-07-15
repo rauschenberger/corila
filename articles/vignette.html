@@ -80,18 +80,17 @@ release, <em>not yet available</em>):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span>repo <span class="op">=</span> <span class="st">"rauschenberger/corila"</span><span class="op">)</span></span>
 <span><span class="co">#utils::install.packages(pkgs = "corila")</span></span></code></pre></div>
-<p>This R package provides the functions <code>corila</code> and
-<code>cv.corila</code> for model fitting without and with hyperparameter
-tuning, respectively. These functions require the arguments
+<p>The main function of this R package is <code>cv.corila</code>. This
+function fits the proposed model, tuning the hyperparameters and
+estimating the parameters. This function requires the arguments
 <code>x</code> (predictor matrix), <code>y</code> (response vector),
 <code>group</code> (group object), and <code>family</code> (character
-“gaussian”, “binomial”, “poisson”, or “cox”). They return objects of
-classes <code>"corila"</code> and <code>"cv.corila"</code>,
-respectively, for which standard S3 methods like <code>coef</code> (for
-extracting coefficients) and <code>predict</code> (for making
-predictions) are available. The R package <code>corila</code> is an
-extension of the R package <code>glmnet</code> (<em>Friedman et al.,
-2010</em>), using a similar user interface.</p>
+“gaussian”, “binomial”, “poisson”, or “cox”). It returns an object of
+class<code>"cv.corila"</code>, for which standard S3 methods like
+<code>coef</code> (for extracting coefficients) and <code>predict</code>
+(for making predictions) are available. The R package
+<code>corila</code> is an extension of the R package <code>glmnet</code>
+(<em>Friedman et al., 2010</em>), using a similar user interface.</p>
 </div>
 <div class="section level2">
 <h2 id="simulating-data">Simulating data<a class="anchor" aria-label="anchor" href="#simulating-data"></a>
@@ -185,10 +184,10 @@ mean-squared error) as compared to standard lasso regression.</p>
 </h2>
 <p>To exploit known groups of predictors or known relationships between
 predictors, the R package <code>corila</code> can exploit three
-different types of inputs for the argument <code>z</code>: (i) If each
-predictor is in a single group, the simplest choice is a vector of group
-labels (or indices). (ii) If some groups are overlapping, however, a
-list of predictor labels (or indices) becomes necessary. (iii) If
+different types of inputs for the argument <code>group</code>: (i) If
+each predictor is in a single group, the simplest choice is a vector of
+group labels (or indices). (ii) If some groups are overlapping, however,
+a list of predictor labels (or indices) becomes necessary. (iii) If
 predictors have asymmetric relationships (e.g., the <span class="math inline">\(i^{\text{th}}\)</span> predictor should share
 information with with the <span class="math inline">\(j^{\text{th}}\)</span> predictor but not vice
 versa), this requires an adjacency matrix (with a unit diagonal).</p>
