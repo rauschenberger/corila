@@ -20,7 +20,7 @@ remotes::install_github(repo = "rauschenberger/corila")
 #utils::install.packages(pkgs = "corila")
 ```
 
-This R package provides the functions `corila` and `cv.corila` for model fitting without and with hyperparameter tuning, respectively. These functions require the arguments `x` (predictor matrix), `y` (response vector), `group` (group object), and `family` (character "gaussian", "binomial", "poisson", or "cox"). They return objects of classes `"corila"` and `"cv.corila"`, respectively, for which standard S3 methods like `coef` (for extracting coefficients) and `predict` (for making predictions) are available. The R package `corila` is an extension of the R package `glmnet` (*Friedman et al., 2010*), using a similar user interface.
+The main function of this R package is `cv.corila`. This function fits the proposed model, tuning the hyperparameters and estimating the parameters. This function requires the arguments `x` (predictor matrix), `y` (response vector), `group` (group object), and `family` (character "gaussian", "binomial", "poisson", or "cox"). It returns an object of class`"cv.corila"`, for which standard S3 methods like `coef` (for extracting coefficients) and `predict` (for making predictions) are available. The R package `corila` is an extension of the R package `glmnet` (*Friedman et al., 2010*), using a similar user interface.
 
 ## Simulating data
 
@@ -99,7 +99,7 @@ lapply(
 
 ## Modelling under complex group structures
 
-To exploit known groups of predictors or known relationships between predictors, the R package `corila` can exploit three different types of inputs for the argument `z`: (i) If each predictor is in a single group, the simplest choice is a vector of group labels (or indices). (ii) If some groups are overlapping, however, a list of predictor labels (or indices) becomes necessary. (iii) If predictors have asymmetric relationships (e.g., the $i^{\text{th}}$ predictor should share information with with the $j^{\text{th}}$ predictor but not vice versa), this requires an adjacency matrix (with a unit diagonal).
+To exploit known groups of predictors or known relationships between predictors, the R package `corila` can exploit three different types of inputs for the argument `group`: (i) If each predictor is in a single group, the simplest choice is a vector of group labels (or indices). (ii) If some groups are overlapping, however, a list of predictor labels (or indices) becomes necessary. (iii) If predictors have asymmetric relationships (e.g., the $i^{\text{th}}$ predictor should share information with with the $j^{\text{th}}$ predictor but not vice versa), this requires an adjacency matrix (with a unit diagonal).
 
 $$
 \begin{array}{ccc}
