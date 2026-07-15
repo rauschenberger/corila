@@ -27,15 +27,15 @@ Identifies adjacent predictors.
 
 - j:
 
-  index of predictor
+  index of predictor (positive integer between \\1\\ and \\p\\)
 
 - p:
 
-  number of predictors
+  number of predictors (positive integer)
 
 - names:
 
-  names of predictors
+  names of predictors (character vector of length \\p\\)
 
 ## Value
 

@@ -7,7 +7,7 @@ Check whether provided arguments satisfy expectations.
 ``` r
 .assert(
   x,
-  type,
+  type = "numeric",
   dim = 1L,
   na.rm = FALSE,
   support = NULL,
@@ -25,15 +25,17 @@ Check whether provided arguments satisfy expectations.
 
 - type:
 
-  character `"numeric"`, `"integer"`, `"nominal"`, or `"logical"`
+  character `"numeric"` (default), `"integer"`, `"nominal"`, or
+  `"logical"`
 
 - dim:
 
-  dimensionality: `dim = 1` for a scalar, `dim = Inf` for a vector of
-  arbitrary length, `dim = c(Inf, Inf)` for a matrix of arbitrary
-  dimensions, `dim = c(Inf, Inf, Inf)` for an array of arbitrary
-  dimensions, `dim = 100` for a vector of length 100,
-  `dim = c(Inf, 100)` for a matrix with 100 columns, etc.
+  vector containing positive integers defining the dimensionality:
+  `dim = 1` for a scalar, `dim = Inf` for a vector of arbitrary length,
+  `dim = c(Inf, Inf)` for a matrix of arbitrary dimensions,
+  `dim = c(Inf, Inf, Inf)` for an array of arbitrary dimensions,
+  `dim = 100` for a vector of length 100, `dim = c(Inf, 100)` for a
+  matrix with 100 columns, etc.
 
 - na.rm:
 

@@ -142,7 +142,9 @@ or <code>NA</code> to set all initial coefficients equal to 1</p></dd>
 
 
 <dt id="arg-alpha-final">alpha_final<a class="anchor" aria-label="anchor" href="#arg-alpha-final"></a></dt>
-<dd><p>elastic net mixing parameter for final regression
+<dd><p>elastic net mixing parameter for final regression:
+numeric between 0 for ridge penalisation
+and 1 for lasso penalisation
 (default: lasso penalisation with <code>alpha_final</code>=1)</p></dd>
 
 
@@ -158,7 +160,8 @@ or \(p \times p\) correlation matrix</p></dd>
 
 
 <dt id="arg-nfolds">nfolds<a class="anchor" aria-label="anchor" href="#arg-nfolds"></a></dt>
-<dd><p>integer specifying the number of folds</p></dd>
+<dd><p>positive integer specifying the number of folds
+(minimum \(3\), maximum \(n\))</p></dd>
 
 
 <dt id="arg-lambda-init">lambda_init<a class="anchor" aria-label="anchor" href="#arg-lambda-init"></a></dt>

@@ -72,7 +72,8 @@ Estimate initial coefficients.
 
 - nfolds:
 
-  integer specifying the number of folds
+  positive integer specifying the number of folds (minimum \\3\\,
+  maximum \\n\\)
 
 - lambda:
 
@@ -103,11 +104,14 @@ correlation coefficients.
 ## Examples
 
 ``` r
+# simulate data
 n <- 20
 p <- 10
 x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
 y <- drop(x %*% beta)
+
+# initial correlation coefficients
 corila:::.estim_initial_coefs(x = x,
                               y = y,
                               family = "gaussian",
@@ -122,5 +126,40 @@ corila:::.estim_initial_coefs(x = x,
 #> 
 #> $lambda
 #> NULL
+#> 
+
+# initial regression coefficients (cross-validating lambda)
+corila:::.estim_initial_coefs(x = x,
+                              y = y,
+                              family = "gaussian",
+                              alpha_init = 0,
+                              group = NULL,
+                              foldid = NULL,
+                              nfolds = 10,
+                              lambda = NULL)
+#> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
+#> $coef
+#>  [1] -0.01003925  1.87125995 -0.04623964  0.85885005  0.62140233  0.01499372
+#>  [7]  0.06481836  0.03630338 -1.41391759  0.05301106
+#> 
+#> $lambda
+#> [1] 0.2427865
+#> 
+                              
+# initial regression coefficients (using fixed lambda)
+corila:::.estim_initial_coefs(x = x,
+                              y = y,
+                              family = "gaussian",
+                              alpha_init = 0,
+                              group = NULL,
+                              foldid = NULL,
+                              nfolds = 10,
+                              lambda = 0.2)
+#> $coef
+#>  [1] -0.01003925  1.87125995 -0.04623964  0.85885005  0.62140233  0.01499372
+#>  [7]  0.06481836  0.03630338 -1.41391759  0.05301106
+#> 
+#> $lambda
+#> [1] 0.2
 #> 
 ```

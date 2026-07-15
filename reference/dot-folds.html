@@ -68,7 +68,8 @@ where \(n_0\) is the number of observations used for model training</p></dd>
 
 
 <dt id="arg-nfolds">nfolds<a class="anchor" aria-label="anchor" href="#arg-nfolds"></a></dt>
-<dd><p>integer specifying the number of folds</p></dd>
+<dd><p>positive integer specifying the number of folds
+(minimum \(3\), maximum \(n\))</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -102,8 +103,8 @@ or censored/uncensored observations in Cox model).</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">foldid</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    foldid</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y   1 2 3 4 5 6 7 8 9 10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0 8 8 8 8 8 8 8 7 7  7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1 2 2 2 2 2 2 2 3 3  3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 8 8 8 8 8 8 8 8 8  7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1 2 2 2 2 2 2 2 2 2  3</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Cox model</span></span></span>
@@ -114,8 +115,8 @@ or censored/uncensored observations in Cox model).</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span>, <span class="st">"status"</span><span class="op">]</span>, <span class="va">foldid</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    foldid</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     1 2 3 4 5 6 7 8 9 10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0 8 8 8 8 8 8 8 8 7  7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   1 2 2 2 2 2 2 2 2 3  3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 8 8 8 8 8 8 8 7 7  7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1 2 2 2 2 2 2 2 3 3  3</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

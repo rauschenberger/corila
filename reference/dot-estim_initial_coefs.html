@@ -117,7 +117,8 @@ from the \(j^{\text{th}}\) to the \(k^{\text{th}}\) variable</p></li>
 
 
 <dt id="arg-nfolds">nfolds<a class="anchor" aria-label="anchor" href="#arg-nfolds"></a></dt>
-<dd><p>integer specifying the number of folds</p></dd>
+<dd><p>positive integer specifying the number of folds
+(minimum \(3\), maximum \(n\))</p></dd>
 
 
 <dt id="arg-lambda">lambda<a class="anchor" aria-label="anchor" href="#arg-lambda"></a></dt>
@@ -141,11 +142,14 @@ or <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats:
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># simulate data</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">p</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># initial correlation coefficients</span></span></span>
 <span class="r-in"><span><span class="fu">corila</span><span class="fu">:::</span><span class="fu">.estim_initial_coefs</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>,</span></span>
 <span class="r-in"><span>                              y <span class="op">=</span> <span class="va">y</span>,</span></span>
 <span class="r-in"><span>                              family <span class="op">=</span> <span class="st">"gaussian"</span>,</span></span>
@@ -160,6 +164,41 @@ or <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats:
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $lambda</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># initial regression coefficients (cross-validating lambda)</span></span></span>
+<span class="r-in"><span><span class="fu">corila</span><span class="fu">:::</span><span class="fu">.estim_initial_coefs</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>,</span></span>
+<span class="r-in"><span>                              y <span class="op">=</span> <span class="va">y</span>,</span></span>
+<span class="r-in"><span>                              family <span class="op">=</span> <span class="st">"gaussian"</span>,</span></span>
+<span class="r-in"><span>                              alpha_init <span class="op">=</span> <span class="fl">0</span>,</span></span>
+<span class="r-in"><span>                              group <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>                              foldid <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>                              nfolds <span class="op">=</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>                              lambda <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $coef</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.01003925  1.87125995 -0.04623964  0.85885005  0.62140233  0.01499372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.06481836  0.03630338 -1.41391759  0.05301106</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $lambda</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.2427865</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span>                              </span></span>
+<span class="r-in"><span><span class="co"># initial regression coefficients (using fixed lambda)</span></span></span>
+<span class="r-in"><span><span class="fu">corila</span><span class="fu">:::</span><span class="fu">.estim_initial_coefs</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>,</span></span>
+<span class="r-in"><span>                              y <span class="op">=</span> <span class="va">y</span>,</span></span>
+<span class="r-in"><span>                              family <span class="op">=</span> <span class="st">"gaussian"</span>,</span></span>
+<span class="r-in"><span>                              alpha_init <span class="op">=</span> <span class="fl">0</span>,</span></span>
+<span class="r-in"><span>                              group <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>                              foldid <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>                              nfolds <span class="op">=</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>                              lambda <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $coef</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.01003925  1.87125995 -0.04623964  0.85885005  0.62140233  0.01499372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.06481836  0.03630338 -1.41391759  0.05301106</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $lambda</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

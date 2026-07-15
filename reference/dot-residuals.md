@@ -22,6 +22,10 @@ Calculates the deviance residuals.
 
   character `"gaussian"`, `"binomial"`, or `"poisson"`
 
+## Value
+
+Returns an \\n\\-dimensional vector.
+
 ## Details
 
 This function is called by
@@ -34,6 +38,6 @@ n <- 10
 y_obs <- stats::rbinom(n = n, size = 1, prob = 0.2)
 y_fit <- stats::runif(n = n)
 corila:::.residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
-#>  [1] -0.3311562 -1.7092747 -1.6068298 -0.5062574  0.3907324  0.6340327
-#>  [7] -2.3999946 -1.8292354 -2.0643748 -2.3998834
+#>  [1]  1.1421337  1.9220425 -1.6448521 -1.7580650 -1.2249872  0.8805749
+#>  [7] -1.4093989 -0.5479869  1.0558925 -2.7001360
 ```

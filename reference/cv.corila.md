@@ -75,7 +75,8 @@ cv.corila(
 
 - alpha_final:
 
-  elastic net mixing parameter for final regression (default: lasso
+  elastic net mixing parameter for final regression: numeric between 0
+  for ridge penalisation and 1 for lasso penalisation (default: lasso
   penalisation with `alpha_final`=1)
 
 - family:
@@ -84,7 +85,8 @@ cv.corila(
 
 - nfolds:
 
-  integer specifying the number of folds
+  positive integer specifying the number of folds (minimum \\3\\,
+  maximum \\n\\)
 
 - cor:
 
@@ -96,19 +98,19 @@ cv.corila(
   character string for determining the candidate values for the
   hyperparameters:
 
-  - "none": fixed weights and exponents (`wgt_local`=1, `exp_local`=1,
+  - `"none"`: fixed weights and exponents (`wgt_local`=1, `exp_local`=1,
     `wgt_global`=0), no tuning
 
-  - "weight": fixed exponents (`exp_local`=0, `exp_global`=1), tuning
+  - `"weight"`: fixed exponents (`exp_local`=0, `exp_global`=1), tuning
     `wgt_local`=1-`wgt_global`
 
-  - "exponent": fixed weights (`wgt_local`=1, `wgt_global`=0), tuning
+  - `"exponent"`: fixed weights (`wgt_local`=1, `wgt_global`=0), tuning
     `exp_local`
 
-  - "bivariate": tuning `wgt_local`=1-`wgt_global` and
+  - `"bivariate"`: tuning `wgt_local`=1-`wgt_global` and
     `exp_local`=`exp_global`
 
-  - "factorial": tuning `wgt_local`, `exp_local`, `wgt_global`,
+  - `"factorial"`: tuning `wgt_local`, `exp_local`, `wgt_global`,
     `exp_global`
 
   (to implement: list with slots `wgt_local`, `exp_local`, `wgt_global`,

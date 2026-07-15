@@ -67,19 +67,19 @@ object <- cv.corila(x = x, y = y, group = group, primary = primary)
 
 # using S3 methods
 coef(object)
-#>  [1] -0.8060842  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
-#>  [7]  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
-#> [13]  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
-#> [19]  0.0000000  0.0000000  0.0000000
+#>  [1] 0.01806361 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
+#>  [7] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
+#> [13] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
+#> [19] 0.00000000 0.00000000 0.00000000
 predict(object, newx = x)
-#>  [1] -0.8060842 -0.8060842 -0.8060842 -0.8060842 -0.8060842 -0.8060842
-#>  [7] -0.8060842 -0.8060842 -0.8060842 -0.8060842
+#>  [1] 0.01806361 0.01806361 0.01806361 0.01806361 0.01806361 0.01806361
+#>  [7] 0.01806361 0.01806361 0.01806361 0.01806361
 fitted(object)
-#>  [1] -0.8060842 -0.8060842 -0.8060842 -0.8060842 -0.8060842 -0.8060842
-#>  [7] -0.8060842 -0.8060842 -0.8060842 -0.8060842
+#>  [1] 0.01806361 0.01806361 0.01806361 0.01806361 0.01806361 0.01806361
+#>  [7] 0.01806361 0.01806361 0.01806361 0.01806361
 residuals(object)
-#>  [1]  0.4167022 -0.5986481 -0.1390526  0.5245383 -0.8345320 -0.8231321
-#>  [7]  0.3724785 -0.1203535 -0.1309522  1.3329514
+#>  [1] -0.9165558 -0.1793822 -0.5025691  2.6860880 -0.7268534  0.3963546
+#>  [7] -0.7750733  0.4715784  0.6972766 -1.1508637
 plot(object)
 
 print(object)
@@ -89,11 +89,11 @@ print(object)
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (9 primary and 11 auxiliary features)
+#> 20 features (13 primary and 7 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 1.104 
-#> selected weights: local = 1, global = 0
-#> selected exponents: local = 0, global = Inf
+#> optimised regularisation parameter: lambda.min = 3.521 
+#> selected weights: local = 0.9, global = 0.1
+#> selected exponents: local = 0, global = 1
 #> 1 non-zero coefficients (including intercept)
 ```

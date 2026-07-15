@@ -24,7 +24,7 @@ Simulates outcome vector.
 
 - n:
 
-  integer or `NULL`
+  positive integer or `NULL`
 
 - factor:
 
@@ -46,8 +46,8 @@ to simulate a predictor matrix, an effect vector, and an outcome vector.
 ``` r
 # simulate independent outcome
 corila:::.simulate_outcome(family = "gaussian", n = 10)
-#>  [1]  0.52362315 -0.01973839  0.35955249  2.86940836  0.05236355  0.64790447
-#>  [7]  0.06967448  0.33082434  0.18316304  0.24630478
+#>  [1]  0.246304780 -0.948836419  0.613990444 -1.320130677  0.138598367
+#>  [6] -0.471144892  2.305710580  0.576793089 -0.691726313 -0.001400463
 
 # simulate dependent outcome
 n <- 10
@@ -55,6 +55,6 @@ p <- 20
 x <- matrix(rnorm(n * p), n, p)
 beta <- rnorm(p)
 corila:::.simulate_outcome(family = "gaussian", x = x, beta = beta)
-#>  [1]  0.14431489  0.33879367 -3.09769902 -0.01120175  1.03561133 -1.54659602
-#>  [7]  0.75059887 -1.22907389 -0.01890733 -0.91226085
+#>  [1] -1.94473471  0.40983288  0.53617522 -0.05408577 -1.19707525  0.29798117
+#>  [7] -0.88099489  1.03116636 -0.30447646  1.22519758
 ```

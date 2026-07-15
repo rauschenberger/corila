@@ -32,19 +32,19 @@ simulate(
 
 - n0:
 
-  number of training observations
+  number of training observations (positive integer)
 
 - n1:
 
-  number of testing observations
+  number of testing observations (positive integer)
 
 - n_group:
 
-  number of variable groups
+  number of variable groups (positive integer)
 
 - n_type:
 
-  number of variable types
+  number of variable types (positive integer)
 
 - size_group:
 

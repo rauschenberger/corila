@@ -66,6 +66,10 @@
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Returns an \(n\)-dimensional vector.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function is called by <code><a href="residuals.cv.corila.html">residuals.cv.corila()</a></code>.</p>
     </div>
@@ -76,8 +80,8 @@
 <span class="r-in"><span><span class="va">y_obs</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y_fit</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">corila</span><span class="fu">:::</span><span class="fu">.residuals</span><span class="op">(</span>y_obs <span class="op">=</span> <span class="va">y_obs</span>, y_fit <span class="op">=</span> <span class="va">y_fit</span>, family <span class="op">=</span> <span class="st">"binomial"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.3311562 -1.7092747 -1.6068298 -0.5062574  0.3907324  0.6340327</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -2.3999946 -1.8292354 -2.0643748 -2.3998834</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1.1421337  1.9220425 -1.6448521 -1.7580650 -1.2249872  0.8805749</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -1.4093989 -0.5479869  1.0558925 -2.7001360</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -87,7 +87,8 @@ corila(
 
 - alpha_final:
 
-  elastic net mixing parameter for final regression (default: lasso
+  elastic net mixing parameter for final regression: numeric between 0
+  for ridge penalisation and 1 for lasso penalisation (default: lasso
   penalisation with `alpha_final`=1)
 
 - cor:
@@ -101,7 +102,8 @@ corila(
 
 - nfolds:
 
-  integer specifying the number of folds
+  positive integer specifying the number of folds (minimum \\3\\,
+  maximum \\n\\)
 
 - lambda_init:
 

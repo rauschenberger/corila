@@ -55,19 +55,19 @@
 
 <dl><dt id="arg-tune">tune<a class="anchor" aria-label="anchor" href="#arg-tune"></a></dt>
 <dd><p>character string for determining the candidate values
-for the hyperparameters:</p><ul><li><p>"none":
+for the hyperparameters:</p><ul><li><p><code>"none"</code>:
 fixed weights and exponents
 (<code>wgt_local</code>=1, <code>exp_local</code>=1, <code>wgt_global</code>=0),
 no tuning</p></li>
-<li><p>"weight":
+<li><p><code>"weight"</code>:
 fixed exponents (<code>exp_local</code>=0, <code>exp_global</code>=1),
 tuning <code>wgt_local</code>=1-<code>wgt_global</code></p></li>
-<li><p>"exponent":
+<li><p><code>"exponent"</code>:
 fixed weights (<code>wgt_local</code>=1, <code>wgt_global</code>=0),
 tuning <code>exp_local</code></p></li>
-<li><p>"bivariate":
+<li><p><code>"bivariate"</code>:
 tuning <code>wgt_local</code>=1-<code>wgt_global</code> and <code>exp_local</code>=<code>exp_global</code></p></li>
-<li><p>"factorial":
+<li><p><code>"factorial"</code>:
 tuning <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, <code>exp_global</code></p></li>
 </ul><p>(to implement: list with slots
 <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, and <code>exp_global</code>)</p></dd>
