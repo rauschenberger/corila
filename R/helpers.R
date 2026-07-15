@@ -12,7 +12,7 @@
 #' scalar, vector, matrix, or array to be checked
 #'
 #' @param dim
-#' dimensionality:
+#' vector containing positive integers defining the dimensionality:
 #' `dim = 1` for a scalar,
 #' `dim = Inf` for a vector of arbitrary length,
 #' `dim = c(Inf, Inf)` for a matrix of arbitrary dimensions,
@@ -21,7 +21,7 @@
 #' `dim = c(Inf, 100)` for a matrix with 100 columns, etc.
 #'
 #' @param type
-#' character `"numeric"`, `"integer"`,
+#' character `"numeric"` (default), `"integer"`,
 #' `"nominal"`, or `"logical"`
 #'
 #' @param na.rm
@@ -67,7 +67,7 @@
 #' @srrstats {G5.2a} *messages are unique*
 #' @srrstats {RE1.4} *tests assumptions for input data*
 #'
-.assert <- function(x, type, dim = 1L, na.rm = FALSE,
+.assert <- function(x, type = "numeric", dim = 1L, na.rm = FALSE,
                     support = NULL, family = NULL, min = -Inf, max = Inf) {
   if (is.null(x)) {
     return(invisible(NULL))
@@ -82,7 +82,7 @@
     "expect support = NULL if type = 'nominal'" =
       type == "nominal" || is.null(support),
     "expected vector"  =
-      length(dim) != 1L || is.vector(x) || inherits(x = x, what = "Surv"),
+      length(dim) != 1L || is.atomic(x) || inherits(x = x, what = "Surv"),
     "expected matrix" =
       length(dim) != 2L || is.matrix(x),
     "expected array" =

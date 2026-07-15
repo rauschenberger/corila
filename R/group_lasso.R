@@ -56,7 +56,9 @@
 #' or `NA` to set all initial coefficients equal to 1
 #'
 #' @param alpha_final
-#' elastic net mixing parameter for final regression
+#' elastic net mixing parameter for final regression:
+#' numeric between 0 for ridge penalisation
+#' and 1 for lasso penalisation
 #' (default: lasso penalisation with `alpha_final`=1)
 #'
 #' @param family
@@ -67,7 +69,8 @@
 #' \eqn{n_0}-dimensional vector containing the fold identifiers
 #'
 #' @param nfolds
-#' integer specifying the number of folds
+#' positive integer specifying the number of folds
+#' (minimum \eqn{3}, maximum \eqn{n})
 #'
 #' @param cor
 #' character string `"pearson"`,
@@ -78,19 +81,19 @@
 #' @param tune
 #' character string for determining the candidate values
 #' for the hyperparameters:
-#' - "none":
+#' - `"none"`:
 #' fixed weights and exponents
 #' (`wgt_local`=1, `exp_local`=1, `wgt_global`=0),
 #' no tuning
-#' - "weight":
+#' - `"weight"`:
 #' fixed exponents (`exp_local`=0, `exp_global`=1),
 #' tuning `wgt_local`=1-`wgt_global`
-#' - "exponent":
+#' - `"exponent"`:
 #' fixed weights (`wgt_local`=1, `wgt_global`=0),
 #' tuning `exp_local`
-#' - "bivariate":
+#' - `"bivariate"`:
 #' tuning `wgt_local`=1-`wgt_global` and `exp_local`=`exp_global`
-#' - "factorial":
+#' - `"factorial"`:
 #' tuning `wgt_local`, `exp_local`, `wgt_global`, `exp_global`
 #'
 #' (to implement: list with slots
@@ -251,6 +254,11 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
     cor <- match.arg(arg = tolower(cor),
                      choices = c("pearson", "spearman", "kendall"))
   }
+  tune <- match.arg(arg = tolower(tune),
+                    choices = c("none", "weight", "exponent", "bivariate",
+                                "factorial"))
+  na_action <- match.arg(arg = tolower(na_action),
+                         choices = c("error", "complete_cases"))
   # set default parameters
   hyper <- .set_candidates(tune = tune)
   .validate(
@@ -790,11 +798,14 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' or [stats::cor()] for initial correlation coefficients.
 #'
 #' @examples
+#' # simulate data
 #' n <- 20
 #' p <- 10
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
 #' y <- drop(x %*% beta)
+#' 
+#' # initial correlation coefficients
 #' corila:::.estim_initial_coefs(x = x,
 #'                               y = y,
 #'                               family = "gaussian",
@@ -803,6 +814,26 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'                               foldid = NULL,
 #'                               nfolds = 10,
 #'                               lambda = NULL)
+#'
+#' # initial regression coefficients (cross-validating lambda)
+#' corila:::.estim_initial_coefs(x = x,
+#'                               y = y,
+#'                               family = "gaussian",
+#'                               alpha_init = 0,
+#'                               group = NULL,
+#'                               foldid = NULL,
+#'                               nfolds = 10,
+#'                               lambda = NULL)
+#'                               
+#' # initial regression coefficients (using fixed lambda)
+#' corila:::.estim_initial_coefs(x = x,
+#'                               y = y,
+#'                               family = "gaussian",
+#'                               alpha_init = 0,
+#'                               group = NULL,
+#'                               foldid = NULL,
+#'                               nfolds = 10,
+#'                               lambda = 0.2)
 #'
 #' @keywords internal
 #'
@@ -891,12 +922,15 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'
 #' @param j
 #' index of predictor
+#' (positive integer between \eqn{1} and \eqn{p})
 #'
 #' @param p
 #' number of predictors
+#' (positive integer)
 #'
 #' @param names
 #' names of predictors
+#' (character vector of length \eqn{p})
 #'
 #' @details
 #' This function is called by [corila()].
@@ -932,18 +966,21 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       group_cond <- vapply(X = group,
                            FUN = function(slot) j %in% slot,
                            FUN.VALUE = logical(1L))
-      seq_len(p) %in% unlist(group[group_cond])
+      stats::setNames(object = seq_len(p) %in% unlist(group[group_cond]),
+                      nm = names)
     } else if (is.character(unlist(group))) {
       group_cond <- vapply(
         X = group,
         FUN = function(slot) names[j] %in% slot,
         FUN.VALUE = logical(1L)
       )
-      names %in% unlist(group[group_cond])
+      stats::setNames(object = names %in% unlist(group[group_cond]),
+                      nm = names)
     } else {
       stop("The list 'group' should have slots of type numeric or character.")
     }
   } else if (is.matrix(group)) {
+    .assert(x = group, type = "integer", dim = c(p, p), support = c(0, 1))
     group[, j] == 1L
   } else {
     stop("Argument 'group' should be a vector, a list, or a matrix.")

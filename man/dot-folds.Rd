@@ -17,7 +17,8 @@ where \eqn{n_0} is the number of observations used for model training}
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
 
-\item{nfolds}{integer specifying the number of folds}
+\item{nfolds}{positive integer specifying the number of folds
+(minimum \eqn{3}, maximum \eqn{n})}
 }
 \value{
 Returns an \eqn{n_0}-dimensional vector

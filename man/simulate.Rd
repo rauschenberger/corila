@@ -25,13 +25,17 @@ simulate(
 \arguments{
 \item{family}{character \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
-\item{n0}{number of training observations}
+\item{n0}{number of training observations
+(positive integer)}
 
-\item{n1}{number of testing observations}
+\item{n1}{number of testing observations
+(positive integer)}
 
-\item{n_group}{number of variable groups}
+\item{n_group}{number of variable groups
+(positive integer)}
 
-\item{n_type}{number of variable types}
+\item{n_type}{number of variable types
+(positive integer)}
 
 \item{size_group}{size of variable groups (per variable type):
 integer vector of length \code{n_type}}

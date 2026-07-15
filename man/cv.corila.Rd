@@ -65,13 +65,16 @@ with one penalty for each group
 (not implemented for \code{family="poisson"} or overlapping groups),
 or \code{NA} to set all initial coefficients equal to 1}
 
-\item{alpha_final}{elastic net mixing parameter for final regression
+\item{alpha_final}{elastic net mixing parameter for final regression:
+numeric between 0 for ridge penalisation
+and 1 for lasso penalisation
 (default: lasso penalisation with \code{alpha_final}=1)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
 
-\item{nfolds}{integer specifying the number of folds}
+\item{nfolds}{positive integer specifying the number of folds
+(minimum \eqn{3}, maximum \eqn{n})}
 
 \item{cor}{character string \code{"pearson"},
 \code{"spearman"} (default),
@@ -81,19 +84,19 @@ or \eqn{p \times p} correlation matrix}
 \item{tune}{character string for determining the candidate values
 for the hyperparameters:
 \itemize{
-\item "none":
+\item \code{"none"}:
 fixed weights and exponents
 (\code{wgt_local}=1, \code{exp_local}=1, \code{wgt_global}=0),
 no tuning
-\item "weight":
+\item \code{"weight"}:
 fixed exponents (\code{exp_local}=0, \code{exp_global}=1),
 tuning \code{wgt_local}=1-\code{wgt_global}
-\item "exponent":
+\item \code{"exponent"}:
 fixed weights (\code{wgt_local}=1, \code{wgt_global}=0),
 tuning \code{exp_local}
-\item "bivariate":
+\item \code{"bivariate"}:
 tuning \code{wgt_local}=1-\code{wgt_global} and \code{exp_local}=\code{exp_global}
-\item "factorial":
+\item \code{"factorial"}:
 tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
 }
 

@@ -54,15 +54,19 @@ calc_sign_prec <- function(truth, estim) {
 #'
 #' @param n0
 #' number of training observations
+#' (positive integer)
 #'
 #' @param n1
 #' number of testing observations
+#' (positive integer)
 #'
 #' @param n_group
 #' number of variable groups
+#' (positive integer)
 #'
 #' @param n_type
 #' number of variable types
+#' (positive integer)
 #'
 #' @param size_group
 #' size of variable groups (per variable type):
@@ -274,7 +278,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 #' numeric \eqn{p}-dimensional vector
 #'
 #' @param n
-#' integer or \code{NULL}
+#' positive integer or \code{NULL}
 #'
 #' @param factor
 #' non-negative scalar (default: `factor=1`)

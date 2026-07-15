@@ -20,11 +20,14 @@ indicates whether information should be transferred
 from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 }}
 
-\item{j}{index of predictor}
+\item{j}{index of predictor
+(positive integer between \eqn{1} and \eqn{p})}
 
-\item{p}{number of predictors}
+\item{p}{number of predictors
+(positive integer)}
 
-\item{names}{names of predictors}
+\item{names}{names of predictors
+(character vector of length \eqn{p})}
 }
 \value{
 Returns a logical vector of length \eqn{p}.

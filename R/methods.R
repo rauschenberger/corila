@@ -613,6 +613,9 @@ nobs.cv.corila <- function(object, ...) {
 #' @details
 #' This function is called by [residuals.cv.corila()].
 #'
+#' @return
+#' Returns an \eqn{n}-dimensional vector.
+#'
 #' @examples
 #' n <- 10
 #' y_obs <- stats::rbinom(n = n, size = 1, prob = 0.2)

@@ -28,7 +28,8 @@ multiridge(
 
 \item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
 
-\item{nfolds}{integer specifying the number of folds}
+\item{nfolds}{positive integer specifying the number of folds
+(minimum \eqn{3}, maximum \eqn{n})}
 
 \item{penalties}{\eqn{q}-dimensional vector of penalty parameters,
 or \code{NULL} (cross-validation)}

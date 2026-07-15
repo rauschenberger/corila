@@ -61,6 +61,7 @@ urlchecker::url_check()
 x <- pkgcheck::pkgcheck(goodpractice=FALSE)
 notes <- autotest::autotest_package(exclude=c("F1","F2"),test=TRUE)
 notes <- autotest::autotest_package(test=TRUE)
+data.frame(notes)[which(notes$type == "error"),c("type", "test_name", "fn_name", "parameter", "parameter_type", "operation", "content")]
 #srr::srr_stats_roxygen(category = c("ml", "regression"))
 
 #devtools::install()

@@ -13,7 +13,7 @@
 
 \item{beta}{numeric \eqn{p}-dimensional vector}
 
-\item{n}{integer or \code{NULL}}
+\item{n}{positive integer or \code{NULL}}
 
 \item{factor}{non-negative scalar (default: \code{factor=1})
 for multiplying the linear predictor

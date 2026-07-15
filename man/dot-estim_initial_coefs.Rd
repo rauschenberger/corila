@@ -60,7 +60,8 @@ from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 
 \item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
 
-\item{nfolds}{integer specifying the number of folds}
+\item{nfolds}{positive integer specifying the number of folds
+(minimum \eqn{3}, maximum \eqn{n})}
 
 \item{lambda}{numeric scalar, or \code{NULL}
 (determined by cross-validation)}
@@ -79,11 +80,14 @@ for an initial lasso, ridge, or elastic net regression,
 or \code{\link[stats:cor]{stats::cor()}} for initial correlation coefficients.
 }
 \examples{
+# simulate data
 n <- 20
 p <- 10
 x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
 y <- drop(x \%*\% beta)
+
+# initial correlation coefficients
 corila:::.estim_initial_coefs(x = x,
                               y = y,
                               family = "gaussian",
@@ -92,6 +96,26 @@ corila:::.estim_initial_coefs(x = x,
                               foldid = NULL,
                               nfolds = 10,
                               lambda = NULL)
+
+# initial regression coefficients (cross-validating lambda)
+corila:::.estim_initial_coefs(x = x,
+                              y = y,
+                              family = "gaussian",
+                              alpha_init = 0,
+                              group = NULL,
+                              foldid = NULL,
+                              nfolds = 10,
+                              lambda = NULL)
+                              
+# initial regression coefficients (using fixed lambda)
+corila:::.estim_initial_coefs(x = x,
+                              y = y,
+                              family = "gaussian",
+                              alpha_init = 0,
+                              group = NULL,
+                              foldid = NULL,
+                              nfolds = 10,
+                              lambda = 0.2)
 
 }
 \keyword{internal}

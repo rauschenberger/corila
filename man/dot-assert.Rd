@@ -6,7 +6,7 @@
 \usage{
 .assert(
   x,
-  type,
+  type = "numeric",
   dim = 1L,
   na.rm = FALSE,
   support = NULL,
@@ -18,10 +18,10 @@
 \arguments{
 \item{x}{scalar, vector, matrix, or array to be checked}
 
-\item{type}{character \code{"numeric"}, \code{"integer"},
+\item{type}{character \code{"numeric"} (default), \code{"integer"},
 \code{"nominal"}, or \code{"logical"}}
 
-\item{dim}{dimensionality:
+\item{dim}{vector containing positive integers defining the dimensionality:
 \code{dim = 1} for a scalar,
 \code{dim = Inf} for a vector of arbitrary length,
 \code{dim = c(Inf, Inf)} for a matrix of arbitrary dimensions,

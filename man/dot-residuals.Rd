@@ -13,6 +13,9 @@
 
 \item{family}{character \code{"gaussian"}, \code{"binomial"}, or \code{"poisson"}}
 }
+\value{
+Returns an \eqn{n}-dimensional vector.
+}
 \description{
 Calculates the deviance residuals.
 }
