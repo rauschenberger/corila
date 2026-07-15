@@ -61,6 +61,7 @@
 #' @srrstats {G2.15} *rejects missing values by default*
 #' @srrstats {G2.3a} *rejects unexpected values*
 #' @srrstats {G2.13} *checks for missing data*
+#' @srrstats {RE1.4} *tests assumptions for input data*
 #'
 .assert <- function(x, type, dim = 1L, na.rm = FALSE,
                     support = NULL, family = NULL, min = -Inf, max = Inf) {

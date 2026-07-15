@@ -104,8 +104,9 @@ tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
 
 \item{na_action}{character \code{"error"} to trigger an error
 if any observation has a missing predictor or a missing response
-or \code{"complete_cases"} to omit observations
-with a missing predictor or a missing response}
+or \code{"complete_cases"} to exclude observations
+with a missing predictor or a missing response from model fitting
+(while providing fitted values for these observations)}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
 be suppressed? logical}

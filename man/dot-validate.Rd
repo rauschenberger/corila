@@ -24,8 +24,9 @@
 \arguments{
 \item{na_action}{character \code{"error"} to trigger an error
 if any observation has a missing predictor or a missing response
-or \code{"complete_cases"} to omit observations
-with a missing predictor or a missing response}
+or \code{"complete_cases"} to exclude observations
+with a missing predictor or a missing response from model fitting
+(while providing fitted values for these observations)}
 
 \item{x}{\eqn{n_0 \times p} predictor matrix,
 containing only numerical values (continuous, integer, or binary),

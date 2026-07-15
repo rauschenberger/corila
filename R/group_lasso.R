@@ -99,8 +99,9 @@
 #' @param na_action
 #' character `"error"` to trigger an error
 #' if any observation has a missing predictor or a missing response
-#' or `"complete_cases"` to omit observations
-#' with a missing predictor or a missing response
+#' or `"complete_cases"` to exclude observations
+#' with a missing predictor or a missing response from model fitting
+#' (while providing fitted values for these observations)
 #'
 #' @param silent
 #' Should messages from [glmnet::glmnet()] and [glmnet::cv.glmnet()]
@@ -224,10 +225,13 @@
 #' @srrstats {G2.14} *uses argument na_action*
 #' @srrstats {G2.14a} *to trigger an error on missing data*
 #' @srrstats {G2.14b} *to ignore observations with missing data*
-#' @srrstatsTODO {G2.16} *provides option to handle undefined values*
+#' @srrstats {G2.16} *provides option to handle undefined values*
+#' @srrstats {RE2.1} *documents parameter controlling missing values*
+#' @srrstats {RE2.2} *can fit values for observations with missing response*
 #' @srrstats {G3.0} *equality comparisons between integers, or approximate*
 #' @srrstats {RE1.2} *documents expected format of predictors*
-#' @srrstatsTODO {RE1.3} *retains names of observations and predictors*
+#' @srrstats {RE1.3} *retains names of observations and predictors*
+#' @srrstats {RE1.4} *documents assumptions for input data*
 #' @srrstats {RE3.1} *convergence messages can be suppressed (@param silent)*
 #' @srrstats {RE4.0} *returns a "model" object (@return)*
 #' @srrstats {RE4.8} *returns response variable in slot "y_obs"*

@@ -343,7 +343,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 ## complete case analysis ------------------------------------------------------
 
-testthat::test_that("complete case analysis works", {
+#' @srrstats {RE2.2} *processing missing values in predictor and response data*
+
+testthat::test_that("complete case analysis works with NAs in predictors", {
   family <- "gaussian"
   data <- simulate(family = family)
   foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
@@ -369,18 +371,50 @@ testthat::test_that("complete case analysis works", {
                              expected = fitted(object1)[!missing])
 })
 
+testthat::test_that("complete case analysis works with NAs in response", {
+  family <- "gaussian"
+  data <- simulate(family = family)
+  foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
+  missing <- stats::rbinom(n = nrow(data$x_train), size = 1L, prob = 0.2) == 1L
+  data$y_train[missing] <- NA
+  object0 <- cv.corila(x = data$x_train[!missing, ],
+                       y = data$y_train[!missing],
+                       group = data$group,
+                       family = family,
+                       foldid = foldid[!missing],
+                       na_action = "error")
+  object1 <- cv.corila(x = data$x_train,
+                       y = data$y_train,
+                       group = data$group,
+                       family = family,
+                       foldid = foldid,
+                       na_action = "complete_cases")
+  testthat::expect_identical(object = coef(object0),
+                             expected = coef(object1))
+  testthat::expect_identical(object = predict(object0, newx = data$x_test),
+                             expected = predict(object1, newx = data$x_test))
+  testthat::expect_identical(object = fitted(object0),
+                             expected = fitted(object1)[!missing])
+  testthat::expect_identical(object = predict(object0,
+                                              newx = data$x_train[missing, ]),
+                             expected = fitted(object1)[missing])
+})
 
 ## parameter recovery tests ----------------------------------------------------
 
-set.seed(1)
-n <- 1000
-p <- 10
-x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
-alpha <- stats::rnorm(n = 1)
-beta <- stats::rnorm(n = p)
-y <- as.numeric(x %*% beta)
-testthat::test_that("parameters are recovered", {
-  model <- cv.corila(x = x, y = y, group = seq_len(p))
-  testthat::expect_true(all(abs(coef(model)[-1] - beta) < 0.1))
-})
+#' @srrstats {G5.6a} *parameter recovery tests with defined tolerance*
+#' @srrstats {G5.6b} *parameter recovery tests with multiple random seeds*
 
+for (i in 1:3) {
+  set.seed(i)
+  n <- 1000
+  p <- 10
+  x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
+  alpha <- stats::rnorm(n = 1)
+  beta <- stats::rnorm(n = p)
+  y <- as.numeric(x %*% beta)
+  testthat::test_that("parameters are recovered", {
+    model <- cv.corila(x = x, y = y, group = seq_len(p))
+    testthat::expect_true(all(abs(coef(model)[-1] - beta) < 0.1))
+  })
+}
