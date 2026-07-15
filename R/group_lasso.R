@@ -228,6 +228,7 @@
 #' @srrstats {G2.16} *provides option to handle undefined values*
 #' @srrstats {RE2.1} *documents parameter controlling missing values*
 #' @srrstats {RE2.2} *can fit values for observations with missing response*
+#' @srrstats {G2.6} *one-dimensional inputs are vectorised*
 #' @srrstats {G3.0} *equality comparisons between integers, or approximate*
 #' @srrstats {RE1.2} *documents expected format of predictors*
 #' @srrstats {RE1.3} *retains names of observations and predictors*
@@ -240,6 +241,9 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
                       alpha_final = 1, family = "gaussian",
                       nfolds = 10L, cor = "spearman", tune = "weight",
                       foldid = NULL, na_action = "error", silent = FALSE) {
+  y <- drop(y)
+  group <- drop(group)
+  primary <- drop(primary)
   # match arguments
   family <- match.arg(arg = tolower(family),
                       choices = c("gaussian", "binomial", "poisson", "cox"))
@@ -274,7 +278,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   if (identical(na_action, "complete_cases")) {
     complete <- stats::complete.cases(x = x, y = y)
     if (sum(complete) < 3) {
-      stop("Requires at least 3 complete observations.")
+      stop("Requires at least three complete observations.")
     }
     warning("Ingoring ", sum(!complete), " observations with missing data.")
     #x <- x[complete, ]

@@ -1,6 +1,10 @@
 
 ## function ".validate" --------------------------------------------------------
 
+#' @srrstats {G5.2} *error and warning behaviour is tested*
+#' @srrstats {G5.2b} *error messages are tested*
+#' @srrstats {G5.8} *edge condition tests*
+
 
 n <- 10L
 for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
@@ -25,14 +29,17 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       if (family_data == family_model) {
         next
       } else if (expect_error) {
+        #' @srrstats {G5.8b} *cv.corila rejects unsupported response types*
         testthat::expect_error(
-          cv.corila(x = data$x_train, y = data$y_train, group = data$group,
-                    family = family_model)
+          object = cv.corila(x = data$x_train, y = data$y_train,
+                             group = data$group, family = family_model),
+          regexp = "" #
         )
       } else if (expect_warning) {
         testthat::expect_warning(
-          cv.corila(x = data$x_train, y = data$y_train, group = data$group,
-                    family = family_model)
+          object = cv.corila(x = data$x_train, y = data$y_train,
+                             group = data$group, family = family_model),
+          regexp = "" # Implement warnings for possibly wrong family?
         )
       } else {
         stop("Implement missing tests!")
@@ -42,7 +49,7 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that(".validate rejects wrong group object", {
     group <- list(
       A = data$group > 5,
-      B = array(data = 1L * outer(data$group, data$group, "=="),
+      B = array(data = 2 * outer(data$group, data$group, "=="),
                 dim = c(p, p, 1L)),
       C = lapply(X = unique(data$group),
                  FUN = function(x) as.factor(which(data$group == x)))
@@ -82,6 +89,7 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       regexp = "at least three observations"
     )
   })
+  #' @srrstats {G5.8d} *rejects data outside the scope of the algorithm*
   testthat::test_that("cv.corila rejects data with < 2 predictors", {
     testthat::expect_error(
       object = cv.corila(x = data$x_train[, 0L, drop = FALSE],
@@ -98,19 +106,19 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       regexp = "at least two predictors"
     )
   })
-  # testthat::test_that("cv.corila rejects NA response", {
-  #   data$x_train[1, 1] <- NA
-  #   testthat::expect_error(
-  #     object = cv.corila(x = data$x_train,
-  #                        y = data$y_train,
-  #                        group = data$group,
-  #                        family = family_data,
-  #                        na_action = "complete_cases"),
-  #     regexp = "missing"
-  #   )
-  # })
+  #' @srrstats {G5.8c} *rejects data without complete observations*
+  testthat::test_that("cv.corila rejects NA response", {
+    data$x_train[, 1] <- NA
+    testthat::expect_error(
+      object = cv.corila(x = data$x_train,
+                         y = data$y_train,
+                         group = data$group,
+                         family = family_data,
+                         na_action = "complete_cases"),
+      regexp = "at least three complete observations"
+    )
+  })
 }
-
 
 ## function ".estim_initial_coefs" ---------------------------------------------
 

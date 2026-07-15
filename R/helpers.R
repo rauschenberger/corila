@@ -61,6 +61,7 @@
 #' @srrstats {G2.15} *rejects missing values by default*
 #' @srrstats {G2.3a} *rejects unexpected values*
 #' @srrstats {G2.13} *checks for missing data*
+#' @srrstats {G5.2a} *messages are unique*
 #' @srrstats {RE1.4} *tests assumptions for input data*
 #'
 .assert <- function(x, type, dim = 1L, na.rm = FALSE,
@@ -109,7 +110,7 @@
     "expected binary variable" =
       is.null(family) || family != "binomial" ||
       all(x %in% c(0, 1), na.rm = TRUE),
-    "expected count varaible" =
+    "expected count variable" =
       is.null(family) || family != "poisson" ||
       (all(x %% 1L == 0L, na.rm = TRUE) && all(x >= 0)),
     "expected survival object" =

@@ -402,19 +402,38 @@ testthat::test_that("complete case analysis works with NAs in response", {
 
 ## parameter recovery tests ----------------------------------------------------
 
+#' @srrstats {G5.6} *parameter recovery test*
 #' @srrstats {G5.6a} *parameter recovery tests with defined tolerance*
 #' @srrstats {G5.6b} *parameter recovery tests with multiple random seeds*
+#' @srrstats {G5.7} *algorithm performance test (sample size -> estim error)*
+#' @srrstats {G5.4} *correctness test with glmnet*
+#' @srrstats {G5.4a} *trivial comparison in setting without groups*
 
 for (i in 1:3) {
   set.seed(i)
-  n <- 1000
+  n <- 100
   p <- 10
   x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
   alpha <- stats::rnorm(n = 1)
   beta <- stats::rnorm(n = p)
   y <- as.numeric(x %*% beta)
+  foldid <- sample(1:10, size = n, replace = TRUE)
+  glmnet <- glmnet::cv.glmnet(x = x, y = y, foldid = foldid)
+  model0 <- cv.corila(x = x[1:(n / 4), ], y = y[1:(n / 4)], group = seq_len(p))
+  model1 <- cv.corila(x = x, y = y, group = seq_len(p), foldid = foldid)
+  diff0 <- abs(coef(model0)[-1] - beta)
+  diff1 <- abs(coef(model1)[-1] - beta)
   testthat::test_that("parameters are recovered", {
-    model <- cv.corila(x = x, y = y, group = seq_len(p))
-    testthat::expect_true(all(abs(coef(model)[-1] - beta) < 0.1))
+    testthat::expect_true(all(diff0 < 0.1))
+  })
+  testthat::test_that("parameters are recovered", {
+    testthat::expect_true(all(diff1 < 0.1))
+  })
+  testthat::test_that("parameters are similar to reference", {
+    testthat::expect_true(all(abs(coef(glmnet) - coef(model1)) < 0.05))
+  })
+  testthat::test_that("performance increases with sample size", {
+    testthat::expect_gte(object = mean(diff1 < diff0), expected = 0.5)
+    testthat::expect_lt(object = mean(diff1), expected = mean(diff0))
   })
 }

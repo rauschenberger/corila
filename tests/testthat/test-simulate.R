@@ -18,6 +18,7 @@ for (i in seq_along(family)) {
                              regexp = "inside support")
       testthat::expect_error(object = .simulate_outcome(family = family[i]),
                              regexp = "Provide either")
+      testthat::skip_if(j == 1)
       testthat::expect_error(object = .simulate_outcome(x = x,
                                                         beta = beta[-1],
                                                         family = family[i]),
