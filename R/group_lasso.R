@@ -804,7 +804,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
 #' y <- drop(x %*% beta)
-#' 
+#'
 #' # initial correlation coefficients
 #' corila:::.estim_initial_coefs(x = x,
 #'                               y = y,
@@ -824,7 +824,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'                               foldid = NULL,
 #'                               nfolds = 10,
 #'                               lambda = NULL)
-#'                               
+#'                      
 #' # initial regression coefficients (using fixed lambda)
 #' corila:::.estim_initial_coefs(x = x,
 #'                               y = y,
@@ -980,7 +980,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       stop("The list 'group' should have slots of type numeric or character.")
     }
   } else if (is.matrix(group)) {
-    .assert(x = group, type = "integer", dim = c(p, p), support = c(0, 1))
+    .assert(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)
     group[, j] == 1L
   } else {
     stop("Argument 'group' should be a vector, a list, or a matrix.")
