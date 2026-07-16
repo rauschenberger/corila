@@ -21,7 +21,7 @@ i.e., the proportion of positive or negative estimated signs
 that match the true sign.
 }
 \examples{
-\donshow{calc_sign_prec <- corila:::calc_sign_prec}
+\dontshow{calc_sign_prec <- corila:::calc_sign_prec}
 truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 calc_sign_prec(truth = truth, estim = estim) # observed value

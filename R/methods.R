@@ -621,15 +621,15 @@ nobs.cv.corila <- function(object, ...) {
 #' @examples
 #' \dontshow{.residuals <- corila:::.residuals}
 #' n <- 10L
-#' 
+#'
 #' y_obs <- stats::rnorm(n = n)
 #' y_fit <- stats::rnorm(n = n)
 #' .residuals(y_obs = y_obs, y_fit = y_fit, family = "gaussian")
-#' 
+#'
 #' y_obs <- stats::rbinom(n = n, size = 1L, prob = 0.2)
 #' y_fit <- stats::runif(n = n)
 #' .residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
-#' 
+#'
 #' y_obs <- stats::rpois(n = n, lambda = 4)
 #' y_fit <- stats::rexp(n = n, rate = 0.25)
 #' .residuals(y_obs = y_obs, y_fit = y_fit, family = "poisson")
@@ -668,9 +668,10 @@ nobs.cv.corila <- function(object, ...) {
 #' Names the method used for obtaining initial or final coefficients.
 #'
 #' @param alpha
-#' elastic net mixing parameter or character string
-#' (see `alpha_init` and `alpha_final`
-#' in [cv.corila()])
+#' elastic net mixing parameter
+#' (numeric scalar, minimum \eqn{0} for ridge, maximum \eqn{1} for lasso)
+#' or character string
+#' (see `alpha_init` and `alpha_final` in [cv.corila()])
 #'
 #' @return
 #' Returns a character string
@@ -683,7 +684,7 @@ nobs.cv.corila <- function(object, ...) {
 #'
 #' @examples
 #' \dontshow{.type <- corila:::.type}
-#' .type(alpha = 0)
+#' .type(alpha = 0.0)
 #'
 #' @keywords internal
 #'
@@ -691,11 +692,11 @@ nobs.cv.corila <- function(object, ...) {
   if (is.na(alpha)) {
     "none"
   } else if (is.numeric(alpha)) {
-    if (alpha == 0) {
+    if (alpha == 0.0) {
       "ridge regression"
-    } else if (alpha == 1) {
+    } else if (alpha == 1.0) {
       "lasso regression"
-    } else if (alpha > 0 && alpha < 1) {
+    } else if (alpha > 0.0 && alpha < 1.0) {
       "elastic net regression"
     } else {
       stop("If argument 'alpha' is numeric, ",

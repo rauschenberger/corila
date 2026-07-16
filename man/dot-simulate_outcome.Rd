@@ -15,7 +15,7 @@
 
 \item{n}{positive integer or \code{NULL}}
 
-\item{factor}{non-negative scalar (default: \code{factor=1})
+\item{factor}{non-negative numeric scalar (default: \code{factor=1.0})
 for multiplying the linear predictor
 (to increase or decrease the signal strength)}
 }
@@ -28,14 +28,14 @@ Simulates outcome vector.
 \examples{
 \dontshow{.simulate_outcome <- corila:::.simulate_outcome}
 # simulate independent outcome
-.simulate_outcome(family = "gaussian", n = 10)
+.simulate_outcome(family = "gaussian", n = 10L, factor = 1.0)
 
 # simulate dependent outcome
-n <- 10
-p <- 20
+n <- 10L
+p <- 20L
 x <- matrix(rnorm(n * p), n, p)
 beta <- rnorm(p)
-.simulate_outcome(family = "gaussian", x = x, beta = beta)
+.simulate_outcome(family = "gaussian", x = x, beta = beta, factor = 1.0)
 
 }
 \seealso{

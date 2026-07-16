@@ -22,7 +22,7 @@
 #' or `NA` if all estimated signs equal 0.
 #'
 #' @examples
-#' \donshow{calc_sign_prec <- corila:::calc_sign_prec}
+#' \dontshow{calc_sign_prec <- corila:::calc_sign_prec}
 #' truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 #' estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 #' calc_sign_prec(truth = truth, estim = estim) # observed value
@@ -282,7 +282,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 #' positive integer or \code{NULL}
 #'
 #' @param factor
-#' non-negative scalar (default: `factor=1`)
+#' non-negative numeric scalar (default: `factor=1.0`)
 #' for multiplying the linear predictor
 #' (to increase or decrease the signal strength)
 #'
@@ -298,23 +298,23 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 #' @examples
 #' \dontshow{.simulate_outcome <- corila:::.simulate_outcome}
 #' # simulate independent outcome
-#' .simulate_outcome(family = "gaussian", n = 10)
+#' .simulate_outcome(family = "gaussian", n = 10L, factor = 1.0)
 #'
 #' # simulate dependent outcome
-#' n <- 10
-#' p <- 20
+#' n <- 10L
+#' p <- 20L
 #' x <- matrix(rnorm(n * p), n, p)
 #' beta <- rnorm(p)
-#' .simulate_outcome(family = "gaussian", x = x, beta = beta)
+#' .simulate_outcome(family = "gaussian", x = x, beta = beta, factor = 1.0)
 #'
 .simulate_outcome <- function(family, x = NULL, beta = NULL, n = NULL,
-                              factor = 1) {
+                              factor = 1.0) {
   if (is.character(family)) family <- tolower(family)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = beta, type = "numeric", dim = ncol(x))
-  .assert(x = n, type = "integer", min = 1)
+  .assert(x = n, type = "integer", min = 1L)
   .assert(x = factor, type = "numeric", min = 0)
   if (!is.null(x) && !is.null(beta) && is.null(n)) {
     eta <- as.numeric(scale(x %*% as.vector(beta))) # was without scale
@@ -327,10 +327,10 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
   if (identical(family, "gaussian")) {
     factor * eta + stats::rnorm(n = n, sd = 1)
   } else if (identical(family, "binomial")) {
-    stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-factor * eta)))
+    stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-factor * eta)))
   } else if (identical(family, "cox")) {
     time <- stats::rexp(n = n, rate = exp(factor * eta))
-    status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+    status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
     survival::Surv(time = time, event = status)
   } else if (identical(family, "poisson")) {
     stats::rpois(n = n, lambda = exp(factor * eta))

@@ -60,8 +60,22 @@ urlchecker::url_check()
 
 x <- pkgcheck::pkgcheck(goodpractice=FALSE)
 notes <- autotest::autotest_package(exclude=c("F1","F2"),test=TRUE)
-notes <- autotest::autotest_package(test=TRUE)
+
+functions <- c("calc_sign_prec","cv.corila",".assert",".combine_slopes",".deviance",".estim_initial_coefs",".expand_auxiliary",".folds",".is_adjacent",".mean_function",".residuals",".set_candidates",".simulate_outcome",".type")
+notes <- list()
+for(i in seq_along(functions)){
+  notes[[i]] <- autotest::autotest_package(functions = functions[i],test=TRUE)
+}
+
+notes <- autotest::autotest_package(exclude = ".folds",test=TRUE)
 data.frame(notes)[which(notes$type == "error"),c("type", "test_name", "fn_name", "parameter", "parameter_type", "operation", "content")]
+data.frame(notes)[which(notes$fn_name==".is_adjacent"),][1,]
+notes[notes$content=="is case dependent",]
+
+data.frame(notes[notes$fn_name==".deviance",])
+
+note <- autotest::autotest_package(functions=".simulate_outcome",test=TRUE)
+
 #srr::srr_stats_roxygen(category = c("ml", "regression"))
 
 #devtools::install()

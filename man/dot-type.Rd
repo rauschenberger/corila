@@ -7,9 +7,10 @@
 .type(alpha)
 }
 \arguments{
-\item{alpha}{elastic net mixing parameter or character string
-(see \code{alpha_init} and \code{alpha_final}
-in \code{\link[=cv.corila]{cv.corila()}})}
+\item{alpha}{elastic net mixing parameter
+(numeric scalar, minimum \eqn{0} for ridge, maximum \eqn{1} for lasso)
+or character string
+(see \code{alpha_init} and \code{alpha_final} in \code{\link[=cv.corila]{cv.corila()}})}
 }
 \value{
 Returns a character string
@@ -22,7 +23,7 @@ Names the method used for obtaining initial or final coefficients.
 }
 \examples{
 \dontshow{.type <- corila:::.type}
-.type(alpha = 0)
+.type(alpha = 0.0)
 
 }
 \seealso{

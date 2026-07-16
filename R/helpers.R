@@ -74,12 +74,13 @@
 #'
 .assert <- function(x = NULL, type = "numeric", dim = 1L, na.rm = FALSE,
                     support = NULL, family = NULL, min = -Inf, max = Inf) {
+  eps <- 1e-06
   if (is.null(x)) return(invisible(NULL))
   if (is.character(type)) type <- tolower(type)
   if (is.character(family)) family <- tolower(family)
   stopifnot(
     "require argument 'type' to be a character scalar" =
-      length(type) == 1L && is.character(type),
+      length(type) == 1L && is.character(type) && !is.na(type),
     "require argument 'support' to be a character vector" =
       is.null(support) || (is.character(support) && is.atomic(support)),
     "require argument support = NULL unless argument type = 'nominal'" =
@@ -87,13 +88,14 @@
     "require argument 'family' to be a character scalar" =
       is.null(family) || (is.character(family) && length(family) == 1L),
     "require argument 'dim' to be an integer vector" =
-      is.atomic(dim) && all(dim > 0) && all(dim %% 1L == 0L | is.infinite(dim)),
+      is.atomic(dim) && all(dim > 0) &&
+      all(abs(dim - round(dim)) < eps | is.infinite(dim)),
     "require argument 'na.rm' to be a logical scalar" =
       length(na.rm) == 1L && is.logical(na.rm) && !is.na(na.rm),
     "require argument 'min' to be a numeric scalar" =
-      length(min) == 1L && is.numeric(min),
+      length(min) == 1L && is.numeric(min) && !is.na(min),
     "require argument 'max' to be a numeric scalar" =
-      length(max) == 1L && is.numeric(max)
+      length(max) == 1L && is.numeric(max) && !is.na(max)
   )
   type <- match.arg(arg = type,
                     choices = c("numeric", "integer", "nominal", "logical"))
@@ -121,7 +123,7 @@
       !type %in% c("numeric", "integer") ||
       is.numeric(x) || (na.rm && all(is.na(x))),
     "expected integer values" =
-      type != "integer" || all(x %% 1L == 0L, na.rm = TRUE),
+      type != "integer" || all(abs(x - round(x)) < eps, na.rm = TRUE),
     "expected nominal values" =
       type != "nominal" || is.character(x),
     "expected logical values" =
@@ -129,15 +131,15 @@
     "expected values inside support" =
       type != "nominal" || is.null(support) || all(x[!is.na(x)] %in% support),
     "expected values greater than or equal to minimum" =
-      type == "nominal" || min == -Inf || all(x >= min, na.rm = TRUE),
+      type == "nominal" || min == -Inf || all(x >= min - eps, na.rm = TRUE),
     "expected values less than or equal to maximum" =
-      type == "nominal" || max == Inf || all(x <= max, na.rm = TRUE),
+      type == "nominal" || max == Inf || all(x <= max + eps, na.rm = TRUE),
     "expected binary variable" =
       is.null(family) || family != "binomial" ||
-      all(x %in% c(0, 1), na.rm = TRUE),
+      all((x > -eps & x < eps) | (x > 1 - eps & x < 1 + eps), na.rm = TRUE),
     "expected count variable" =
       is.null(family) || family != "poisson" ||
-      (all(x %% 1L == 0L, na.rm = TRUE) && all(x >= 0)),
+      (all(abs(x - round(x)) < eps, na.rm = TRUE) && all(x >= -eps)),
     "expected survival object" =
       is.null(family) || family != "cox" || inherits(x = x, what = "Surv")
   )
@@ -462,6 +464,7 @@
   #  stop("Require object of class 'Surv'.")
   #}
   .assert(x = nfolds, type = "integer", min = 2L, max = length(y))
+  nfolds <- as.integer(nfolds)
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
     if (identical(family, "cox")) {
@@ -522,7 +525,7 @@
 #'
 #' @description
 #' Calculates the deviance.
-#' 
+#'
 #' @inheritParams cv.corila y family
 #'
 #' @param y_hat
@@ -531,7 +534,7 @@
 #' with entries on the real range (`family="gaussian"` or `family="cox"`),
 #' in the unit interval (`family="binomial"`),
 #' or on the non-negative real range (`family="poisson"`)
-#' 
+#'
 #' @return
 #' Returns the deviance (a numeric scalar).
 #'
@@ -565,9 +568,11 @@
   .assert(x = y, type = "numeric", dim = Inf, family = family)
   if (identical(family, "binomial")) {
     .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
+    y <- as.integer(y)
     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
   } else if (identical(family, "poisson")) {
     .assert(x = y, type = "integer", dim = Inf, min = 0L)
+    y <- as.integer(y)
     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0)
   } else {
     .assert(x = y, type = "numeric", dim = Inf)
@@ -578,7 +583,7 @@
   if (identical(family, "gaussian")) {
     2 * mean((y - y_hat)^2)
   } else if (identical(family, "binomial")) {
-    mean(
+    2 * mean(
       -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
     )
   } else if (identical(family, "poisson")) {

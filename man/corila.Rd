@@ -111,14 +111,14 @@ that allows for heterogeneous, overlapping and unknown groups
 of correlated variables.
 }
 \details{
-The number of observations (samples) for training or testing
+The numbers of observations (samples) for training or testing
 are indicated by \eqn{n_0} and \eqn{n_1}, respectively,
-the number of variables (features) is indicated by \eqn{p},
-and the number of variable groups is indicated by \eqn{q}.
-Observations (samples) are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
-variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
-and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
-The number of variables in the \eqn{k^{\text{th}}} group
+the number of predictors (features) is indicated by \eqn{p},
+and the number of predictor group is indicated by \eqn{q}.
+Observations are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
+predictors are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
+and predictor groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
+The number of predictors in the \eqn{k^{\text{th}}} group
 is indicated by \eqn{p_k},
 with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 }

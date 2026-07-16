@@ -802,13 +802,20 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' [multiridge()] for an initial multi-penalty ridge regression,
 #' or [stats::cor()] for initial correlation coefficients.
 #'
+#' @return
+#' Returns a list with two slots:
+#' - `coef`: numeric vector of length \eqn{p}
+#'   (estimated coefficients)
+#' - `lambda`: non-negative numeric scalar
+#'   (optimised regularisation parameter) or `NULL`
+#'
 #' @examples
 #' \dontshow{.estim_initial_coefs <- corila:::.estim_initial_coefs}
 #' # simulate data
-#' n <- 20
-#' p <- 10
+#' n <- 20L
+#' p <- 10L
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
-#' beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
+#' beta <- rbinom(n = p, size = 1L, prob = 0.5) * rnorm(p)
 #' y <- drop(x %*% beta)
 #'
 #' # initial correlation coefficients
@@ -818,17 +825,18 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'                      alpha_init = "spearman",
 #'                      group = NULL,
 #'                      foldid = NULL,
-#'                      nfolds = 10,
+#'                      nfolds = 10L,
 #'                      lambda = NULL)
 #'
 #' # initial regression coefficients (cross-validating lambda)
+#' foldid <- sample(seq_len(10L), size = n, replace = TRUE)
 #' .estim_initial_coefs(x = x,
 #'                      y = y,
 #'                      family = "gaussian",
 #'                      alpha_init = 0,
 #'                      group = NULL,
-#'                      foldid = NULL,
-#'                      nfolds = 10,
+#'                      foldid = foldid,
+#'                      nfolds = 10L,
 #'                      lambda = NULL)
 #'
 #' # initial regression coefficients (using fixed lambda)
@@ -838,7 +846,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'                      alpha_init = 0,
 #'                      group = NULL,
 #'                      foldid = NULL,
-#'                      nfolds = 10,
+#'                      nfolds = 10L,
 #'                      lambda = 0.2)
 #'
 #' @keywords internal
