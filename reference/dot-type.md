@@ -12,7 +12,8 @@ Names the method used for obtaining initial or final coefficients.
 
 - alpha:
 
-  elastic net mixing parameter or character string (see `alpha_init` and
+  elastic net mixing parameter (numeric scalar, minimum \\0\\ for ridge,
+  maximum \\1\\ for lasso) or character string (see `alpha_init` and
   `alpha_final` in
   [`cv.corila()`](https://rauschenberger.github.io/corila/reference/cv.corila.md))
 
@@ -30,6 +31,6 @@ This function is called by
 ## Examples
 
 ``` r
-.type(alpha = 0)
+.type(alpha = 0.0)
 #> [1] "ridge regression"
 ```

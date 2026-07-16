@@ -133,6 +133,13 @@ be suppressed? (<code>FALSE</code> or <code>TRUE</code>)</p></dd>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Returns a list with two slots:</p><ul><li><p><code>coef</code>: numeric vector of length \(p\)
+(estimated coefficients)</p></li>
+<li><p><code>lambda</code>: non-negative numeric scalar
+(optimised regularisation parameter) or <code>NULL</code></p></li>
+</ul></div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function is called by <code><a href="corila.html">corila()</a></code>.
 It calls <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code> or <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code>
@@ -144,10 +151,10 @@ or <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats:
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># simulate data</span></span></span>
-<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
-<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">20L</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">10L</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">p</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">p</span>, size <span class="op">=</span> <span class="fl">1L</span>, prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># initial correlation coefficients</span></span></span>
@@ -157,7 +164,7 @@ or <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats:
 <span class="r-in"><span>                     alpha_init <span class="op">=</span> <span class="st">"spearman"</span>,</span></span>
 <span class="r-in"><span>                     group <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
 <span class="r-in"><span>                     foldid <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>                     nfolds <span class="op">=</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>                     nfolds <span class="op">=</span> <span class="fl">10L</span>,</span></span>
 <span class="r-in"><span>                     lambda <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coef</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.04210526  0.58947368 -0.38646617  0.26466165  0.04511278 -0.13834586</span>
@@ -168,14 +175,16 @@ or <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats:
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># initial regression coefficients (cross-validating lambda)</span></span></span>
+<span class="r-in"><span><span class="va">foldid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">10L</span><span class="op">)</span>, size <span class="op">=</span> <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">.estim_initial_coefs</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>,</span></span>
 <span class="r-in"><span>                     y <span class="op">=</span> <span class="va">y</span>,</span></span>
 <span class="r-in"><span>                     family <span class="op">=</span> <span class="st">"gaussian"</span>,</span></span>
 <span class="r-in"><span>                     alpha_init <span class="op">=</span> <span class="fl">0</span>,</span></span>
 <span class="r-in"><span>                     group <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>                     foldid <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>                     nfolds <span class="op">=</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>                     foldid <span class="op">=</span> <span class="va">foldid</span>,</span></span>
+<span class="r-in"><span>                     nfolds <span class="op">=</span> <span class="fl">10L</span>,</span></span>
 <span class="r-in"><span>                     lambda <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>number of rows of result is not a multiple of vector length (arg 1)</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coef</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.02515595  1.04723119 -0.36371329  0.07573726  0.05057138 -0.03498746</span>
@@ -192,7 +201,7 @@ or <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats:
 <span class="r-in"><span>                     alpha_init <span class="op">=</span> <span class="fl">0</span>,</span></span>
 <span class="r-in"><span>                     group <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
 <span class="r-in"><span>                     foldid <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>                     nfolds <span class="op">=</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>                     nfolds <span class="op">=</span> <span class="fl">10L</span>,</span></span>
 <span class="r-in"><span>                     lambda <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coef</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.02760918  1.03400885 -0.36489326  0.08274210  0.05476363 -0.03841544</span>

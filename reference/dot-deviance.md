@@ -53,7 +53,7 @@ y_hat <- rnorm(n)
 y <- rbinom(n = n, size = 1, prob = 0.5)
 y_hat <- runif(n)
 .deviance(y = y , y_hat = y_hat, family = "binomial")
-#> [1] 1.331855
+#> [1] 2.66371
 
 y <- rpois(n = n, lambda = 4)
 y_hat <- rexp(n)

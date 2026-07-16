@@ -88,6 +88,15 @@ Estimate initial coefficients.
   [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
   be suppressed? (`FALSE` or `TRUE`)
 
+## Value
+
+Returns a list with two slots:
+
+- `coef`: numeric vector of length \\p\\ (estimated coefficients)
+
+- `lambda`: non-negative numeric scalar (optimised regularisation
+  parameter) or `NULL`
+
 ## Details
 
 This function is called by
@@ -106,10 +115,10 @@ correlation coefficients.
 
 ``` r
 # simulate data
-n <- 20
-p <- 10
+n <- 20L
+p <- 10L
 x <- matrix(rnorm(n * p), nrow = n, ncol = p)
-beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
+beta <- rbinom(n = p, size = 1L, prob = 0.5) * rnorm(p)
 y <- drop(x %*% beta)
 
 # initial correlation coefficients
@@ -119,7 +128,7 @@ y <- drop(x %*% beta)
                      alpha_init = "spearman",
                      group = NULL,
                      foldid = NULL,
-                     nfolds = 10,
+                     nfolds = 10L,
                      lambda = NULL)
 #> $coef
 #>  [1] -0.04210526  0.58947368 -0.38646617  0.26466165  0.04511278 -0.13834586
@@ -130,14 +139,16 @@ y <- drop(x %*% beta)
 #> 
 
 # initial regression coefficients (cross-validating lambda)
+foldid <- sample(seq_len(10L), size = n, replace = TRUE)
 .estim_initial_coefs(x = x,
                      y = y,
                      family = "gaussian",
                      alpha_init = 0,
                      group = NULL,
-                     foldid = NULL,
-                     nfolds = 10,
+                     foldid = foldid,
+                     nfolds = 10L,
                      lambda = NULL)
+#> Warning: number of rows of result is not a multiple of vector length (arg 1)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
 #> $coef
 #>  [1] -0.02515595  1.04723119 -0.36371329  0.07573726  0.05057138 -0.03498746
@@ -154,7 +165,7 @@ y <- drop(x %*% beta)
                      alpha_init = 0,
                      group = NULL,
                      foldid = NULL,
-                     nfolds = 10,
+                     nfolds = 10L,
                      lambda = 0.2)
 #> $coef
 #>  [1] -0.02760918  1.03400885 -0.36489326  0.08274210  0.05476363 -0.03841544

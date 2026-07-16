@@ -70,7 +70,7 @@
 
 
 <dt id="arg-factor">factor<a class="anchor" aria-label="anchor" href="#arg-factor"></a></dt>
-<dd><p>non-negative scalar (default: <code>factor=1</code>)
+<dd><p>non-negative numeric scalar (default: <code>factor=1.0</code>)
 for multiplying the linear predictor
 (to increase or decrease the signal strength)</p></dd>
 
@@ -88,16 +88,16 @@ an effect vector, and an outcome vector.</p></div>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># simulate independent outcome</span></span></span>
-<span class="r-in"><span><span class="fu">.simulate_outcome</span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">.simulate_outcome</span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>, n <span class="op">=</span> <span class="fl">10L</span>, factor <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.01630106  0.48985659 -0.08067527 -0.12074474 -1.00545767 -0.76637666</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.41149538  0.21176267  0.22923896 -0.72947843</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># simulate dependent outcome</span></span></span>
-<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
-<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10L</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">20L</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">.simulate_outcome</span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>, x <span class="op">=</span> <span class="va">x</span>, beta <span class="op">=</span> <span class="va">beta</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">.simulate_outcome</span><span class="op">(</span>family <span class="op">=</span> <span class="st">"gaussian"</span>, x <span class="op">=</span> <span class="va">x</span>, beta <span class="op">=</span> <span class="va">beta</span>, factor <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -1.90096148  1.12334430  0.76754954 -0.10134765 -1.33034655  0.06386416</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -1.54369537 -1.43104691 -1.70874831  0.07181430</span>
 <span class="r-in"><span></span></span>

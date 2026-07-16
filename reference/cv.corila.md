@@ -163,15 +163,14 @@ slots:
 
 ## Details
 
-The number of observations (samples) for training or testing are
-indicated by \\n_0\\ and \\n_1\\, respectively, the number of variables
-(features) is indicated by \\p\\, and the number of variable groups is
-indicated by \\q\\. Observations (samples) are indexed by \\i\\ in
-\\\\1, \ldots, n\\\\, variables (features) are indexed by \\j\\ in
-\\\\1, \ldots, p\\\\, and variable groups are indexed by \\k\\ in \\\\1,
-\ldots, q\\\\. The number of variables in the \\k^{\text{th}}\\ group is
-indicated by \\p_k\\, with \\\sum\_{k=1}^q p_k = p\\ for non-overlapping
-groups.
+The numbers of observations (samples) for training or testing are
+indicated by \\n_0\\ and \\n_1\\, respectively, the number of predictors
+(features) is indicated by \\p\\, and the number of predictor group is
+indicated by \\q\\. Observations are indexed by \\i\\ in \\\\1, \ldots,
+n\\\\, predictors are indexed by \\j\\ in \\\\1, \ldots, p\\\\, and
+predictor groups are indexed by \\k\\ in \\\\1, \ldots, q\\\\. The
+number of predictors in the \\k^{\text{th}}\\ group is indicated by
+\\p_k\\, with \\\sum\_{k=1}^q p_k = p\\ for non-overlapping groups.
 
 ## References
 
