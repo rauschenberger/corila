@@ -124,8 +124,11 @@ with <code><a href="cv.corila.html">cv.corila()</a></code>.</p></div>
 <span class="r-in"><span>                 nfolds <span class="op">=</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>                 hyper <span class="op">=</span> <span class="va">hyper</span>,</span></span>
 <span class="r-in"><span>                 lambda_init <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to max; returning -Inf</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in glmnet::cv.glmnet(x = x, y = y, family = family, alpha = alpha_init,     foldid = foldid, nfolds = nfolds):</span> nfolds must be bigger than 3; nfolds=10 recommended</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span>, index <span class="op">=</span> <span class="fl">1</span>, s <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'object' not found</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -47,16 +47,16 @@ n <- 10
 
 y <- rnorm(n)
 y_hat <- rnorm(n)
-.deviance(y = y , y_hat = y_hat, family = "gaussian")
+.deviance(y = y, y_hat = y_hat, family = "gaussian")
 #> [1] 2.119926
 
 y <- rbinom(n = n, size = 1, prob = 0.5)
 y_hat <- runif(n)
-.deviance(y = y , y_hat = y_hat, family = "binomial")
+.deviance(y = y, y_hat = y_hat, family = "binomial")
 #> [1] 2.66371
 
 y <- rpois(n = n, lambda = 4)
 y_hat <- rexp(n)
-.deviance(y = y , y_hat = y_hat, family = "poisson")
+.deviance(y = y, y_hat = y_hat, family = "poisson")
 #> [1] 8.916808
 ```
