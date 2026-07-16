@@ -53,7 +53,7 @@ Estimate initial coefficients.
 
 - group:
 
-  group structure (three options):
+  group structure (multiple options):
 
   - \\p\\-dimensional vector of group indices (in \\\\1, \ldots, q\\\\)
     or labels,
@@ -68,7 +68,8 @@ Estimate initial coefficients.
 
 - foldid:
 
-  \\n_0\\-dimensional vector containing the fold identifiers
+  \\n_0\\-dimensional vector containing the fold identifiers (minimum
+  \\1\\, maximum `nfolds`)
 
 - nfolds:
 
@@ -85,7 +86,7 @@ Estimate initial coefficients.
   [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
   and
   [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-  be suppressed? logical
+  be suppressed? (`FALSE` or `TRUE`)
 
 ## Details
 
@@ -112,52 +113,52 @@ beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
 y <- drop(x %*% beta)
 
 # initial correlation coefficients
-corila:::.estim_initial_coefs(x = x,
-                              y = y,
-                              family = "gaussian",
-                              alpha_init = "spearman",
-                              group = NULL,
-                              foldid = NULL,
-                              nfolds = 10,
-                              lambda = NULL)
+.estim_initial_coefs(x = x,
+                     y = y,
+                     family = "gaussian",
+                     alpha_init = "spearman",
+                     group = NULL,
+                     foldid = NULL,
+                     nfolds = 10,
+                     lambda = NULL)
 #> $coef
-#>  [1]  0.14736842  0.35037594 -0.03909774  0.29924812  0.43759398 -0.17293233
-#>  [7]  0.17293233 -0.10977444 -0.72180451  0.14135338
+#>  [1] -0.04210526  0.58947368 -0.38646617  0.26466165  0.04511278 -0.13834586
+#>  [7] -0.32781955  0.18646617 -0.11278195  0.75187970
 #> 
 #> $lambda
 #> NULL
 #> 
 
 # initial regression coefficients (cross-validating lambda)
-corila:::.estim_initial_coefs(x = x,
-                              y = y,
-                              family = "gaussian",
-                              alpha_init = 0,
-                              group = NULL,
-                              foldid = NULL,
-                              nfolds = 10,
-                              lambda = NULL)
+.estim_initial_coefs(x = x,
+                     y = y,
+                     family = "gaussian",
+                     alpha_init = 0,
+                     group = NULL,
+                     foldid = NULL,
+                     nfolds = 10,
+                     lambda = NULL)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
 #> $coef
-#>  [1] -0.01003925  1.87125995 -0.04623964  0.85885005  0.62140233  0.01499372
-#>  [7]  0.06481836  0.03630338 -1.41391759  0.05301106
+#>  [1] -0.02515595  1.04723119 -0.36371329  0.07573726  0.05057138 -0.03498746
+#>  [7] -0.89062638  0.07621415 -0.22428786  1.34885909
 #> 
 #> $lambda
-#> [1] 0.2427865
+#> [1] 0.1763745
 #> 
-                              
+
 # initial regression coefficients (using fixed lambda)
-corila:::.estim_initial_coefs(x = x,
-                              y = y,
-                              family = "gaussian",
-                              alpha_init = 0,
-                              group = NULL,
-                              foldid = NULL,
-                              nfolds = 10,
-                              lambda = 0.2)
+.estim_initial_coefs(x = x,
+                     y = y,
+                     family = "gaussian",
+                     alpha_init = 0,
+                     group = NULL,
+                     foldid = NULL,
+                     nfolds = 10,
+                     lambda = 0.2)
 #> $coef
-#>  [1] -0.01003925  1.87125995 -0.04623964  0.85885005  0.62140233  0.01499372
-#>  [7]  0.06481836  0.03630338 -1.41391759  0.05301106
+#>  [1] -0.02760918  1.03400885 -0.36489326  0.08274210  0.05476363 -0.03841544
+#>  [7] -0.87535485  0.08259835 -0.21968587  1.33762730
 #> 
 #> $lambda
 #> [1] 0.2

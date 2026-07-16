@@ -85,21 +85,21 @@ coef1 <- stats::coef(lm1)
 yhat1 <- predict(lm1, newdata = x[fold == 1, ])
 
 # regression with standardisation
-scale <- corila:::.forescale(x = as.matrix(x)[fold == 0, ],
-                   y = y[fold == 0],
-                   family = family)
+scale <- .forescale(x = as.matrix(x)[fold == 0, ],
+                    y = y[fold == 0],
+                    family = family)
 if (identical(family, "cox")) {
   lm2 <- survival::coxph(scale$y~., data = data.frame(scale$x))
 } else {
   lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
 }
 coef_temp <- stats::coef(lm2)
-newx_temp <- corila:::.forescale(x = as.matrix(x)[fold == 1, ],
-                                 pars = scale$pars)$x
+newx_temp <- .forescale(x = as.matrix(x)[fold == 1, ],
+                        pars = scale$pars)$x
 yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
-result <- corila:::.backscale(pars = scale$pars,
-                              y = yhat_temp,
-                              coef = coef_temp)
+result <- .backscale(pars = scale$pars,
+                     y = yhat_temp,
+                     coef = coef_temp)
 coef2 <- result$coef
 yhat2 <- result$y
 

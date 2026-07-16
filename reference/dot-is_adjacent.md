@@ -12,7 +12,7 @@ Identifies adjacent predictors.
 
 - group:
 
-  group structure (three options):
+  group structure (multiple options):
 
   - \\p\\-dimensional vector of group indices (in \\\\1, \ldots, q\\\\)
     or labels,
@@ -45,23 +45,26 @@ Returns a logical vector of length \\p\\.
 
 This function is called by
 [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md).
+A predictor is adjacent to itself. If argument `group` is a list
+(specifying potentially overlapping groups), two predictors are adjacent
+if they are one or more common groups.
 
 ## Examples
 
 ``` r
-p <- 5
+p <- 5L
 names <- paste0("x", seq_len(p))
 group <- list()
-group$index_vector <- setNames(object = c(1, 1, 2, 2, 3), nm = names)
+group$index_vector <- setNames(object = c(1L, 1L, 2L, 2L, 3L), nm = names)
 group$label_vector <- setNames(object = LETTERS[group$index_vector],
                                  nm = names(group$index_vector))
 group$index_list <- lapply(X = setNames(nm = unique(group$label_vector)),
                      FUN = function(x) which(group$label_vector == x))
 group$label_list <- lapply(group$index_list, names)
-group$matrix <- 1 * outer(X = group$index_vector,
+group$matrix <- 1L * outer(X = group$index_vector,
                           Y = group$index_vector,
                           FUN = "==")
-corila:::.is_adjacent(group = group[[1]], j = 3, p = p, names = names)
+.is_adjacent(group = group[[1]], j = 3L, p = p, names = names)
 #>    x1    x2    x3    x4    x5 
 #> FALSE FALSE  TRUE  TRUE FALSE 
 ```

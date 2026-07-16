@@ -54,7 +54,7 @@ and
 
 - group:
 
-  group structure (three options):
+  group structure (multiple options):
 
   - \\p\\-dimensional vector of group indices (in \\\\1, \ldots, q\\\\)
     or labels,
@@ -97,11 +97,13 @@ and
 - cor:
 
   character string `"pearson"`, `"spearman"` (default), or `"kendall"`;
-  or \\p \times p\\ correlation matrix
+  or a correlation matrix (\\p\\ rows, \\p\\ columns, entries between
+  \\-1\\ and \\+1\\)
 
 - foldid:
 
-  \\n_0\\-dimensional vector containing the fold identifiers
+  \\n_0\\-dimensional vector containing the fold identifiers (minimum
+  \\1\\, maximum `nfolds`)
 
 - nfolds:
 
@@ -114,7 +116,7 @@ and
   [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
   and
   [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-  be suppressed? logical
+  be suppressed? (`FALSE` or `TRUE`)
 
 ## Value
 

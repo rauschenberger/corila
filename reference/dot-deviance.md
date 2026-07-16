@@ -12,15 +12,23 @@ Calculates the deviance.
 
 - y:
 
-  response: numeric vector of length \\n\\
+  response vector of length \\n_0\\, containing numerical values
+  (`family="gaussian"`), integer values (`family="poisson"`), binary
+  values (`family="binomial"`), or a survival object created with
+  [`survival::Surv()`](https://rdrr.io/pkg/survival/man/Surv.html)
+  (`family="cox"`), where \\n_0\\ is the number of observations used for
+  model training
 
 - y_hat:
 
-  predicted response: numeric vector of length \\n\\
+  predicted response: numeric vector of length \\n\\, with entries on
+  the real range (`family="gaussian"` or `family="cox"`), in the unit
+  interval (`family="binomial"`), or on the non-negative real range
+  (`family="poisson"`)
 
 - family:
 
-  character
+  character string `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 
 ## Value
 
@@ -39,16 +47,16 @@ n <- 10
 
 y <- rnorm(n)
 y_hat <- rnorm(n)
-corila:::.deviance(y = y , y_hat = y_hat, family = "gaussian")
-#> [1] 5.761124
+.deviance(y = y , y_hat = y_hat, family = "gaussian")
+#> [1] 2.119926
 
 y <- rbinom(n = n, size = 1, prob = 0.5)
 y_hat <- runif(n)
-corila:::.deviance(y = y , y_hat = y_hat, family = "binomial")
-#> [1] 1.444421
+.deviance(y = y , y_hat = y_hat, family = "binomial")
+#> [1] 1.331855
 
 y <- rpois(n = n, lambda = 4)
 y_hat <- rexp(n)
-corila:::.deviance(y = y , y_hat = y_hat, family = "poisson")
-#> [1] 9.178619
+.deviance(y = y , y_hat = y_hat, family = "poisson")
+#> [1] 8.916808
 ```

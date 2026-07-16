@@ -30,6 +30,6 @@ This function is called by
 ## Examples
 
 ``` r
-corila:::.type(alpha = 0)
+.type(alpha = 0)
 #> [1] "ridge regression"
 ```

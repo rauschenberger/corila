@@ -84,7 +84,7 @@ where \(n_0\) is the number of observations used for model training</p></dd>
 
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
-<dd><p>group structure (three options):</p><ul><li><p>\(p\)-dimensional vector of group indices
+<dd><p>group structure (multiple options):</p><ul><li><p>\(p\)-dimensional vector of group indices
 (in \(\{1, \ldots, q\}\)) or labels,</p></li>
 <li><p>list with \(q\) slots containing the variable indices
 (in \(\{1, \ldots, p\}\)) or labels,</p></li>
@@ -140,7 +140,9 @@ and 1 for lasso penalisation
 <dd><p>character string <code>"pearson"</code>,
 <code>"spearman"</code> (default),
 or <code>"kendall"</code>;
-or \(p \times p\) correlation matrix</p></dd>
+or a correlation matrix
+(\(p\) rows, \(p\) columns,
+entries between \(-1\) and \(+1\))</p></dd>
 
 
 <dt id="arg-tune">tune<a class="anchor" aria-label="anchor" href="#arg-tune"></a></dt>
@@ -164,7 +166,8 @@ tuning <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, 
 
 
 <dt id="arg-foldid">foldid<a class="anchor" aria-label="anchor" href="#arg-foldid"></a></dt>
-<dd><p>\(n_0\)-dimensional vector containing the fold identifiers</p></dd>
+<dd><p>\(n_0\)-dimensional vector containing the fold identifiers
+(minimum \(1\), maximum <code>nfolds</code>)</p></dd>
 
 
 <dt id="arg-na-action">na_action<a class="anchor" aria-label="anchor" href="#arg-na-action"></a></dt>
@@ -177,7 +180,7 @@ with a missing predictor or a missing response from model fitting
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
 <dd><p>Should messages from <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
-be suppressed? logical</p></dd>
+be suppressed? (<code>FALSE</code> or <code>TRUE</code>)</p></dd>
 
 </dl></div>
     <div class="section level2">

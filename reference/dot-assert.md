@@ -6,7 +6,7 @@ Check whether provided arguments satisfy expectations.
 
 ``` r
 .assert(
-  x,
+  x = NULL,
   type = "numeric",
   dim = 1L,
   na.rm = FALSE,
@@ -77,10 +77,14 @@ of samples and features).
 ## Examples
 
 ``` r
-corila:::.assert(x = NULL)
-corila:::.assert(x = rnorm(1), type = "numeric")
-corila:::.assert(x = "A", type = "nominal", support = LETTERS)
-corila:::.assert(x = rexp(10), dim = Inf, type = "numeric", min = 0)
-corila:::.assert(x = c(NA, rpois(9, lambda = 4)), dim = 10,
-                 type = "integer", na.rm = TRUE)
+.assert(x = NULL)
+.assert(x = rnorm(1))
+.assert(x = "A", type = "nominal", support = LETTERS)
+.assert(x = rexp(10), dim = Inf, type = "numeric", min = 0)
+.assert(x = c(NA, rpois(9, lambda = 4)), dim = 10,
+       type = "integer", na.rm = TRUE)
+.assert(x = NA, na.rm = TRUE)
+.assert(x = 1, na.rm = FALSE)
+.assert(x = rpois(n = 10, lambda = 4), dim = Inf,
+       family = "poisson")
 ```

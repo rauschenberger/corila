@@ -67,19 +67,19 @@ object <- cv.corila(x = x, y = y, group = group, primary = primary)
 
 # using S3 methods
 coef(object)
-#>  [1] 0.01806361 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
-#>  [7] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
-#> [13] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
-#> [19] 0.00000000 0.00000000 0.00000000
+#>  [1] -0.3194595  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
+#>  [7]  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
+#> [13]  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
+#> [19]  0.0000000  0.0000000  0.0000000
 predict(object, newx = x)
-#>  [1] 0.01806361 0.01806361 0.01806361 0.01806361 0.01806361 0.01806361
-#>  [7] 0.01806361 0.01806361 0.01806361 0.01806361
+#>  [1] -0.3194595 -0.3194595 -0.3194595 -0.3194595 -0.3194595 -0.3194595
+#>  [7] -0.3194595 -0.3194595 -0.3194595 -0.3194595
 fitted(object)
-#>  [1] 0.01806361 0.01806361 0.01806361 0.01806361 0.01806361 0.01806361
-#>  [7] 0.01806361 0.01806361 0.01806361 0.01806361
+#>  [1] -0.3194595 -0.3194595 -0.3194595 -0.3194595 -0.3194595 -0.3194595
+#>  [7] -0.3194595 -0.3194595 -0.3194595 -0.3194595
 residuals(object)
-#>  [1] -0.9165558 -0.1793822 -0.5025691  2.6860880 -0.7268534  0.3963546
-#>  [7] -0.7750733  0.4715784  0.6972766 -1.1508637
+#>  [1] -1.4694153  0.2787855  1.4097096  1.5532303 -0.1279948 -0.6676504
+#>  [7] -1.0561274  1.0007138 -0.1721173 -0.7491339
 plot(object)
 
 print(object)
@@ -89,11 +89,11 @@ print(object)
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (13 primary and 7 auxiliary features)
+#> 20 features (7 primary and 13 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 3.521 
-#> selected weights: local = 0.9, global = 0.1
+#> optimised regularisation parameter: lambda.min = 0.8538 
+#> selected weights: local = 0.1, global = 0.9
 #> selected exponents: local = 0, global = 1
 #> 1 non-zero coefficients (including intercept)
 ```

@@ -47,7 +47,7 @@ This function is called by
 ## Examples
 
 ``` r
-corila:::.set_candidates(tune = "none")
+.set_candidates(tune = "none")
 #>   wgt_local exp_local wgt_global exp_global
 #> 1         1         1          0        Inf
 ```

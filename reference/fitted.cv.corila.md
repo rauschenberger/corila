@@ -51,33 +51,33 @@ object <- cv.corila(x = x, y = y, group = group, primary = primary)
 
 # using S3 methods
 coef(object)
-#>  [1] 0.03385926 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
-#>  [7] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
-#> [13] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
-#> [19] 0.00000000 0.00000000 0.00000000
+#>  [1]  0.1435740  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
+#>  [7]  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
+#> [13]  0.0000000  0.0000000 -0.1997738  0.0000000  0.0000000  0.0000000
+#> [19]  0.0000000  0.0000000  0.0000000
 predict(object, newx = x)
-#>  [1] 0.03385926 0.03385926 0.03385926 0.03385926 0.03385926 0.03385926
-#>  [7] 0.03385926 0.03385926 0.03385926 0.03385926
+#>  [1]  0.25777848  0.16488811  0.28292914  0.10192787  0.37821762  0.04403382
+#>  [7]  0.23439076 -0.09932211  0.26511080  0.19203287
 fitted(object)
-#>  [1] 0.03385926 0.03385926 0.03385926 0.03385926 0.03385926 0.03385926
-#>  [7] 0.03385926 0.03385926 0.03385926 0.03385926
+#>  [1]  0.25777848  0.16488811  0.28292914  0.10192787  0.37821762  0.04403382
+#>  [7]  0.23439076 -0.09932211  0.26511080  0.19203287
 residuals(object)
-#>  [1] -1.0203984 -0.1297852  0.1355968  0.2877109 -0.4928061 -0.6170884
-#>  [7] -0.8932443  1.7304278  0.3405536  0.6590333
+#>  [1] -0.8737269  0.6954060 -0.4406849 -0.7145216  0.5414637 -0.6102182
+#>  [7]  0.5768959 -0.4819820  1.8509564 -0.5435885
 plot(object)
 
 print(object)
 #> object of class ‘cv.corila’ 
 #> (contains multiple objects of class ‘cv.glmnet’)
-#> selected 0 from 20 predictors
+#> selected 1 from 20 predictors
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (11 primary and 9 auxiliary features)
+#> 20 features (8 primary and 12 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 1.69 
+#> optimised regularisation parameter: lambda.min = 0.6982 
 #> selected weights: local = 1, global = 0
 #> selected exponents: local = 0, global = Inf
-#> 1 non-zero coefficients (including intercept)
+#> 2 non-zero coefficients (including intercept)
 ```
