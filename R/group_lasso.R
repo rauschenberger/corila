@@ -23,7 +23,7 @@
 #' where \eqn{n_0} is the number of observations used for model training
 #'
 #' @param group
-#' group structure (three options):
+#' group structure (multiple options):
 #' - \eqn{p}-dimensional vector of group indices
 #' (in \eqn{\{1, \ldots, q\}}) or labels,
 #' - list with \eqn{q} slots containing the variable indices
@@ -77,7 +77,9 @@
 #' character string `"pearson"`,
 #' `"spearman"` (default),
 #' or `"kendall"`;
-#' or \eqn{p \times p} correlation matrix
+#' or a correlation matrix
+#' (\eqn{p} rows, \eqn{p} columns,
+#' entries between \eqn{-1} and \eqn{+1})
 #'
 #' @param tune
 #' character string for determining the candidate values
@@ -109,7 +111,7 @@
 #'
 #' @param silent
 #' Should messages from [glmnet::glmnet()] and [glmnet::cv.glmnet()]
-#' be suppressed? logical
+#' be suppressed? (`FALSE` or `TRUE`)
 #'
 #' @inherit corila details
 #'
@@ -450,14 +452,14 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' numeric in unit interval
 #'
 #' @details
-#' The number of observations (samples) for training or testing
+#' The numbers of observations (samples) for training or testing
 #' are indicated by \eqn{n_0} and \eqn{n_1}, respectively,
-#' the number of variables (features) is indicated by \eqn{p},
-#' and the number of variable groups is indicated by \eqn{q}.
-#' Observations (samples) are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
-#' variables (features) are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
-#' and variable groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
-#' The number of variables in the \eqn{k^{\text{th}}} group
+#' the number of predictors (features) is indicated by \eqn{p},
+#' and the number of predictor group is indicated by \eqn{q}.
+#' Observations are indexed by \eqn{i} in \eqn{\{1, \ldots, n\}},
+#' predictors are indexed by \eqn{j} in \eqn{\{1, \ldots, p\}},
+#' and predictor groups are indexed by \eqn{k} in \eqn{\{1, \ldots, q\}}.
+#' The number of predictors in the \eqn{k^{\text{th}}} group
 #' is indicated by \eqn{p_k},
 #' with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 #'
@@ -736,7 +738,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @keywords internal
 #'
 .set_candidates <- function(tune) {
-  if (is.character(tune)) tune <- tolower(tune)
   .assert(x = tune, type = "nominal")
   if (identical(tune, "none")) {
     hyper <- data.frame(wgt_local = 1,

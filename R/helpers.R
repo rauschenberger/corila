@@ -522,18 +522,16 @@
 #'
 #' @description
 #' Calculates the deviance.
-#'
-#' @param y
-#' response:
-#' numeric vector of length \eqn{n}
+#' 
+#' @inheritParams cv.corila y family
 #'
 #' @param y_hat
 #' predicted response:
-#' numeric vector of length \eqn{n}
-#'
-#' @param family
-#' character
-#'
+#' numeric vector of length \eqn{n},
+#' with entries on the real range (`family="gaussian"` or `family="cox"`),
+#' in the unit interval (`family="binomial"`),
+#' or on the non-negative real range (`family="poisson"`)
+#' 
 #' @return
 #' Returns the deviance (a numeric scalar).
 #'

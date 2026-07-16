@@ -22,12 +22,13 @@
 #' or `NA` if all estimated signs equal 0.
 #'
 #' @examples
+#' \donshow{calc_sign_prec <- corila:::calc_sign_prec}
 #' truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
 #' estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
-#' corila:::calc_sign_prec(truth = truth, estim = estim) # observed value
-#' corila:::calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
-#' corila:::calc_sign_prec(truth = truth, estim = truth) # upper limit 1
-#' corila:::calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
+#' calc_sign_prec(truth = truth, estim = estim) # observed value
+#' calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
+#' calc_sign_prec(truth = truth, estim = truth) # upper limit 1
+#' calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
 #'
 #' @keywords internal
 #'
@@ -295,15 +296,16 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 #' @keywords internal
 #'
 #' @examples
+#' \dontshow{.simulate_outcome <- corila:::.simulate_outcome}
 #' # simulate independent outcome
-#' corila:::.simulate_outcome(family = "gaussian", n = 10)
+#' .simulate_outcome(family = "gaussian", n = 10)
 #'
 #' # simulate dependent outcome
 #' n <- 10
 #' p <- 20
 #' x <- matrix(rnorm(n * p), n, p)
 #' beta <- rnorm(p)
-#' corila:::.simulate_outcome(family = "gaussian", x = x, beta = beta)
+#' .simulate_outcome(family = "gaussian", x = x, beta = beta)
 #'
 .simulate_outcome <- function(family, x = NULL, beta = NULL, n = NULL,
                               factor = 1) {
