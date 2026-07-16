@@ -33,7 +33,7 @@ binary values (\code{family="binomial"}),
 or a survival object created with \code{survival::Surv()} (\code{family="cox"}),
 where \eqn{n_0} is the number of observations used for model training}
 
-\item{group}{group structure (three options):
+\item{group}{group structure (multiple options):
 \itemize{
 \item \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
@@ -79,7 +79,9 @@ and 1 for lasso penalisation
 \item{cor}{character string \code{"pearson"},
 \code{"spearman"} (default),
 or \code{"kendall"};
-or \eqn{p \times p} correlation matrix}
+or a correlation matrix
+(\eqn{p} rows, \eqn{p} columns,
+entries between \eqn{-1} and \eqn{+1})}
 
 \item{tune}{character string for determining the candidate values
 for the hyperparameters:
@@ -103,7 +105,8 @@ tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
 (to implement: list with slots
 \code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global})}
 
-\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
+\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers
+(minimum \eqn{1}, maximum \code{nfolds})}
 
 \item{na_action}{character \code{"error"} to trigger an error
 if any observation has a missing predictor or a missing response
@@ -112,7 +115,7 @@ with a missing predictor or a missing response from model fitting
 (while providing fitted values for these observations)}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
-be suppressed? logical}
+be suppressed? (\code{FALSE} or \code{TRUE})}
 }
 \value{
 Returns an object of class \code{"cv.corila"},

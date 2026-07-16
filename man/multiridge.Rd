@@ -26,7 +26,8 @@ multiridge(
 \item{family}{character \code{"linear"} (or \code{"gaussian"}),
 \code{"logistic"} (or \code{"binomial"}), or \code{"cox"}}
 
-\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
+\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers
+(minimum \eqn{1}, maximum \code{nfolds})}
 
 \item{nfolds}{positive integer specifying the number of folds
 (minimum \eqn{3}, maximum \eqn{n})}

@@ -40,7 +40,8 @@ for the global prior information.
 Sets candidate values for hyperparameters.
 }
 \examples{
-corila:::.set_candidates(tune = "none")
+\dontshow{.set_candidates <- corila:::.set_candidates}
+.set_candidates(tune = "none")
 
 }
 \seealso{

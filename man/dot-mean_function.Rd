@@ -19,9 +19,10 @@ Returns a numeric vector of length \eqn{n}.
 Transform the linear predictor to predicted values/probabilities.
 }
 \examples{
+\dontshow{.mean_function <- corila:::.mean_function}
 x <- rnorm(10)
-corila:::.mean_function(x, family = "binomial")
-corila:::.mean_function(x, family = "poisson")
+.mean_function(x, family = "binomial")
+.mean_function(x, family = "poisson")
 
 }
 \keyword{internal}

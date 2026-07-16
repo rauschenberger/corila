@@ -40,7 +40,7 @@ binary values (\code{family="binomial"}),
 or a survival object created with \code{survival::Surv()} (\code{family="cox"}),
 where \eqn{n_0} is the number of observations used for model training}
 
-\item{group}{group structure (three options):
+\item{group}{group structure (multiple options):
 \itemize{
 \item \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
@@ -83,15 +83,18 @@ and 1 for lasso penalisation
 \item{cor}{character string \code{"pearson"},
 \code{"spearman"} (default),
 or \code{"kendall"};
-or \eqn{p \times p} correlation matrix}
+or a correlation matrix
+(\eqn{p} rows, \eqn{p} columns,
+entries between \eqn{-1} and \eqn{+1})}
 
-\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
+\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers
+(minimum \eqn{1}, maximum \code{nfolds})}
 
 \item{nfolds}{positive integer specifying the number of folds
 (minimum \eqn{3}, maximum \eqn{n})}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
-be suppressed? logical}
+be suppressed? (\code{FALSE} or \code{TRUE})}
 }
 \value{
 Returns a list with slots \code{n}, \code{p}, and \code{q} or an error message.

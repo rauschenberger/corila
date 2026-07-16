@@ -7,13 +7,21 @@
 .deviance(y, y_hat, family)
 }
 \arguments{
-\item{y}{response:
-numeric vector of length \eqn{n}}
+\item{y}{response vector of length \eqn{n_0},
+containing numerical values (\code{family="gaussian"}),
+integer values (\code{family="poisson"}),
+binary values (\code{family="binomial"}),
+or a survival object created with \code{survival::Surv()} (\code{family="cox"}),
+where \eqn{n_0} is the number of observations used for model training}
 
 \item{y_hat}{predicted response:
-numeric vector of length \eqn{n}}
+numeric vector of length \eqn{n},
+with entries on the real range (\code{family="gaussian"} or \code{family="cox"}),
+in the unit interval (\code{family="binomial"}),
+or on the non-negative real range (\code{family="poisson"})}
 
-\item{family}{character}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"},
+\code{"poisson"}, or \code{"cox"}}
 }
 \value{
 Returns the deviance (a numeric scalar).
@@ -22,19 +30,20 @@ Returns the deviance (a numeric scalar).
 Calculates the deviance.
 }
 \examples{
+\dontshow{.deviance <- corila:::.deviance}
 n <- 10
 
 y <- rnorm(n)
 y_hat <- rnorm(n)
-corila:::.deviance(y = y , y_hat = y_hat, family = "gaussian")
+.deviance(y = y , y_hat = y_hat, family = "gaussian")
 
 y <- rbinom(n = n, size = 1, prob = 0.5)
 y_hat <- runif(n)
-corila:::.deviance(y = y , y_hat = y_hat, family = "binomial")
+.deviance(y = y , y_hat = y_hat, family = "binomial")
 
 y <- rpois(n = n, lambda = 4)
 y_hat <- rexp(n)
-corila:::.deviance(y = y , y_hat = y_hat, family = "poisson")
+.deviance(y = y , y_hat = y_hat, family = "poisson")
 
 }
 \seealso{

@@ -23,10 +23,20 @@ Calculates the deviance residuals.
 This function is called by \code{\link[=residuals.cv.corila]{residuals.cv.corila()}}.
 }
 \examples{
-n <- 10
-y_obs <- stats::rbinom(n = n, size = 1, prob = 0.2)
+\dontshow{.residuals <- corila:::.residuals}
+n <- 10L
+
+y_obs <- stats::rnorm(n = n)
+y_fit <- stats::rnorm(n = n)
+.residuals(y_obs = y_obs, y_fit = y_fit, family = "gaussian")
+
+y_obs <- stats::rbinom(n = n, size = 1L, prob = 0.2)
 y_fit <- stats::runif(n = n)
-corila:::.residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
+.residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
+
+y_obs <- stats::rpois(n = n, lambda = 4)
+y_fit <- stats::rexp(n = n, rate = 0.25)
+.residuals(y_obs = y_obs, y_fit = y_fit, family = "poisson")
 
 }
 \keyword{internal}

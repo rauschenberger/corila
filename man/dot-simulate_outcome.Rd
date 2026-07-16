@@ -26,15 +26,16 @@ Returns an \eqn{n}-dimensional outcome vector.
 Simulates outcome vector.
 }
 \examples{
+\dontshow{.simulate_outcome <- corila:::.simulate_outcome}
 # simulate independent outcome
-corila:::.simulate_outcome(family = "gaussian", n = 10)
+.simulate_outcome(family = "gaussian", n = 10)
 
 # simulate dependent outcome
 n <- 10
 p <- 20
 x <- matrix(rnorm(n * p), n, p)
 beta <- rnorm(p)
-corila:::.simulate_outcome(family = "gaussian", x = x, beta = beta)
+.simulate_outcome(family = "gaussian", x = x, beta = beta)
 
 }
 \seealso{

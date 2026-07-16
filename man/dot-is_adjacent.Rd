@@ -7,7 +7,7 @@
 .is_adjacent(group, j, p, names)
 }
 \arguments{
-\item{group}{group structure (three options):
+\item{group}{group structure (multiple options):
 \itemize{
 \item \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
@@ -37,21 +37,25 @@ Identifies adjacent predictors.
 }
 \details{
 This function is called by \code{\link[=corila]{corila()}}.
+A predictor is adjacent to itself.
+If argument \code{group} is a list (specifying potentially overlapping groups),
+two predictors are adjacent if they are one or more common groups.
 }
 \examples{
-p <- 5
+\dontshow{.is_adjacent <- corila:::.is_adjacent}
+p <- 5L
 names <- paste0("x", seq_len(p))
 group <- list()
-group$index_vector <- setNames(object = c(1, 1, 2, 2, 3), nm = names)
+group$index_vector <- setNames(object = c(1L, 1L, 2L, 2L, 3L), nm = names)
 group$label_vector <- setNames(object = LETTERS[group$index_vector],
                                  nm = names(group$index_vector))
 group$index_list <- lapply(X = setNames(nm = unique(group$label_vector)),
                      FUN = function(x) which(group$label_vector == x))
 group$label_list <- lapply(group$index_list, names)
-group$matrix <- 1 * outer(X = group$index_vector,
+group$matrix <- 1L * outer(X = group$index_vector,
                           Y = group$index_vector,
                           FUN = "==")
-corila:::.is_adjacent(group = group[[1]], j = 3, p = p, names = names)
+.is_adjacent(group = group[[1]], j = 3L, p = p, names = names)
 
 }
 \keyword{internal}

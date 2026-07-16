@@ -23,11 +23,12 @@ Combine estimated coefficients for positive effects
 and estimated coefficients for negative effects.
 }
 \examples{
+\dontshow{.combine_slopes <- corila:::.combine_slopes}
 p <- 10
 alpha <- rnorm(1)
 temp <- rnorm(p)
 beta <- pmax(c(temp, -temp), 0)
-corila:::.combine_slopes(alpha = alpha, beta = beta)
+.combine_slopes(alpha = alpha, beta = beta)
 
 }
 \seealso{

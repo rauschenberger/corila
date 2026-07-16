@@ -45,7 +45,7 @@ with one penalty for each group
 (not implemented for \code{family="poisson"} or overlapping groups),
 or \code{NA} to set all initial coefficients equal to 1}
 
-\item{group}{group structure (three options):
+\item{group}{group structure (multiple options):
 \itemize{
 \item \eqn{p}-dimensional vector of group indices
 (in \eqn{\{1, \ldots, q\}}) or labels,
@@ -58,7 +58,8 @@ indicates whether information should be transferred
 from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 }}
 
-\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers}
+\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers
+(minimum \eqn{1}, maximum \code{nfolds})}
 
 \item{nfolds}{positive integer specifying the number of folds
 (minimum \eqn{3}, maximum \eqn{n})}
@@ -67,7 +68,7 @@ from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
 (determined by cross-validation)}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
-be suppressed? logical}
+be suppressed? (\code{FALSE} or \code{TRUE})}
 }
 \description{
 Estimate initial coefficients.
@@ -80,6 +81,7 @@ for an initial lasso, ridge, or elastic net regression,
 or \code{\link[stats:cor]{stats::cor()}} for initial correlation coefficients.
 }
 \examples{
+\dontshow{.estim_initial_coefs <- corila:::.estim_initial_coefs}
 # simulate data
 n <- 20
 p <- 10
@@ -88,34 +90,34 @@ beta <- rbinom(n = p, size = 1, prob = 0.5) * rnorm(p)
 y <- drop(x \%*\% beta)
 
 # initial correlation coefficients
-corila:::.estim_initial_coefs(x = x,
-                              y = y,
-                              family = "gaussian",
-                              alpha_init = "spearman",
-                              group = NULL,
-                              foldid = NULL,
-                              nfolds = 10,
-                              lambda = NULL)
+.estim_initial_coefs(x = x,
+                     y = y,
+                     family = "gaussian",
+                     alpha_init = "spearman",
+                     group = NULL,
+                     foldid = NULL,
+                     nfolds = 10,
+                     lambda = NULL)
 
 # initial regression coefficients (cross-validating lambda)
-corila:::.estim_initial_coefs(x = x,
-                              y = y,
-                              family = "gaussian",
-                              alpha_init = 0,
-                              group = NULL,
-                              foldid = NULL,
-                              nfolds = 10,
-                              lambda = NULL)
-                              
+.estim_initial_coefs(x = x,
+                     y = y,
+                     family = "gaussian",
+                     alpha_init = 0,
+                     group = NULL,
+                     foldid = NULL,
+                     nfolds = 10,
+                     lambda = NULL)
+
 # initial regression coefficients (using fixed lambda)
-corila:::.estim_initial_coefs(x = x,
-                              y = y,
-                              family = "gaussian",
-                              alpha_init = 0,
-                              group = NULL,
-                              foldid = NULL,
-                              nfolds = 10,
-                              lambda = 0.2)
+.estim_initial_coefs(x = x,
+                     y = y,
+                     family = "gaussian",
+                     alpha_init = 0,
+                     group = NULL,
+                     foldid = NULL,
+                     nfolds = 10,
+                     lambda = 0.2)
 
 }
 \keyword{internal}

@@ -21,7 +21,8 @@ or \code{"Pearson/Spearman/Kendall correlation"})
 Names the method used for obtaining initial or final coefficients.
 }
 \examples{
-corila:::.type(alpha = 0)
+\dontshow{.type <- corila:::.type}
+.type(alpha = 0)
 
 }
 \seealso{
