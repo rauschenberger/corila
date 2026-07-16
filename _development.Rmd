@@ -74,7 +74,7 @@ notes[notes$content=="is case dependent",]
 
 data.frame(notes[notes$fn_name==".deviance",])
 
-note <- autotest::autotest_package(functions=".simulate_outcome",test=TRUE)
+note <- autotest::autotest_package(functions=".deviance",test=TRUE)
 
 #srr::srr_stats_roxygen(category = c("ml", "regression"))
 

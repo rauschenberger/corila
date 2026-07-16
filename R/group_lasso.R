@@ -415,6 +415,7 @@ predict.corila <- function(object, newx, index, s, ...) {
   .assert(x = newx, type = "numeric",
           dim = c(Inf, length(object$scale$mu.x)))
   .assert(x = index, type = "integer", min = 1L, max = length(object$model))
+  index <- as.integer(index)
   .assert(x = s, type = "numeric", dim = Inf, min = 0)
   # --- make predictions ---
   newx_stand <- .forescale(x = newx, pars = object$scale)$x
@@ -656,6 +657,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     q <- length(unique(group))
     if (is.numeric(group)) {
       .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
+      group <- as.integer(group)
     } else if (is.character(group)) {
       .assert(x = group, type = "nominal", dim = p)
     } else {
@@ -668,6 +670,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       if (is.numeric(group[[i]])) {
         .assert(x = group[[i]], type = "integer", dim = Inf,
                 min = 1L, max = p)
+        group[[i]] <- as.integer(group[[i]])
       } else if (is.character(group[[i]])) {
         .assert(x = group[[i]], type = "nominal", dim = Inf,
                 support = colnames(x))
@@ -680,6 +683,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   } else if (is.matrix(group)) {
     q <- NA
     .assert(x = group, type = "integer", dim = c(p, p), min = 0L, max = 1L)
+    group <- as.integer(group)
   } else {
     stop("Argument 'group' must be a vector, ",
          "a list, or a matrix.")
@@ -870,7 +874,9 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   }
   .assert(x = foldid, type = "integer", dim = n,
           min = 1L, max = n)
+  foldid <- as.integer(foldid)
   .assert(x = nfolds, type = "integer", min = 2L, max = n)
+  nfolds <- as.integer(nfolds)
   if (identical(alpha_init, "multiridge")) {
     dim <- length(unique(group))
   } else {
@@ -977,7 +983,9 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'
 .is_adjacent <- function(group, j, p, names) {
   .assert(x = j, type = "integer", min = 1L)
+  j <- as.integer(j)
   .assert(x = p, type = "integer", min = j)
+  p <- as.integer(p)
   .assert(x = names, type = "nominal", dim = p)
   if (is.atomic(group) && is.null(dim(group))) {
     if (length(group) != p) {
@@ -1006,7 +1014,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       stop("List 'group' should have slots of type numeric or character.")
     }
   } else if (is.matrix(group)) {
-    .assert(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)
+    .assert(x = group, type = "integer", dim = c(p, p), min = 0L, max = 1L)
+    class(group) <- "integer"
     group[, j] == 1L
   } else {
     stop("Argument 'group' should be a vector, a list, or a matrix.")
