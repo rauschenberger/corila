@@ -166,6 +166,7 @@
 multiridge <- function(x, y, z, family = "gaussian", foldid = NULL,
                        nfolds = 10L, penalties = NULL) {
   # --- check arguments ---
+  if (is.character(family)) family <- tolower(family)
   if (is.matrix(x) && ncol(x) != length(z)) {
     stop("For each variable, 'x' should have one column, ",
          "and 'z' should have one entry.")

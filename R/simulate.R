@@ -307,6 +307,7 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
 #'
 .simulate_outcome <- function(family, x = NULL, beta = NULL, n = NULL,
                               factor = 1) {
+  if (is.character(family)) family <- tolower(family)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
@@ -325,7 +326,6 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
     factor * eta + stats::rnorm(n = n, sd = 1)
   } else if (identical(family, "binomial")) {
     stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-factor * eta)))
-    # NB: was without 2*
   } else if (identical(family, "cox")) {
     time <- stats::rexp(n = n, rate = exp(factor * eta))
     status <- stats::rbinom(n = n, prob = 0.5, size = 1)

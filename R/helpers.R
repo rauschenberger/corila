@@ -49,12 +49,17 @@
 #' have compatible dimensions (number of samples and features).
 #'
 #' @examples
-#' corila:::.assert(x = NULL)
-#' corila:::.assert(x = rnorm(1), type = "numeric")
-#' corila:::.assert(x = "A", type = "nominal", support = LETTERS)
-#' corila:::.assert(x = rexp(10), dim = Inf, type = "numeric", min = 0)
-#' corila:::.assert(x = c(NA, rpois(9, lambda = 4)), dim = 10,
-#'                  type = "integer", na.rm = TRUE)
+#' \dontshow{.assert <- corila:::.assert}
+#' .assert(x = NULL)
+#' .assert(x = rnorm(1))
+#' .assert(x = "A", type = "nominal", support = LETTERS)
+#' .assert(x = rexp(10), dim = Inf, type = "numeric", min = 0)
+#' .assert(x = c(NA, rpois(9, lambda = 4)), dim = 10,
+#'        type = "integer", na.rm = TRUE)
+#' .assert(x = NA, na.rm = TRUE)
+#' .assert(x = 1, na.rm = FALSE)
+#' .assert(x = rpois(n = 10, lambda = 4), dim = Inf,
+#'        family = "poisson")
 #'
 #' @keywords internal
 #'
@@ -67,22 +72,39 @@
 #' @srrstats {G5.2a} *messages are unique*
 #' @srrstats {RE1.4} *tests assumptions for input data*
 #'
-.assert <- function(x, type = "numeric", dim = 1L, na.rm = FALSE,
+.assert <- function(x = NULL, type = "numeric", dim = 1L, na.rm = FALSE,
                     support = NULL, family = NULL, min = -Inf, max = Inf) {
-  if (is.null(x)) {
-    return(invisible(NULL))
-  }
+  if (is.null(x)) return(invisible(NULL))
+  if (is.character(type)) type <- tolower(type)
+  if (is.character(family)) family <- tolower(family)
+  stopifnot(
+    "require argument 'type' to be a character scalar" =
+      length(type) == 1L && is.character(type),
+    "require argument 'support' to be a character vector" =
+      is.null(support) || (is.character(support) && is.atomic(support)),
+    "require argument support = NULL unless argument type = 'nominal'" =
+      type == "nominal" || is.null(support),
+    "require argument 'family' to be a character scalar" =
+      is.null(family) || (is.character(family) && length(family) == 1L),
+    "require argument 'dim' to be an integer vector" =
+      is.atomic(dim) && all(dim > 0) && all(dim %% 1L == 0L | is.infinite(dim)),
+    "require argument 'na.rm' to be a logical scalar" =
+      length(na.rm) == 1L && is.logical(na.rm) && !is.na(na.rm),
+    "require argument 'min' to be a numeric scalar" =
+      length(min) == 1L && is.numeric(min),
+    "require argument 'max' to be a numeric scalar" =
+      length(max) == 1L && is.numeric(max)
+  )
   type <- match.arg(arg = type,
                     choices = c("numeric", "integer", "nominal", "logical"))
-  family <- match.arg(arg = family,
-                      choices = c("gaussian", "binomial", "poisson", "cox"))
+  if (!is.null(family)) {
+    family <- match.arg(arg = family,
+                        choices = c("gaussian", "binomial", "poisson", "cox"))
+  }
   stopifnot(
-    "expected argument support to be of type character" =
-      is.null(support) || is.character(support),
-    "expect support = NULL if type = 'nominal'" =
-      type == "nominal" || is.null(support),
     "expected vector"  =
-      length(dim) != 1L || is.atomic(x) || inherits(x = x, what = "Surv"),
+      length(dim) != 1L || (is.atomic(x) & is.null(dim(x))) ||
+      inherits(x = x, what = "Surv"),
     "expected matrix" =
       length(dim) != 2L || is.matrix(x),
     "expected array" =
@@ -182,6 +204,7 @@
 #'
 .forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   # --- check arguments ---
+  if (is.character(family)) family <- tolower(family)
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   if (is.null(family) == is.null(pars)) {
     stop('Expect either "family" or "pars".')
@@ -276,6 +299,10 @@
 #'
 #' @examples
 #' \donttest{
+#' \dontshow{
+#' .forescale <- corila:::.forescale
+#' .backscale <- corila:::.backscale
+#' }
 #' # simulate data
 #' family <- "gaussian"
 #' n0 <- 100; n1 <- 50; p <- 3
@@ -308,21 +335,21 @@
 #' yhat1 <- predict(lm1, newdata = x[fold == 1, ])
 #'
 #' # regression with standardisation
-#' scale <- corila:::.forescale(x = as.matrix(x)[fold == 0, ],
-#'                    y = y[fold == 0],
-#'                    family = family)
+#' scale <- .forescale(x = as.matrix(x)[fold == 0, ],
+#'                     y = y[fold == 0],
+#'                     family = family)
 #' if (identical(family, "cox")) {
 #'   lm2 <- survival::coxph(scale$y~., data = data.frame(scale$x))
 #' } else {
 #'   lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
 #' }
 #' coef_temp <- stats::coef(lm2)
-#' newx_temp <- corila:::.forescale(x = as.matrix(x)[fold == 1, ],
-#'                                  pars = scale$pars)$x
+#' newx_temp <- .forescale(x = as.matrix(x)[fold == 1, ],
+#'                         pars = scale$pars)$x
 #' yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
-#' result <- corila:::.backscale(pars = scale$pars,
-#'                               y = yhat_temp,
-#'                               coef = coef_temp)
+#' result <- .backscale(pars = scale$pars,
+#'                      y = yhat_temp,
+#'                      coef = coef_temp)
 #' coef2 <- result$coef
 #' yhat2 <- result$y
 #'
@@ -402,15 +429,16 @@
 #' or censored/uncensored observations in Cox model).
 #'
 #' @examples
+#' \dontshow{.folds <- corila:::.folds}
 #' # Gaussian and Poisson families
 #' y <- stats::rnorm(n = 100)
 #' y <- stats::rpois(n = 100, lambda = 4)
-#' foldid <- corila:::.folds(y = y, family = "gaussian", nfolds = 10)
+#' foldid <- .folds(y = y, family = "gaussian", nfolds = 10)
 #' table(foldid)
 #'
 #' # binomial family
 #' y <- stats::rbinom(n = 100, prob = 0.2, size = 1)
-#' foldid <- corila:::.folds(y = y, family = "binomial", nfolds = 10)
+#' foldid <- .folds(y = y, family = "binomial", nfolds = 10)
 #' table(y, foldid)
 #'
 #' \donttest{
@@ -418,7 +446,7 @@
 #' time <- stats::rexp(n = 100, rate = 5)
 #' status <- stats::rbinom(n = 100, prob = 0.2, size = 1)
 #' y <- survival::Surv(time = time, event = status)
-#' foldid <- corila:::.folds(y = y, family = "cox", nfolds = 10)
+#' foldid <- .folds(y = y, family = "cox", nfolds = 10)
 #' table(y[, "status"], foldid)
 #' }
 #'
@@ -426,6 +454,7 @@
 #'
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
+  if (is.character(family)) family <- tolower(family)
   support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
   .assert(x = family, type = "nominal", support = support)
   .assert(x = y, type = "numeric", dim = Inf, family = family)
@@ -465,14 +494,16 @@
 #' Returns a numeric vector of length \eqn{n}.
 #'
 #' @examples
+#' \dontshow{.mean_function <- corila:::.mean_function}
 #' x <- rnorm(10)
-#' corila:::.mean_function(x, family = "binomial")
-#' corila:::.mean_function(x, family = "poisson")
+#' .mean_function(x, family = "binomial")
+#' .mean_function(x, family = "poisson")
 #'
 #' @keywords internal
 #'
 .mean_function <- function(x, family) {
   # --- check arguments ---
+  if (is.character(family)) family <- tolower(family)
   support <- c("gaussian", "binomial", "poisson", "cox")
   .assert(x = x, type = "numeric", dim = Inf)
   .assert(x = family, type = "nominal", support = support)
@@ -511,24 +542,26 @@
 #' extracts the deviance from a fitted model.
 #'
 #' @examples
+#' \dontshow{.deviance <- corila:::.deviance}
 #' n <- 10
 #'
 #' y <- rnorm(n)
 #' y_hat <- rnorm(n)
-#' corila:::.deviance(y = y , y_hat = y_hat, family = "gaussian")
+#' .deviance(y = y , y_hat = y_hat, family = "gaussian")
 #'
 #' y <- rbinom(n = n, size = 1, prob = 0.5)
 #' y_hat <- runif(n)
-#' corila:::.deviance(y = y , y_hat = y_hat, family = "binomial")
+#' .deviance(y = y , y_hat = y_hat, family = "binomial")
 #'
 #' y <- rpois(n = n, lambda = 4)
 #' y_hat <- rexp(n)
-#' corila:::.deviance(y = y , y_hat = y_hat, family = "poisson")
+#' .deviance(y = y , y_hat = y_hat, family = "poisson")
 #'
 #' @keywords internal
 #'
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---
+  if (is.character(family)) family <- tolower(family)
   support <- c("gaussian", "binomial", "poisson", "cox")
   .assert(x = family, type = "nominal", support = support)
   .assert(x = y, type = "numeric", dim = Inf, family = family)

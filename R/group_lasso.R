@@ -67,6 +67,7 @@
 #'
 #' @param foldid
 #' \eqn{n_0}-dimensional vector containing the fold identifiers
+#' (minimum \eqn{1}, maximum `nfolds`)
 #'
 #' @param nfolds
 #' positive integer specifying the number of folds
@@ -483,6 +484,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 #' @examples
 #' \donttest{
+#' \dontshow{corila <- corila:::corila}
 #' # simulation
 #' n <- 100
 #' p <- 50
@@ -494,18 +496,18 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' # model fitting
 #' hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
 #'                     exp_global = 1, wgt_global = 0.5)
-#' object <- corila:::corila(x = x,
-#'                           y = y,
-#'                           group = group,
-#'                           primary = primary,
-#'                           family = "gaussian",
-#'                           alpha_init = 0,
-#'                           alpha_final = 1,
-#'                           cor = "spearman",
-#'                           foldid = NULL,
-#'                           nfolds = 10,
-#'                           hyper = hyper,
-#'                           lambda_init = NULL)
+#' object <- corila(x = x,
+#'                  y = y,
+#'                  group = group,
+#'                  primary = primary,
+#'                  family = "gaussian",
+#'                  alpha_init = 0,
+#'                  alpha_final = 1,
+#'                  cor = "spearman",
+#'                  foldid = NULL,
+#'                  nfolds = 10,
+#'                  hyper = hyper,
+#'                  lambda_init = NULL)
 #'
 #' y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
 #' }
@@ -728,11 +730,13 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' This function is called by [cv.corila()].
 #'
 #' @examples
-#' corila:::.set_candidates(tune = "none")
+#' \dontshow{.set_candidates <- corila:::.set_candidates}
+#' .set_candidates(tune = "none")
 #'
 #' @keywords internal
 #'
 .set_candidates <- function(tune) {
+  if (is.character(tune)) tune <- tolower(tune)
   .assert(x = tune, type = "nominal")
   if (identical(tune, "none")) {
     hyper <- data.frame(wgt_local = 1,
@@ -798,6 +802,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' or [stats::cor()] for initial correlation coefficients.
 #'
 #' @examples
+#' \dontshow{.estim_initial_coefs <- corila:::.estim_initial_coefs}
 #' # simulate data
 #' n <- 20
 #' p <- 10
@@ -806,40 +811,41 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' y <- drop(x %*% beta)
 #'
 #' # initial correlation coefficients
-#' corila:::.estim_initial_coefs(x = x,
-#'                               y = y,
-#'                               family = "gaussian",
-#'                               alpha_init = "spearman",
-#'                               group = NULL,
-#'                               foldid = NULL,
-#'                               nfolds = 10,
-#'                               lambda = NULL)
+#' .estim_initial_coefs(x = x,
+#'                      y = y,
+#'                      family = "gaussian",
+#'                      alpha_init = "spearman",
+#'                      group = NULL,
+#'                      foldid = NULL,
+#'                      nfolds = 10,
+#'                      lambda = NULL)
 #'
 #' # initial regression coefficients (cross-validating lambda)
-#' corila:::.estim_initial_coefs(x = x,
-#'                               y = y,
-#'                               family = "gaussian",
-#'                               alpha_init = 0,
-#'                               group = NULL,
-#'                               foldid = NULL,
-#'                               nfolds = 10,
-#'                               lambda = NULL)
-#'                      
+#' .estim_initial_coefs(x = x,
+#'                      y = y,
+#'                      family = "gaussian",
+#'                      alpha_init = 0,
+#'                      group = NULL,
+#'                      foldid = NULL,
+#'                      nfolds = 10,
+#'                      lambda = NULL)
+#'
 #' # initial regression coefficients (using fixed lambda)
-#' corila:::.estim_initial_coefs(x = x,
-#'                               y = y,
-#'                               family = "gaussian",
-#'                               alpha_init = 0,
-#'                               group = NULL,
-#'                               foldid = NULL,
-#'                               nfolds = 10,
-#'                               lambda = 0.2)
+#' .estim_initial_coefs(x = x,
+#'                      y = y,
+#'                      family = "gaussian",
+#'                      alpha_init = 0,
+#'                      group = NULL,
+#'                      foldid = NULL,
+#'                      nfolds = 10,
+#'                      lambda = 0.2)
 #'
 #' @keywords internal
 #'
 .estim_initial_coefs <- function(x, y, family, alpha_init, group,
                                  foldid, nfolds, lambda, silent) {
   # --- check arguments ---
+  if (is.character(family)) family <- tolower(family)
   methods <- c("pearson", "spearman", "kendall", "multiridge")
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   n <- nrow(x)
@@ -848,6 +854,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   if (is.character(alpha_init)) {
+    alpha_init <- tolower(alpha_init)
     .assert(x = alpha_init, type = "nominal", support = methods)
   } else {
     .assert(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
@@ -934,24 +941,28 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'
 #' @details
 #' This function is called by [corila()].
+#' A predictor is adjacent to itself.
+#' If argument `group` is a list (specifying potentially overlapping groups),
+#' two predictors are adjacent if they are one or more common groups.
 #'
 #' @return
 #' Returns a logical vector of length \eqn{p}.
 #'
 #' @examples
-#' p <- 5
+#' \dontshow{.is_adjacent <- corila:::.is_adjacent}
+#' p <- 5L
 #' names <- paste0("x", seq_len(p))
 #' group <- list()
-#' group$index_vector <- setNames(object = c(1, 1, 2, 2, 3), nm = names)
+#' group$index_vector <- setNames(object = c(1L, 1L, 2L, 2L, 3L), nm = names)
 #' group$label_vector <- setNames(object = LETTERS[group$index_vector],
 #'                                  nm = names(group$index_vector))
 #' group$index_list <- lapply(X = setNames(nm = unique(group$label_vector)),
 #'                      FUN = function(x) which(group$label_vector == x))
 #' group$label_list <- lapply(group$index_list, names)
-#' group$matrix <- 1 * outer(X = group$index_vector,
+#' group$matrix <- 1L * outer(X = group$index_vector,
 #'                           Y = group$index_vector,
 #'                           FUN = "==")
-#' corila:::.is_adjacent(group = group[[1]], j = 3, p = p, names = names)
+#' .is_adjacent(group = group[[1]], j = 3L, p = p, names = names)
 #'
 #' @keywords internal
 #'
@@ -959,9 +970,15 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   .assert(x = j, type = "integer", min = 1L)
   .assert(x = p, type = "integer", min = j)
   .assert(x = names, type = "nominal", dim = p)
-  if (is.vector(group) && is.atomic(group)) {
+  if (is.atomic(group) && is.null(dim(group))) {
+    if (length(group) != p) {
+      stop("Vector 'group' should have length p.")
+    }
     group[j] == group
   } else if (is.list(group)) {
+    if (length(group) == 0L) {
+      stop("List 'group' should not have length 0.")
+    }
     if (is.numeric(unlist(group))) {
       group_cond <- vapply(X = group,
                            FUN = function(slot) j %in% slot,
@@ -977,7 +994,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       stats::setNames(object = names %in% unlist(group[group_cond]),
                       nm = names)
     } else {
-      stop("The list 'group' should have slots of type numeric or character.")
+      stop("List 'group' should have slots of type numeric or character.")
     }
   } else if (is.matrix(group)) {
     .assert(x = group, type = "integer", dim = c(p, p), min = 0, max = 1)

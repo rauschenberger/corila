@@ -524,11 +524,12 @@ nobs.cv.corila <- function(object, ...) {
 #' This function is called by [coef()][coef.cv.corila].
 #'
 #' @examples
+#' \dontshow{.combine_slopes <- corila:::.combine_slopes}
 #' p <- 10
 #' alpha <- rnorm(1)
 #' temp <- rnorm(p)
 #' beta <- pmax(c(temp, -temp), 0)
-#' corila:::.combine_slopes(alpha = alpha, beta = beta)
+#' .combine_slopes(alpha = alpha, beta = beta)
 #'
 #' @keywords internal
 #'
@@ -569,12 +570,13 @@ nobs.cv.corila <- function(object, ...) {
 #' This function is called by [predict()][predict.cv.corila()].
 #'
 #' @examples
+#' \dontshow{.expand_auxiliary <- corila:::.expand_auxiliary}
 #' n <- 5
 #' p <- 10
 #' x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 #' primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
 #' x_primary <- x[, primary]
-#' x_expanded <- corila:::.expand_auxiliary(x = x_primary, primary = primary)
+#' x_expanded <- .expand_auxiliary(x = x_primary, primary = primary)
 #' all(x_expanded[, primary] == x[, primary])
 #' all(x_expanded[, !primary] == 0)
 #'
@@ -617,14 +619,16 @@ nobs.cv.corila <- function(object, ...) {
 #' Returns an \eqn{n}-dimensional vector.
 #'
 #' @examples
+#' \dontshow{.residuals <- corila:::.residuals}
 #' n <- 10
 #' y_obs <- stats::rbinom(n = n, size = 1, prob = 0.2)
 #' y_fit <- stats::runif(n = n)
-#' corila:::.residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
+#' .residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
 #'
 #' @keywords internal
 #'
 .residuals <- function(y_obs, y_fit, family) {
+  if (is.character(family)) family <- tolower(family)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson"))
   eps <- 1e-06
@@ -669,7 +673,8 @@ nobs.cv.corila <- function(object, ...) {
 #' This function is called by [print.summary.cv.corila()].
 #'
 #' @examples
-#' corila:::.type(alpha = 0)
+#' \dontshow{.type <- corila:::.type}
+#' .type(alpha = 0)
 #'
 #' @keywords internal
 #'
