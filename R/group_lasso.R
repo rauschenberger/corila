@@ -147,8 +147,8 @@
 #'
 #' @examples
 #' # minimal example
-#' set.seed(1)
-#' n <- 50; p <- 20; q <- 5
+#' set.seed(1L)
+#' n <- 50L; p <- 20L; q <- 5L
 #' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 #' y <- rnorm(n)
 #' group <- rep(seq_len(q), length.out = p)
@@ -489,9 +489,9 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' \donttest{
 #' \dontshow{corila <- corila:::corila}
 #' # simulation
-#' n <- 100
-#' p <- 50
-#' group <- rep(x = 1:10, each = 5)
+#' n <- 100L
+#' p <- 50L
+#' group <- rep(x = seq_len(10L), each = 5L)
 #' primary <- rep(x = TRUE, times = p)
 #' x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 #' y <- rnorm(n = n)
@@ -508,7 +508,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'                  alpha_final = 1,
 #'                  cor = "spearman",
 #'                  foldid = NULL,
-#'                  nfolds = 10,
+#'                  nfolds = 10L,
 #'                  hyper = hyper,
 #'                  lambda_init = NULL)
 #'
@@ -742,6 +742,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @keywords internal
 #'
 .set_candidates <- function(tune) {
+  if (is.character(tune)) tune <- tolower(tune)
   .assert(x = tune, type = "nominal")
   if (identical(tune, "none")) {
     hyper <- data.frame(wgt_local = 1,
@@ -875,7 +876,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   .assert(x = foldid, type = "integer", dim = n,
           min = 1L, max = n)
   if (!is.null(foldid)) foldid <- as.integer(foldid)
-  .assert(x = nfolds, type = "integer", min = 2L, max = n)
+  .assert(x = nfolds, type = "integer", min = 3L, max = n)
   nfolds <- as.integer(nfolds)
   if (identical(alpha_init, "multiridge")) {
     dim <- length(unique(group))
