@@ -80,10 +80,7 @@ object <- corila(x = x,
                  nfolds = 10,
                  hyper = hyper,
                  lambda_init = NULL)
-#> Warning: no non-missing arguments to max; returning -Inf
-#> Error in glmnet::cv.glmnet(x = x, y = y, family = family, alpha = alpha_init,     foldid = foldid, nfolds = nfolds): nfolds must be bigger than 3; nfolds=10 recommended
 
 y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
-#> Error: object 'object' not found
 # }
 ```
