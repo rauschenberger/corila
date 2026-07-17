@@ -26,9 +26,11 @@ rho <- 0.5
 sigma <- rho * outer(X = group, Y = group, FUN = "==") +
   (1.0 - rho) * diag(rep(x = 1.0, times = p))
 x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
-count <- vapply(X = seq_len(p),
-                FUN = function(i) sum(group[seq_len(i)] == group[i]),
-                FUN.VALUE = numeric(1L))
+count <- vapply(
+  X = seq_len(p),
+  FUN = function(i) sum(group[seq_len(i)] == group[i]),
+  FUN.VALUE = numeric(1L)
+)
 
 # effect vector
 beta_group <- sign(stats::rnorm(n = q)) *
@@ -58,20 +60,20 @@ x_test[, !primary] <- NA # privileged information
 y_test <- y[holdout]
 
 # dataset
-data <- list(x_train = x_train,
-             y_train = y_train,
-             group = group,
-             primary = primary,
-             beta = beta,
-             x_test = x_test,
-             y_test = y_test)
+corila_data <- list(x_train = x_train,
+                    y_train = y_train,
+                    group = group,
+                    primary = primary,
+                    beta = beta,
+                    x_test = x_test,
+                    y_test = y_test)
 
-print(object.size(data), units = "Mb")
+print(object.size(corila_data), units = "Mb")
 
-usethis::use_data(data, overwrite = TRUE)
+usethis::use_data(corila_data, overwrite = TRUE)
 
 # coef <- y_hat <- list()
-# 
+#
 # # standard lasso regression
 # object <- glmnet::cv.glmnet(x = data$x_train[, data$primary],
 # y = data$y_train)
@@ -81,21 +83,21 @@ usethis::use_data(data, overwrite = TRUE)
 #                                newx = data$x_test[, data$primary],
 #                                type = "response",
 #                                s = "lambda.min")
-# 
+#
 # # flexible group lasso regression
 # object <- cv.corila(x = data$x_train, y = data$y_train,
 #                     group = data$group, primary = data$primary)
 # coef$corila <- stats::coef(object = object)
 # y_hat$corila <- stats::predict(object = object,
 #                                newx = data$x_test[, data$primary])
-# 
+#
 # # selection performance
 # vapply(X = coef,
 #        FUN = function(x) {
 #          calc_sign_prec(truth = sign(data$beta),estim = sign(x[-1L]))
 #        },
 #        FUN.VALUE = numeric(1L))
-# 
+#
 # # predictive performance
 # vapply(X = y_hat,
 #        FUN = function(x) mean((x - data$y_test)^2.0),
