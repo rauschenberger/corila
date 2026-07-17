@@ -128,21 +128,27 @@ for (glmnet in c(FALSE, TRUE)) {
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   message("family=\"", family, "\"")
-  data <- simulate(family = family, n1 = 50L, n_group = 3L,
-                   size_group = c(3L, 2L))
-  names_train <- paste0("train_", seq_len(data$info$n0))
-  rownames(data$x_train) <- names(data$y_train) <- names_train
-  names_test <- paste0("train_", seq_len(data$info$n1))
-  rownames(data$x_test) <- names(data$y_test) <- names_test
-  names_covs <- LETTERS[seq_len(ncol(data$x_train))]
-  colnames(data$x_train) <- colnames(data$x_test) <- names_covs
+  data <- simulate_data(family = family, n1 = 50L, q = 3L, p = 5L)
+  names_train <- names(data$y_train)
+  names_test <- names(data$y_test)
+  names_covs <- colnames(data$x_train)
+  #names_train <- paste0("train_", seq_len(data$info$n0))
+  #rownames(data$x_train) <- names(data$y_train) <- names_train
+  #names_test <- paste0("train_", seq_len(data$info$n1))
+  #rownames(data$x_test) <- names(data$y_test) <- names_test
+  #names_covs <- LETTERS[seq_len(ncol(data$x_train))]
+  #colnames(data$x_train) <- colnames(data$x_test) <- names_covs
   group <- list()
   group$vector <- data$group
   group$vector_char <- LETTERS[data$group]
-  group$list <- lapply(X = unique(group$vector),
-                       FUN = function(x) which(group$vector == x))
-  group$list_char <- lapply(X = unique(group$vector),
-                            FUN = function(x) LETTERS[which(group$vector == x)])
+  group$list <- lapply(
+    X = unique(group$vector),
+    FUN = function(x) which(group$vector == x)
+  )
+  group$list_char <- lapply(
+    X = unique(group$vector),
+    FUN = function(x) names_covs[which(group$vector == x)]
+  )
   group$matrix <- 1 * outer(X = group$vector,
                             Y = group$vector,
                             FUN = "==")
@@ -152,6 +158,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     model[[i]] <- cv.corila(x = data$x_train,
                             y = data$y_train,
                             group = group[[i]],
+                            primary = data$primary,
                             family = family)
   }
   coef <- lapply(X = model,
@@ -219,8 +226,10 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     ),
     code = {
       if (family == "cox") {
+        data$x_test[is.na(data$x_test)] <- 0
         eta <- data$x_test %*% coef$vector
       } else {
+        data$x_test[is.na(data$x_test)] <- 0
         eta <- cbind(1.0, data$x_test) %*% coef$vector
       }
       if (family == "gaussian") {
@@ -292,16 +301,17 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   # simulate data
-  data <- simulate(family = family)
-  primary <- as.logical(stats::rbinom(n = data$info$p, size = 1L, prob = 0.5))
+  data <- simulate_data(family = family)
+  #primary <- as.logical(stats::rbinom(n = data$info$p, size = 1L, prob = 0.5))
   # fit model
   object <- cv.corila(x = data$x_train, y = data$y_train,
-                      group = data$group, primary = primary, family = family)
+                      group = data$group, primary = data$primary,
+                      family = family)
   testthat::test_that("predict is not influenced by auxiliary predictors", {
     y_hat1 <- predict(object = object, newx = data$x_test)
-    y_hat2 <- predict(object = object, newx = data$x_test[, primary])
+    y_hat2 <- predict(object = object, newx = data$x_test[, data$primary])
     newx <- data$x_test
-    newx[, !primary] <- 0.0
+    newx[, !data$primary] <- 0.0
     y_hat3 <- predict(object = object, newx = newx)
     testthat::expect_equal(object = y_hat1, expected = y_hat2)
     testthat::expect_equal(object = y_hat1, expected = y_hat3)
@@ -317,7 +327,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   # simulate data
-  data <- simulate(family = family)
+  data <- simulate_data(family = family)
   foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
   object <- y_hat <- coef <- list()
   for (i in 1L:2L) {
@@ -331,6 +341,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       y <- data$y_train
     }
     object[[i]] <- cv.corila(x = x, y = y, group = data$group,
+                             primary = data$primary,
                              family = family, foldid = foldid)
     coef[[i]] <- coef(object[[i]])
     y_hat[[i]] <- predict(object[[i]], newx = data$x_test)
@@ -349,7 +360,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 testthat::test_that("complete case analysis works with NAs in predictors", {
   family <- "gaussian"
-  data <- simulate(family = family)
+  data <- simulate_data(family = family, prob_primary = 1)
   foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
   missing <- stats::rbinom(n = nrow(data$x_train), size = 1L, prob = 0.2) == 1L
   data$x_train[missing, 1L] <- NA
@@ -375,7 +386,7 @@ testthat::test_that("complete case analysis works with NAs in predictors", {
 
 testthat::test_that("complete case analysis works with NAs in response", {
   family <- "gaussian"
-  data <- simulate(family = family)
+  data <- simulate_data(family = family, prob_primary = 1)
   foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
   missing <- stats::rbinom(n = nrow(data$x_train), size = 1L, prob = 0.2) == 1L
   data$y_train[missing] <- NA

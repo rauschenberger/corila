@@ -593,6 +593,8 @@ nobs.cv.corila <- function(object, ...) {
   } else if (ncol(x) == sum(primary)) {
     full <- matrix(data = 0.0, nrow = nrow(x), ncol = length(primary))
     full[, primary] <- x
+    if (!is.null(rownames(x))) rownames(full) <- rownames(x)
+    if (!is.null(colnames(x))) colnames(full)[primary] <- colnames(x)
     full
   } else {
     stop("incompatible number of (primary) features")

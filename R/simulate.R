@@ -52,10 +52,11 @@ calc_sign_prec <- function(truth, estim) {
 #' Data simulation
 #'
 #' @description
-#' Simulates data with grouped predictor variables.
+#' Simulates a predictor matrix, an effect vector and a response vector.
+#' The simulated datasets can be used for modelling a response based on
+#' grouped and correlated primary and auxiliary predictors.
 #'
-#' @param family
-#' character `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
+#' @inheritParams cv.corila family
 #'
 #' @param n0
 #' number of training observations
@@ -65,215 +66,277 @@ calc_sign_prec <- function(truth, estim) {
 #' number of testing observations
 #' (positive integer)
 #'
-#' @param n_group
-#' number of variable groups
+#' @param p
+#' number of predictors
 #' (positive integer)
 #'
-#' @param n_type
-#' number of variable types
+#' @param q
+#' number of predictor groups
 #' (positive integer)
 #'
-#' @param size_group
-#' size of variable groups (per variable type):
-#' integer vector of length `n_type`
+#' @param rho
+#' correlation coefficient for predictors within the same group:
+#' numeric scalar in the unit interval (minimum 0, maximum 1)
 #'
-#' @param effect_size
-#' effect sizes (per variable type):
-#' numeric vector of length `n_type`
+#' @param prob_primary
+#' probability for each predictor to be primary (rather than auxiliary):
+#' numeric scalar in the unit interval
+#' (minimum 0 leads to auxiliary predictors only,
+#' maximum 1 leads to primary predictors only)
 #'
-#' @param corfac_feature
-#' decrease of correlation if different variable:
-#' scalar in unit interval
+#' @param signal_strength
+#' non-negative numeric scalar (default: `signal_strength=1`)
+#' for multiplying the effect sizes
+#' (to increase or decrease the signal strength)
 #'
-#' @param corfac_type
-#' decrease of correlation if different type:
-#' scalar in unit interval
+#' @param prob_group
+#' probability for each group to be active:
+#' numeric scalar in the unit interval
 #'
-#' @param corfac_group
-#' decrease of correlation if different group:
-#' scalar in unit interval
+#' @param prob_predictor
+#' probability for each predictor in an active group to be active:
+#' numeric scalar in the unit interval
 #'
-#' @param n_group_causal
-#' number of causal groups:
-#' integer
+#' @param seed
+#' random seed for reproducibility:
+#' integer scalar
 #'
-#' @param prop_causal
-#' proportion of causal features within causal groups:
-#' scalar in unit interval
-#'
-#' @param noise_factor
-#' noise factor:
-#' numeric scalar
-#'
-#' @param plot
-#' Attempt to visualise effects of and correlation between variables?
-#' (`TRUE` or `FALSE`)
-#'
-#' @param trial
-#' logical (groups of negatively correlated subgroups)
+#' @aliases simulate
 #'
 #' @return
-#' Returns a list with the following slots:
-#' - \eqn{n_0 \times p} matrix `x_train`
-#' - \eqn{p}-dimensional vector `type`
-#' - \eqn{p}-dimensional vector `group`
-#' - \eqn{n_0}-dimensional vector `y_train`
-#' - \eqn{n_1 \times p} matrix `x_test`
-#' - \eqn{n_1}-dimensional vector `y_test`
-#' - \eqn{p}-dimensional vector `beta`
-#' - data frame `info` with entries
-#' \eqn{n_0}, \eqn{n_1}, \eqn{p}, `n_type`,
-#' `n_group`, and `family`
+#' Returns a list with multiple slots:
+#' - `x_train`:
+#'   predictor matrix of the training observations
+#'   (\eqn{n_0} rows, \eqn{p} columns)
+#' - `y_train`:
+#'   response vector of the training observations
+#'   (length \eqn{n_0})
+#' - `group`:
+#'   integer vector indicating the group of the predictors
+#'   (length \eqn{p})
+#' - `primary`:
+#'   logical vector indicating
+#'   primary (`TRUE`) and auxiliary (`FALSE`) predictors
+#'   (length \eqn{p})
+#' - `beta`:
+#'    numeric vector of the effects of the predictors on the response
+#'    (length \eqn{p})
+#' - `x_test`:
+#'   \eqn{n_1 \times p} predictor matrix for the test observations
+#' - `y_test`:
+#'   response vector for the test observations of length \eqn{n_1}
+#'
+#' Training and testing observations are named `train_` or `test_`,
+#' respectively, followed by a number indexing the observations
+#' (e.g., `train_1` or `test_1`).
+#'
+#' Primary and auxiliary predictors are named `pri_` or `aux_`, respectively,
+#' followed by a number indexing the predictor groups, a point,
+#' and a number indexing the predictors within this group
+#' (e.g., `pri_1.1` or `aux_1.1`).
+#'
+#' @details
+#' - Use the objects `x_train`, `y_train`, `group`, and `primary`
+#'   for model training.
+#'   Estimated coefficients can be compared with `beta`.
+#' - Use the object `x_test` for model testing.
+#'   Predicted values can be compared with `y_test`.
+#'
+#' @seealso
+#' This function calls the internal functions [.simulate_predictors()],
+#' [.simulate_effects()], and [.simulate_response()] for simulating the
+#' predictor matrix, the effect vector, or the response vector, respectively.
+#'
+#' @export
 #'
 #' @examples
-#' data <- corila:::simulate()
-#' dims <- function(x) {
-#'    if (is.matrix(x)||is.data.frame(x)) {
-#'      paste(base::dim(x), collapse = " x ")
-#'    } else {
-#'      paste0(base::length(x))
-#'    }
+#' \donttest{
+#' data <- simulate_data(n0 = 100, n1 = 10000)
+#'
+#' coef <- y_hat <- list()
+#'
+#' # standard lasso regression
+#' object <- glmnet::cv.glmnet(x = data$x_train[, data$primary],
+#' y = data$y_train)
+#' temp <- stats::coef(object = object, s = "lambda.min")[-1L]
+#' coef$glmnet <- c(temp[1L], ifelse(primary, temp[-1L], 0.0))
+#' y_hat$glmnet <- stats::predict(object = object,
+#'                                newx = data$x_test[, data$primary],
+#'                                type = "response",
+#'                                s = "lambda.min")
+#'
+#' # flexible group lasso regression
+#' object <- cv.corila(x = data$x_train, y = data$y_train,
+#'                     group = data$group, primary = data$primary)
+#' coef$corila <- stats::coef(object = object)
+#' y_hat$corila <- stats::predict(object = object,
+#'                                newx = data$x_test[, data$primary])
+#'
+#' # selection performance (precision: higher = better)
+#' vapply(X = coef,
+#'        FUN = function(x) {
+#'          calc_sign_prec(truth = sign(data$beta), estim = sign(x[-1L]))
+#'        },
+#'        FUN.VALUE = numeric(1L))
+#'
+#' # predictive performance (mean squared error: lower = better)
+#' vapply(X = y_hat,
+#'        FUN = function(x) mean((x - data$y_test)^2.0),
+#'        FUN.VALUE = numeric(1L))
 #' }
-#' sapply(X = data, FUN = dims)
+#'
+#' @srrstats {G5.1} *data set for tests and examples is exported*
+#'
+simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
+                          family = "gaussian", rho = 0.5,
+                          prob_primary = 0.5, signal_strength = 1.0,
+                          prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
+  # argument checks
+  .assert(x = n0, type = "integer", min = 2L)
+  n0 <- as.integer(n0)
+  .assert(x = n1, type = "integer", min = 0L)
+  n1 <- as.integer(n1)
+  .assert(x = p, type = "integer", min = 2L)
+  p <- as.integer(p)
+  .assert(x = q, type = "integer", min = 1L)
+  q <- as.integer(q)
+  .assert(x = family, type = "nominal",
+          support = c("gaussian", "binomial", "poisson", "cox"))
+  .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = prob_primary, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = seed, type = "integer")
+  # simulation
+  set.seed(seed)
+  n <- n0 + n1
+  group <- sort(c(seq_len(q),
+                  sample(x = seq_len(q), size = p - q, replace = TRUE)))
+  primary <- as.logical(stats::rbinom(n = p, size = 1L, prob = prob_primary))
+  holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
+  x <- .simulate_predictors(n = n, group = group, rho = rho)
+  beta <- .simulate_effects(group = group,
+                            signal_strength = signal_strength,
+                            prob_group = prob_group,
+                            prob_predictor = prob_predictor)
+  y <- .simulate_response(family = family, x = x, beta = beta)
+  # names of observations and predictors
+  rownames <- c(paste0("train_", seq_len(n0)), paste0("test_", seq_len(n1)))
+  rownames(x) <- names(y) <- rownames
+  count <- vapply(
+    X = seq_len(p),
+    FUN = function(i) sum(group[seq_len(i)] == group[i]),
+    FUN.VALUE = numeric(1L)
+  )
+  colnames <- paste0(group, ".", count)
+  colnames[primary] <- paste0("pri_", colnames[primary])
+  colnames[!primary] <- paste0("aux_", colnames[!primary])
+  colnames(x) <- names(primary) <- names(group) <- names(beta) <- colnames
+  # training/test split
+  x_train <- x[!holdout, ]
+  y_train <- y[!holdout]
+  x_test <- x[holdout, ]
+  y_test <- y[holdout]
+  # privileged information
+  x_test[, !primary] <- NA
+  # dataset
+  list(x_train = x_train,
+       y_train = y_train,
+       group = group,
+       primary = primary,
+       beta = beta,
+       x_test = x_test,
+       y_test = y_test)
+}
+
+#' @title
+#' Simulate predictors
+#'
+#' @description
+#' Simulates predictor matrix.
+#'
+#' @inheritParams simulate_data p rho
+#'
+#' @param n
+#' number of observations (positive integer)
+#'
+#' @param p
+#' number of predictors (positive integer)
+#'
+#' @param group
+#' integer vector (length \eqn{p}, minimum 1, maximum \eqn{p})
+#'
+#' @return
+#' Returns a numeric matrix with \eqn{n} rows (observations)
+#' and \eqn{p} columns (predictors).
+#'
+#' @seealso
+#' This function is called by [simulate_data()].
 #'
 #' @keywords internal
 #'
-simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
-                     n_type = 2L, size_group = c(5L, 3L),
-                     effect_size = c(1.0, 1.0),
-                     corfac_feature = 0.5, corfac_type = 0.5,
-                     corfac_group = 0.25, n_group_causal = 2L,
-                     prop_causal = 0.5, noise_factor = 1.0,
-                     plot = FALSE, trial = FALSE) {
-  # --- check arguments ---
-  .assert(x = family, type = "nominal",
-          support = c("gaussian", "binomial", "poisson", "cox"))
-  .assert(x = n0, type = "integer", min = 2L)
-  n0 <- as.integer(n0)
-  .assert(x = n1, type = "integer", min = 2L)
-  n1 <- as.integer(n1)
-  .assert(x = n_group, type = "integer", min = 2L)
-  n_group <- as.integer(n_group)
-  .assert(x = n_type, type = "integer", min = 2L)
-  n_type <- as.integer(n_type)
-  .assert(x = size_group, type = "integer", dim = n_type, min = 1L)
-  size_group <- as.integer(size_group)
-  .assert(x = effect_size, type = "numeric", dim = n_type, min = 0.0)
-  .assert(x = corfac_feature, type = "numeric", min = 0.0, max = 1.0)
-  .assert(x = corfac_type, type = "numeric", min = 0.0, max = 1.0)
-  .assert(x = corfac_group, type = "numeric", min = 0.0, max = 1.0)
-  .assert(x = n_group_causal, type = "integer", min = 0.0, max = n_group)
-  n_group_causal <- as.integer(n_group_causal)
-  .assert(x = prop_causal, type = "numeric", min = 0.0, max = 1.0)
-  .assert(x = noise_factor, type = "numeric", min = 0.0)
-  .assert(x = plot, type = "logical")
-  .assert(x = trial, type = "logical")
-  # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;
-  # size_group = c(5, 3);effect_size = c(1, 1);corfac_feature = 0.5;
-  # corfac_type = 0.5;corfac_group = 0.25;n_group_causal = 2;
-  # prop_causal = 0.5; noise_factor = 1; plot = TRUE
-  n <- n0 + n1
-  #if (n_type != length(size_group)) {
-  #  stop("Wrong length.")
-  #}
-  #- - - feature modalities and groups - - -
-  p <- sum(n_group * size_group)
-  if (!trial) {
-    type <- rep(x = seq_len(n_type),
-                times = n_group * size_group) # original
-    group <- unlist(
-      lapply(
-        X = size_group,
-        FUN = function(x) rep(x = seq_len(n_group), each = x)
-      )
-    ) # original
-  } else {
-    group <- rep(x = seq_len(n_group),
-                 each = sum(size_group)) # trial 2025-09-22
-    type <- rep(x = rep(x = seq_len(n_type), times = size_group),
-                times = n_group) # trial 2025-09-22
+#' @examples
+#' \dontshow{.simulate_predictors <- corila:::.simulate_predictors}
+#' .simulate_predictors(n = 5L, p = 7L)
+#'
+#' .simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
+#'
+.simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0) {
+  if (is.null(p) == is.null(group)) stop("Provide either p or group.")
+  .assert(x = n, type = "integer", min = 2)
+  .assert(x = p, type = "integer", min = 2)
+  if (is.null(group)) group <- seq_len(p)
+  .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
+  group <- as.integer(group)
+  .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
+  p <- length(group)
+  mu <- rep(x = 0.0, times = p)
+  sigma <- rho * outer(X = group, Y = group, FUN = "==") +
+    (1.0 - rho) * diag(rep(x = 1.0, times = p))
+  MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
+}
+
+#' @title
+#' Simulate effects
+#'
+#' @description
+#' Simulates effect vector.
+#'
+#' @inheritParams simulate_data
+#' @inheritParams .simulate_predictors group
+#'
+#' @return
+#' Returns a numeric vector of length \eqn{p}.
+#'
+#' @seealso
+#' This function is called by [simulate_data()].
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontshow{.simulate_effects <- corila:::.simulate_effects}
+#' .simulate_effects(group = rep(c(1L:5L), each = 3L))
+#'
+.simulate_effects <- function(group, prob_group = 0.5, prob_predictor = 0.8,
+                              signal_strength = 1.0) {
+  .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
+  group <- as.integer(group)
+  .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = signal_strength, type = "numeric", min = 0.0)
+  p <- length(group)
+  q <- length(unique(group))
+  beta_group <-
+    sign(stats::rnorm(n = q)) *
+    stats::rbinom(n = q, size = 1L, prob = prob_group)
+  beta <- rep(x = NA, times = p)
+  for (i in seq_len(q)) {
+    beta[group == i] <-
+      beta_group[i] * signal_strength *
+      abs(stats::rnorm(n = sum(group == i))) *
+      stats::rbinom(n = sum(group == i), size = 1L, prob = prob_predictor)
   }
-  #- - - effect vector - - -
-  beta <- rep(x = 0.0, times = p)
-  index_common <- sample(x = seq_len(n_group), size = n_group_causal)
-  cond <- group %in% index_common
-  var_binom <- stats::rbinom(n = sum(cond), size = 1L, prob = prop_causal)
-  var_norm <- abs(stats::rnorm(n = sum(cond)))
-  beta[cond] <- var_binom * var_norm
-  if (!trial) {
-    beta <- beta * rep(x = effect_size, times = table(type))
-    # NB: original, added on 2025-06-20
-  } else {
-    for (i in seq_along(unique(type))) { # trial 2025-09-22
-      beta[type == i] <- beta[type == i] * effect_size[i] # trial 2025-09-22
-    } # trial 2025-09-22
-  }
-  if (plot) {
-    tryCatch(expr = graphics::plot(x = beta, col = group, pch = type),
-             error = function(x) NULL)
-  }
-  #- - - feature matrix - - -
-  mean <- rep(x = 0.0, times = p)
-  sigma <- matrix(data = NA, nrow = p, ncol = p)
-  for (i in seq_len(p)) {
-    for (j in seq_len(p)) {
-      if (!trial) {
-        sigma[i, j] <- corfac_feature^(i != j) *
-          corfac_type^(type[i] != type[j]) *
-          corfac_group^(group[i] != group[j]) # original
-      } else {
-        sigma[i, j] <- ifelse(i == j, 1.0, ifelse(group[i] == group[j] & type[i] == type[j], 0.5, ifelse(group[i] == group[j], -0.25, ifelse(type[i] == type[j], 0.125, -0.125)))) # Consider not only + but also - (but then use + and - for effect sizes), was -0.0625 MAKE THIS LINE SHORTER USING IF ELSE STATEMENTS # nolint: line_length_linter.
-      }
-    }
-  }
-  if (any(diag(sigma) != 1.0)) {
-    stop("diagonal != 1")
-  }
-  if (plot) {
-    tryCatch(graphics::image(x = sigma[, rev(seq_len(p))]),
-             error = function(x) NULL)
-  }
-  x <- mvtnorm::rmvnorm(n = n, mean = mean, sigma = sigma)
-  #- - - target vector - - -
-  eta <- scale(x %*% as.vector(beta)) # was without scale
-  if (identical(family, "gaussian")) {
-    y <- eta + noise_factor * stats::rnorm(n = n, sd = stats::sd(eta))
-    # NB: decrease/increase noise?
-    if (stats::sd(y) == 0.0) {
-      warning("Replacing constant y by random noise.")
-      y <- stats::rnorm(n = n)
-    }
-  } else if (identical(family, "binomial")) {
-    y <- stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-2.0 * eta)))
-    # NB: was without 2*
-  } else if (identical(family, "cox")) {
-    time <- stats::rexp(n = n, rate = exp(eta))
-    status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
-    #y <- cbind(time = time, status = status)
-    y <- survival::Surv(time = time, event = status)
-  } else if (identical(family, "poisson")) {
-    y <- stats::rpois(n = n, lambda = exp(eta))
-  }
-  #- - - outputs - - -
-  fold <- rep(x = c(0L, 1L), times = c(n0, n1))
-  x_train <- x[fold == 0L, ]
-  y_train <- y[fold == 0L]
-  x_test <- x[fold == 1L, ]
-  y_test <- y[fold == 1L]
-  info <- data.frame(n0 = n0,
-                     n1 = n1,
-                     p = p,
-                     n_type = n_type,
-                     n_group = n_group,
-                     family = family)
-  list(x_train = x_train,
-       type = type,
-       group = group,
-       y_train = y_train,
-       x_test = x_test,
-       y_test = y_test,
-       beta = beta,
-       info = info)
+  beta
 }
 
 #' @title
@@ -282,54 +345,50 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
 #' @description
 #' Simulates outcome vector.
 #'
-#' @inheritParams simulate
+#' @inheritParams simulate_data family
 #'
 #' @param x
-#' numeric \eqn{n \times p} matrix
+#' predictors:
+#' numeric matrix with \eqn{n} rows (observations)
+#' and \eqn{p} columns (predictors)
 #'
 #' @param beta
-#' numeric \eqn{p}-dimensional vector
+#' effects:
+#' numeric vector of length \eqn{q}
 #'
 #' @param n
-#' positive integer or \code{NULL}
-#'
-#' @param factor
-#' non-negative numeric scalar (default: `factor=1.0`)
-#' for multiplying the linear predictor
-#' (to increase or decrease the signal strength)
+#' sample size:
+#' positive integer scalar or \code{NULL}
 #'
 #' @return
-#' Returns an \eqn{n}-dimensional outcome vector.
+#' Returns an \eqn{n}-dimensional response vector.
 #'
 #' @seealso
-#' Use [simulate()] to simulate a predictor matrix,
-#' an effect vector, and an outcome vector.
+#' This function is called by [simulate_data()].
 #'
 #' @keywords internal
 #'
 #' @examples
-#' \dontshow{.simulate_outcome <- corila:::.simulate_outcome}
-#' # simulate independent outcome
-#' .simulate_outcome(family = "gaussian", n = 10L, factor = 1.0)
+#' \dontshow{.simulate_response <- corila:::.simulate_response}
+#' # simulate independent response
+#' .simulate_response(family = "gaussian", n = 10L)
 #'
-#' # simulate dependent outcome
+#' # simulate dependent response
 #' n <- 10L
 #' p <- 20L
 #' x <- matrix(rnorm(n * p), n, p)
 #' beta <- rnorm(p)
-#' .simulate_outcome(family = "gaussian", x = x, beta = beta, factor = 1.0)
+#' .simulate_response(family = "gaussian", x = x, beta = beta)
 #'
-.simulate_outcome <- function(family, x = NULL, beta = NULL, n = NULL,
-                              factor = 1.0) {
+.simulate_response <- function(family, x = NULL, beta = NULL, n = NULL) {
   if (is.character(family)) family <- tolower(family)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = beta, type = "numeric", dim = ncol(x))
   .assert(x = n, type = "integer", min = 1L)
-  .assert(x = factor, type = "numeric", min = 0.0)
   if (!is.null(x) && !is.null(beta) && is.null(n)) {
-    eta <- as.numeric(scale(x %*% as.vector(beta))) # was without scale
+    eta <- as.numeric(x %*% as.vector(beta))
     n <- nrow(x)
   } else if (is.null(x) && is.null(beta) && !is.null(n)) {
     eta <- rep(x = 0.0, times = n)
@@ -337,14 +396,14 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
     stop("Provide either `x` and `beta` or `n`.")
   }
   if (identical(family, "gaussian")) {
-    factor * eta + stats::rnorm(n = n, sd = 1.0)
+    eta + stats::rnorm(n = n, sd = 1.0)
   } else if (identical(family, "binomial")) {
-    stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-factor * eta)))
+    stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
   } else if (identical(family, "cox")) {
-    time <- stats::rexp(n = n, rate = exp(factor * eta))
+    time <- stats::rexp(n = n, rate = exp(eta))
     status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
     survival::Surv(time = time, event = status)
   } else if (identical(family, "poisson")) {
-    stats::rpois(n = n, lambda = exp(factor * eta))
+    stats::rpois(n = n, lambda = exp(eta))
   }
 }

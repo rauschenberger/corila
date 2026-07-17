@@ -290,7 +290,7 @@ for (i in c(0L, 1L)){
   testthat::expect_setequal(object = foldid, expected = seq_len(nfolds))
 }
 
-## function ".simulate_outcome" ------------------------------------------------
+## function ".simulate_response" -----------------------------------------------
 
 testthat::test_that("outcomes are simulated", {
   family <- c("gaussian", "binomial", "poisson", "cox")
@@ -300,16 +300,16 @@ testthat::test_that("outcomes are simulated", {
   beta <- stats::rnorm(n = p)
   for (i in seq_along(family)) {
     testthat::expect_error(
-      .simulate_outcome(family = family[i])
+      .simulate_response(family = family[i])
     )
     testthat::expect_error(
-      .simulate_outcome(family = family[i], x = x, beta = beta, n = n)
+      .simulate_response(family = family[i], x = x, beta = beta, n = n)
     )
     for (j in 1L:2L){
       if (j == 1L) {
-        y <- .simulate_outcome(family = family[i], x = x, beta = beta)
+        y <- .simulate_response(family = family[i], x = x, beta = beta)
       } else {
-        y <- .simulate_outcome(family = family[i], n = n)
+        y <- .simulate_response(family = family[i], n = n)
       }
       testthat::expect_length(object = y, n = n)
       testthat::expect_no_error(

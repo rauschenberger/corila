@@ -9,8 +9,7 @@
 n <- 10L
 for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
   set.seed(1L)
-  data <- simulate(family = family_data, n0 = n, n1 = n, n_group = 3L,
-                   size_group = c(3L, 2L))
+  data <- simulate_data(family = family_data, n0 = n, n1 = n, q = 3L, p = 5L)
   p <- ncol(data$x_train)
   testthat::test_that("function '.validate' rejects wrong family", {
     for (family_model in c("gaussian", "binomial", "poisson", "cox")) {
@@ -141,7 +140,7 @@ testthat::test_that("initial coefficients are estimated", {
           & alpha[[j]][1L] %in% c("pearson", "spearman", "kendall")) {
         next
       }
-      y <- .simulate_outcome(family = family[i], x = x, beta = beta)
+      y <- .simulate_response(family = family[i], x = x, beta = beta)
       init <- list()
       for (k in 1L:2L) {
         if (k == 1L) {

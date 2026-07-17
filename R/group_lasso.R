@@ -383,7 +383,8 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
   class(object) <- "cv.corila"
   object$y_obs <- y
   complete_x <- stats::complete.cases(x = x)
-  object$y_fit <- rep(x = NA, times = n)
+  object$y_fit <- stats::setNames(object = rep(x = NA, times = n),
+                                  nm = rownames(x))
   object$y_fit[complete_x] <- stats::predict(object = object,
                                              newx = x[complete_x, ])
   object

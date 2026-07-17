@@ -5,6 +5,7 @@ Description: Implements sparse modelling with grouped and correlated features al
 Depends: R (>= 4.0.0)
 Imports: stats, glmnet, multiridge
 Suggests:
+    MASS,
     mvtnorm,
     pROC,
     survival,
@@ -23,4 +24,3 @@ License: GPL (>= 3)
 Config/roxygen2/version: 8.0.0
 Roxygen: list(markdown = TRUE, roclets = c ("namespace", "rd", "srr::srr_stats_roclet"))
 RoxygenNote: 7.3.3
-LazyData: true

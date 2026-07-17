@@ -75,7 +75,7 @@ notes[notes$content=="is case dependent",]
 
 data.frame(notes[notes$fn_name=="cv.corila",])
 
-note <- autotest::autotest_package(functions=".deviance",test=TRUE)
+note <- autotest::autotest_package(functions="cv.corila",test=TRUE)
 
 #srr::srr_stats_roxygen(category = c("ml", "regression"))
 

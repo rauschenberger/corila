@@ -1,5 +1,5 @@
 
-data(data, package = "corila")
+data <- simulate_data()
 
 slots <- c("x_train", "y_train", "group", "primary", "beta", "x_test", "y_test")
 

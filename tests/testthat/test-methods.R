@@ -3,12 +3,11 @@
 
 #' @srrstats {RE7.3} test S3 methods
 
-n <- 10L
+n <- 15L
+p <- 5L
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   set.seed(1L)
-  data <- simulate(family = family, n0 = n, n1 = n, n_group = 3L,
-                   size_group = c(3L, 2L))
-  p <- data$info$p
+  data <- simulate_data(family = family, n0 = n, n1 = n, q = 3L, p = p)
   object <- cv.corila(x = data$x_train, y = data$y_train, group = data$group,
                       family = family)
   testthat::test_that("function 'cv.corila' returns a list", {
