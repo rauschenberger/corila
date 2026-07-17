@@ -52,18 +52,21 @@ indicating whether a predictor may be included in the final model
 or must be excluded from the final model
 (\code{FALSE} for "auxiliary predictors")}
 
-\item{alpha_init}{elastic net mixing parameter
+\item{alpha_init}{A scalar specifying the method used for obtaining initial coefficients:
+\itemize{
+\item a numeric scalar in the unit interval
 (\eqn{0 \leq} \code{alpha_init} \eqn{\leq 1})
-for initial regression
+to define the mixing parameter for elastic net regression
 (default: ridge penalisation with \code{alpha_init}=0);
-alternative choices are
-\code{"pearson"}, \code{"spearman"}, or \code{"kendall"}
+\item the character scalar \code{"pearson"}, \code{"spearman"}, or \code{"kendall"}
 to use initial correlation coefficients
-(not implemented for \code{family="cox"}),
-\code{"multiridge"} for multi-penalty ridge regression
+(not implemented for \code{family="cox"})
+\item the character scalar\code{"multiridge"}
+to use multi-penalty ridge regression
 with one penalty for each group
 (not implemented for \code{family="poisson"} or overlapping groups),
-or \code{NA} to set all initial coefficients equal to 1}
+\item \code{NA} to set all initial coefficients equal to 1
+}}
 
 \item{alpha_final}{elastic net mixing parameter for final regression:
 numeric between 0 for ridge penalisation
