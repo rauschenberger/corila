@@ -148,10 +148,15 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   .assert(x = n0, type = "integer", min = 2L)
+  n0 <- as.integer(n0)
   .assert(x = n1, type = "integer", min = 2L)
+  n1 <- as.integer(n1)
   .assert(x = n_group, type = "integer", min = 2L)
+  n_group <- as.integer(n_group)
   .assert(x = n_type, type = "integer", min = 2L)
+  n_type <- as.integer(n_type)
   .assert(x = size_group, type = "integer", dim = n_type, min = 1L)
+  size_group <- as.integer(size_group)
   .assert(x = effect_size, type = "numeric", dim = n_type, min = 0)
   .assert(x = corfac_feature, type = "numeric", min = 0, max = 1)
   .assert(x = corfac_type, type = "numeric", min = 0, max = 1)
@@ -190,7 +195,7 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
   beta <- rep(x = 0, times = p)
   index_common <- sample(x = seq_len(n_group), size = n_group_causal)
   cond <- group %in% index_common
-  var_binom <- stats::rbinom(n = sum(cond), size = 1, prob = prop_causal)
+  var_binom <- stats::rbinom(n = sum(cond), size = 1L, prob = prop_causal)
   var_norm <- abs(stats::rnorm(n = sum(cond)))
   beta[cond] <- var_binom * var_norm
   if (!trial) {
@@ -223,7 +228,8 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
     stop("diagonal != 1")
   }
   if (plot) {
-    tryCatch(graphics::image(x = sigma[, p:1]), error = function(x) NULL)
+    tryCatch(graphics::image(x = sigma[, rev(seq_len(p))]),
+             error = function(x) NULL)
   }
   x <- mvtnorm::rmvnorm(n = n, mean = mean, sigma = sigma)
   #- - - target vector - - -
@@ -236,22 +242,22 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
       y <- stats::rnorm(n = n)
     }
   } else if (identical(family, "binomial")) {
-    y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-2 * eta)))
+    y <- stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-2 * eta)))
     # NB: was without 2*
   } else if (identical(family, "cox")) {
     time <- stats::rexp(n = n, rate = exp(eta))
-    status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+    status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
     #y <- cbind(time = time, status = status)
     y <- survival::Surv(time = time, event = status)
   } else if (identical(family, "poisson")) {
     y <- stats::rpois(n = n, lambda = exp(eta))
   }
   #- - - outputs - - -
-  fold <- rep(x = c(0, 1), times = c(n0, n1))
-  x_train <- x[fold == 0, ]
-  y_train <- y[fold == 0]
-  x_test <- x[fold == 1, ]
-  y_test <- y[fold == 1]
+  fold <- rep(x = c(0L, 1L), times = c(n0, n1))
+  x_train <- x[fold == 0L, ]
+  y_train <- y[fold == 0L]
+  x_test <- x[fold == 1L, ]
+  y_test <- y[fold == 1L]
   info <- data.frame(n0 = n0,
                      n1 = n1,
                      p = p,
