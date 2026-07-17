@@ -31,13 +31,13 @@ Calculates the deviance.
 }
 \examples{
 \dontshow{.deviance <- corila:::.deviance}
-n <- 10
+n <- 10L
 
 y <- rnorm(n)
 y_hat <- rnorm(n)
 .deviance(y = y, y_hat = y_hat, family = "gaussian")
 
-y <- rbinom(n = n, size = 1, prob = 0.5)
+y <- rbinom(n = n, size = 1L, prob = 0.5)
 y_hat <- runif(n)
 .deviance(y = y, y_hat = y_hat, family = "binomial")
 

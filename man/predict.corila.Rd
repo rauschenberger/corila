@@ -32,9 +32,9 @@ Makes prediction from an object of class \code{"corila"}.
 \donttest{
 \dontshow{corila <- corila:::corila}
 # simulation
-n <- 100
-p <- 50
-group <- rep(x = 1:10, each = 5)
+n <- 100L
+p <- 50L
+group <- rep(x = seq_len(10L), each = 5L)
 primary <- rep(x = TRUE, times = p)
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
@@ -51,7 +51,7 @@ object <- corila(x = x,
                  alpha_final = 1,
                  cor = "spearman",
                  foldid = NULL,
-                 nfolds = 10,
+                 nfolds = 10L,
                  hyper = hyper,
                  lambda_init = NULL)
 

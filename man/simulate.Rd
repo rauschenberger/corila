@@ -6,11 +6,11 @@
 \usage{
 simulate(
   family = "gaussian",
-  n0 = 100,
-  n1 = 10000,
-  n_group = 20,
-  n_type = 2,
-  size_group = c(5, 3),
+  n0 = 100L,
+  n1 = 10000L,
+  n_group = 20L,
+  n_type = 2L,
+  size_group = c(5L, 3L),
   effect_size = c(1, 1),
   corfac_feature = 0.5,
   corfac_type = 0.5,

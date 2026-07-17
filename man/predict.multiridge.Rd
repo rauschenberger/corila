@@ -25,11 +25,19 @@ Makes predictions from a multi-penalty ridge regression model.
 }
 \examples{
 # minimal example
-n <- 50; p <- 20; q <- 5
-x <- matrix(rnorm(n * p), nrow = n , ncol = p)
+n <- 50L; p <- 20L; q <- 5L
+x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n)
 z <- rep(seq_len(q), length.out = p)
-multiridge(x = x, y = y, z = z)
+model <- multiridge(x = x, y = y, z = z)
+
+# fitting with given folds
+foldid <- sample(seq_len(10L), size = n, replace = TRUE)
+model <- multiridge(x = x, y = y, z = z, foldid = foldid)
+
+# fitting with given penalties
+penalties <- abs(rnorm(q))
+model <- multiridge(x = x, y = y, z = z, penalties = penalties)
 
 \donttest{
 # simulation

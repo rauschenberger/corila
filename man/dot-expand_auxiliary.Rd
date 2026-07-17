@@ -22,14 +22,14 @@ Add empty columns for auxiliary features.
 }
 \examples{
 \dontshow{.expand_auxiliary <- corila:::.expand_auxiliary}
-n <- 5
-p <- 10
+n <- 5L
+p <- 10L
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
-primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 x_primary <- x[, primary]
 x_expanded <- .expand_auxiliary(x = x_primary, primary = primary)
 all(x_expanded[, primary] == x[, primary])
-all(x_expanded[, !primary] == 0)
+all(x_expanded[, !primary] == 0L)
 
 }
 \seealso{

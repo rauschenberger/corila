@@ -20,7 +20,7 @@ Transform the linear predictor to predicted values/probabilities.
 }
 \examples{
 \dontshow{.mean_function <- corila:::.mean_function}
-x <- rnorm(10)
+x <- rnorm(n = 10L)
 .mean_function(x, family = "binomial")
 .mean_function(x, family = "poisson")
 

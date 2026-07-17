@@ -16,12 +16,12 @@ multiridge(
 }
 \arguments{
 \item{x}{predictors:
-\eqn{n \times p} matrix}
+\eqn{n \times p} numeric matrix}
 
 \item{y}{response:
 \eqn{n}-dimensional vector}
 
-\item{z}{\eqn{p}-dimensional vector with entries in \eqn{\{1, \ldots, q\}}}
+\item{z}{\eqn{p}-dimensional integer vector with entries in \eqn{\{1, \ldots, q\}}}
 
 \item{family}{character \code{"linear"} (or \code{"gaussian"}),
 \code{"logistic"} (or \code{"binomial"}), or \code{"cox"}}
@@ -32,7 +32,7 @@ multiridge(
 \item{nfolds}{positive integer specifying the number of folds
 (minimum \eqn{3}, maximum \eqn{n})}
 
-\item{penalties}{\eqn{q}-dimensional vector of penalty parameters,
+\item{penalties}{\eqn{q}-dimensional vector of non-negative penalty parameters,
 or \code{NULL} (cross-validation)}
 }
 \value{
@@ -81,11 +81,19 @@ with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 }
 \examples{
 # minimal example
-n <- 50; p <- 20; q <- 5
-x <- matrix(rnorm(n * p), nrow = n , ncol = p)
+n <- 50L; p <- 20L; q <- 5L
+x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n)
 z <- rep(seq_len(q), length.out = p)
-multiridge(x = x, y = y, z = z)
+model <- multiridge(x = x, y = y, z = z)
+
+# fitting with given folds
+foldid <- sample(seq_len(10L), size = n, replace = TRUE)
+model <- multiridge(x = x, y = y, z = z, foldid = foldid)
+
+# fitting with given penalties
+penalties <- abs(rnorm(q))
+model <- multiridge(x = x, y = y, z = z, penalties = penalties)
 
 \donttest{
 # simulation
