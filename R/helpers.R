@@ -51,14 +51,14 @@
 #' @examples
 #' \dontshow{.assert <- corila:::.assert}
 #' .assert(x = NULL)
-#' .assert(x = rnorm(1))
+#' .assert(x = rnorm(n = 1L))
 #' .assert(x = "A", type = "nominal", support = LETTERS)
-#' .assert(x = rexp(10), dim = Inf, type = "numeric", min = 0)
-#' .assert(x = c(NA, rpois(9, lambda = 4)), dim = 10,
+#' .assert(x = rexp(n= 10L), dim = Inf, type = "numeric", min = 0)
+#' .assert(x = c(NA, rpois(n = 9L, lambda = 4)), dim = 10L,
 #'        type = "integer", na.rm = TRUE)
 #' .assert(x = NA, na.rm = TRUE)
 #' .assert(x = 1, na.rm = FALSE)
-#' .assert(x = rpois(n = 10, lambda = 4), dim = Inf,
+#' .assert(x = rpois(n = 10L, lambda = 4), dim = Inf,
 #'        family = "poisson")
 #'
 #' @keywords internal
@@ -307,9 +307,9 @@
 #' }
 #' # simulate data
 #' family <- "gaussian"
-#' n0 <- 100; n1 <- 50; p <- 3
+#' n0 <- 100L; n1 <- 50L; p <- 3L
 #' n <- n0 + n1
-#' fold <- rep(c(0, 1), times = c(n0, n1))
+#' fold <- rep(c(0L, 1L), times = c(n0, n1))
 #' sd <- stats::rpois(n = p, lambda = 5)
 #' x <- data.frame(x = sapply(X = sd,
 #'                            FUN = function(x) stats::rnorm(n = n, sd = x)))
@@ -433,22 +433,22 @@
 #' @examples
 #' \dontshow{.folds <- corila:::.folds}
 #' # Gaussian and Poisson families
-#' y <- stats::rnorm(n = 100)
-#' y <- stats::rpois(n = 100, lambda = 4)
-#' foldid <- .folds(y = y, family = "gaussian", nfolds = 10)
+#' y <- stats::rnorm(n = 100L)
+#' y <- stats::rpois(n = 100L, lambda = 4)
+#' foldid <- .folds(y = y, family = "gaussian", nfolds = 10L)
 #' table(foldid)
 #'
 #' # binomial family
-#' y <- stats::rbinom(n = 100, prob = 0.2, size = 1)
-#' foldid <- .folds(y = y, family = "binomial", nfolds = 10)
+#' y <- stats::rbinom(n = 100L, size = 1L, prob = 0.2)
+#' foldid <- .folds(y = y, family = "binomial", nfolds = 10L)
 #' table(y, foldid)
 #'
 #' \donttest{
 #' # Cox model
-#' time <- stats::rexp(n = 100, rate = 5)
-#' status <- stats::rbinom(n = 100, prob = 0.2, size = 1)
+#' time <- stats::rexp(n = 100L, rate = 5)
+#' status <- stats::rbinom(n = 100L, size = 1L, prob = 0.2)
 #' y <- survival::Surv(time = time, event = status)
-#' foldid <- .folds(y = y, family = "cox", nfolds = 10)
+#' foldid <- .folds(y = y, family = "cox", nfolds = 10L)
 #' table(y[, "status"], foldid)
 #' }
 #'
@@ -498,7 +498,7 @@
 #'
 #' @examples
 #' \dontshow{.mean_function <- corila:::.mean_function}
-#' x <- rnorm(10)
+#' x <- rnorm(n = 10L)
 #' .mean_function(x, family = "binomial")
 #' .mean_function(x, family = "poisson")
 #'
@@ -544,13 +544,13 @@
 #'
 #' @examples
 #' \dontshow{.deviance <- corila:::.deviance}
-#' n <- 10
+#' n <- 10L
 #'
 #' y <- rnorm(n)
 #' y_hat <- rnorm(n)
 #' .deviance(y = y, y_hat = y_hat, family = "gaussian")
 #'
-#' y <- rbinom(n = n, size = 1, prob = 0.5)
+#' y <- rbinom(n = n, size = 1L, prob = 0.5)
 #' y_hat <- runif(n)
 #' .deviance(y = y, y_hat = y_hat, family = "binomial")
 #'
