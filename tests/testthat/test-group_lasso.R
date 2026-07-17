@@ -122,6 +122,7 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
 
 ## function ".estim_initial_coefs" ---------------------------------------------
 
+set.seed(1)
 testthat::test_that("initial coefficients are estimated", {
   family <- c("gaussian", "binomial", "poisson", "cox")
   alpha <- list(0, 0.5, 1, "pearson", "spearman", "kendall", "multiridge", NA)
