@@ -32,3 +32,23 @@ testthat::test_that("data have same number of columns (predictors)", {
   testthat::expect_length(object = data$group,
                           n = ncol(data$x_train))
 })
+
+testthat::test_that("data have consistent row names", {
+  testthat::expect_identical(object = names(data$y_train),
+                             expected = rownames(data$x_train))
+  testthat::expect_identical(object = names(data$y_test),
+                             expected = rownames(data$x_test))
+})
+
+testthat::test_that("data have consistent column names", {
+  colnames <- colnames(data$x_train)
+  testthat::expect_identical(object = names(data$group),
+                             expected = colnames)
+  testthat::expect_identical(object = names(data$primary),
+                             expected = colnames)
+  testthat::expect_identical(object = colnames(data$x_test),
+                             expected = colnames)
+  testthat::expect_identical(object = names(data$beta),
+                             expected = colnames)
+})
+
