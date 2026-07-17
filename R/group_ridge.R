@@ -17,21 +17,21 @@
 #'
 #' @param x
 #' predictors:
-#' \eqn{n \times p} matrix
+#' \eqn{n \times p} numeric matrix
 #'
 #' @param y
 #' response:
 #' \eqn{n}-dimensional vector
 #'
 #' @param z
-#' \eqn{p}-dimensional vector with entries in \eqn{\{1, \ldots, q\}}
+#' \eqn{p}-dimensional integer vector with entries in \eqn{\{1, \ldots, q\}}
 #'
 #' @param family
 #' character `"linear"` (or `"gaussian"`),
 #' `"logistic"` (or `"binomial"`), or `"cox"`
 #'
 #' @param penalties
-#' \eqn{q}-dimensional vector of penalty parameters,
+#' \eqn{q}-dimensional vector of non-negative penalty parameters,
 #' or `NULL` (cross-validation)
 #'
 #' @inherit corila details
@@ -95,11 +95,19 @@
 #'
 #' @examples
 #' # minimal example
-#' n <- 50; p <- 20; q <- 5
-#' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
+#' n <- 50L; p <- 20L; q <- 5L
+#' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- rnorm(n)
 #' z <- rep(seq_len(q), length.out = p)
-#' multiridge(x = x, y = y, z = z)
+#' model <- multiridge(x = x, y = y, z = z)
+#'
+#' # fitting with given folds
+#' foldid <- sample(seq_len(10L), size = n, replace = TRUE)
+#' model <- multiridge(x = x, y = y, z = z, foldid = foldid)
+#'
+#' # fitting with given penalties
+#' penalties <- abs(rnorm(q))
+#' model <- multiridge(x = x, y = y, z = z, penalties = penalties)
 #'
 #' \donttest{
 #' # simulation
@@ -180,11 +188,14 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL,
   .assert(x = y, type = "numeric", dim = nrow(x))
   .assert(x = z, type = "integer", dim = ncol(x),
           min = 1L, max = length(unique(z)))
+  z <- as.integer(z)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "cox"))
   .assert(x = foldid, type = "integer", dim = nrow(x),
           min = 1L, max = nrow(x))
+  if (!is.null(foldid)) foldid <- as.integer(foldid)
   .assert(x = nfolds, type = "integer", min = 2L, max = nrow(x))
+  nfolds <- as.integer(nfolds)
   .assert(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
   #.validate(x = x, y = y, group = NULL, family = family)
   # --- initial regression ---
