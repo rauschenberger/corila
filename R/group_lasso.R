@@ -42,18 +42,19 @@
 #' (`FALSE` for "auxiliary predictors")
 #'
 #' @param alpha_init
-#' elastic net mixing parameter
-#' (\eqn{0 \leq} `alpha_init` \eqn{\leq 1})
-#' for initial regression
-#' (default: ridge penalisation with `alpha_init`=0);
-#' alternative choices are
-#' `"pearson"`, `"spearman"`, or `"kendall"`
-#' to use initial correlation coefficients
-#' (not implemented for `family="cox"`),
-#' `"multiridge"` for multi-penalty ridge regression
-#' with one penalty for each group
-#' (not implemented for `family="poisson"` or overlapping groups),
-#' or `NA` to set all initial coefficients equal to 1
+#' A scalar specifying the method used for obtaining initial coefficients:
+#' - a numeric scalar in the unit interval
+#'   (\eqn{0 \leq} `alpha_init` \eqn{\leq 1})
+#'   to define the mixing parameter for elastic net regression
+#'   (default: ridge penalisation with `alpha_init`=0);
+#' - the character scalar `"pearson"`, `"spearman"`, or `"kendall"`
+#'   to use initial correlation coefficients
+#'   (not implemented for `family="cox"`)
+#' - the character scalar`"multiridge"`
+#'   to use multi-penalty ridge regression
+#'    with one penalty for each group
+#'   (not implemented for `family="poisson"` or overlapping groups),
+#' - `NA` to set all initial coefficients equal to 1
 #'
 #' @param alpha_final
 #' elastic net mixing parameter for final regression:
