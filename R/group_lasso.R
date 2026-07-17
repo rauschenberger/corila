@@ -874,7 +874,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   }
   .assert(x = foldid, type = "integer", dim = n,
           min = 1L, max = n)
-  foldid <- as.integer(foldid)
+  if (!is.null(foldid)) foldid <- as.integer(foldid)
   .assert(x = nfolds, type = "integer", min = 2L, max = n)
   nfolds <- as.integer(nfolds)
   if (identical(alpha_init, "multiridge")) {
