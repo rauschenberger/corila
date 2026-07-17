@@ -54,17 +54,26 @@ and make predictions with
 ## Examples
 
 ``` r
+#data(corila_data)
+#\dontshow{model <- cv.corila(x = corila_data$x_train,
+#                             y = corila_data$y_train,
+#                             group = corila_data$group,
+#                             primary = corila_data$primary,
+#                             tune = "none")}
+#\donttest{model <- cv.corila(x = corila_data$x_train,
+#                             y = corila_data$y_train,
+#                             group = corila_data$group,
+#                             primary = corila_data$primary)}
+
 # minimal example
 set.seed(1L)
 n <- 50L; p <- 20L; q <- 5L
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
 group <- rep(seq_len(q), length.out = p)
-primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
-cv.corila(x = x, y = y, group = group, primary = primary, tune = "none")
-#> object of class ‘cv.corila’ 
-#> (contains an object of class ‘cv.glmnet’)
-#> selected 0 from 20 predictors
+primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
+# \donttest{
+model <- cv.corila(x = x, y = y, group = group, primary = primary)# }
 
 # \donttest{
 # simulation
@@ -109,7 +118,7 @@ sapply(coef, function(x) mean(sign(x[-1]) == sign(beta)))
 #>    glmnet    corila 
 #> 0.8066667 0.7866667 
 sapply(coef, function(x) {
-  sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0)
+  sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0.0)
 })
 #>    glmnet    corila 
 #> 0.5675676 0.5227273 
@@ -122,7 +131,7 @@ if (identical(family, "gaussian")) {
   metric <- sapply(X = y_hat, FUN = function(x)
     pROC::auc(response = y[!cond],
               predictor = as.vector(x),
-              levels = c(0, 1),
+              levels = c(0L, 1L),
               direction = "<"))
 } else if (identical(family, "cox")) {
   metric <- sapply(X = y_hat, FUN = function(x)
@@ -133,7 +142,7 @@ metric
 #> 61.23431 49.25623 
 
 # privileged information
-#primary <- stats::rbinom(n = sum(p), size = 1, prob = 0.5) == 1
+#primary <- stats::rbinom(n = sum(p), size = 1L, prob = 0.5) == 1L
 #object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
 #                     primary = primary, family = family)
 # }

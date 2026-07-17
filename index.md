@@ -31,10 +31,13 @@ for detailed examples.
 ``` r
 
 library(corila)
-attach(data)
-object <- cv.corila(x = x_train, y = y_train, group = group, primary = primary)
+data(corila_data)
+object <- cv.corila(x = corila_data$x_train,
+                    y = corila_data$y_train,
+                    group = corila_data$group,
+                    primary = corila_data$primary)
 coef(object)
-predict(object, newx = x_test)
+predict(object, newx = corila_data$x_test)
 ```
 
 ## Reference

@@ -48,7 +48,7 @@
 
 ## Example dataset
 
-- [`data`](https://rauschenberger.github.io/corila/reference/lupi_data.md)
+- [`corila_data`](https://rauschenberger.github.io/corila/reference/corila_data.md)
   : Example data
 
 ## Internal functions

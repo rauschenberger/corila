@@ -56,12 +56,14 @@ methods(class = "cv.corila")
 #> [8] residuals summary  
 #> see '?methods' for accessing help and source code
 
-# fitting the model
+# simulating data
 n <- 10L; p <- 20L; q <- 5L
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
 group <- rep(seq_len(q), length.out = p)
 primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
+
+# fitting the model
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
 
