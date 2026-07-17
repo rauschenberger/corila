@@ -48,7 +48,7 @@ y_fit <- stats::runif(n = n)
 #>  [1] -1.3798325 -0.7243609 -0.5710542 -0.7056555 -1.7914253  0.9822467
 #>  [7] -1.3669939 -0.5981388 -1.0471899 -1.1286798
 
-y_obs <- stats::rpois(n = n, lambda = 4)
+y_obs <- stats::rpois(n = n, lambda = 4.0)
 y_fit <- stats::rexp(n = n, rate = 0.25)
 .residuals(y_obs = y_obs, y_fit = y_fit, family = "poisson")
 #>  [1] -2.8210408 -1.7191617  3.8927327  5.6934177 -1.0755031  7.7879500

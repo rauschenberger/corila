@@ -11,7 +11,7 @@ wrapper function of some functions from the
 multiridge(
   x,
   y,
-  z,
+  group,
   family = "gaussian",
   foldid = NULL,
   nfolds = 10L,
@@ -29,7 +29,7 @@ multiridge(
 
   response: \\n\\-dimensional vector
 
-- z:
+- group:
 
   \\p\\-dimensional integer vector with entries in \\\\1, \ldots, q\\\\
 
@@ -75,7 +75,7 @@ slots:
   each containing an \\n_0 \times p_k\\ matrix, where \\k \in \\1,
   \ldots, q\\\\
 
-- \\p\\-dimensional group vector `z` (see argument)
+- \\p\\-dimensional group vector `group` (see argument)
 
 - list `pars` with slots `family` (see above), the \\p\\-dimensional
   vectors `mu.x` and `sd.x` and the scalars `mu.y` and `sd.y`
@@ -134,16 +134,16 @@ accepts not only an \\n \times p\\ matrix but also a list of length
 n <- 50L; p <- 20L; q <- 5L
 x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n)
-z <- rep(seq_len(q), length.out = p)
-model <- multiridge(x = x, y = y, z = z)
+group <- rep(seq_len(q), length.out = p)
+model <- multiridge(x = x, y = y, group = group)
 
 # fitting with given folds
 foldid <- sample(seq_len(10L), size = n, replace = TRUE)
-model <- multiridge(x = x, y = y, z = z, foldid = foldid)
+model <- multiridge(x = x, y = y, group = group, foldid = foldid)
 
 # fitting with given penalties
 penalties <- abs(rnorm(q))
-model <- multiridge(x = x, y = y, z = z, penalties = penalties)
+model <- multiridge(x = x, y = y, group = group, penalties = penalties)
 
 # \donttest{
 # simulation
@@ -152,8 +152,8 @@ n0 <- 100
 n1 <- 10000
 n <- n0 + n1
 p <- c(100, 50)
-z <- rep(x = seq_along(p), times = p)
-x <- sapply(X = z, FUN = function(x) stats::rnorm(n = n, sd = x))
+group <- rep(x = seq_along(p), times = p)
+x <- sapply(X = group, FUN = function(x) stats::rnorm(n = n, sd = x))
 beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
         stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 eta <- x %*% beta
@@ -179,7 +179,8 @@ y_hat$glmnet <- stats::predict(object = object, newx = x[!cond, ],
                               type = "response", s = "lambda.min")
 
 # multi-penalty ridge regression
-object <- multiridge(x = x[cond, ], y = y[cond], z = z, family = family)
+object <- multiridge(x = x[cond, ], y = y[cond],
+                     group = group, family = family)
 coef$multiridge <- stats::coef(object = object)
 y_hat$multiridge <- stats::predict(object = object, newx = x[!cond, ])
 

@@ -66,21 +66,21 @@ x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
 
 # model fitting
-hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
-                    exp_global = 1, wgt_global = 0.5)
+hyper <- data.frame(exp_local = 1.0, wgt_local = 0.5,
+                    exp_global = 1.0, wgt_global = 0.5)
 object <- corila(x = x,
                  y = y,
                  group = group,
                  primary = primary,
                  family = "gaussian",
-                 alpha_init = 0,
-                 alpha_final = 1,
+                 alpha_init = 0.0,
+                 alpha_final = 1.0,
                  cor = "spearman",
                  foldid = NULL,
                  nfolds = 10L,
                  hyper = hyper,
                  lambda_init = NULL)
 
-y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
+y_hat <- stats::predict(object, newx = x, index = 1L, s = 0)
 # }
 ```

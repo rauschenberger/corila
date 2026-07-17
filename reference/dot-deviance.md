@@ -55,7 +55,7 @@ y_hat <- runif(n)
 .deviance(y = y, y_hat = y_hat, family = "binomial")
 #> [1] 2.66371
 
-y <- rpois(n = n, lambda = 4)
+y <- rpois(n = n, lambda = 4.0)
 y_hat <- rexp(n)
 .deviance(y = y, y_hat = y_hat, family = "poisson")
 #> [1] 8.916808

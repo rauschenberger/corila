@@ -36,7 +36,7 @@ This function is called by
 p <- 10L
 alpha <- rnorm(1L)
 temp <- rnorm(p)
-beta <- pmax(c(temp, -temp), 0)
+beta <- pmax(c(temp, -temp), 0.0)
 .combine_slopes(alpha = alpha, beta = beta)
 #>  [1] -1.0363519 -1.1107092  0.2066082  0.3540105 -1.0114184  1.2174819
 #>  [7]  0.7275355 -3.2210369  0.6559715  0.4356118 -0.5215687

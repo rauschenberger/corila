@@ -83,8 +83,9 @@ Estimate initial coefficients.
 - silent:
 
   Should messages from
-  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) and
-  [`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  and
+  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
   be suppressed? (`FALSE` or `TRUE`)
 
 ## Value
@@ -101,9 +102,10 @@ Returns a list with two slots:
 This function is called by
 [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md).
 It calls
-[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
-or [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
-an initial lasso, ridge, or elastic net regression,
+[`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
+or
+[`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+for an initial lasso, ridge, or elastic net regression,
 [`multiridge()`](https://rauschenberger.github.io/corila/reference/multiridge.md)
 for an initial multi-penalty ridge regression, or
 [`stats::cor()`](https://rdrr.io/r/stats/cor.html) for initial
@@ -141,7 +143,7 @@ foldid <- sample(seq_len(10L), size = n, replace = TRUE)
 .estim_initial_coefs(x = x,
                      y = y,
                      family = "gaussian",
-                     alpha_init = 0,
+                     alpha_init = 0.0,
                      group = NULL,
                      foldid = foldid,
                      nfolds = 10L,
@@ -160,7 +162,7 @@ foldid <- sample(seq_len(10L), size = n, replace = TRUE)
 .estim_initial_coefs(x = x,
                      y = y,
                      family = "gaussian",
-                     alpha_init = 0,
+                     alpha_init = 0.0,
                      group = NULL,
                      foldid = NULL,
                      nfolds = 10L,

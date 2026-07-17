@@ -78,7 +78,7 @@ cv.corila(x = x, y = y, group = group, primary = primary, tune = "none")
 
 # \donttest{
 # simulation
-set.seed(1)
+set.seed(1L)
 n0 <- 100
 n1 <- 10000
 n <- n0 + n1
