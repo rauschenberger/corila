@@ -51,4 +51,3 @@ testthat::test_that("data have consistent column names", {
   testthat::expect_identical(object = names(data$beta),
                              expected = colnames)
 })
-
