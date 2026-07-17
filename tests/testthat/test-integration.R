@@ -105,7 +105,7 @@ for (glmnet in c(FALSE, TRUE)) {
       testthat::expect_equal(object = coef1,
                              expected = coef2,
                              check.attributes = FALSE)
-      if (glmnet & family == "cox") {
+      if (glmnet && family == "cox") {
         testthat::expect_equal(object = y_hat1,
                                expected = y_hat2 * mean(y_hat1 / y_hat2),
                                tolerance = 1e-06,
