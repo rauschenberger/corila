@@ -41,11 +41,11 @@
 #' methods(class = "cv.corila")
 #'
 #' # fitting the model
-#' n <- 10; p <- 20; q <- 5
+#' n <- 10L; p <- 20L; q <- 5L
 #' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 #' y <- rnorm(n)
 #' group <- rep(seq_len(q), length.out = p)
-#' primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+#' primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 #' object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #'
 #' # using S3 methods
@@ -370,13 +370,13 @@ print.cv.corila <- function(x, ...) {
 #' Returns an invisible list with multiple slots.
 #'
 #' @examples
-#' n <- 12 # decrease to 10 to check LOOCV
-#' p <- 20
-#' q <- 5
+#' n <- 12L # decrease to 10 to check LOOCV
+#' p <- 20L
+#' q <- 5L
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- rnorm(n)
 #' group <- rep(seq_len(q), length.out = p)
-#' primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+#' primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 #' object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #' print(object)
 #' summary(object)
@@ -525,8 +525,8 @@ nobs.cv.corila <- function(object, ...) {
 #'
 #' @examples
 #' \dontshow{.combine_slopes <- corila:::.combine_slopes}
-#' p <- 10
-#' alpha <- rnorm(1)
+#' p <- 10L
+#' alpha <- rnorm(1L)
 #' temp <- rnorm(p)
 #' beta <- pmax(c(temp, -temp), 0)
 #' .combine_slopes(alpha = alpha, beta = beta)
@@ -571,14 +571,14 @@ nobs.cv.corila <- function(object, ...) {
 #'
 #' @examples
 #' \dontshow{.expand_auxiliary <- corila:::.expand_auxiliary}
-#' n <- 5
-#' p <- 10
+#' n <- 5L
+#' p <- 10L
 #' x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
-#' primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+#' primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 #' x_primary <- x[, primary]
 #' x_expanded <- .expand_auxiliary(x = x_primary, primary = primary)
 #' all(x_expanded[, primary] == x[, primary])
-#' all(x_expanded[, !primary] == 0)
+#' all(x_expanded[, !primary] == 0L)
 #'
 #' @keywords internal
 #'
@@ -647,12 +647,14 @@ nobs.cv.corila <- function(object, ...) {
     y_obs - y_fit
   } else if (identical(family, "binomial")) {
     .assert(x = y_obs, type = "integer", dim = Inf, min = 0L, max = 1L)
+    y_obs <- as.integer(y_obs)
     .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0, max = 1)
     y_fit <- pmax(eps, pmin(y_fit, 1 - eps))
     sign(y_obs - y_fit) * sqrt(2) *
       sqrt(- y_obs * log(y_fit) - (1 - y_obs) * log(1 - y_fit))
   } else if (identical(family, "poisson")) {
     .assert(x = y_obs, type = "integer", dim = Inf, min = 0L)
+    y_obs <- as.integer(y_obs)
     .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0)
     sign(y_obs - y_fit) *
       sqrt((2 * (ifelse(test = abs(y_obs) < .Machine$double.eps,
