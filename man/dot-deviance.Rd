@@ -41,7 +41,7 @@ y <- rbinom(n = n, size = 1L, prob = 0.5)
 y_hat <- runif(n)
 .deviance(y = y, y_hat = y_hat, family = "binomial")
 
-y <- rpois(n = n, lambda = 4)
+y <- rpois(n = n, lambda = 4.0)
 y_hat <- rexp(n)
 .deviance(y = y, y_hat = y_hat, family = "poisson")
 

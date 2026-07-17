@@ -38,7 +38,7 @@ or censored/uncensored observations in Cox model).
 \dontshow{.folds <- corila:::.folds}
 # Gaussian and Poisson families
 y <- stats::rnorm(n = 100L)
-y <- stats::rpois(n = 100L, lambda = 4)
+y <- stats::rpois(n = 100L, lambda = 4.0)
 foldid <- .folds(y = y, family = "gaussian", nfolds = 10L)
 table(foldid)
 
@@ -49,7 +49,7 @@ table(y, foldid)
 
 \donttest{
 # Cox model
-time <- stats::rexp(n = 100L, rate = 5)
+time <- stats::rexp(n = 100L, rate = 5.0)
 status <- stats::rbinom(n = 100L, size = 1L, prob = 0.2)
 y <- survival::Surv(time = time, event = status)
 foldid <- .folds(y = y, family = "cox", nfolds = 10L)

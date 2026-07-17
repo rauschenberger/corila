@@ -88,7 +88,7 @@
     "require argument 'family' to be a character scalar" =
       is.null(family) || (is.character(family) && length(family) == 1L),
     "require argument 'dim' to be an integer vector" =
-      is.atomic(dim) && all(dim > 0) &&
+      is.atomic(dim) && all(dim > 0L) &&
       all(abs(dim - round(dim)) < eps | is.infinite(dim)),
     "require argument 'na.rm' to be a logical scalar" =
       length(na.rm) == 1L && is.logical(na.rm) && !is.na(na.rm),
@@ -136,7 +136,7 @@
       type == "nominal" || max == Inf || all(x <= max + eps, na.rm = TRUE),
     "expected binary variable" =
       is.null(family) || family != "binomial" ||
-      all((x > -eps & x < eps) | (x > 1 - eps & x < 1 + eps), na.rm = TRUE),
+      all((x > -eps & x < eps) | (x > 1.0 - eps & x < 1.0 + eps), na.rm = TRUE),
     "expected count variable" =
       is.null(family) || family != "poisson" ||
       (all(abs(x - round(x)) < eps, na.rm = TRUE) && all(x >= -eps)),
@@ -218,9 +218,9 @@
           support = slots)
   .assert(x = pars$family, type = "nominal", support = families)
   .assert(x = pars$mu.x, type = "numeric", dim = ncol(x))
-  .assert(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0)
+  .assert(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0.0)
   .assert(x = pars$mu.y, type = "numeric")
-  .assert(x = pars$sd.y, type = "numeric", min = 0)
+  .assert(x = pars$sd.y, type = "numeric", min = 0.0)
   .assert(x = y, type = "numeric", dim = nrow(x),
           family = c(family, pars$family))
   # --- estimate parameters ---
@@ -239,13 +239,13 @@
       pars$mu.y <- mean(y, na.rm = TRUE)
       pars$sd.y <- stats::sd(y, na.rm = TRUE)
     } else if (!is.null(y)) {
-      pars$mu.y <- 0
-      pars$sd.y <- 1
+      pars$mu.y <- 0.0
+      pars$sd.y <- 1.0
     }
   }
   # --- standardise variables ---
   x_scaled <- t((t(x) - pars$mu.x) / pars$sd.x)
-  x_scaled[, pars$sd.x < .Machine$double.eps] <- 0
+  x_scaled[, pars$sd.x < .Machine$double.eps] <- 0.0
   if (!is.null(y) && identical(family, "gaussian")) {
     y_scaled <- (y - pars$mu.y) / pars$sd.y
   } else if (!is.null(y)) {
@@ -376,9 +376,9 @@
   families <- c("gaussian", "binomial", "poisson", "cox")
   .assert(x = pars$family, type = "nominal", support = families)
   .assert(x = pars$mu.x, type = "numeric", dim = Inf)
-  .assert(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0)
+  .assert(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0.0)
   .assert(x = pars$mu.y, type = "numeric")
-  .assert(x = pars$sd.y, type = "numeric", min = 0)
+  .assert(x = pars$sd.y, type = "numeric", min = 0.0)
   dim <- rep(x = Inf, times = 1 + is.matrix(y))
   .assert(x = y, type = "numeric", dim = dim)
   dim <- length(pars$mu.x) + !identical(pars$family, "cox")
@@ -395,7 +395,7 @@
     if (identical(pars$family, "cox")) {
       alpha <- NULL
       beta <- coef * ifelse(test = pars$sd.x < .Machine$double.eps,
-                            yes = 0,
+                            yes = 0.0,
                             no = pars$sd.y / pars$sd.x)
     } else {
       factor <- ifelse(test = pars$sd.x < .Machine$double.eps,
@@ -403,7 +403,7 @@
                        no = pars$mu.x / pars$sd.x)
       alpha <- pars$mu.y + pars$sd.y * (coef[1L] - sum(coef[-1L] * factor))
       beta <- coef[-1L] * ifelse(test = pars$sd.x < .Machine$double.eps,
-                                 yes = 0,
+                                 yes = 0.0,
                                  no = pars$sd.y / pars$sd.x)
     }
     list$coef <- c(alpha, beta)
@@ -434,7 +434,7 @@
 #' \dontshow{.folds <- corila:::.folds}
 #' # Gaussian and Poisson families
 #' y <- stats::rnorm(n = 100L)
-#' y <- stats::rpois(n = 100L, lambda = 4)
+#' y <- stats::rpois(n = 100L, lambda = 4.0)
 #' foldid <- .folds(y = y, family = "gaussian", nfolds = 10L)
 #' table(foldid)
 #'
@@ -445,7 +445,7 @@
 #'
 #' \donttest{
 #' # Cox model
-#' time <- stats::rexp(n = 100L, rate = 5)
+#' time <- stats::rexp(n = 100L, rate = 5.0)
 #' status <- stats::rbinom(n = 100L, size = 1L, prob = 0.2)
 #' y <- survival::Surv(time = time, event = status)
 #' foldid <- .folds(y = y, family = "cox", nfolds = 10L)
@@ -514,7 +514,7 @@
   if (family %in% c("gaussian", "cox")) {
     x
   } else if (identical(family, "binomial")) {
-    1 / (1 + exp(-x))
+    1.0 / (1.0 + exp(-x))
   } else if (identical(family, "poisson")) {
     exp(x)
   }
@@ -554,7 +554,7 @@
 #' y_hat <- runif(n)
 #' .deviance(y = y, y_hat = y_hat, family = "binomial")
 #'
-#' y <- rpois(n = n, lambda = 4)
+#' y <- rpois(n = n, lambda = 4.0)
 #' y_hat <- rexp(n)
 #' .deviance(y = y, y_hat = y_hat, family = "poisson")
 #'
@@ -569,11 +569,11 @@
   if (identical(family, "binomial")) {
     .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
     y <- as.integer(y)
-    .assert(x = y_hat, type = "numeric", dim = length(y), min = 0, max = 1)
+    .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0, max = 1.0)
   } else if (identical(family, "poisson")) {
     .assert(x = y, type = "integer", dim = Inf, min = 0L)
     y <- as.integer(y)
-    .assert(x = y_hat, type = "numeric", dim = length(y), min = 0)
+    .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0)
   } else {
     .assert(x = y, type = "numeric", dim = Inf)
     .assert(x = y_hat, type = "numeric", dim = length(y))
@@ -581,16 +581,16 @@
   # --- calculate deviance ---
   eps <- 1e-06
   if (identical(family, "gaussian")) {
-    2 * mean((y - y_hat)^2)
+    2.0 * mean((y - y_hat)^2)
   } else if (identical(family, "binomial")) {
-    2 * mean(
-      -y * log(pmax(y_hat, eps)) - (1 - y) * log(1 - pmin(y_hat, 1 - eps))
+    2.0 * mean(
+      -y * log(pmax(y_hat, eps)) - (1.0 - y) * log(1.0 - pmin(y_hat, 1.0 - eps))
     )
   } else if (identical(family, "poisson")) {
     mean(
-      2 * (ifelse(test = abs(y) < .Machine$double.eps,
-                  yes = 0,
-                  no = y * log(y / y_hat)) - y + y_hat)
+      2.0 * (ifelse(test = abs(y) < .Machine$double.eps,
+                    yes = 0.0,
+                    no = y * log(y / y_hat)) - y + y_hat)
     )
   } else if (identical(family, "cox")) {
     glmnet::coxnet.deviance(pred = log(y_hat), y = y)

@@ -139,10 +139,11 @@ calc_sign_prec <- function(truth, estim) {
 #' @keywords internal
 #'
 simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
-                     n_type = 2L, size_group = c(5L, 3L), effect_size = c(1, 1),
+                     n_type = 2L, size_group = c(5L, 3L),
+                     effect_size = c(1.0, 1.0),
                      corfac_feature = 0.5, corfac_type = 0.5,
-                     corfac_group = 0.25, n_group_causal = 2,
-                     prop_causal = 0.5, noise_factor = 1,
+                     corfac_group = 0.25, n_group_causal = 2L,
+                     prop_causal = 0.5, noise_factor = 1.0,
                      plot = FALSE, trial = FALSE) {
   # --- check arguments ---
   .assert(x = family, type = "nominal",
@@ -157,13 +158,14 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
   n_type <- as.integer(n_type)
   .assert(x = size_group, type = "integer", dim = n_type, min = 1L)
   size_group <- as.integer(size_group)
-  .assert(x = effect_size, type = "numeric", dim = n_type, min = 0)
-  .assert(x = corfac_feature, type = "numeric", min = 0, max = 1)
-  .assert(x = corfac_type, type = "numeric", min = 0, max = 1)
-  .assert(x = corfac_group, type = "numeric", min = 0, max = 1)
-  .assert(x = n_group_causal, type = "integer", min = 0, max = n_group)
-  .assert(x = prop_causal, type = "numeric", min = 0, max = 1)
-  .assert(x = noise_factor, type = "numeric", min = 0)
+  .assert(x = effect_size, type = "numeric", dim = n_type, min = 0.0)
+  .assert(x = corfac_feature, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = corfac_type, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = corfac_group, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = n_group_causal, type = "integer", min = 0.0, max = n_group)
+  n_group_causal <- as.integer(n_group_causal)
+  .assert(x = prop_causal, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = noise_factor, type = "numeric", min = 0.0)
   .assert(x = plot, type = "logical")
   .assert(x = trial, type = "logical")
   # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;
@@ -192,7 +194,7 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
                 times = n_group) # trial 2025-09-22
   }
   #- - - effect vector - - -
-  beta <- rep(x = 0, times = p)
+  beta <- rep(x = 0.0, times = p)
   index_common <- sample(x = seq_len(n_group), size = n_group_causal)
   cond <- group %in% index_common
   var_binom <- stats::rbinom(n = sum(cond), size = 1L, prob = prop_causal)
@@ -211,7 +213,7 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
              error = function(x) NULL)
   }
   #- - - feature matrix - - -
-  mean <- rep(x = 0, times = p)
+  mean <- rep(x = 0.0, times = p)
   sigma <- matrix(data = NA, nrow = p, ncol = p)
   for (i in seq_len(p)) {
     for (j in seq_len(p)) {
@@ -220,11 +222,11 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
           corfac_type^(type[i] != type[j]) *
           corfac_group^(group[i] != group[j]) # original
       } else {
-        sigma[i, j] <- ifelse(i == j, 1, ifelse(group[i] == group[j] & type[i] == type[j], 0.5, ifelse(group[i] == group[j], -0.25, ifelse(type[i] == type[j], 0.125, -0.125)))) # Consider not only + but also - (but then use + and - for effect sizes), was -0.0625 MAKE THIS LINE SHORTER USING IF ELSE STATEMENTS # nolint: line_length_linter.
+        sigma[i, j] <- ifelse(i == j, 1.0, ifelse(group[i] == group[j] & type[i] == type[j], 0.5, ifelse(group[i] == group[j], -0.25, ifelse(type[i] == type[j], 0.125, -0.125)))) # Consider not only + but also - (but then use + and - for effect sizes), was -0.0625 MAKE THIS LINE SHORTER USING IF ELSE STATEMENTS # nolint: line_length_linter.
       }
     }
   }
-  if (any(diag(sigma) != 1)) {
+  if (any(diag(sigma) != 1.0)) {
     stop("diagonal != 1")
   }
   if (plot) {
@@ -237,12 +239,12 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
   if (identical(family, "gaussian")) {
     y <- eta + noise_factor * stats::rnorm(n = n, sd = stats::sd(eta))
     # NB: decrease/increase noise?
-    if (stats::sd(y) == 0) {
+    if (stats::sd(y) == 0.0) {
       warning("Replacing constant y by random noise.")
       y <- stats::rnorm(n = n)
     }
   } else if (identical(family, "binomial")) {
-    y <- stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-2 * eta)))
+    y <- stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-2.0 * eta)))
     # NB: was without 2*
   } else if (identical(family, "cox")) {
     time <- stats::rexp(n = n, rate = exp(eta))
@@ -325,19 +327,19 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = beta, type = "numeric", dim = ncol(x))
   .assert(x = n, type = "integer", min = 1L)
-  .assert(x = factor, type = "numeric", min = 0)
+  .assert(x = factor, type = "numeric", min = 0.0)
   if (!is.null(x) && !is.null(beta) && is.null(n)) {
     eta <- as.numeric(scale(x %*% as.vector(beta))) # was without scale
     n <- nrow(x)
   } else if (is.null(x) && is.null(beta) && !is.null(n)) {
-    eta <- rep(x = 0, times = n)
+    eta <- rep(x = 0.0, times = n)
   } else {
     stop("Provide either `x` and `beta` or `n`.")
   }
   if (identical(family, "gaussian")) {
-    factor * eta + stats::rnorm(n = n, sd = 1)
+    factor * eta + stats::rnorm(n = n, sd = 1.0)
   } else if (identical(family, "binomial")) {
-    stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-factor * eta)))
+    stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-factor * eta)))
   } else if (identical(family, "cox")) {
     time <- stats::rexp(n = n, rate = exp(factor * eta))
     status <- stats::rbinom(n = n, size = 1L, prob = 0.5)

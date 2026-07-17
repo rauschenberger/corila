@@ -55,7 +55,7 @@ group$label_list <- lapply(group$index_list, names)
 group$matrix <- 1L * outer(X = group$index_vector,
                           Y = group$index_vector,
                           FUN = "==")
-.is_adjacent(group = group[[1]], j = 3L, p = p, names = names)
+.is_adjacent(group = group[[1L]], j = 3L, p = p, names = names)
 
 }
 \keyword{internal}

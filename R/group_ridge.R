@@ -23,7 +23,7 @@
 #' response:
 #' \eqn{n}-dimensional vector
 #'
-#' @param z
+#' @param group
 #' \eqn{p}-dimensional integer vector with entries in \eqn{\{1, \ldots, q\}}
 #'
 #' @param family
@@ -66,7 +66,7 @@
 #' with \eqn{q} slots (one for each predictor group),
 #' each containing an \eqn{n_0 \times p_k} matrix,
 #' where \eqn{k \in \{1, \ldots, q\}}
-#' - \eqn{p}-dimensional group vector `z` (see argument)
+#' - \eqn{p}-dimensional group vector `group` (see argument)
 #' - list `pars` with slots `family` (see above),
 #' the \eqn{p}-dimensional vectors `mu.x` and `sd.x`
 #' and the scalars `mu.y` and `sd.y`
@@ -98,16 +98,16 @@
 #' n <- 50L; p <- 20L; q <- 5L
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- rnorm(n)
-#' z <- rep(seq_len(q), length.out = p)
-#' model <- multiridge(x = x, y = y, z = z)
+#' group <- rep(seq_len(q), length.out = p)
+#' model <- multiridge(x = x, y = y, group = group)
 #'
 #' # fitting with given folds
 #' foldid <- sample(seq_len(10L), size = n, replace = TRUE)
-#' model <- multiridge(x = x, y = y, z = z, foldid = foldid)
+#' model <- multiridge(x = x, y = y, group = group, foldid = foldid)
 #'
 #' # fitting with given penalties
 #' penalties <- abs(rnorm(q))
-#' model <- multiridge(x = x, y = y, z = z, penalties = penalties)
+#' model <- multiridge(x = x, y = y, group = group, penalties = penalties)
 #'
 #' \donttest{
 #' # simulation
@@ -116,8 +116,8 @@
 #' n1 <- 10000
 #' n <- n0 + n1
 #' p <- c(100, 50)
-#' z <- rep(x = seq_along(p), times = p)
-#' x <- sapply(X = z, FUN = function(x) stats::rnorm(n = n, sd = x))
+#' group <- rep(x = seq_along(p), times = p)
+#' x <- sapply(X = group, FUN = function(x) stats::rnorm(n = n, sd = x))
 #' beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
 #'         stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 #' eta <- x %*% beta
@@ -143,7 +143,8 @@
 #'                               type = "response", s = "lambda.min")
 #'
 #' # multi-penalty ridge regression
-#' object <- multiridge(x = x[cond, ], y = y[cond], z = z, family = family)
+#' object <- multiridge(x = x[cond, ], y = y[cond],
+#'                      group = group, family = family)
 #' coef$multiridge <- stats::coef(object = object)
 #' y_hat$multiridge <- stats::predict(object = object, newx = x[!cond, ])
 #'
@@ -171,24 +172,24 @@
 #' @keywords methods models regression classif
 #'
 #' @export
-multiridge <- function(x, y, z, family = "gaussian", foldid = NULL,
+multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                        nfolds = 10L, penalties = NULL) {
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
-  if (is.matrix(x) && ncol(x) != length(z)) {
+  if (is.matrix(x) && ncol(x) != length(group)) {
     stop("For each variable, 'x' should have one column, ",
-         "and 'z' should have one entry.")
+         "and 'group' should have one entry.")
   }
-  cond <- !is.null(penalties) && !is.null(z) &&
-    length(unique(z)) != length(penalties)
+  cond <- !is.null(penalties) && !is.null(group) &&
+    length(unique(group)) != length(penalties)
   if (cond) {
     stop("Argument 'penalties' must have one entry for each group.")
   }
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = y, type = "numeric", dim = nrow(x))
-  .assert(x = z, type = "integer", dim = ncol(x),
-          min = 1L, max = length(unique(z)))
-  z <- as.integer(z)
+  .assert(x = group, type = "integer", dim = ncol(x),
+          min = 1L, max = length(unique(group)))
+  group <- as.integer(group)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "cox"))
   .assert(x = foldid, type = "integer", dim = nrow(x),
@@ -196,13 +197,13 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL,
   if (!is.null(foldid)) foldid <- as.integer(foldid)
   .assert(x = nfolds, type = "integer", min = 2L, max = nrow(x))
   nfolds <- as.integer(nfolds)
-  .assert(x = penalties, type = "numeric", dim = length(unique(z)), min = 0)
+  .assert(x = penalties, type = "numeric", dim = length(unique(group)), min = 0)
   #.validate(x = x, y = y, group = NULL, family = family)
   # --- initial regression ---
   scale <- .forescale(x = x, y = y, family = family)
   table <- c(gaussian = "linear", binomial = "logistic")
   model <- if (family %in% names(table)) table[[family]] else family
-  xx <- lapply(X = unique(z), FUN = function(i) scale$x[, z == i])
+  xx <- lapply(X = unique(group), FUN = function(i) scale$x[, group == i])
   xxblocks <- multiridge::createXXblocks(datablocks = xx)
   invisible(utils::capture.output({
     init <- multiridge::fastCV2(XXblocks = xxblocks,
@@ -242,7 +243,7 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL,
   object$penalties <- penalties
   object$datablocks <- xx
   object$indices <- indices
-  object$z <- z
+  object$group <- group
   object$pars <- scale$pars
   class(object) <- "multiridge"
   object
@@ -276,15 +277,15 @@ multiridge <- function(x, y, z, family = "gaussian", foldid = NULL,
 #' @export
 predict.multiridge <- function(object, newx, ...) {
   # --- check arguments ---
-  if (length(object$z) != ncol(newx)) {
+  if (length(object$group) != ncol(newx)) {
     stop("Argument 'newx' must have one column",
          "for each variable used in model fitting.")
   }
-  .assert(x = newx, type = "numeric", dim = c(Inf, length(object$z)))
+  .assert(x = newx, type = "numeric", dim = c(Inf, length(object$group)))
   # --- make predictions ---
   scale <- .forescale(x = newx, pars = object$pars)
-  newxx <- lapply(X = unique(object$z),
-                  FUN = function(x) scale$x[, object$z == x])
+  newxx <- lapply(X = unique(object$group),
+                  FUN = function(x) scale$x[, object$group == x])
   xxblocks <- multiridge::createXXblocks(datablocks = object$datablocks,
                                          datablocksnew = newxx)
   sigmanew <- multiridge::SigmaFromBlocks(XXblocks = xxblocks,

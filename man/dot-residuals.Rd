@@ -34,7 +34,7 @@ y_obs <- stats::rbinom(n = n, size = 1L, prob = 0.2)
 y_fit <- stats::runif(n = n)
 .residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
 
-y_obs <- stats::rpois(n = n, lambda = 4)
+y_obs <- stats::rpois(n = n, lambda = 4.0)
 y_fit <- stats::rexp(n = n, rate = 0.25)
 .residuals(y_obs = y_obs, y_fit = y_fit, family = "poisson")
 

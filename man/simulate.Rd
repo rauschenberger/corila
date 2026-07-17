@@ -15,7 +15,7 @@ simulate(
   corfac_feature = 0.5,
   corfac_type = 0.5,
   corfac_group = 0.25,
-  n_group_causal = 2,
+  n_group_causal = 2L,
   prop_causal = 0.5,
   noise_factor = 1,
   plot = FALSE,

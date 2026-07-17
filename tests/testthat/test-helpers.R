@@ -7,7 +7,7 @@
 n <- 5L
 p <- 10L
 
-set.seed(1)
+set.seed(1L)
 sd <- seq(from = 0L, to = 1L, length.out = p)
 x <- vapply(X = sd,
             FUN = function(x) stats::rnorm(n = n, sd = x),
@@ -19,10 +19,10 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   } else if (identical(family, "binomial")) {
     y <- stats::rbinom(n = n, size = 1L, prob = 0.5)
   } else if (identical(family, "poisson")) {
-    y <- stats::rpois(n = n, lambda = 4)
+    y <- stats::rpois(n = n, lambda = 4.0)
   } else if (identical(family, "cox")) {
-    time_survival <- stats::rexp(n = n, rate = 1)
-    time_censoring <- stats::rexp(n = n, rate = 1)
+    time_survival <- stats::rexp(n = n, rate = 1.0)
+    time_censoring <- stats::rexp(n = n, rate = 1.0)
     time <- pmin(time_survival, time_censoring)
     event <- 1 * (time_survival <= time_censoring)
     y <- survival::Surv(time = time, event = event)
@@ -43,10 +43,10 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   })
   # coefficients
   beta <- stats::rnorm(p + (family != "cox"))
-  mu_x <- rep(x = 0, times = p)
-  sd_x <- rep(x = 1, times = p)
-  mu_y <- 0
-  sd_y <- 1
+  mu_x <- rep(x = 0.0, times = p)
+  sd_x <- rep(x = 1.0, times = p)
+  mu_y <- 0.0
+  sd_y <- 1.0
   pars <- list(mu.x = mu_x, sd.x = sd_x,
                mu.y = mu_y, sd.y = sd_y,
                family = family)
@@ -72,8 +72,8 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 ## function ".type" ------------------------------------------------------------
 
-expect <- list("ridge" = 0,
-               "lasso" = 1,
+expect <- list("ridge" = 0.0,
+               "lasso" = 1.0,
                "elastic" = 0.5,
                "none" = NA,
                "pearson" = "pearson",
@@ -84,9 +84,9 @@ testthat::test_that("initial coefficients are named correctly", {
   for (i in seq_along(expect)) {
     string <- .type(alpha = expect[[i]])
     testthat::expect_type(object = string, type = "character")
-    testthat::expect_length(object = string, n = 1)
+    testthat::expect_length(object = string, n = 1L)
     testthat::expect_false(is.na(string))
-    split <- tolower(strsplit(x = string, split = " ", fixed = TRUE)[[1]])
+    split <- tolower(strsplit(x = string, split = " ", fixed = TRUE)[[1L]])
     testthat::expect_contains(object = split, expected = names(expect)[i])
   }
   testthat::expect_error(.type(alpha = -0.1))
@@ -104,17 +104,17 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
     y_hat <- stats::rnorm(n = n)
   } else if (family == "binomial") {
     y <- stats::rbinom(n = n, size = 1L, prob = 0.5)
-    y_hat <- stats::rbinom(n = n, size = 1, prob = 0.5)
+    y_hat <- stats::rbinom(n = n, size = 1L, prob = 0.5)
   } else if (family == "poisson") {
-    y <- stats::rpois(n = n, lambda = 4)
-    y_hat <- stats::rpois(n = n, lambda = 4)
+    y <- stats::rpois(n = n, lambda = 4.0)
+    y_hat <- stats::rpois(n = n, lambda = 4.0)
   } else if (family == "cox") {
-    time_survival <- stats::rexp(n = n, rate = 1)
-    time_censoring <- stats::rexp(n = n, rate = 1)
+    time_survival <- stats::rexp(n = n, rate = 1.0)
+    time_censoring <- stats::rexp(n = n, rate = 1.0)
     time <- pmin(time_survival, time_censoring)
-    event <- 1 * (time_survival <= time_censoring)
+    event <- 1L * (time_survival <= time_censoring)
     y <- survival::Surv(time = time, event = event)
-    y_hat <- stats::rexp(n = n, rate = 1)
+    y_hat <- stats::rexp(n = n, rate = 1.0)
   } else if (family == "gamma") {
     y <- stats::rgamma(n = n, shape = 0.5)
     y_hat <- stats::rgamma(n = n, shape = 0.5)
@@ -128,12 +128,12 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
   testthat::test_that("imperfect predictions lead to positive deviance", {
     testthat::skip_if(family == "gamma")
     deviance <- .deviance(y = y, y_hat = y_hat, family = family)
-    testthat::expect_gt(object = deviance, expected = 0)
+    testthat::expect_gt(object = deviance, expected = 0.0)
   })
   testthat::test_that("perfect predictions lead to deviance zero", {
     testthat::skip_if(family %in% c("cox", "gamma"))
     deviance <- .deviance(y = y, y_hat = y, family = family)
-    testthat::expect_identical(object = deviance, expected = 0)
+    testthat::expect_identical(object = deviance, expected = 0.0)
   })
   testthat::test_that("worse predictions increase cox deviance", {
     testthat::skip_if_not(family == "cox")
@@ -174,12 +174,12 @@ testthat::test_that("mean function works", {
     testthat::expect_true(all(is.finite(mean)))
     testthat::expect_length(object = mean, n = n)
     cor <- stats::cor(mean, eta, method = "spearman")
-    testthat::expect_equal(object = cor, expected = 1)
+    testthat::expect_equal(object = cor, expected = 1.0)
     if (family %in% c("binomial", "poisson")) {
-      testthat::expect_gte(object = min(mean), expected = 0)
+      testthat::expect_gte(object = min(mean), expected = 0.0)
     }
     if (identical(family, "binomial")) {
-      testthat::expect_lte(object = max(mean), expected = 1)
+      testthat::expect_lte(object = max(mean), expected = 1.0)
     }
   }
 })
@@ -194,22 +194,22 @@ estim <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
 testthat::test_that("precision is finite scalar", {
   precision <- calc_sign_prec(truth = truth, estim = estim)
   testthat::expect_type(object = precision, type = "double")
-  testthat::expect_length(object = precision, n = 1)
+  testthat::expect_length(object = precision, n = 1L)
   testthat::expect_true(all(is.finite(precision)))
 })
 
 testthat::test_that("precision equals zero if all signs are inverted", {
   prec <- calc_sign_prec(truth = truth, estim = -truth)
-  testthat::expect_identical(object = prec, expected = 0)
+  testthat::expect_identical(object = prec, expected = 0.0)
 })
 
 testthat::test_that("precision equals one if all signs are true", {
   prec <- calc_sign_prec(truth = truth, estim = truth)
-  testthat::expect_identical(object = prec, expected = 1)
+  testthat::expect_identical(object = prec, expected = 1.0)
 })
 
 testthat::test_that("precision is not defined if all signs equal zero", {
-  prec <- calc_sign_prec(truth = truth, estim = 0 * estim)
+  prec <- calc_sign_prec(truth = truth, estim = 0L * estim)
   testthat::expect_identical(object = prec, expected = NA)
 })
 
@@ -222,7 +222,7 @@ testthat::test_that("precision is not influenced by estimated zeros", {
 
 testthat::test_that("precision equals zero if all true signs are zero", {
   prec <- calc_sign_prec(truth = rep(x = 0L, times = n), estim = estim)
-  testthat::expect_identical(object = prec, expected = 0)
+  testthat::expect_identical(object = prec, expected = 0.0)
 })
 
 testthat::test_that("error if different lengths", {
@@ -234,19 +234,19 @@ testthat::test_that("error if different lengths", {
 ## function ".folds" -----------------------------------------------------------
 
 set.seed(1L)
-n <- stats::rpois(n = 1L, lambda = 50)
+n <- stats::rpois(n = 1L, lambda = 50.0)
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   if (family == "gaussian") {
     y <- stats::rnorm(n = n)
     index <- rep(x = 1L, times = n)
   } else if (family == "binomial") {
-    y <- stats::rbinom(n = n, size = 1, prob = 0.2)
+    y <- stats::rbinom(n = n, size = 1L, prob = 0.2)
     index <- y
   } else if (family == "poisson") {
-    y <- stats::rpois(n = n, lambda = 4)
+    y <- stats::rpois(n = n, lambda = 4.0)
     index <- rep(x = 1L, times = n)
   } else if (family == "cox") {
-    time <- stats::rexp(n = n, rate = 2)
+    time <- stats::rexp(n = n, rate = 2.0)
     status <- stats::rbinom(n = n, size = 1L, prob = 0.2)
     y <- survival::Surv(time = time, event = status)
     index <- y[, "status"]
@@ -254,7 +254,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that(
     desc = "function '.folds' throws an error if nfolds < 2 or nfolds > n",
     code = {
-      for (nfolds in c(-1, 0, 1, n + 1, Inf)) {
+      for (nfolds in c(-1L, 0L, 1L, n + 1L, Inf)) {
         testthat::expect_error(.folds(y = y, family = family, nfolds = nfolds))
       }
     }
@@ -315,7 +315,7 @@ testthat::test_that("outcomes are simulated", {
       testthat::expect_no_error(
         object = {
           .validate(na_action = NULL,
-                    x = matrix(data = 0, nrow = n, ncol = p),
+                    x = matrix(data = 0.0, nrow = n, ncol = p),
                     y = y,
                     group = rep(x = 1L, times = p),
                     primary = NULL,
@@ -339,7 +339,7 @@ testthat::test_that("residuals match those from stats::residuals", {
     } else if (family == "binomial") {
       y <- stats::rbinom(n = n, size = 1L, prob = 0.5)
     } else if (family == "poisson") {
-      y <- stats::rpois(n = n, lambda = 4)
+      y <- stats::rpois(n = n, lambda = 4.0)
     } else {
       stop()
     }

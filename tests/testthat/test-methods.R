@@ -35,7 +35,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
                                    s = "lambda.min"))
     testthat::expect_error(predict(object, newx = data$x_train,
                                    s = "lambda.1se"))
-    testthat::expect_error(predict(object, newx = data$x_train, s = -1))
+    testthat::expect_error(predict(object, newx = data$x_train, s = -1.0))
   })
   testthat::test_that("function 'fitted.cv.corila' returns finite n-vector", {
     y_hat <- fitted(object)
@@ -108,7 +108,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       dev <- deviance(object)
       testthat::expect_type(object = dev, type = "double")
       testthat::expect_length(object = dev, n = 1L)
-      testthat::expect_gte(object = dev, expected = 0)
+      testthat::expect_gte(object = dev, expected = 0.0)
     }
   )
 }

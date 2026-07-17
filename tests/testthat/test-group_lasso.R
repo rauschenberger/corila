@@ -48,8 +48,8 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
   })
   testthat::test_that(".validate rejects wrong group object", {
     group <- list(
-      A = data$group > 5,
-      B = array(data = 2 * outer(data$group, data$group, "=="),
+      A = data$group > 5.0,
+      B = array(data = 2L * outer(data$group, data$group, "=="),
                 dim = c(p, p, 1L)),
       C = lapply(X = unique(data$group),
                  FUN = function(x) as.factor(which(data$group == x)))
@@ -108,7 +108,7 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
   })
   #' @srrstats {G5.8c} *rejects data without complete observations*
   testthat::test_that("cv.corila rejects NA response", {
-    data$x_train[, 1] <- NA
+    data$x_train[, 1L] <- NA
     testthat::expect_error(
       object = cv.corila(x = data$x_train,
                          y = data$y_train,
@@ -122,10 +122,10 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
 
 ## function ".estim_initial_coefs" ---------------------------------------------
 
-set.seed(1)
+set.seed(1L)
 testthat::test_that("initial coefficients are estimated", {
   family <- c("gaussian", "binomial", "poisson", "cox")
-  alpha <- list(0, 0.5, 1, "pearson", "spearman", "kendall", "multiridge", NA)
+  alpha <- list(0.0, 0.5, 1, "pearson", "spearman", "kendall", "multiridge", NA)
   n <- 20L
   p <- 10L
   x <- matrix(rnorm(n * p), nrow = n, ncol = p)
@@ -172,7 +172,7 @@ testthat::test_that("initial coefficients are estimated", {
       testthat::expect_length(object = init[[1L]]$lambda, n = length)
     }
   }
-  alpha <- list(-1, Inf, "A")
+  alpha <- list(-1.0, Inf, "A")
   for (i in seq_along(alpha)) {
     testthat::expect_error(
       .estim_initial_coefs(
@@ -233,7 +233,7 @@ set.seed(1L)
 p <- 10L
 alpha <- stats::rnorm(1L)
 temp <- stats::rnorm(p)
-beta <- pmax(c(temp, -temp), 0)
+beta <- pmax(c(temp, -temp), 0.0)
 coef <- .combine_slopes(alpha = alpha, beta = beta)
 testthat::test_that("coefficients are in finite p + 1 vector", {
   testthat::expect_type(object = coef, type = "double")
@@ -273,7 +273,7 @@ testthat::test_that("primary predictors are equal", {
                              expected = x[, primary])
 })
 testthat::test_that("auxiliary features are zero", {
-  testthat::expect_setequal(object = x_expanded[, !primary], expected = 0)
+  testthat::expect_setequal(object = x_expanded[, !primary], expected = 0.0)
 })
 testthat::test_that("expanded features are in a finite n x p matrix", {
   testthat::expect_type(object = x_expanded, type = "double")
@@ -291,7 +291,7 @@ for (tune in c("none", "weight", "exponent", "bivariate", "factorial")) {
     labels <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
     testthat::expect_type(object = hyper, type = "list")
     testthat::expect_named(object = hyper, expected = labels)
-    testthat::expect_gte(object = min(hyper), expected = 0)
+    testthat::expect_gte(object = min(hyper), expected = 0.0)
     testthat::expect_identical(object = hyper, expected = unique(hyper))
     testthat::expect_identical(object = rownames(hyper),
                                expected = as.character(seq_len(nrow(hyper))))

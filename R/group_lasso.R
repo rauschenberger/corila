@@ -157,7 +157,7 @@
 #'
 #' \donttest{
 #' # simulation
-#' set.seed(1)
+#' set.seed(1L)
 #' n0 <- 100
 #' n1 <- 10000
 #' n <- n0 + n1
@@ -243,8 +243,8 @@
 #' @srrstats {RE4.0} *returns a "model" object (@return)*
 #' @srrstats {RE4.8} *returns response variable in slot "y_obs"*
 #'
-cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
-                      alpha_final = 1, family = "gaussian",
+cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
+                      alpha_final = 1.0, family = "gaussian",
                       nfolds = 10L, cor = "spearman", tune = "weight",
                       foldid = NULL, na_action = "error", silent = FALSE) {
   y <- drop(y)
@@ -288,7 +288,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   }
   if (identical(na_action, "complete_cases")) {
     complete <- stats::complete.cases(x = x, y = y)
-    if (sum(complete) < 3) {
+    if (sum(complete) < 3L) {
       stop("Requires at least three complete observations.")
     }
     warning("Ingoring ", sum(!complete), " observations with missing data.")
@@ -350,13 +350,13 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0,
   for (l in seq_len(nrow(hyper))) {
     cvm[[l]] <- apply(
       X = pred[[l]][complete, ],
-      MARGIN = 2,
+      MARGIN = 2L,
       FUN = function(x) .deviance(y_hat = x, y =  y[complete], family = family)
     )
   }
   hyper$cvm <- cvm_min <- vapply(X = cvm,
                                  FUN = base::min,
-                                 FUN.VALUE = numeric(1))
+                                 FUN.VALUE = numeric(1L))
   id_hyper <- which.min(cvm_min)
   lambda.min <- object_ext$model[[id_hyper]]$lambda[which.min(cvm[[id_hyper]])]
   # return fitted model
@@ -497,29 +497,29 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' y <- rnorm(n = n)
 #'
 #' # model fitting
-#' hyper <- data.frame(exp_local = 1, wgt_local = 0.5,
-#'                     exp_global = 1, wgt_global = 0.5)
+#' hyper <- data.frame(exp_local = 1.0, wgt_local = 0.5,
+#'                     exp_global = 1.0, wgt_global = 0.5)
 #' object <- corila(x = x,
 #'                  y = y,
 #'                  group = group,
 #'                  primary = primary,
 #'                  family = "gaussian",
-#'                  alpha_init = 0,
-#'                  alpha_final = 1,
+#'                  alpha_init = 0.0,
+#'                  alpha_final = 1.0,
 #'                  cor = "spearman",
 #'                  foldid = NULL,
 #'                  nfolds = 10L,
 #'                  hyper = hyper,
 #'                  lambda_init = NULL)
 #'
-#' y_hat <- stats::predict(object, newx = x, index = 1, s = 0)
+#' y_hat <- stats::predict(object, newx = x, index = 1L, s = 0)
 #' }
 #'
 #' @keywords internal
 #'
 corila <- function(x, y, group, primary, family, hyper, alpha_init,
                    alpha_final, cor, foldid,
-                   nfolds, lambda_init, silent = FALSE, threshold = 0) {
+                   nfolds, lambda_init, silent = FALSE, threshold = 0.0) {
   args <- .validate(
     x = x,
     y = y,
@@ -554,9 +554,9 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   #--- feature correlation ---
   if (!is.matrix(cor)) {
     cor <- stats::cor(x = scale$x, method = cor, use = "pairwise.complete")
-    cor[abs(cor) <= threshold] <- 0
+    cor[abs(cor) <= threshold] <- 0.0
   }
-  cor[is.na(cor)] <- 0
+  cor[is.na(cor)] <- 0.0
   #--- regression ---
   model <- list()
   for (i in seq_len(nrow(hyper))) {
@@ -567,28 +567,28 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
                                names = colnames(scale$x))
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
       temp <-  cor_trans * init$coef * adjacent
-      weight$local[j] <- sum(pmax(0, temp)[adjacent]) / sum(adjacent)
-      weight$local[p + j] <- sum(pmax(0, -temp)[adjacent]) / sum(adjacent)
+      weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
+      weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
       # ad-hoc solution for features that are in no group (unreachable?)
       # weight$local[is.na(weight$local)] <- 0
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * init$coef
-      weight$global[j] <- sum(pmax(0, temp)) / p
-      weight$global[p + j] <- sum(pmax(0, -temp)) / p
+      weight$global[j] <- sum(pmax(0.0, temp)) / p
+      weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
     }
     weight <- lapply(
       X = weight,
-      FUN = function(x) p * ifelse(test = x == 0, yes = 0, no = x / sum(x))
+      FUN = function(x) p * ifelse(test = x == 0.0, yes = 0.0, no = x / sum(x))
     )
     pf_ext <- 1 / (weight$local * hyper$wgt_local[i] +
                      weight$global * hyper$wgt_global[i])
     pf_ext[!c(primary, primary)] <- Inf # exclude auxiliary features
-    .assert(x = pf_ext, type = "numeric", dim = 2 * p, min = 0)
+    .assert(x = pf_ext, type = "numeric", dim = 2L * p, min = 0.0)
     model[[i]] <- suppressMessages(
       glmnet::glmnet(x = cbind(scale$x, -scale$x),
                      y = scale$y,
                      family = family,
                      penalty.factor = pf_ext,
-                     lower.limits = 0,
+                     lower.limits = 0.0,
                      alpha = alpha_final),
       classes = "message"[silent]
     )
@@ -701,18 +701,19 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     .assert(x = alpha_init, type = "nominal",
             support = c("pearson", "spearman", "kendall", "multiridge"))
   } else {
-    .assert(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
+    .assert(x = alpha_init, type = "numeric",
+            min = 0.0, max = 1.0, na.rm = TRUE)
   }
-  .assert(x = alpha_final, type = "numeric", min = 0, max = 1)
+  .assert(x = alpha_final, type = "numeric", min = 0.0, max = 1.0)
   if (is.character(cor)) {
     .assert(x = cor, type = "nominal",
             support = c("pearson", "spearman", "kendall"))
   } else {
-    .assert(x = cor, type = "numeric", dim = c(p, p), min = 0, max = 1)
+    .assert(x = cor, type = "numeric", dim = c(p, p), min = 0.0, max = 1.0)
   }
   .assert(x = foldid, type = "integer", dim = n, min = 1L, max = n)
   .assert(x = nfolds, type = "integer", min = 3L, max = n)
-  .assert(x = lambda_init, type = "numeric", min = 0)
+  .assert(x = lambda_init, type = "numeric", min = 0.0)
   .assert(x = silent, type = "logical")
   list(n = n, p = p, q = q)
 }
@@ -745,39 +746,39 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   if (is.character(tune)) tune <- tolower(tune)
   .assert(x = tune, type = "nominal")
   if (identical(tune, "none")) {
-    hyper <- data.frame(wgt_local = 1,
-                        exp_local = 1,
-                        wgt_global = 0,
+    hyper <- data.frame(wgt_local = 1.0,
+                        exp_local = 1.0,
+                        wgt_global = 0.0,
                         exp_global = Inf)
   } else if (identical(tune, "weight")) {
-    wgt_cand <- seq(from = 0, to = 1, by = 0.1)
+    wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
     hyper <- data.frame(wgt_local = wgt_cand,
-                        exp_local = 0,
-                        wgt_global = 1 - wgt_cand,
-                        exp_global = 1)
+                        exp_local = 0.0,
+                        wgt_global = 1.0 - wgt_cand,
+                        exp_global = 1.0)
   } else if (identical(tune, "exponent")) {
-    exp_cand <- c(0, 0.1, 0.25, 1 / 3, 0.5, 1, 2, 3, 4, 10, Inf)
+    exp_cand <- c(0.0, 0.1, 0.25, 1 / 3, 0.5, 1.0, 2.0, 3.0, 4.0, 10.0, Inf)
     hyper <- data.frame(wgt_local = 1,
                         exp_local = exp_cand,
-                        wgt_global = 0,
+                        wgt_global = 0.0,
                         exp_global = Inf)
   } else if (identical(tune, "bivariate")) {
-    wgt_cand <- seq(from = 0, to = 1, by = 0.1)
+    wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
     hyper <- data.frame(wgt_local = wgt_cand,
                         exp_local = NA,
-                        wgt_global = 1 - wgt_cand,
+                        wgt_global = 1.0 - wgt_cand,
                         exp_global = NA)
-    exp_cand <- c(0.1, 0.5, 0.8, 1, 1.25, 2, 10)
+    exp_cand <- c(0.1, 0.5, 0.8, 1.0, 1.25, 2.0, 10.0)
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
     hyper$exp_local <- hyper$exp_global <- exp_cand
   } else if (identical(tune, "factorial")) {
     wgt_cand <- seq(from = 0, to = 1, by = 0.25)
-    exp_cand <- c(0.1, 0.5, 1, 2, 10)
+    exp_cand <- c(0.1, 0.5, 1.0, 2.0, 10.0)
     hyper <- expand.grid(wgt_local = wgt_cand,
                          exp_local = exp_cand,
                          wgt_global = NA,
                          exp_global = exp_cand)
-    hyper$wgt_global <- 1 - hyper$wgt_local
+    hyper$wgt_global <- 1.0 - hyper$wgt_local
   } else {
     stop("Invalid value for argument 'tune'.")
   }
@@ -838,7 +839,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' .estim_initial_coefs(x = x,
 #'                      y = y,
 #'                      family = "gaussian",
-#'                      alpha_init = 0,
+#'                      alpha_init = 0.0,
 #'                      group = NULL,
 #'                      foldid = foldid,
 #'                      nfolds = 10L,
@@ -848,7 +849,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' .estim_initial_coefs(x = x,
 #'                      y = y,
 #'                      family = "gaussian",
-#'                      alpha_init = 0,
+#'                      alpha_init = 0.0,
 #'                      group = NULL,
 #'                      foldid = NULL,
 #'                      nfolds = 10L,
@@ -871,7 +872,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     alpha_init <- tolower(alpha_init)
     .assert(x = alpha_init, type = "nominal", support = methods)
   } else {
-    .assert(x = alpha_init, type = "numeric", min = 0, max = 1, na.rm = TRUE)
+    .assert(x = alpha_init, type = "numeric", min = 0.0, max = 1.0,
+            na.rm = TRUE)
   }
   .assert(x = foldid, type = "integer", dim = n,
           min = 1L, max = n)
@@ -881,9 +883,9 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   if (identical(alpha_init, "multiridge")) {
     dim <- length(unique(group))
   } else {
-    dim <- 1
+    dim <- 1L
   }
-  .assert(x = lambda, type = "numeric", dim = dim, min = 0)
+  .assert(x = lambda, type = "numeric", dim = dim, min = 0.0)
   # --- estimate initial coefficients ---
   is_slope <- rep(c(FALSE, TRUE), times = c(family != "cox", p))
   if (all(is.na(alpha_init))) {
@@ -892,7 +894,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     if (is.null(lambda)) {
       model <- multiridge(x = x,
                           y = y,
-                          z = group,
+                          group = group,
                           family = family,
                           foldid = foldid,
                           nfolds = nfolds)
@@ -901,7 +903,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     } else {
       model <- multiridge(x = x,
                           y = y,
-                          z = group,
+                          group = group,
                           family = family,
                           penalties = lambda)
       coef <- stats::coef(object = model)[is_slope]
@@ -911,8 +913,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
                        y = y,
                        method = alpha_init,
                        use = "pairwise.complete")
-    coef[is.na(coef)] <- 0
-  } else if (is.numeric(alpha_init) && alpha_init >= 0 && alpha_init <= 1) {
+    coef[is.na(coef)] <- 0.0
+  } else if (is.numeric(alpha_init) && alpha_init >= 0.0 && alpha_init <= 1.0) {
     if (is.null(lambda)) {
       model <- suppressMessages(glmnet::cv.glmnet(x = x,
                                                   y = y,
@@ -978,7 +980,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' group$matrix <- 1L * outer(X = group$index_vector,
 #'                           Y = group$index_vector,
 #'                           FUN = "==")
-#' .is_adjacent(group = group[[1]], j = 3L, p = p, names = names)
+#' .is_adjacent(group = group[[1L]], j = 3L, p = p, names = names)
 #'
 #' @keywords internal
 #'

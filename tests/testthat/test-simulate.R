@@ -1,10 +1,10 @@
 
 family <- c("gaussian", "binomial", "poisson", "cox")
-n <- 10
-p <- 5
+n <- 10L
+p <- 5L
 for (i in seq_along(family)) {
-  for (j in 1:2) {
-    if (j == 1) {
+  for (j in 1L:2L) {
+    if (j == 1L) {
       y <- .simulate_outcome(n = n, family = family[i])
     } else {
       x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
@@ -18,9 +18,9 @@ for (i in seq_along(family)) {
                              regexp = "inside support")
       testthat::expect_error(object = .simulate_outcome(family = family[i]),
                              regexp = "Provide either")
-      testthat::skip_if(j == 1)
+      testthat::skip_if(j == 1L)
       testthat::expect_error(object = .simulate_outcome(x = x,
-                                                        beta = beta[-1],
+                                                        beta = beta[-1L],
                                                         family = family[i]),
                              regexp = "other length")
     })

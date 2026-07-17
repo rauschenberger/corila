@@ -18,7 +18,7 @@ for (glmnet in c(FALSE, TRUE)) {
       n <- n0 + n1
       fold <- rep(x = c(0L, 1L), times = c(n0, n1))
       foldid <- sample(rep(seq_len(10L), length.out = n0))
-      sd <- stats::rpois(n = p, lambda = 5)
+      sd <- stats::rpois(n = p, lambda = 5.0)
       x <- vapply(X = sd,
                   FUN = function(x) stats::rnorm(n = n, sd = x),
                   FUN.VALUE = numeric(length = n))
@@ -27,7 +27,7 @@ for (glmnet in c(FALSE, TRUE)) {
       if (family  ==  "gaussian") {
         y <- stats::rnorm(n = n, mean = eta)
       } else if (family == "binomial") {
-        y <- stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-eta)))
+        y <- stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
       } else if (family == "poisson") {
         y <- stats::rpois(n = n, lambda = exp(eta))
       } else if (family == "cox") {
@@ -43,11 +43,11 @@ for (glmnet in c(FALSE, TRUE)) {
                                  y = y[fold == 0L],
                                  family = family,
                                  foldid = foldid,
-                                 lambda = c(99e99, 0),
+                                 lambda = c(99e99, 0.0),
                                  standardize = TRUE)
         y_hat1 <- as.numeric(stats::predict(object = lm1,
                                             newx = x[fold == 1L, ],
-                                            s = 0,
+                                            s = 0.0,
                                             type = "response"))
       } else {
         if (family == "cox") {
@@ -64,7 +64,7 @@ for (glmnet in c(FALSE, TRUE)) {
           type = ifelse(family == "cox", "risk", "response")
         )
       }
-      coef1 <- as.numeric(stats::coef(object = lm1, s = 0))
+      coef1 <- as.numeric(stats::coef(object = lm1, s = 0.0))
       #--- regression with standardisation ---
       scale <- .forescale(x = x[fold == 0L, ], y = y[fold == 0L],
                           family = family)
@@ -74,11 +74,11 @@ for (glmnet in c(FALSE, TRUE)) {
                                  y = scale$y,
                                  family = family,
                                  foldid = foldid,
-                                 lambda = c(99e99, 0),
+                                 lambda = c(99e99, 0.0),
                                  standardize = TRUE)
         y_hat_temp <- as.numeric(stats::predict(object = lm2,
                                                 newx = newx,
-                                                s = 0,
+                                                s = 0.0,
                                                 type = "response"))
       } else {
         if (family == "cox") {
@@ -97,7 +97,7 @@ for (glmnet in c(FALSE, TRUE)) {
           )
         )
       }
-      coef.temp <- as.numeric(stats::coef(object = lm2, s = 0))
+      coef.temp <- as.numeric(stats::coef(object = lm2, s = 0.0))
       result <- .backscale(pars = scale$pars, y = y_hat_temp, coef = coef.temp)
       y_hat2 <- result$y
       coef2 <- result$coef
@@ -221,12 +221,12 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       if (family == "cox") {
         eta <- data$x_test %*% coef$vector
       } else {
-        eta <- cbind(1, data$x_test) %*% coef$vector
+        eta <- cbind(1.0, data$x_test) %*% coef$vector
       }
       if (family == "gaussian") {
         pred <- eta
       } else if (family == "binomial") {
-        pred <- 1 / (1 + exp(-eta))
+        pred <- 1.0 / (1.0 + exp(-eta))
       } else if (family %in% c("poisson", "cox")) {
         pred <- exp(eta)
       }
@@ -251,15 +251,17 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   p <- 50L
   sd <- abs(stats::rnorm(n = p))
   x <- y <- list()
-  x$original <- vapply(X = sd,
-                       FUN = function(x) stats::rnorm(n = n, mean = 0, sd = x),
-                       FUN.VALUE = numeric(length = n))
+  x$original <- vapply(
+    X = sd,
+    FUN = function(x) stats::rnorm(n = n, mean = 0.0, sd = x),
+    FUN.VALUE = numeric(length = n)
+  )
   beta <- stats::rbinom(n = p, size = 1L, prob = 0.2) * stats::rnorm(n = p)
   eta <- as.numeric(scale(x$original %*% beta))
   if (family == "gaussian") {
     y <- eta + stats::rnorm(n = n, sd = 0.5)
   } else if (family == "binomial") {
-    y <- stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-eta)))
+    y <- stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
   } else if (family == "poisson") {
     y <- stats::rpois(n = n, lambda = exp(eta))
   } else if (family == "cox") {
@@ -299,7 +301,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     y_hat1 <- predict(object = object, newx = data$x_test)
     y_hat2 <- predict(object = object, newx = data$x_test[, primary])
     newx <- data$x_test
-    newx[, !primary] <- 0
+    newx[, !primary] <- 0.0
     y_hat3 <- predict(object = object, newx = newx)
     testthat::expect_equal(object = y_hat1, expected = y_hat2)
     testthat::expect_equal(object = y_hat1, expected = y_hat3)
@@ -411,18 +413,19 @@ testthat::test_that("complete case analysis works with NAs in response", {
 
 for (i in 1:3) {
   set.seed(i)
-  n <- 100
-  p <- 10
+  n <- 100L
+  p <- 10L
   x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
-  alpha <- stats::rnorm(n = 1)
+  alpha <- stats::rnorm(n = 1L)
   beta <- stats::rnorm(n = p)
   y <- as.numeric(x %*% beta)
   foldid <- sample(1:10, size = n, replace = TRUE)
   glmnet <- glmnet::cv.glmnet(x = x, y = y, foldid = foldid)
-  model0 <- cv.corila(x = x[1:(n / 4), ], y = y[1:(n / 4)], group = seq_len(p))
+  model0 <- cv.corila(x = x[1L:(n / 4L), ], y = y[1L:(n / 4L)],
+                      group = seq_len(p))
   model1 <- cv.corila(x = x, y = y, group = seq_len(p), foldid = foldid)
-  diff0 <- abs(coef(model0)[-1] - beta)
-  diff1 <- abs(coef(model1)[-1] - beta)
+  diff0 <- abs(coef(model0)[-1L] - beta)
+  diff1 <- abs(coef(model1)[-1L] - beta)
   testthat::test_that("parameters are recovered", {
     testthat::expect_true(all(diff0 < 0.1))
   })

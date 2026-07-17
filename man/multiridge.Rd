@@ -7,7 +7,7 @@
 multiridge(
   x,
   y,
-  z,
+  group,
   family = "gaussian",
   foldid = NULL,
   nfolds = 10L,
@@ -21,7 +21,7 @@ multiridge(
 \item{y}{response:
 \eqn{n}-dimensional vector}
 
-\item{z}{\eqn{p}-dimensional integer vector with entries in \eqn{\{1, \ldots, q\}}}
+\item{group}{\eqn{p}-dimensional integer vector with entries in \eqn{\{1, \ldots, q\}}}
 
 \item{family}{character \code{"linear"} (or \code{"gaussian"}),
 \code{"logistic"} (or \code{"binomial"}), or \code{"cox"}}
@@ -54,7 +54,7 @@ each containing the indices of the observations
 with \eqn{q} slots (one for each predictor group),
 each containing an \eqn{n_0 \times p_k} matrix,
 where \eqn{k \in \{1, \ldots, q\}}
-\item \eqn{p}-dimensional group vector \code{z} (see argument)
+\item \eqn{p}-dimensional group vector \code{group} (see argument)
 \item list \code{pars} with slots \code{family} (see above),
 the \eqn{p}-dimensional vectors \code{mu.x} and \code{sd.x}
 and the scalars \code{mu.y} and \code{sd.y}
@@ -84,16 +84,16 @@ with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 n <- 50L; p <- 20L; q <- 5L
 x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n)
-z <- rep(seq_len(q), length.out = p)
-model <- multiridge(x = x, y = y, z = z)
+group <- rep(seq_len(q), length.out = p)
+model <- multiridge(x = x, y = y, group = group)
 
 # fitting with given folds
 foldid <- sample(seq_len(10L), size = n, replace = TRUE)
-model <- multiridge(x = x, y = y, z = z, foldid = foldid)
+model <- multiridge(x = x, y = y, group = group, foldid = foldid)
 
 # fitting with given penalties
 penalties <- abs(rnorm(q))
-model <- multiridge(x = x, y = y, z = z, penalties = penalties)
+model <- multiridge(x = x, y = y, group = group, penalties = penalties)
 
 \donttest{
 # simulation
@@ -102,8 +102,8 @@ n0 <- 100
 n1 <- 10000
 n <- n0 + n1
 p <- c(100, 50)
-z <- rep(x = seq_along(p), times = p)
-x <- sapply(X = z, FUN = function(x) stats::rnorm(n = n, sd = x))
+group <- rep(x = seq_along(p), times = p)
+x <- sapply(X = group, FUN = function(x) stats::rnorm(n = n, sd = x))
 beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
         stats::rbinom(n = sum(p), size = 1, prob = 0.2)
 eta <- x \%*\% beta
@@ -129,7 +129,8 @@ y_hat$glmnet <- stats::predict(object = object, newx = x[!cond, ],
                               type = "response", s = "lambda.min")
 
 # multi-penalty ridge regression
-object <- multiridge(x = x[cond, ], y = y[cond], z = z, family = family)
+object <- multiridge(x = x[cond, ], y = y[cond],
+                     group = group, family = family)
 coef$multiridge <- stats::coef(object = object)
 y_hat$multiridge <- stats::predict(object = object, newx = x[!cond, ])
 

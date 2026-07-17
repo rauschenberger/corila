@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r,eval=FALSE}
 rm(list=ls(all.names=TRUE))
+devtools::load_all()
 #install.packages(c("roxygen2","pkgdown","rcmdcheck","usethis","remotes","testthat","devtools","goodpractice","checkglobals","roxylint", "cyclocomp"))
 #remotes::install_github(c("ropensci-review-tools/pkgcheck","ropensci-review-tools/autotest","ropensci-review-tools/srr"))
 setwd("C:/Users/arauschenberger/Desktop/corila/package")
@@ -72,7 +73,7 @@ data.frame(notes)[which(notes$type == "error"),c("type", "test_name", "fn_name",
 data.frame(notes)[which(notes$fn_name==".is_adjacent"),][1,]
 notes[notes$content=="is case dependent",]
 
-data.frame(notes[notes$fn_name==".deviance",])
+data.frame(notes[notes$fn_name=="cv.corila",])
 
 note <- autotest::autotest_package(functions=".deviance",test=TRUE)
 
@@ -80,7 +81,6 @@ note <- autotest::autotest_package(functions=".deviance",test=TRUE)
 
 #devtools::install()
 .rs.restartR()
-devtools::load_all()
 ```
 
 # Some notes on sparse correlation matrices

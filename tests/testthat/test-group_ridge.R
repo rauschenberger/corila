@@ -3,22 +3,22 @@
 
 for (family in c("gaussian", "binomial", "cox")) {
   # simulate
-  set.seed(1)
-  n0 <- 100
-  n1 <- 10000
+  set.seed(1L)
+  n0 <- 100L
+  n1 <- 10000L
   n <- n0 + n1
-  p <- c(100, 50)
-  z <- rep(x = seq_along(p), times = p)
-  x <- vapply(X = z,
+  p <- c(100L, 50L)
+  group <- rep(x = seq_along(p), times = p)
+  x <- vapply(X = group,
               FUN = function(x) stats::rnorm(n = n, sd = x),
               FUN.VALUE = numeric(length = n))
-  beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
+  beta <- stats::rnorm(n = sum(p), mean = 1.0, sd = 0.0) *
     stats::rbinom(n = sum(p), size = 1L, prob = 0.2)
   eta <- as.numeric(x %*% beta)
   if (family == "gaussian") {
     y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
   } else if (family == "binomial") {
-    y <- stats::rbinom(n = n, size = 1L, prob = 1 / (1 + exp(-eta)))
+    y <- stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
   } else if (family == "cox") {
     time <- stats::rexp(n = n, rate = exp(eta))
     status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
@@ -26,13 +26,16 @@ for (family in c("gaussian", "binomial", "cox")) {
   }
   cond <- rep(x = c(TRUE, FALSE), times = c(n0, n1))
   # equality
-  object <- multiridge(x = x[cond, ], y = y[cond], z = z, family = family)
+  object <- multiridge(x = x[cond, ],
+                       y = y[cond],
+                       group = group,
+                       family = family)
   y_hat <- stats::predict(object, newx = x[!cond, ])
   if (family == "cox") {
     temp <- exp(x[!cond, ] %*% stats::coef(object))
   } else {
     temp <- .mean_function(
-      x = drop(coef(object)[1L] + x[!cond, ] %*% coef(object)[-1]),
+      x = drop(coef(object)[1L] + x[!cond, ] %*% coef(object)[-1L]),
       family = family
     )
   }
@@ -46,18 +49,27 @@ for (family in c("gaussian", "binomial", "cox")) {
     }
   })
   testthat::test_that("refit with penalties is identical", {
-    refit <- multiridge(x = x[cond, ], y = y[cond], z = z,
-                        family = family, penalties = object$penalties)
+    refit <- multiridge(x = x[cond, ],
+                        y = y[cond],
+                        group = group,
+                        family = family,
+                        penalties = object$penalties)
     object$indices <- NULL
     testthat::expect_identical(object = refit, expected = object)
   })
   testthat::test_that("multiridge-fit rejects wrong matrices", {
     testthat::expect_error(
-      multiridge(x = x[cond, ], y = y[cond], z = z[-1], family = family)
+      multiridge(x = x[cond, ],
+                 y = y[cond],
+                 group = group[-1L],
+                 family = family)
     )
     testthat::expect_error(
-      multiridge(x = x[cond, ], y = y[cond], z = z, family = family,
-                 penalties = rep(x = 1, times = length(p) + 1L))
+      multiridge(x = x[cond, ],
+                 y = y[cond],
+                 group = group,
+                 family = family,
+                 penalties = rep(x = 1.0, times = length(p) + 1L))
     )
   })
   testthat::test_that("multiridge-predict rejects wrong matrices", {
@@ -73,8 +85,11 @@ for (family in c("gaussian", "binomial", "cox")) {
     for (i in seq_along(object$indices)) {
       foldid[object$indices[[i]]] <- i
     }
-    refit <- multiridge(x = x[cond, ], y = y[cond], z = z,
-                        family = family, foldid = foldid)
+    refit <- multiridge(x = x[cond, ],
+                        y = y[cond],
+                        group = group,
+                        family = family,
+                        foldid = foldid)
     testthat::expect_identical(object = refit, expected = object)
   })
 }

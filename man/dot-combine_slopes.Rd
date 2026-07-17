@@ -27,7 +27,7 @@ and estimated coefficients for negative effects.
 p <- 10L
 alpha <- rnorm(1L)
 temp <- rnorm(p)
-beta <- pmax(c(temp, -temp), 0)
+beta <- pmax(c(temp, -temp), 0.0)
 .combine_slopes(alpha = alpha, beta = beta)
 
 }

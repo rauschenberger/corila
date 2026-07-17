@@ -100,7 +100,7 @@ NULL
 coef.cv.corila <- function(object, s = "lambda.min", ...) {
   if (identical(s, "lambda.min")) {
     s <- object$lambda.min
-  } else if (!is.numeric(s) || length(s) != 1L || s < 0) {
+  } else if (!is.numeric(s) || length(s) != 1L || s < 0.0) {
     stop("Set s='lambda.min' or provide non-negative scalar.")
   }
   coef_stand <- as.numeric(
@@ -116,7 +116,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
   coef <- .combine_slopes(alpha = alpha, beta = beta)
   coef <- .backscale(coef = coef, pars = object$scale)$coef
   is_primary <- c(FALSE[object$scale$family != "cox"], !object$args$primary)
-  if (any(coef[is_primary] != 0)) {
+  if (any(coef[is_primary] != 0.0)) {
     # nocov start (invariant check)
     stop("Excluded coefficients must equal zero.")
     # nocov end
@@ -175,7 +175,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
   # --- check arguments ---
   if (identical(s, "lambda.min")) {
     s <- object$lambda.min
-  } else if (!is.numeric(s) || length(s) != 1L || s < 0) {
+  } else if (!is.numeric(s) || length(s) != 1L || s < 0.0) {
     stop("Set s='lambda.min' or provide non-negative value.")
   }
   # --- handle auxiliary predictors ---
@@ -296,11 +296,11 @@ plot.cv.corila <- function(x, ...) {
                    xlab = "observed values",
                    ylab = "fitted values",
                    xlim = lim, ylim = lim)
-    graphics::abline(a = 0, b = 1, lty = 2)
+    graphics::abline(a = 0.0, b = 1.0, lty = 2L)
   } else if (identical(x$args$family, "binomial")) {
     graphics::boxplot(y_fit ~ y_obs,
                       xlab = "observed class",
-                      ylab = "fitted probabilities", ylim = c(0, 1))
+                      ylab = "fitted probabilities", ylim = c(0.0, 1.0))
   } else if (identical(x$args$family, "cox")) {
     graphics::hist(y_fit,
                    xlab = "fitted relative risks",
@@ -312,7 +312,7 @@ plot.cv.corila <- function(x, ...) {
   graphics::plot(y = beta,
                  x = seq_along(beta),
                  xlab = "predictor",
-                 ylab = "coefficient", type = "h", lwd = 2, ylim = lim)
+                 ylab = "coefficient", type = "h", lwd = 2.0, ylim = lim)
   invisible(NULL)
 }
 
@@ -408,7 +408,7 @@ summary.cv.corila <- function(object, ...) {
   list$wgt_global <- object$args$hyper$wgt_global[object$id_hyper]
   list$exp_local <- object$args$hyper$exp_local[object$id_hyper]
   list$exp_global <- object$args$hyper$exp_global[object$id_hyper]
-  list$nzero <- sum(stats::coef(object, s = "lambda.min") != 0)
+  list$nzero <- sum(stats::coef(object, s = "lambda.min") != 0.0)
   class(list) <- "summary.cv.corila"
   list
 }
@@ -528,14 +528,14 @@ nobs.cv.corila <- function(object, ...) {
 #' p <- 10L
 #' alpha <- rnorm(1L)
 #' temp <- rnorm(p)
-#' beta <- pmax(c(temp, -temp), 0)
+#' beta <- pmax(c(temp, -temp), 0.0)
 #' .combine_slopes(alpha = alpha, beta = beta)
 #'
 #' @keywords internal
 #'
 .combine_slopes <- function(alpha, beta) {
   .assert(x = alpha, type = "numeric")
-  .assert(x = beta, type = "numeric", dim = Inf, min = 0)
+  .assert(x = beta, type = "numeric", dim = Inf, min = 0.0)
   beta_positive <- beta[1L:(length(beta) / 2L)]
   beta_negative <- beta[(length(beta) / 2L + 1L):(length(beta))]
   eps <- 1e-06
@@ -586,10 +586,10 @@ nobs.cv.corila <- function(object, ...) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
   .assert(x = primary, type = "logical", dim = Inf)
   if (ncol(x) == length(primary)) {
-    x[, !primary] <- 0
+    x[, !primary] <- 0.0
     x
   } else if (ncol(x) == sum(primary)) {
-    full <- matrix(data = 0, nrow = nrow(x), ncol = length(primary))
+    full <- matrix(data = 0.0, nrow = nrow(x), ncol = length(primary))
     full[, primary] <- x
     full
   } else {
@@ -630,7 +630,7 @@ nobs.cv.corila <- function(object, ...) {
 #' y_fit <- stats::runif(n = n)
 #' .residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
 #'
-#' y_obs <- stats::rpois(n = n, lambda = 4)
+#' y_obs <- stats::rpois(n = n, lambda = 4.0)
 #' y_fit <- stats::rexp(n = n, rate = 0.25)
 #' .residuals(y_obs = y_obs, y_fit = y_fit, family = "poisson")
 #'
@@ -648,18 +648,19 @@ nobs.cv.corila <- function(object, ...) {
   } else if (identical(family, "binomial")) {
     .assert(x = y_obs, type = "integer", dim = Inf, min = 0L, max = 1L)
     y_obs <- as.integer(y_obs)
-    .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0, max = 1)
-    y_fit <- pmax(eps, pmin(y_fit, 1 - eps))
-    sign(y_obs - y_fit) * sqrt(2) *
-      sqrt(- y_obs * log(y_fit) - (1 - y_obs) * log(1 - y_fit))
+    .assert(x = y_fit, type = "numeric", dim = length(y_obs),
+            min = 0.0, max = 1.0)
+    y_fit <- pmax(eps, pmin(y_fit, 1.0 - eps))
+    sign(y_obs - y_fit) * sqrt(2.0) *
+      sqrt(- y_obs * log(y_fit) - (1.0 - y_obs) * log(1.0 - y_fit))
   } else if (identical(family, "poisson")) {
     .assert(x = y_obs, type = "integer", dim = Inf, min = 0L)
     y_obs <- as.integer(y_obs)
-    .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0)
+    .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0.0)
     sign(y_obs - y_fit) *
-      sqrt((2 * (ifelse(test = abs(y_obs) < .Machine$double.eps,
-                        yes = 0,
-                        no = y_obs * log(y_obs / y_fit)) - y_obs + y_fit)))
+      sqrt((2.0 * (ifelse(test = abs(y_obs) < .Machine$double.eps,
+                          yes = 0.0,
+                          no = y_obs * log(y_obs / y_fit)) - y_obs + y_fit)))
   }
 }
 
