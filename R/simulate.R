@@ -23,18 +23,22 @@
 #'
 #' @examples
 #' \dontshow{calc_sign_prec <- corila:::calc_sign_prec}
-#' truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
-#' estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
+#' truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+#' estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
 #' calc_sign_prec(truth = truth, estim = estim) # observed value
 #' calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
 #' calc_sign_prec(truth = truth, estim = truth) # upper limit 1
-#' calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
+#' calc_sign_prec(truth = truth, estim = 0L * estim) # not defined
 #'
 #' @keywords internal
 #'
 calc_sign_prec <- function(truth, estim) {
-  .assert(x = truth, type = "integer", dim = Inf, na.rm = TRUE)
-  .assert(x = estim, type = "integer", dim = length(truth), na.rm = TRUE)
+  .assert(x = truth, type = "integer", dim = Inf,
+          min = -1, max = 1, na.rm = TRUE)
+  truth <- as.integer(truth)
+  .assert(x = estim, type = "integer", dim = length(truth),
+          min = -1, max = 1, na.rm = TRUE)
+  estim <- as.integer(estim)
   if (all(is.na(estim) | estim == 0)) {
     NA
   } else {
@@ -134,8 +138,8 @@ calc_sign_prec <- function(truth, estim) {
 #'
 #' @keywords internal
 #'
-simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
-                     n_type = 2, size_group = c(5, 3), effect_size = c(1, 1),
+simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
+                     n_type = 2L, size_group = c(5L, 3L), effect_size = c(1, 1),
                      corfac_feature = 0.5, corfac_type = 0.5,
                      corfac_group = 0.25, n_group_causal = 2,
                      prop_causal = 0.5, noise_factor = 1,
@@ -143,11 +147,11 @@ simulate <- function(family = "gaussian", n0 = 100, n1 = 10000, n_group = 20,
   # --- check arguments ---
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
-  .assert(x = n0, type = "integer", min = 2)
-  .assert(x = n1, type = "integer", min = 2)
-  .assert(x = n_group, type = "integer", min = 2)
-  .assert(x = n_type, type = "integer", min = 2)
-  .assert(x = size_group, type = "integer", dim = n_type, min = 1)
+  .assert(x = n0, type = "integer", min = 2L)
+  .assert(x = n1, type = "integer", min = 2L)
+  .assert(x = n_group, type = "integer", min = 2L)
+  .assert(x = n_type, type = "integer", min = 2L)
+  .assert(x = size_group, type = "integer", dim = n_type, min = 1L)
   .assert(x = effect_size, type = "numeric", dim = n_type, min = 0)
   .assert(x = corfac_feature, type = "numeric", min = 0, max = 1)
   .assert(x = corfac_type, type = "numeric", min = 0, max = 1)
