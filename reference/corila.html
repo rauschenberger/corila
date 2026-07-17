@@ -127,18 +127,19 @@ for the regularisation and mixing hyperparameters</p></dd>
 
 
 <dt id="arg-alpha-init">alpha_init<a class="anchor" aria-label="anchor" href="#arg-alpha-init"></a></dt>
-<dd><p>elastic net mixing parameter
+<dd><p>A scalar specifying the method used for obtaining initial coefficients:</p><ul><li><p>a numeric scalar in the unit interval
 (\(0 \leq\) <code>alpha_init</code> \(\leq 1\))
-for initial regression
-(default: ridge penalisation with <code>alpha_init</code>=0);
-alternative choices are
-<code>"pearson"</code>, <code>"spearman"</code>, or <code>"kendall"</code>
+to define the mixing parameter for elastic net regression
+(default: ridge penalisation with <code>alpha_init</code>=0);</p></li>
+<li><p>the character scalar <code>"pearson"</code>, <code>"spearman"</code>, or <code>"kendall"</code>
 to use initial correlation coefficients
-(not implemented for <code>family="cox"</code>),
-<code>"multiridge"</code> for multi-penalty ridge regression
+(not implemented for <code>family="cox"</code>)</p></li>
+<li><p>the character scalar<code>"multiridge"</code>
+to use multi-penalty ridge regression
 with one penalty for each group
-(not implemented for <code>family="poisson"</code> or overlapping groups),
-or <code>NA</code> to set all initial coefficients equal to 1</p></dd>
+(not implemented for <code>family="poisson"</code> or overlapping groups),</p></li>
+<li><p><code>NA</code> to set all initial coefficients equal to 1</p></li>
+</ul></dd>
 
 
 <dt id="arg-alpha-final">alpha_final<a class="anchor" aria-label="anchor" href="#arg-alpha-final"></a></dt>
@@ -173,7 +174,7 @@ or <code>NULL</code> (cross-validation)</p></dd>
 
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
-<dd><p>Should messages from <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
+<dd><p>Should messages from <code><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
 be suppressed? (<code>FALSE</code> or <code>TRUE</code>)</p></dd>
 
 
@@ -220,7 +221,7 @@ respectively,
 <code><a href="dot-folds.html">.folds()</a></code> for splitting samples into folds,
 <code><a href="dot-estim_initial_coefs.html">.estim_initial_coefs()</a></code> for obtaining initial coefficients,
 <code><a href="dot-is_adjacent.html">.is_adjacent()</a></code> for identifying adjacent predictors,
-and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code>
+and <code><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code> and <code><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet::glmnet()</a></code>
 for adaptive lasso regression.</p></div>
     </div>
 
