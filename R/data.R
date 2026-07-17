@@ -28,21 +28,21 @@
 #'   \eqn{n_1 \times p} predictor matrix for the test observations
 #' - `y_test`:
 #'   response vector for the test observations of length \eqn{n_1}
-#'   
+#'
 #' Training and testing observations are named `train_` or `test_`,
 #' respectively, followed by a number indexing the observations
 #' (e.g., `train_1` or `test_1`).
-#' 
+#'
 #' Primary and auxiliary predictors are named `pri_` or `aux_`, respectively,
 #' followed by a number indexing the predictor groups, a point,
 #' and a number indexing the predictors within this group
 #' (e.g., `pri_1.1` or `aux_1.1`).
 #'
-#' @name lupi_data
+#' @name corila_data
 #' @aliases data
 #' @docType data
 #' @keywords datasets
-#' 
+#'
 #' @details
 #' - Use the objects `x_train`, `y_train`, `group`, and `primary`
 #'   for model training.
@@ -52,4 +52,4 @@
 #'
 #' @srrstats {G5.1} *data set for tests and examples is exported*
 #'
-"data"
+"corila_data"
