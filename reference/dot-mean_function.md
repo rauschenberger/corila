@@ -25,7 +25,7 @@ Returns a numeric vector of length \\n\\.
 ## Examples
 
 ``` r
-x <- rnorm(10)
+x <- rnorm(n = 10L)
 .mean_function(x, family = "binomial")
 #>  [1] 0.4468054 0.3459346 0.2425051 0.9488641 0.5663275 0.5220676 0.1661518
 #>  [8] 0.6451374 0.8100362 0.8303441

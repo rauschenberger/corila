@@ -114,9 +114,8 @@ corila(
 - silent:
 
   Should messages from
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-  and
-  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) and
+  [`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
   be suppressed? (`FALSE` or `TRUE`)
 
 - threshold:
@@ -165,19 +164,18 @@ for splitting samples into folds,
 for obtaining initial coefficients,
 [`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/dot-is_adjacent.md)
 for identifying adjacent predictors, and
-[`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-and
-[`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-for adaptive lasso regression.
+[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+and [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
+adaptive lasso regression.
 
 ## Examples
 
 ``` r
 # \donttest{
 # simulation
-n <- 100
-p <- 50
-group <- rep(x = 1:10, each = 5)
+n <- 100L
+p <- 50L
+group <- rep(x = seq_len(10L), each = 5L)
 primary <- rep(x = TRUE, times = p)
 x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
@@ -194,7 +192,7 @@ object <- corila(x = x,
                  alpha_final = 1,
                  cor = "spearman",
                  foldid = NULL,
-                 nfolds = 10,
+                 nfolds = 10L,
                  hyper = hyper,
                  lambda_init = NULL)
 

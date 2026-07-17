@@ -34,11 +34,11 @@ methods(class = "cv.corila")
 #> see '?methods' for accessing help and source code
 
 # fitting the model
-n <- 10; p <- 20; q <- 5
+n <- 10L; p <- 20L; q <- 5L
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
 group <- rep(seq_len(q), length.out = p)
-primary <- as.logical(rbinom(n = p, size = 1, prob = 0.5))
+primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
 

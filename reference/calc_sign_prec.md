@@ -28,14 +28,14 @@ precision), or `NA` if all estimated signs equal 0.
 ## Examples
 
 ``` r
-truth <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
-estim <- sample(x = c(-1, 0, 1), size = 10, replace = TRUE)
+truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
 calc_sign_prec(truth = truth, estim = estim) # observed value
 #> [1] 0.4285714
 calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
 #> [1] 0
 calc_sign_prec(truth = truth, estim = truth) # upper limit 1
 #> [1] 1
-calc_sign_prec(truth = truth, estim = 0 * estim) # not defined
+calc_sign_prec(truth = truth, estim = 0L * estim) # not defined
 #> [1] NA
 ```

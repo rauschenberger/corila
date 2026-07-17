@@ -55,8 +55,8 @@ and make predictions with
 
 ``` r
 # minimal example
-set.seed(1)
-n <- 50; p <- 20; q <- 5
+set.seed(1L)
+n <- 50L; p <- 20L; q <- 5L
 x <- matrix(rnorm(n * p), nrow = n , ncol = p)
 y <- rnorm(n)
 group <- rep(seq_len(q), length.out = p)

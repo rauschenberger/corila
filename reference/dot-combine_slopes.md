@@ -33,8 +33,8 @@ This function is called by
 ## Examples
 
 ``` r
-p <- 10
-alpha <- rnorm(1)
+p <- 10L
+alpha <- rnorm(1L)
 temp <- rnorm(p)
 beta <- pmax(c(temp, -temp), 0)
 .combine_slopes(alpha = alpha, beta = beta)

@@ -78,13 +78,13 @@ of samples and features).
 
 ``` r
 .assert(x = NULL)
-.assert(x = rnorm(1))
+.assert(x = rnorm(n = 1L))
 .assert(x = "A", type = "nominal", support = LETTERS)
-.assert(x = rexp(10), dim = Inf, type = "numeric", min = 0)
-.assert(x = c(NA, rpois(9, lambda = 4)), dim = 10,
+.assert(x = rexp(n= 10L), dim = Inf, type = "numeric", min = 0)
+.assert(x = c(NA, rpois(n = 9L, lambda = 4)), dim = 10L,
        type = "integer", na.rm = TRUE)
 .assert(x = NA, na.rm = TRUE)
 .assert(x = 1, na.rm = FALSE)
-.assert(x = rpois(n = 10, lambda = 4), dim = Inf,
+.assert(x = rpois(n = 10L, lambda = 4), dim = Inf,
        family = "poisson")
 ```

@@ -72,9 +72,9 @@ to bring coefficients and predictions back to original scale.
 # \donttest{
 # simulate data
 family <- "gaussian"
-n0 <- 100; n1 <- 50; p <- 3
+n0 <- 100L; n1 <- 50L; p <- 3L
 n <- n0 + n1
-fold <- rep(c(0, 1), times = c(n0, n1))
+fold <- rep(c(0L, 1L), times = c(n0, n1))
 sd <- stats::rpois(n = p, lambda = 5)
 x <- data.frame(x = sapply(X = sd,
                            FUN = function(x) stats::rnorm(n = n, sd = x)))
