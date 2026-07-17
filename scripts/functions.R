@@ -1,6 +1,6 @@
 
 #' @srrstats {G1.5} *code for reproducing results in manuscript*
-#' @srrstatsTODO {G1.6} *code for comparing with other methods*
+#' @srrstats {G1.6} *code for comparing with other methods*
 
 #' @title
 #' Correlation Plot
@@ -30,56 +30,56 @@
 #' non-negative scalar or `NULL`
 #'
 #' @examples
-#' q <- 10
-#' group <- rep(LETTERS[seq_len(q)], times = stats::rpois(n = q, lambda = 4))
+#' q <- 10L
+#' group <- rep(LETTERS[seq_len(q)], times = stats::rpois(n = q, lambda = 4.0))
 #' p <- length(group)
 #' rho <- 0.8
-#' sigma <- rho * outer(X = group, Y = group, FUN = "==") + (1 - rho) * diag(p)
+#' sigma <- rho * outer(X = group, Y = group, FUN = "==") + (1.0 - rho) * diag(p)
 #' x <- MASS::mvrnorm(n = 10, mu = rep(0, times = p), Sigma = sigma)
-#' .plot_cor(x = sigma, group = group, min = 1)
-#' .plot_cor(x = cor(x), group = group, min = 1)
+#' .plot_cor(x = sigma, group = group, min = 1.0)
+#' .plot_cor(x = cor(x), group = group, min = 1.0)
 #' 
-.plot_cor <- function(x, group, exp = 1, min = 5, cex = 0.7,
+.plot_cor <- function(x, group, exp = 1.0, min = 5L, cex = 0.7,
                       xline = 0.5, yline = 0.5) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf),
-          min = -1, max = 1)
+          min = -1.0, max = 1.0)
   p <- ncol(x)
   .assert(x = group, type = "nominal", dim = p)
-  .assert(x = exp, type = "numeric", min = 0)
-  .assert(x = min, type = "integer", min = 1)
-  .assert(x = cex, type = "numeric", min = 0)
-  .assert(x = xline, type = "numeric", min = 0)
-  .assert(x = yline, type = "numeric", min = 0)
+  .assert(x = exp, type = "numeric", min = 0.0)
+  .assert(x = min, type = "integer", min = 1L)
+  .assert(x = cex, type = "numeric", min = 0.0)
+  .assert(x = xline, type = "numeric", min = 0.0)
+  .assert(x = yline, type = "numeric", min = 0.0)
   levels <- names(sort(table(group), decreasing = TRUE))
   index <- sapply(levels, function(x) which(group == x))
   size <- sapply(index, length)
   order <- unlist(index)
   cor_exp <- sign(x) * abs(x) ^ exp
-  col <- grDevices::colorRampPalette(c("blue", "white", "red"))(200)
+  col <- grDevices::colorRampPalette(c("blue", "white", "red"))(200L)
   graphics::image(x = cor_exp[order, rev(order)],
-                  axes = FALSE, col = col, zlim = c(-1,1))
-  pos <- (c(0, cumsum(size)) - 0.5) / (ncol(x) - 1)
+                  axes = FALSE, col = col, zlim = c(-1.0, 1.0))
+  pos <- (c(0.0, cumsum(size)) - 0.5) / (ncol(x) - 1L)
   # add grid
   #lwd <- ifelse(size >= min, 2, ifelse(size > 2, 1, 0.5))
-  graphics::abline(v = pos, col = "grey", lty = 1, lwd = 0.5)
-  graphics::abline(h = 1 - pos, col = "grey" ,lty = 1, lwd = 0.5)
+  graphics::abline(v = pos, col = "grey", lty = 1L, lwd = 0.5)
+  graphics::abline(h = 1.0 - pos, col = "grey" ,lty = 1L, lwd = 0.5)
   # add ticks
-  spaces <- rep(x = "", times = length(levels) + 1)
-  graphics::axis(side = 3, at = pos, labels = spaces,
-                 lwd = 0, lwd.ticks = 0.5)
-  graphics::axis(side = 2, at= 1 - pos, labels = spaces,
-                 lwd = 0, lwd.ticks = 0.5)
+  spaces <- rep(x = "", times = length(levels) + 1L)
+  graphics::axis(side = 3L, at = pos, labels = spaces,
+                 lwd = 0.0, lwd.ticks = 0.5)
+  graphics::axis(side = 2L, at= 1.0 - pos, labels = spaces,
+                 lwd = 0.0, lwd.ticks = 0.5)
   # add labels
   label <- which(size >= min)
-  pos_centre <- 0.5 * pos[label] + 0.5 * pos[label + 1]
+  pos_centre <- 0.5 * pos[label] + 0.5 * pos[label + 1L]
   if(!is.null(xline)){
-    las <- ifelse(any(nchar(levels) >= 10), 2, 1)
-    graphics::mtext(text = levels[label], side = 3, at = pos_centre,
+    las <- ifelse(any(nchar(levels) >= 10L), 2L, 1L)
+    graphics::mtext(text = levels[label], side = 3L, at = pos_centre,
                   las = las, cex = cex, line = xline)
   }
   if(!is.null(yline)){
-    graphics::mtext(text = levels[label], side = 2, at = 1 - pos_centre,
-                  las = 1, cex = cex, line = yline)
+    graphics::mtext(text = levels[label], side = 2L, at = 1.0 - pos_centre,
+                  las = 1L, cex = cex, line = yline)
   }
   invisible(NULL)
 }
@@ -108,33 +108,35 @@
   if(ncol(z) != nrow(z)) {
     stop("Requires p rows and p columns.")
   }
-  if(any(abs(diag(z) - 1) > 1e-06)){
+  if(any(abs(diag(z) - 1.0) > 1e-06)){
     stop("Requires unit diagonal.")
   }
   p <- ncol(z)
-  xpos <- seq(from = 0, to = 1, length.out = p)
-  ypos <- seq(from = 1, to = 0, length.out = p)
-  lines <- seq(from = - 0.5 / (p - 1),
-               to = 1 + 0.5 / (p - 1),
-               length.out = p + 1)
-  if(all(z %in% c(0,1))) {
-    breaks <- c(0,0.5,1)
+  xpos <- seq(from = 0.0, to = 1.0, length.out = p)
+  ypos <- seq(from = 1.0, to = 0.0, length.out = p)
+  lines <- seq(from = - 0.5 / (p - 1L),
+               to = 1L + 0.5 / (p - 1L),
+               length.out = p + 1L)
+  if(all(z %in% c(0, 1))) {
+    breaks <- c(0.0, 0.5, 1.0)
     col <- c("white", col)
   } else {
     max <- 1.1*max(abs(z))
     eps <- 1e-06
-    breaks <- c(seq(-max, -eps, length.out = 50),
-                seq(eps, max, length.out = 50))
-    col <- grDevices::colorRampPalette(c("blue","white","red"))(99)
-    col <- c(col[1:49], "white", col[51:99])
+    breaks <- c(seq(-max, -eps, length.out = 50L),
+                seq(eps, max, length.out = 50L))
+    col <- grDevices::colorRampPalette(c("blue","white","red"))(99L)
+    col <- c(col[1L:49L], "white", col[51L:99L])
   }
-  graphics::par(mar=c(0,2,2,0))
-  graphics::image(t(z[p:1,]), breaks = breaks, col = col, axes = FALSE)
+  graphics::par(mar=c(0.0, 2.0, 2.0, 0.0))
+  graphics::image(t(z[p:1L,]), breaks = breaks, col = col, axes = FALSE)
   graphics::abline(h=lines, col = "white")
   graphics::abline(v=lines, col = "white")
   labels <- parse(text = paste0("x[", seq_len(p), "]"))
-  graphics::axis(side = 2, at = ypos, labels = labels, tick = FALSE, las = 2, line = -0.5)
-  graphics::axis(side = 3, at = xpos, labels = labels, tick = FALSE, las = 1, line = -0.5)
+  graphics::axis(side = 2L, at = ypos, labels = labels, tick = FALSE,
+                 las = 2L, line = -0.5)
+  graphics::axis(side = 3L, at = xpos, labels = labels, tick = FALSE,
+                 las = 1L, line = -0.5)
 }
 
 
@@ -165,21 +167,21 @@
 #' 
 #' @examples
 #' set.seed(1)
-#' n <- 10; p <- 20; q <- 5
+#' n <- 10L; p <- 20L; q <- 5L
 #' group <- rep(x = seq_len(q), each = p / q)
 #' sigma <- 0.9 * outer(group, group, "==") + 0.1 * diag(p)
-#' x <- mvtnorm::rmvnorm(n = n, mean = rep(0, times = p), sigma = sigma)
-#' beta <- stats::rbinom(n = p, size = 1, prob = 0.25) * stats::rnorm(p)
+#' x <- mvtnorm::rmvnorm(n = n, mean = rep(0.0, times = p), sigma = sigma)
+#' beta <- stats::rbinom(n = p, size = 1L, prob = 0.25) * stats::rnorm(p)
 #' y <- as.numeric(scale(x %*% beta))
-#' holdout <- rep(c(FALSE, TRUE), each = n / 2)
-#' primary <- rep(rep(c(TRUE, FALSE), times = c(1, p / q - 1)), times = q)
+#' holdout <- rep(c(FALSE, TRUE), each = n / 2L)
+#' primary <- rep(rep(c(TRUE, FALSE), times = c(1L, p / q - 1L)), times = q)
 #' .heatmap_lupi(x = x, y = y, holdout = holdout, group = group, primary = primary)
 #' 
 #' data <- .simulate_lupi_data(mode = "upstream",
-#'     p = 30, q = 5, n0 = 10, n1 = 20)
+#'     p = 30L, q = 5L, n0 = 10L, n1 = 20L)
 #' .heatmap_lupi(x = data$x_train, y = data$y_train,
 #'    group = data$group, primary = data$primary,
-#'    holdout = rep(c(FALSE, TRUE), times = c(5, 5)))
+#'    holdout = rep(c(FALSE, TRUE), times = c(5L, 5L)))
 #' 
 .heatmap_lupi <- function(x, y, holdout = NULL, group = NULL, primary = NULL) {
   .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
@@ -205,100 +207,97 @@
   }
   y[holdout] <- NA
   x[holdout, !primary] <- NA
-  graphics::par(mar = c(0, 0, 0, 0), oma = c(2, 4, 4, 2))
+  graphics::par(mar = c(0.0, 0.0, 0.0, 0.0), oma = c(2.0, 4.0, 4.0, 2.0))
   cols <- list(na = "lightgrey", grid = "grey",sep = "black", box = "grey")
-  lwd <- list(grid = 1, sep = 3, box = 1)
+  lwd <- list(grid = 1.0, sep = 3.0, box = 1.0)
   cex <- list(axis = 1.1, cell = 1.2, lab = 0.9)
   col  <- grDevices::colorRampPalette(c("blue","white","red"))(99)
-  col <- c(col[1:49], "white", col[51:99], cols$na)
+  col <- c(col[1L:49L], "white", col[51L:99L], cols$na)
   max <- 1.01 * max(abs(c(as.vector(x), as.vector(y))), na.rm=TRUE)
   eps <- 1e-06
-  breaks <- c(seq(-max, -eps, length.out = 50),
-              seq(eps, max, length.out = 50), 99e99)
-  xpos <- seq(from = 0, to = 1, length.out = p)
-  ypos <- seq(from = 1, to = 0, length.out = n)
-  vlines <- seq(from = - 0.5 / (p - 1),
-                to = 1 + 0.5 / (p - 1),
+  breaks <- c(seq(-max, -eps, length.out = 50L),
+              seq(eps, max, length.out = 50L), 99e99)
+  xpos <- seq(from = 0.0, to = 1.0, length.out = p)
+  ypos <- seq(from = 1.0, to = 0.0, length.out = n)
+  vlines <- seq(from = - 0.5 / (p - 1L),
+                to = 1.0 + 0.5 / (p - 1L),
                 length.out = p + 1)
-  hlines <- seq(from = - 0.5 / (n - 1),
-                to = 1 + 0.5 / (n - 1),
-                length.out = n + 1)
-  thick_vlines <- (which(diff(group) != 0) - 0.5) * 1/ (p - 1)
+  hlines <- seq(from = - 0.5 / (n - 1L),
+                to = 1.0 + 0.5 / (n - 1L),
+                length.out = n + 1L)
+  thick_vlines <- (which(diff(group) != 0.0) - 0.5) * 1.0 / (p - 1L)
   
   y[is.na(y)] <- 99e99 # for grey colour
-  
   #--- feature matrix ---
-  graphics::layout(mat = matrix(data = seq_len(9), nrow = 3, ncol = 3),
-                   widths = c(p, 1, 1), heights = c(n, 1, 1))
-  graphics::image(x = t(x[nrow(x):1, ]), axes = FALSE,
+  graphics::layout(mat = matrix(data = seq_len(9L), nrow = 3L, ncol = 3L),
+                   widths = c(p, 1.0, 1.0), heights = c(n, 1.0, 1.0))
+  graphics::image(x = t(x[nrow(x):1L, ]), axes = FALSE,
                   col = col, breaks = breaks)
   if(all(!holdout)){
-    graphics::mtext(side = 2, at = 0.5, text = "observations",
-                    line = 2, font = 2, cex = cex$lab)
+    graphics::mtext(side = 2L, at = 0.5, text = "observations",
+                    line = 2.0, font = 2L, cex = cex$lab)
   } else {
-      graphics::mtext(side = 2,
-                      at = c(1 - mean(holdout) / 2, mean(holdout) / 2),
+      graphics::mtext(side = 2L,
+                      at = c(1.0 - mean(holdout) / 2.0, mean(holdout) / 2.0),
                       text = c("training set", "test set"),
-                      line = 2, font = 2, cex = cex$lab)
+                      line = 2.0, font = 2L, cex = cex$lab)
   }
-  graphics::mtext(side = 3, text = "predictors",
-                  line = 2, font = 2, cex = cex$lab)
+  graphics::mtext(side = 3L, text = "predictors",
+                  line = 2.0, font = 2L, cex = cex$lab)
   graphics::abline(h = hlines, col = cols$grid, lwd = lwd$grid)
   graphics::abline(v = vlines, col = cols$grid, lwd = lwd$grid)
   graphics::abline(v = thick_vlines, lwd = lwd$sep, col = cols$sep)
   is_na <- which(is.na(x) | x == 99e99, arr.ind = TRUE)
-  if(nrow(is_na)>0){
+  if(nrow(is_na)>0L){
     graphics::text(x = xpos[is_na[, "col"]], y = ypos[is_na[, "row"]],
-                   labels = "?", font = 2, cex = cex$cell)
+                   labels = "?", font = 2L, cex = cex$cell)
   }
   graphics::abline(h = mean(holdout), lwd = lwd$sep, col = cols$sep)
   graphics::box(col=cols$box, lwd=lwd$box)
-  graphics::axis(side = 2,
+  graphics::axis(side = 2L,
                  at = ypos,
-                 labels = seq_len(n), tick = FALSE, line = 0, las = 2,
+                 labels = seq_len(n), tick = FALSE, line = 0.0, las = 2L,
                  cex.axis=cex$axis)
-  graphics::axis(side = 3,
+  graphics::axis(side = 3L,
                  at = xpos,
                  labels = parse(text = paste0("x[", seq_len(p), "]")),
                  tick = FALSE, line = -0.5,
                  cex.axis=cex$axis)
-  
   #--- effect vector ---
   graphics::plot.new()
-  graphics::image(x = matrix(ifelse(primary, 1, NA), ncol = 1),
+  graphics::image(x = matrix(ifelse(primary, 1L, NA), ncol = 1L),
                   axes = FALSE, col = cols$na)
   graphics::abline(v = vlines, col = cols$grid, lwd = lwd$grid)
-  graphics::mtext(side = 2, text = "coefs", line = 2, font = 2, cex = cex$lab)
+  graphics::mtext(side = 2L, text = "coefs", line = 2.0, font = 2L,
+                  cex = cex$lab)
   graphics::box(col=cols$box,lwd=lwd$box)
   graphics::abline(v = thick_vlines, lwd = lwd$sep, col = cols$sep)
-  graphics::axis(side = 1,
+  graphics::axis(side = 1L,
                  at = xpos,
                  labels = parse(text = paste0("hat(beta)[", seq_len(p), "]")),
                  tick = FALSE,
                  line = -0.3,
                  cex.axis=cex$axis)
-  graphics::text(x = xpos[!primary], y = 0, label = "0",
-                 font = 2, cex = cex$cell, col = "black")
-  graphics::text(x = xpos[primary], y = 0, label = "?",
-                 font = 2, cex = cex$cell)
+  graphics::text(x = xpos[!primary], y = 0.0, label = "0",
+                 font = 2L, cex = cex$cell, col = "black")
+  graphics::text(x = xpos[primary], y = 0.0, label = "?",
+                 font = 2L, cex = cex$cell)
   graphics::plot.new()
   graphics::plot.new()
   graphics::plot.new()
-  
   #--- target vector ---
-  graphics::image(x = matrix(rev(y), nrow = 1), axes = FALSE,
+  graphics::image(x = matrix(rev(y), nrow = 1L), axes = FALSE,
                   col = col, breaks = breaks)
   graphics::abline(h = hlines, col = cols$grid, lwd = lwd$grid)
   graphics::abline(h = mean(holdout), lwd = lwd$sep, col = cols$sep)
-  graphics::mtext(text = "response", side = 3, line = 2,
-                  font = 2, cex = cex$lab)
-  graphics::axis(side = 3, at = 0, labels = "y", tick = FALSE,
+  graphics::mtext(text = "response", side = 3L, line = 2.0,
+                  font = 2L, cex = cex$lab)
+  graphics::axis(side = 3L, at = 0.0, labels = "y", tick = FALSE,
                  line = -0.5, cex.axis = cex$cell)
   graphics::box(col = cols$box, lwd = lwd$box)
-  graphics::text(x = 0, y = ypos[holdout], labels = "?",
-                 font = 2, cex = cex$cell)
+  graphics::text(x = 0.0, y = ypos[holdout], labels = "?",
+                 font = 2L, cex = cex$cell)
   graphics::plot.new()
-  
   invisible(NULL)
 }
 
@@ -353,18 +352,18 @@
 #' sapply(data, length)
 #' # Also return ordered group object (sort X, beta, group, binary, causal).
 #'
-.simulate_lupi_data <- function(mode, n0 = 100, n1 = 10000, p = 200, q = 4,
+.simulate_lupi_data <- function(mode, n0 = 100L, n1 = 10000L, p = 200L, q = 4L,
                                 plot = FALSE) {
-  .assert(x = n0, type = "integer", min = 2)
-  .assert(x = n1, type = "integer", min = 2)
-  .assert(x = p, type = "integer", min = 5)
-  .assert(x = q, type = "integer", min = 2, max = p)
+  .assert(x = n0, type = "integer", min = 2L)
+  .assert(x = n1, type = "integer", min = 2L)
+  .assert(x = p, type = "integer", min = 5L)
+  .assert(x = q, type = "integer", min = 2L, max = p)
   .assert(x = mode, type = "nominal",
           support = c("upstream", "aggregated", "surrogate", "baseline", "uninformative"))
   .assert(x = plot, type = "logical")
-  fold <- rep(x = c(0, 1), times = c(n0, n1))
+  fold <- rep(x = c(0L, 1L), times = c(n0, n1))
   n <- n0 + n1
-  if (p %% q != 0) {
+  if (p %% q != 0L) {
     stop("This function simulates equally sized groups.",
          "So `p` must be a multiple of `q`.")
   }
@@ -372,9 +371,9 @@
     #--- upstream and downstream predictors ---
     group <- rep(x = seq_len(p / q),
                  each = q)
-    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
+    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1L, q - 1L)),
                    times = p / q)
-    causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5, p / q - 5))),
+    causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5L, p / q - 5L))),
                   each = q)
     x <- matrix(data = NA, nrow = n, ncol = p)
     for (j in seq_len(p / q)) {
@@ -387,7 +386,7 @@
         stats::rnorm(n * sum(sel_aux)),
         nrow = n,
         ncol = sum(sel_aux)
-      )) * sqrt(1 - w))
+      )) * sqrt(1.0 - w))
     }
     beta <- (!primary) * causal * abs(stats::rnorm(n = p))
     eta <- x %*% beta
@@ -395,10 +394,10 @@
   } else if (mode == "aggregated") {
     #--- fine-grained and aggregated predictors ---
     group <- rep(x = seq_len(p / q), each = q)
-    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
+    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1L, q - 1L)),
                    times = p / q)
     causal <- rep(x = sample(rep(
-      x = c(TRUE, FALSE), times = c(5, p / q - 5)
+      x = c(TRUE, FALSE), times = c(5L, p / q - 5L)
     )), each = q)
     x <- matrix(data = NA,
                 nrow = n,
@@ -410,7 +409,7 @@
     for (j in seq_len(p / q)) {
       sel_pry <- group == j & primary
       sel_aux <- group == j & !primary
-      w <- stats::runif(n = 1)
+      w <- stats::runif(n = 1L)
       #x[,sel_aux] <- sqrt(w)*stats::rnorm(n=n)+
       #sqrt(1-w)*stats::rnorm(n=n*sum(sel_aux))
       #x[,sel_pry] <- rowSums(x[,sel_aux])
@@ -438,10 +437,10 @@
   } else if (mode == "surrogate") {
     #--- canonical and surrogate predictors ---
     group <- rep(x = seq_len(p / q), each = q)
-    primary <- rep(x = rep(x = c(FALSE, TRUE), times = c(1, q - 1)),
+    primary <- rep(x = rep(x = c(FALSE, TRUE), times = c(1L, q - 1L)),
                    times = p / q)
     causal <- rep(x = sample(rep(
-      x = c(TRUE, FALSE), times = c(5, p / q - 5)
+      x = c(TRUE, FALSE), times = c(5L, p / q - 5L)
     )), each = q)
     x <- matrix(data = NA,
                 nrow = n,
@@ -452,7 +451,7 @@
       x[, sel_aux] <- stats::rnorm(n = n)
       # w <- c(0.2,0.5,0.8) # TRIAL
       # was c(0.7,0.5,0.3)#  stats::runif(n=q-1) # rep(x=0.9,times=q-1)
-      w <- stats::runif(q - 1)
+      w <- stats::runif(n = q - 1L)
       x[, sel_pry] <- x[, sel_aux] %*% t(sqrt(w)) + t(t(matrix(
         stats::rnorm(n * sum(sel_pry)),
         nrow = n,
@@ -464,7 +463,7 @@
     y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
   } else if (mode == "baseline") {
     #--- baseline and follow-up predictors ---
-    w <- c(NA, rep(x = 0.9, times = q - 1))
+    w <- c(NA, rep(x = 0.9, times = q - 1L))
     #w <- c(NA,runif(3)) # TRIAl
     list <- list()
     list[[1]] <- matrix(
@@ -472,23 +471,23 @@
       nrow = n,
       ncol = p / q
     )
-    for (j in seq(from = 2, to = q)) {
-      list[[j]] <- sqrt(w[j]) * list[[j - 1]] +
+    for (j in seq(from = 2L, to = q)) {
+      list[[j]] <- sqrt(w[j]) * list[[j - 1L]] +
         sqrt(1 - w[j]) * stats::rnorm(n = n * p / q)
     }
     x <- do.call(what = "cbind", args = list)
     group <- rep(x = seq_len(p / q), times = q)
-    primary <- rep(x = c(TRUE, FALSE), times = c(p / q, p / q * (q - 1)))
-    beta <- sample(rep(x = c(0, 1), times = c(p / q - 5, 5))) * 
+    primary <- rep(x = c(TRUE, FALSE), times = c(p / q, p / q * (q - 1L)))
+    beta <- sample(rep(x = c(0.0, 1.0), times = c(p / q - 5L, 5L))) * 
       abs(stats::rnorm(n = p / q))
     causal <- NULL
     eta <- list[[length(list)]] %*% beta
     y <- eta + stats::rnorm(n = n, sd = 0.5 * sd(eta))
   } else if (mode == "uninformative") {
     group <- rep(x = seq_len(p / q), each = q)
-    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1, q - 1)),
+    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1L, q - 1L)),
                    times = p / q)
-    causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5, p / q - 5))),
+    causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5L, p / q - 5L))),
                   each = q)
     x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
     beta <- primary * causal * abs(stats::rnorm(n = p))
@@ -531,19 +530,19 @@
   #   eta <- z %*% beta
   #   y <- eta + stats::rnorm(n=n,sd=0.5*sd(eta))
   # }
-  sd <- apply(X = x, MARGIN = 2, FUN = function(x) stats::sd(x))
+  sd <- apply(X = x, MARGIN = 2L, FUN = function(x) stats::sd(x))
   if (any(sd <= 0.95) || any(sd >= 1.05)) {
     warning("no unit variance")
   }
   if (plot) {
-    graphics::par(mfrow = c(1, 2))
+    graphics::par(mfrow = c(1L, 2L))
     graphics::plot(beta, col = group)
-    graphics::image(t(stats::cor(x)[p:1, ]))
+    graphics::image(t(stats::cor(x)[p:1L, ]))
   }
-  list(y_train = y[fold == 0],
-       x_train = x[fold == 0, ],
-       y_test = y[fold == 1],
-       x_test = x[fold == 1, ],
+  list(y_train = y[fold == 0L],
+       x_train = x[fold == 0L, ],
+       y_test = y[fold == 1L],
+       x_test = x[fold == 1L, ],
        group = group,
        primary = primary,
        causal = causal,
@@ -559,46 +558,47 @@
 #' .flowchart_lupi(mode = "baseline")
 #'
 .flowchart_lupi <- function(mode, lwd = 1.5, length_arrow = 0.06,
-                                 mar = 0.3, xlim = c(1, 5), ylim = c(11, 0),
-                                 cex = 0.9) {
+                            mar = 0.3, xlim = c(1.0, 5.0),
+                            ylim = c(11.0, 0.0),
+                            cex = 0.9) {
   .assert(x = mode, type = "nominal",
           support = c("upstream", "aggregated", "surrogate", "baseline"))
-  .assert(x = lwd, type = "numeric", min = 0)
-  .assert(x = length_arrow, type = "numeric", min = 0)
-  .assert(x = mar, type = "numeric", min = 0)
-  .assert(x = xlim, type = "numeric", dim = 2)
-  .assert(x = ylim, type = "numeric", dim = 2)
-  .assert(x = cex, type = "numeric", min = 0)
+  .assert(x = lwd, type = "numeric", min = 0.0)
+  .assert(x = length_arrow, type = "numeric", min = 0.0)
+  .assert(x = mar, type = "numeric", min = 0.0)
+  .assert(x = xlim, type = "numeric", dim = 2L)
+  .assert(x = ylim, type = "numeric", dim = 2L)
+  .assert(x = cex, type = "numeric", min = 0.0)
   graphics::plot.new()
   graphics::plot.window(xlim = xlim, ylim = ylim)
   if (identical(mode, "upstream")) {
     graphics::mtext(
-      at = c(NA, 3),
-      adj = c(0, NA),
+      at = c(NA, 3.0),
+      adj = c(0.0, NA),
       text = c("upstream", "downstream"),
       col = c("blue", "red"),
-      side = 3,
+      side = 3L,
       line = 0.5,
       cex = cex
     )
     graphics::text(
-      x = 1,
-      y = c(1, 5, 10),
+      x = 1.0,
+      y = c(1.0, 5.0, 10.0),
       label = expression(x["1,0"], x["2,0"], x["50,0"]),
       col = "blue",
       cex = cex
     )
     graphics::segments(
-      x0 = 1 + mar,
-      y0 = c(1, 5, 10),
-      x1 = 2,
+      x0 = 1.0 + mar,
+      y0 = c(1.0, 5.0, 10.0),
+      x1 = 2.0,
       lwd = lwd,
       col = "grey"
     )
     graphics::arrows(
-      x0 = 2,
-      y0 = rep(c(1, 5, 10), each = 3),
-      x1 = 3 - mar,
+      x0 = 2.0,
+      y0 = rep(c(1.0, 5.0, 10.0), each = 3L),
+      x1 = 3.0 - mar,
       y1 = c(0:2, 4:6, 9:11),
       length = length_arrow,
       col = "grey",
@@ -613,23 +613,23 @@
       col = "red",
       cex = cex
     )
-    knot <- c(2.5, 5, 8) # c(2,5,9)
+    knot <- c(2.5, 5.0, 8.0) # c(2,5,9)
     graphics::segments(
       x0 = 3 + mar,
       y0 = c(0:2, 4:6, 9:11),
       x1 = 4,
-      y = rep(knot, each = 3),
+      y = rep(knot, each = 3L),
       lwd = lwd,
       col = "grey"
     )
     graphics::arrows(
-      x0 = 4,
+      x0 = 4.0,
       y0 = knot,
-      x1 = 5 - mar,
-      y1 = 5 + seq(
+      x1 = 5.0 - mar,
+      y1 = 5.0 + seq(
         from = -1,
         to = +1,
-        length.out = 3
+        length.out = 3L
       ),
       length = length_arrow,
       col = "grey",
@@ -643,36 +643,36 @@
       cex = cex
     )
     graphics::text(
-      x = c(1, 3),
+      x = c(1.0, 3.0),
       y = 7.5,
       label = "...",
-      srt = 90,
-      font = 2,
+      srt = 90.0,
+      font = 2L,
       col = c("blue", "red"),
       cex = cex
     )
   } else if (identical(mode, "aggregated")) {
     graphics::mtext(
-      at = c(NA, 3),
+      at = c(NA, 3.0),
       adj = c(0, NA),
       text = c("aggregated", "fine-grained"),
       col = c("blue", "red"),
-      side = 3,
+      side = 3L,
       line = 0.5,
       cex = cex
     )
     graphics::text(
-      x = 1,
+      x = 1.0,
       y = c(1, 5, 10),
       label = expression(x["1,0"], x["2,0"], x["50,0"]),
       col = "blue",
       cex = cex
     )
     graphics::segments(
-      x0 = 3 - mar,
+      x0 = 3.0 - mar,
       y0 = c(0:2, 4:6, 9:11),
-      x1 = 2,
-      y = rep(c(1, 5, 10), each = 3),
+      x1 = 2.0,
+      y = rep(c(1, 5, 10), each = 3L),
       lwd = lwd,
       col = "grey"
     )
@@ -698,7 +698,7 @@
       x0 = 3 + mar,
       y0 = c(0:2, 4:6, 9:11),
       x1 = 4,
-      y = rep(knot, each = 3),
+      y = rep(knot, each = 3L),
       lwd = lwd,
       col = "grey"
     )
@@ -709,7 +709,7 @@
       y1 = 5 + seq(
         from = -1,
         to = +1,
-        length.out = 3
+        length.out = 3L
       ),
       length = length_arrow,
       col = "grey",
@@ -727,7 +727,7 @@
       y = 7.5,
       label = "...",
       srt = 90,
-      font = 2,
+      font = 2L,
       col = c("blue", "red"),
       cex = cex
     )
@@ -737,12 +737,12 @@
       adj = c(0, NA),
       text = c("surrogate", "canonical"),
       col = c("blue", "red"),
-      side = 3,
+      side = 3L,
       line = 0.5,
       cex = cex
     )
     graphics::text(
-      x = 1,
+      x = 1.0,
       y = c(0:2, 4:6, 9:11),
       label = expression(x["1,1"], x["1,2"], x["1,3"],
                          x["2,1"], x["2,2"], x["2,3"],
@@ -751,15 +751,15 @@
       cex = cex
     )
     graphics::segments(
-      x0 = 3 - mar,
+      x0 = 3.0 - mar,
       y0 = c(1, 5, 10),
-      x1 = 2,
+      x1 = 2.0,
       lwd = lwd,
       col = "grey"
     )
     graphics::arrows(
-      x0 = 2,
-      y0 = rep(c(1, 5, 10), each = 3),
+      x0 = 2.0,
+      y0 = rep(c(1, 5, 10), each = 3L),
       x1 = 1 + mar,
       y1 = c(0:2, 4:6, 9:11),
       length = length_arrow,
@@ -780,7 +780,7 @@
       y1 = 5 + seq(
         from = -1,
         to = +1,
-        length.out = 3
+        length.out = 3L
       ),
       length = length_arrow,
       col = "grey",
@@ -808,7 +808,7 @@
       adj = c(0, NA),
       text = c("baseline", "follow-up"),
       col = c("blue", "red"),
-      side = 3,
+      side = 3L,
       line = 0.5,
       cex = cex
     )
@@ -860,9 +860,9 @@
       x = c(1, 2, 3, 4),
       y = 7.5,
       label = "...",
-      srt = 90,
-      font = 2,
-      col = rep(x = c("blue", "red"), times = c(1, 3)),
+      srt = 90.0,
+      font = 2L,
+      col = rep(x = c("blue", "red"), times = c(1L, 3L)),
       cex = cex
     )
   }
@@ -881,7 +881,7 @@
 #' list of matrices of equal dimensions
 #' 
 .plot_change <- function(x, ylab = "", main = names(x) , alternative = "two.sided",
-                         lwd = 1, cex = 1, cex.axis = 1, cex.lab = 1){
+                         lwd = 1.0, cex = 1.0, cex.axis = 1.0, cex.lab = 1.0){
   if(!is.list(x)){stop("Expect list.")}
   nslot <- length(x)
   for (i in seq_len(nslot)) {
@@ -891,7 +891,7 @@
   .assert(x = alternative, type = "nominal",
           support = c("two.sided", "greater", "less"))
   ylim <- range(x)
-  if(graphics::par()$mfrow[2] != nslot){
+  if(graphics::par()$mfrow[2L] != nslot){
     warning("Set graphics::par(mfrow=c(...,length(x)))." )
   }
   if(!is.na(graphics::par()$xpd)){
@@ -904,9 +904,9 @@
     graphics::plot.window(xlim = c(0.5, ncol + 0.5), ylim = ylim)
     usr <- graphics::par("usr")
     if (i == 1) {
-      graphics::axis(side = 2, cex.axis = cex.axis)
-      graphics::segments(x0 = usr[1], y0 = usr[3], y1 = usr[4])
-      graphics::segments(x0 = usr[1], x1 = 99, y0 = usr[3])
+      graphics::axis(side = 2L, cex.axis = cex.axis)
+      graphics::segments(x0 = usr[1L], y0 = usr[3L], y1 = usr[4L])
+      graphics::segments(x0 = usr[1L], x1 = 99, y0 = usr[3L])
       graphics::title(ylab = ylab , cex.lab = cex.lab)
     }
     graphics::title(main = main[i], line = 0.5, cex.main = cex.lab)
@@ -918,15 +918,15 @@
     col[, 1] <- "blue"
     col[, ncol] <- "red"
     graphics::points(x = col(x[[i]]), y = x[[i]],
-                     col = col, pch = 16, cex = cex)
+                     col = col, pch = 16L, cex = cex)
     pvalue <- stats::t.test(x = x[[i]][, 1],
                             y = x[[i]][, ncol],
                             paired = TRUE,
                             alternative = alternative)$p.value
-    text <- paste0("p=", format(x = signif(pvalue, digits = 2),
+    text <- paste0("p=", format(x = signif(pvalue, digits = 2L),
                                 scientific = TRUE))
     #graphics::mtext(text = text, side = 1, cex = cex.axis, line = 0.2)
-    graphics::axis(side = 1, at = ncol/2 + 0.5, labels = text,
+    graphics::axis(side = 1L, at = ncol/2L + 0.5, labels = text,
                    cex.axis = cex.axis, tick = FALSE, line = - 0.5)
   }
   invisible(NULL)
@@ -938,11 +938,11 @@
 # scoop, sparsegl, squeezy, graper
 
 simulate_overlap <- function() {
-  n0 <- 100
-  n1 <- 10000
+  n0 <- 100L
+  n1 <- 10000L
   n <- n0 + n1
-  p <- 100
-  n_group <- 20
+  p <- 100L
+  n_group <- 20L
   size_group <- rep(x = 5, times = n_group)
   # sample(x = 2:10, size = n_group, replace = TRUE)
   group <- lapply(X = seq_len(n_group),
