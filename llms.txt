@@ -31,7 +31,7 @@ for detailed examples.
 ``` r
 
 library(corila)
-#load(toydata)
+attach(data)
 object <- cv.corila(x = x_train, y = y_train, group = group, primary = primary)
 coef(object)
 predict(object, newx = x_test)
