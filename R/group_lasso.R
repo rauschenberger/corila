@@ -153,7 +153,7 @@
 #'                    group = data$group,
 #'                    primary = data$primary,
 #'                    tune = "none")
-#' 
+#'
 #' #\dontshow{
 #' #model <- cv.corila(x = data$x_train,
 #' #                    y = data$y_train,

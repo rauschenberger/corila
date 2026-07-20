@@ -95,15 +95,15 @@
 #'
 #' @examples
 #' data <- simulate_data()
-#' 
+#'
 #' ## standard model fitting
 #' #model <- multiridge(x = data$x_train, y = data$y_train, group = data$group)
-#' 
+#'
 #' ## fitting with given folds
 #' #foldid <- sample(seq_len(10L), size = nrow(data$x_train), replace = TRUE)
 #' #model <- multiridge(x = data$x_train, y = data$y_train, group = data$group,
 #' #                    foldid = foldid)
-#' 
+#'
 #' ## fitting with given penalties
 #' #penalties <- abs(rnorm(length(unique(data$group))))
 #' #model <- multiridge(x = data$x_train, y = data$y_train, group = data$group,

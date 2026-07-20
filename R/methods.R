@@ -124,6 +124,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
     # nocov end
   }
   #coef[c(TRUE[object$scale$family != "cox"], object$args$primary)] # ?
+  if (object$scale$family != "cox") names(coef)[1] <- "(intercept)"
   coef
 }
 
