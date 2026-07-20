@@ -147,29 +147,16 @@
 #' with different values for the regularisation and mixing hyperparameters.
 #'
 #' @examples
-#' #data(corila_data)
-#' #\dontshow{model <- cv.corila(x = corila_data$x_train,
-#' #                             y = corila_data$y_train,
-#' #                             group = corila_data$group,
-#' #                             primary = corila_data$primary,
-#' #                             tune = "none")}
-#' #\donttest{model <- cv.corila(x = corila_data$x_train,
-#' #                             y = corila_data$y_train,
-#' #                             group = corila_data$group,
-#' #                             primary = corila_data$primary)}
-#'
-#' # minimal example
-#' set.seed(1L)
-#' n <- 50L; p <- 20L; q <- 5L
-#' x <- matrix(rnorm(n * p), nrow = n , ncol = p)
-#' y <- rnorm(n)
-#' group <- rep(seq_len(q), length.out = p)
-#' primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
-#' \dontshow{
-#' model <- cv.corila(x = x, y = y, group = group, primary = primary,
-#'                    tune = "none")}
-#' \donttest{
-#' model <- cv.corila(x = x, y = y, group = group, primary = primary)}
+#' data <- simulate_data()
+#' \dontshow{model <- cv.corila(x = data$x_train,
+#'                              y = data$y_train,
+#'                              group = data$group,
+#'                              primary = data$primary,
+#'                              tune = "none")}
+#' \donttest{model <- cv.corila(x = data$x_train,
+#'                              y = data$y_train,
+#'                              group = data$group,
+#'                              primary = data$primary)}
 #'
 #' @keywords methods models regression classif
 #'
