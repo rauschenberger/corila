@@ -96,9 +96,10 @@ calc_sign_prec <- function(truth, estim) {
 #' maximum 1 leads to primary predictors only)
 #'
 #' @param signal_strength
-#' non-negative numeric scalar (default: `signal_strength=1`)
+#' non-negative numeric scalar 
 #' for multiplying the effect sizes
-#' (to increase or decrease the signal strength)
+#' (default: `signal_strength=1.0`,
+#' minimum 0 sets all effect sizes to 0)
 #'
 #' @param prob_group
 #' probability for each group to be active:
