@@ -15,10 +15,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r,eval=FALSE}
 rm(list=ls(all.names=TRUE))
+setwd("C:/Users/arauschenberger/Desktop/corila/package")
 devtools::load_all()
 #install.packages(c("roxygen2","pkgdown","rcmdcheck","usethis","remotes","testthat","devtools","goodpractice","checkglobals","roxylint", "cyclocomp"))
 #remotes::install_github(c("ropensci-review-tools/pkgcheck","ropensci-review-tools/autotest","ropensci-review-tools/srr"))
-setwd("C:/Users/arauschenberger/Desktop/corila/package")
 #setwd("/Users/armin.rauschenberger/Desktop/corila/package")
 ```
 
@@ -60,17 +60,24 @@ print(x, positions_limit = 20)
 urlchecker::url_check()
 
 x <- pkgcheck::pkgcheck(goodpractice=FALSE)
-notes <- autotest::autotest_package(exclude=c("F1","F2"),test=TRUE)
 
-functions <- c("calc_sign_prec","cv.corila",".assert",".combine_slopes",".deviance",".estim_initial_coefs",".expand_auxiliary",".folds",".is_adjacent",".mean_function",".residuals",".set_candidates",".simulate_outcome",".type")
+# autotest all functions at once
+notes <- autotest::autotest_package(exclude = c(""),test=TRUE)
+extra <- autotest::autotest_package(functions= ".folds",test=TRUE)
+
+# autotest functions one-by-one
+list <- rcompendium::get_all_functions()
+functions <- gsub(x = c(list$external, list$internal[-c(1, 25, 26)]), pattern = "\\(\\)", replacement = "")
 notes <- list()
 for(i in seq_along(functions)){
+  cat("function ", functions[i], "\n")
   notes[[i]] <- autotest::autotest_package(functions = functions[i],test=TRUE)
 }
 
-notes <- autotest::autotest_package(exclude = ".folds",test=TRUE)
+
+
 data.frame(notes)[which(notes$type == "error"),c("type", "test_name", "fn_name", "parameter", "parameter_type", "operation", "content")]
-data.frame(notes)[which(notes$fn_name==".is_adjacent"),][1,]
+data.frame(notes)[which(notes$fn_name==".is_adjacent"),][1, ]
 notes[notes$content=="is case dependent",]
 
 data.frame(notes[notes$fn_name=="cv.corila",])
