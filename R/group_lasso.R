@@ -248,7 +248,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
     if (sum(complete) < 3L) {
       stop("Requires at least three complete observations.")
     }
-    warning("Ingoring ", sum(!complete), " observations with missing data.")
+    warning("Ignoring ", sum(!complete), " observations with missing data.")
     #x <- x[complete, ]
     #y <- y[complete]
     #foldid <- foldid[complete]

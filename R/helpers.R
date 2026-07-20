@@ -106,7 +106,7 @@
   }
   stopifnot(
     "expected vector"  =
-      length(dim) != 1L || (is.atomic(x) & is.null(dim(x))) ||
+      length(dim) != 1L || (is.atomic(x) && is.null(dim(x))) ||
       inherits(x = x, what = "Surv"),
     "expected matrix" =
       length(dim) != 2L || is.matrix(x),
@@ -470,7 +470,7 @@
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
     if (family %in% c("binomial", "logistic")) {
-      y <- as.integer(y) 
+      y <- as.integer(y)
     }
     if (identical(family, "cox")) {
       y <- y[, "status"]

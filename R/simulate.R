@@ -96,7 +96,7 @@ calc_sign_prec <- function(truth, estim) {
 #' maximum 1 leads to primary predictors only)
 #'
 #' @param signal_strength
-#' non-negative numeric scalar 
+#' non-negative numeric scalar
 #' for multiplying the effect sizes
 #' (default: `signal_strength=1.0`,
 #' minimum 0 sets all effect sizes to 0)
