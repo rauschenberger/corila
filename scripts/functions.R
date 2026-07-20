@@ -35,7 +35,7 @@
 #' p <- length(group)
 #' rho <- 0.8
 #' sigma <- rho * outer(X = group, Y = group, FUN = "==") + (1.0 - rho) * diag(p)
-#' x <- MASS::mvrnorm(n = 10, mu = rep(0, times = p), Sigma = sigma)
+#' x <- MASS::mvrnorm(n = 10L, mu = rep(0.0, times = p), Sigma = sigma)
 #' .plot_cor(x = sigma, group = group, min = 1.0)
 #' .plot_cor(x = cor(x), group = group, min = 1.0)
 #' 
@@ -200,7 +200,7 @@
   }
   .assert(x = primary, type = "logical", dim = p)
   if(is.null(group)) {
-    group <- rep(x = 1, times = p)
+    group <- rep(x = 1L, times = p)
   }
   if(is.null(primary)) {
     primary <- rep(x = TRUE, times = p)
