@@ -148,15 +148,25 @@
 #'
 #' @examples
 #' data <- simulate_data()
-#' \dontshow{model <- cv.corila(x = data$x_train,
-#'                              y = data$y_train,
-#'                              group = data$group,
-#'                              primary = data$primary,
-#'                              tune = "none")}
-#' \donttest{model <- cv.corila(x = data$x_train,
-#'                              y = data$y_train,
-#'                              group = data$group,
-#'                              primary = data$primary)}
+#' model <- cv.corila(x = data$x_train,
+#'                    y = data$y_train,
+#'                    group = data$group,
+#'                    primary = data$primary,
+#'                    tune = "none")
+#' 
+#' #\dontshow{
+#' #model <- cv.corila(x = data$x_train,
+#' #                    y = data$y_train,
+#' #                    group = data$group,
+#' #                    primary = data$primary,
+#' #                    tune = "none")
+#' # }
+#' # \donttest{
+#' # model <- cv.corila(x = data$x_train,
+#' #                    y = data$y_train,
+#' #                    group = data$group,
+#' #                    primary = data$primary)
+#' # }
 #'
 #' @keywords methods models regression classif
 #'
