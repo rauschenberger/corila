@@ -172,11 +172,11 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                           prob_primary = 0.5, signal_strength = 1.0,
                           prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
   # argument checks
-  .assert(x = n0, type = "integer", min = 0L, max = 1e06)
+  .assert(x = n0, type = "integer", min = 0L, max = 1e06L)
   n0 <- as.integer(n0)
-  .assert(x = n1, type = "integer", min = 0L, max = 1e06)
+  .assert(x = n1, type = "integer", min = 0L, max = 1e06L)
   n1 <- as.integer(n1)
-  .assert(x = p, type = "integer", min = 1L, max = 1e06)
+  .assert(x = p, type = "integer", min = 1L, max = 1e06L)
   p <- as.integer(p)
   .assert(x = q, type = "integer", min = 1L, max = p)
   q <- as.integer(q)
@@ -387,7 +387,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   }
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = beta, type = "numeric", dim = ncol(x))
-  .assert(x = n, type = "integer", min = 1L, max = 1e06)
+  .assert(x = n, type = "integer", min = 1L, max = 1e06L)
   .assert(x = seed, type = "integer")
   set.seed(as.integer(round(seed)))
   if (!is.null(x) && !is.null(beta) && is.null(n)) {

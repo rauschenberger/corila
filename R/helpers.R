@@ -76,18 +76,18 @@
                     support = NULL, family = NULL, min = -Inf, max = Inf) {
   eps <- 1e-06
   if (is.null(x)) return(invisible(NULL))
-  if (is.character(type)) type <- tolower(type)
-  if (is.numeric(na.rm) && na.rm %in% c(0, 1)) na.rm <- as.logical(na.rm)
-  if (is.character(family)) family <- tolower(family)
+  #if (length(type)==1 && is.character(type)) type <- tolower(type)
+  #if (is.numeric(na.rm) && na.rm %in% c(0, 1)) na.rm <- as.logical(na.rm)
+  #if (length(family) == 1 && is.character(family)) family <- tolower(family)
   stopifnot(
     "require argument 'type' to be a character scalar" =
       length(type) == 1L && is.character(type) && !is.na(type),
     "require argument 'support' to be a character vector" =
       is.null(support) || (is.character(support) && is.atomic(support)),
     "require argument support = NULL unless argument type = 'nominal'" =
-      type == "nominal" || is.null(support),
+      tolower(type) == "nominal" || is.null(support),
     "require argument 'family' to be a character scalar" =
-      is.null(family) || (is.character(family) && length(family) == 1L),
+      is.null(family) || (length(family) == 1L && is.character(family)),
     "require argument 'dim' to be an integer vector" =
       is.atomic(dim) && all(dim > 0L) &&
       all(abs(dim - round(dim)) < eps | is.infinite(dim)),
@@ -98,10 +98,10 @@
     "require argument 'max' to be a numeric scalar" =
       length(max) == 1L && is.numeric(max) && !is.na(max)
   )
-  type <- match.arg(arg = type,
+  type <- match.arg(arg = tolower(type),
                     choices = c("numeric", "integer", "nominal", "logical"))
   if (!is.null(family)) {
-    family <- match.arg(arg = family,
+    family <- match.arg(arg = tolower(family),
                         choices = c("gaussian", "binomial", "poisson", "cox"))
   }
   stopifnot(
