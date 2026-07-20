@@ -150,7 +150,6 @@ calc_sign_prec <- function(truth, estim) {
 #' @export
 #'
 #' @examples
-#' \donttest{
 #' data <- simulate_data(n0 = 100, n1 = 10000)
 #' utils::str(data, vec.len = 2)
 #'
