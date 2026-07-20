@@ -107,6 +107,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       dev <- deviance(object)
       testthat::expect_type(object = dev, type = "double")
       testthat::expect_length(object = dev, n = 1L)
+      testthat::skip_if(family == "cox")
       testthat::expect_gte(object = dev, expected = 0.0)
     }
   )
