@@ -147,13 +147,13 @@
 #' with different values for the regularisation and mixing hyperparameters.
 #'
 #' @examples
+#' warning("Re-activate examples.")
 #' data <- simulate_data()
 #' model <- cv.corila(x = data$x_train,
 #'                    y = data$y_train,
 #'                    group = data$group,
 #'                    primary = data$primary,
 #'                    tune = "none")
-#'
 #' #\dontshow{
 #' #model <- cv.corila(x = data$x_train,
 #' #                    y = data$y_train,

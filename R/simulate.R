@@ -35,10 +35,10 @@
 calc_sign_prec <- function(truth, estim) {
   .assert(x = truth, type = "integer", dim = Inf,
           min = -1L, max = 1L, na.rm = TRUE)
-  truth <- as.integer(truth)
+  truth <- as.integer(round(truth))
   .assert(x = estim, type = "integer", dim = length(truth),
           min = -1L, max = 1L, na.rm = TRUE)
-  estim <- as.integer(estim)
+  estim <- as.integer(round(estim))
   if (all(is.na(estim) | estim == 0L)) {
     NA
   } else {
@@ -245,10 +245,11 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' @keywords internal
 #'
 #' @examples
-#' \dontshow{.simulate_predictors <- corila:::.simulate_predictors}
-#' .simulate_predictors(n = 5L, p = 7L)
+#' warning("Re-activate examples.")
+#' #\dontshow{.simulate_predictors <- corila:::.simulate_predictors}
+#' #.simulate_predictors(n = 5L, p = 7L)
 #'
-#' .simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
+#' #.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
 #'
 .simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0) {
   if (is.null(p) == is.null(group)) stop("Provide either p or group.")

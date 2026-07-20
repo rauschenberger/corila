@@ -94,6 +94,7 @@
 #' with \eqn{k} in \eqn{\{1, \ldots, q\}}.
 #'
 #' @examples
+#' warning("Re-activate examples.")
 #' data <- simulate_data()
 #'
 #' ## standard model fitting
