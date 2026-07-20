@@ -150,7 +150,7 @@ calc_sign_prec <- function(truth, estim) {
 #' @export
 #'
 #' @examples
-#' data <- simulate_data(n0 = 100, n1 = 10000)
+#' data <- simulate_data()
 #' utils::str(data, vec.len = 2)
 #'
 #' @srrstats {G5.1} *data set for tests and examples is exported*
