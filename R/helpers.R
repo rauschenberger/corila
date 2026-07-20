@@ -42,7 +42,7 @@
 #' This function is called by multiple function of the [corila-package].
 #'
 #' @return
-#' Returns `NULL` invisibly, or an error message.
+#' Returns `NULL` invisibly, or throws an error.
 #'
 #' @seealso
 #' The function [.validate()] verifies whether the main arguments
@@ -77,6 +77,7 @@
   eps <- 1e-06
   if (is.null(x)) return(invisible(NULL))
   if (is.character(type)) type <- tolower(type)
+  if (is.numeric(na.rm) && na.rm %in% c(0, 1)) na.rm <- as.logical(na.rm)
   if (is.character(family)) family <- tolower(family)
   stopifnot(
     "require argument 'type' to be a character scalar" =
