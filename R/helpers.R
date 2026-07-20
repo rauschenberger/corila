@@ -461,6 +461,7 @@
   support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
   .assert(x = family, type = "nominal", support = support)
   .assert(x = y, type = "numeric", dim = Inf, family = family)
+  if (length(y) < 2) stop("Require at least 2 observations.")
   #if(identical(family, "cox") && !inherits(y, "Surv")){
   #  stop("Require object of class 'Surv'.")
   #}
@@ -468,6 +469,9 @@
   nfolds <- as.integer(nfolds)
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
+    if (family %in% c("binomial", "logistic")) {
+      y <- as.integer(y) 
+    }
     if (identical(family, "cox")) {
       y <- y[, "status"]
     }
