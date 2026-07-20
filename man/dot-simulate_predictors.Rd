@@ -24,10 +24,10 @@ and \eqn{p} columns (predictors).
 Simulates predictor matrix.
 }
 \examples{
-\dontshow{.simulate_predictors <- corila:::.simulate_predictors}
-.simulate_predictors(n = 5L, p = 7L)
+#\dontshow{.simulate_predictors <- corila:::.simulate_predictors}
+#.simulate_predictors(n = 5L, p = 7L)
 
-.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
+#.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
 
 }
 \seealso{
