@@ -152,38 +152,7 @@ calc_sign_prec <- function(truth, estim) {
 #' @examples
 #' \donttest{
 #' data <- simulate_data(n0 = 100, n1 = 10000)
-#'
-#' coef <- y_hat <- list()
-#'
-#' # standard lasso regression
-#' object <- glmnet::cv.glmnet(x = data$x_train[, data$primary],
-#' y = data$y_train)
-#' temp <- stats::coef(object = object, s = "lambda.min")[-1L]
-#' coef$glmnet <- c(temp[1L], ifelse(primary, temp[-1L], 0.0))
-#' y_hat$glmnet <- stats::predict(object = object,
-#'                                newx = data$x_test[, data$primary],
-#'                                type = "response",
-#'                                s = "lambda.min")
-#'
-#' # flexible group lasso regression
-#' object <- cv.corila(x = data$x_train, y = data$y_train,
-#'                     group = data$group, primary = data$primary)
-#' coef$corila <- stats::coef(object = object)
-#' y_hat$corila <- stats::predict(object = object,
-#'                                newx = data$x_test[, data$primary])
-#'
-#' # selection performance (precision: higher = better)
-#' vapply(X = coef,
-#'        FUN = function(x) {
-#'          calc_sign_prec(truth = sign(data$beta), estim = sign(x[-1L]))
-#'        },
-#'        FUN.VALUE = numeric(1L))
-#'
-#' # predictive performance (mean squared error: lower = better)
-#' vapply(X = y_hat,
-#'        FUN = function(x) mean((x - data$y_test)^2.0),
-#'        FUN.VALUE = numeric(1L))
-#' }
+#' utils::str(data, vec.len = 2)
 #'
 #' @srrstats {G5.1} *data set for tests and examples is exported*
 #'
