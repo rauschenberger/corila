@@ -53,9 +53,10 @@ numeric scalar in the unit interval
 (minimum 0 leads to auxiliary predictors only,
 maximum 1 leads to primary predictors only)}
 
-\item{signal_strength}{non-negative numeric scalar (default: \code{signal_strength=1})
+\item{signal_strength}{non-negative numeric scalar
 for multiplying the effect sizes
-(to increase or decrease the signal strength)}
+(default: \code{signal_strength=1.0},
+minimum 0 sets all effect sizes to 0)}
 
 \item{prob_group}{probability for each group to be active:
 numeric scalar in the unit interval}

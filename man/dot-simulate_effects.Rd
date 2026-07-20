@@ -21,9 +21,10 @@ numeric scalar in the unit interval}
 \item{prob_predictor}{probability for each predictor in an active group to be active:
 numeric scalar in the unit interval}
 
-\item{signal_strength}{non-negative numeric scalar (default: \code{signal_strength=1})
+\item{signal_strength}{non-negative numeric scalar
 for multiplying the effect sizes
-(to increase or decrease the signal strength)}
+(default: \code{signal_strength=1.0},
+minimum 0 sets all effect sizes to 0)}
 
 \item{seed}{random seed for reproducibility:
 integer scalar (unrestricted)}
