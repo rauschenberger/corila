@@ -21,20 +21,24 @@ simulate_data(
 }
 \arguments{
 \item{n0}{number of training observations
-(non-negative integer,
-minimum 0 makes model training impossible)}
+(non-negative integer scalar,
+minimum 0 makes model training impossible,
+maximum \eqn{1\,000\,000})}
 
 \item{n1}{number of testing observations
-(non-negative integer,
-minimum 0 makes model testing impossible)}
+(non-negative integer scalar,
+minimum 0 makes model testing impossible,
+maximum \eqn{1\,000\,000})}
 
 \item{p}{number of predictors
-(positive integer,
-minimum 1 leads to a single predictor)}
+(positive integer scalar,
+minimum 1 leads to a single predictor,
+maximum \eqn{1\,000\,000})}
 
 \item{q}{number of predictor groups
-(positive integer,
-minimum 1 assigns all predictors to the same group)}
+(positive integer scalar,
+minimum 1 assigns all predictors to the same group.
+maximum \code{p} assigns each predictor to its own group)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}

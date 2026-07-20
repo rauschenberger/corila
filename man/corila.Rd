@@ -99,7 +99,7 @@ entries between \eqn{-1} and \eqn{+1})}
 or \code{NULL} (cross-validation)}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
-be suppressed? (\code{FALSE} or \code{TRUE})}
+be suppressed? (logical scalar, \code{FALSE} or \code{TRUE})}
 
 \item{threshold}{threshold for absolute correlation coefficients:
 numeric in unit interval}

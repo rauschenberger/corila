@@ -15,10 +15,11 @@ numeric matrix with \eqn{n} rows (observations)
 and \eqn{p} columns (predictors)}
 
 \item{beta}{effects:
-numeric vector of length \eqn{q}}
+numeric vector of length \eqn{p}}
 
 \item{n}{sample size:
-positive integer scalar or \code{NULL}}
+positive integer scalar or \code{NULL}
+(minimum 1, maximum \eqn{1\,000\,000})}
 
 \item{seed}{random seed for reproducibility:
 integer scalar (unrestricted)}

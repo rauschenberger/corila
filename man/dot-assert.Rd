@@ -43,7 +43,7 @@
 \item{max}{numerical value (not used for \code{type = "nominal"})}
 }
 \value{
-Returns \code{NULL} invisibly, or an error message.
+Returns \code{NULL} invisibly, or throws an error.
 }
 \description{
 Check whether provided arguments satisfy expectations.

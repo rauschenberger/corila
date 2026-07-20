@@ -97,7 +97,7 @@ entries between \eqn{-1} and \eqn{+1})}
 (minimum \eqn{3}, maximum \eqn{n})}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
-be suppressed? (\code{FALSE} or \code{TRUE})}
+be suppressed? (logical scalar, \code{FALSE} or \code{TRUE})}
 }
 \value{
 Returns a list with slots \code{n}, \code{p}, and \code{q} or an error message.
