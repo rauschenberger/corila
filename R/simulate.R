@@ -61,23 +61,27 @@ calc_sign_prec <- function(truth, estim) {
 #'
 #' @param n0
 #' number of training observations
-#' (non-negative integer,
-#' minimum 0 makes model training impossible)
+#' (non-negative integer scalar,
+#' minimum 0 makes model training impossible,
+#' maximum \eqn{1\,000\,000})
 #'
 #' @param n1
 #' number of testing observations
-#' (non-negative integer,
-#' minimum 0 makes model testing impossible)
+#' (non-negative integer scalar,
+#' minimum 0 makes model testing impossible,
+#' maximum \eqn{1\,000\,000})
 #'
 #' @param p
 #' number of predictors
-#' (positive integer,
-#' minimum 1 leads to a single predictor)
+#' (positive integer scalar,
+#' minimum 1 leads to a single predictor,
+#' maximum \eqn{1\,000\,000})
 #'
 #' @param q
 #' number of predictor groups
-#' (positive integer,
-#' minimum 1 assigns all predictors to the same group)
+#' (positive integer scalar,
+#' minimum 1 assigns all predictors to the same group.
+#' maximum `p` assigns each predictor to its own group)
 #'
 #' @param rho
 #' correlation coefficient for predictors within the same group:
@@ -167,19 +171,20 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                           prob_primary = 0.5, signal_strength = 1.0,
                           prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
   # argument checks
-  .assert(x = n0, type = "integer", min = 0L)
+  .assert(x = n0, type = "integer", min = 0L, max = 1e06)
   n0 <- as.integer(n0)
-  .assert(x = n1, type = "integer", min = 0L)
+  .assert(x = n1, type = "integer", min = 0L, max = 1e06)
   n1 <- as.integer(n1)
-  .assert(x = p, type = "integer", min = 1L)
+  .assert(x = p, type = "integer", min = 1L, max = 1e06)
   p <- as.integer(p)
-  .assert(x = q, type = "integer", min = 1L)
+  .assert(x = q, type = "integer", min = 1L, max = p)
   q <- as.integer(q)
   if (is.character(family)) family <- tolower(family)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
   .assert(x = prob_primary, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = signal_strength, type = "numeric", min = 0.0)
   .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
   .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
   .assert(x = seed, type = "integer")
@@ -198,8 +203,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                             seed = seed)
   y <- .simulate_response(family = family, x = x, beta = beta, seed = seed)
   # names of observations and predictors
-  rownames <- c(paste0("train_"[n0 > 0], seq_len(n0)),
-                paste0("test_"[n1 > 0], seq_len(n1)))
+  rownames <- c(paste0("train_"[n0 > 0L], seq_len(n0)),
+                paste0("test_"[n1 > 0L], seq_len(n1)))
   rownames(x) <- names(y) <- rownames
   count <- vapply(
     X = seq_len(p),
@@ -310,6 +315,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
   prob_predictor <- round(prob_predictor, digits = 6L)
   .assert(x = signal_strength, type = "numeric", min = 0.0)
+  signal_strength <- as.double(signal_strength)
   .assert(x = seed, type = "integer")
   set.seed(as.integer(round(seed)))
   p <- length(group)
@@ -342,11 +348,12 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 #' @param beta
 #' effects:
-#' numeric vector of length \eqn{q}
+#' numeric vector of length \eqn{p}
 #'
 #' @param n
 #' sample size:
 #' positive integer scalar or \code{NULL}
+#' (minimum 1, maximum \eqn{1\,000\,000})
 #'
 #' @return
 #' Returns an \eqn{n}-dimensional response vector.
@@ -374,9 +381,12 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   if (is.character(family)) family <- tolower(family)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
+  if (is.null(x) != is.null(beta)) {
+    stop("Provide either none or both of 'x' and 'beta'.")
+  }
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = beta, type = "numeric", dim = ncol(x))
-  .assert(x = n, type = "integer", min = 1L)
+  .assert(x = n, type = "integer", min = 1L, max = 1e06)
   .assert(x = seed, type = "integer")
   set.seed(as.integer(round(seed)))
   if (!is.null(x) && !is.null(beta) && is.null(n)) {
