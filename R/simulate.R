@@ -61,23 +61,29 @@ calc_sign_prec <- function(truth, estim) {
 #'
 #' @param n0
 #' number of training observations
-#' (positive integer)
+#' (non-negative integer,
+#' minimum 0 makes model training impossible)
 #'
 #' @param n1
 #' number of testing observations
-#' (positive integer)
+#' (non-negative integer,
+#' minimum 0 makes model testing impossible)
 #'
 #' @param p
 #' number of predictors
-#' (positive integer)
+#' (positive integer,
+#' minimum 1 leads to a single predictor)
 #'
 #' @param q
 #' number of predictor groups
-#' (positive integer)
+#' (positive integer,
+#' minimum 1 assigns all predictors to the same group)
 #'
 #' @param rho
 #' correlation coefficient for predictors within the same group:
-#' numeric scalar in the unit interval (minimum 0, maximum 1)
+#' numeric scalar in the unit interval
+#' (minimum 0 leads to uncorrelated predictors within each group,
+#' maximum 1 leads to identical predictors within each group)
 #'
 #' @param prob_primary
 #' probability for each predictor to be primary (rather than auxiliary):
@@ -100,7 +106,7 @@ calc_sign_prec <- function(truth, estim) {
 #'
 #' @param seed
 #' random seed for reproducibility:
-#' integer scalar
+#' integer scalar (unrestricted)
 #'
 #' @aliases simulate
 #'
@@ -161,14 +167,15 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                           prob_primary = 0.5, signal_strength = 1.0,
                           prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
   # argument checks
-  .assert(x = n0, type = "integer", min = 2L)
+  .assert(x = n0, type = "integer", min = 0L)
   n0 <- as.integer(n0)
   .assert(x = n1, type = "integer", min = 0L)
   n1 <- as.integer(n1)
-  .assert(x = p, type = "integer", min = 2L)
+  .assert(x = p, type = "integer", min = 1L)
   p <- as.integer(p)
   .assert(x = q, type = "integer", min = 1L)
   q <- as.integer(q)
+  if (is.character(family)) family <- tolower(family)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
@@ -176,21 +183,23 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
   .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
   .assert(x = seed, type = "integer")
+  seed <- as.integer(round(seed))
   # simulation
-  set.seed(seed)
   n <- n0 + n1
   group <- sort(c(seq_len(q),
                   sample(x = seq_len(q), size = p - q, replace = TRUE)))
   primary <- as.logical(stats::rbinom(n = p, size = 1L, prob = prob_primary))
   holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
-  x <- .simulate_predictors(n = n, group = group, rho = rho)
+  x <- .simulate_predictors(n = n, group = group, rho = rho, seed = seed)
   beta <- .simulate_effects(group = group,
                             signal_strength = signal_strength,
                             prob_group = prob_group,
-                            prob_predictor = prob_predictor)
-  y <- .simulate_response(family = family, x = x, beta = beta)
+                            prob_predictor = prob_predictor,
+                            seed = seed)
+  y <- .simulate_response(family = family, x = x, beta = beta, seed = seed)
   # names of observations and predictors
-  rownames <- c(paste0("train_", seq_len(n0)), paste0("test_", seq_len(n1)))
+  rownames <- c(paste0("train_"[n0 > 0], seq_len(n0)),
+                paste0("test_"[n1 > 0], seq_len(n1)))
   rownames(x) <- names(y) <- rownames
   count <- vapply(
     X = seq_len(p),
@@ -202,9 +211,9 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   colnames[!primary] <- paste0("aux_", colnames[!primary])
   colnames(x) <- names(primary) <- names(group) <- names(beta) <- colnames
   # training/test split
-  x_train <- x[!holdout, ]
+  x_train <- x[!holdout, , drop = FALSE]
   y_train <- y[!holdout]
-  x_test <- x[holdout, ]
+  x_test <- x[holdout, , drop = FALSE]
   y_test <- y[holdout]
   # privileged information
   x_test[, !primary] <- NA
@@ -224,7 +233,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' @description
 #' Simulates predictor matrix.
 #'
-#' @inheritParams simulate_data p rho
+#' @inheritParams simulate_data p rho seed
 #'
 #' @param n
 #' number of observations (positive integer)
@@ -251,7 +260,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 #' #.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
 #'
-.simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0) {
+.simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0,
+                                 seed = 1L) {
   if (is.null(p) == is.null(group)) stop("Provide either p or group.")
   .assert(x = n, type = "integer", min = 2L)
   .assert(x = p, type = "integer", min = 2L)
@@ -259,6 +269,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
   group <- as.integer(group)
   .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
+  .assert(x = seed, type = "integer")
+  set.seed(as.integer(round(seed)))
   p <- length(group)
   mu <- rep(x = 0.0, times = p)
   sigma <- rho * outer(X = group, Y = group, FUN = "==") +
@@ -285,15 +297,21 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 #' @examples
 #' \dontshow{.simulate_effects <- corila:::.simulate_effects}
-#' .simulate_effects(group = rep(c(1L:5L), each = 3L))
+#' group <- rep(c(1L:5L), each = 3L)
+#' .simulate_effects(group = group)
+#' .simulate_effects(group = group, signal_strength = 1.5)
 #'
 .simulate_effects <- function(group, prob_group = 0.5, prob_predictor = 0.8,
-                              signal_strength = 1.0) {
+                              signal_strength = 1.0, seed = 1L) {
   .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
   group <- as.integer(group)
   .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
+  prob_group <- round(prob_group, digits = 6L)
   .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
+  prob_predictor <- round(prob_predictor, digits = 6L)
   .assert(x = signal_strength, type = "numeric", min = 0.0)
+  .assert(x = seed, type = "integer")
+  set.seed(as.integer(round(seed)))
   p <- length(group)
   q <- length(unique(group))
   beta_group <-
@@ -315,7 +333,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' @description
 #' Simulates outcome vector.
 #'
-#' @inheritParams simulate_data family
+#' @inheritParams simulate_data family seed
 #'
 #' @param x
 #' predictors:
@@ -344,19 +362,23 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' .simulate_response(family = "gaussian", n = 10L)
 #'
 #' # simulate dependent response
+#' set.seed(1L)
 #' n <- 10L
 #' p <- 20L
 #' x <- matrix(rnorm(n * p), n, p)
 #' beta <- rnorm(p)
 #' .simulate_response(family = "gaussian", x = x, beta = beta)
 #'
-.simulate_response <- function(family, x = NULL, beta = NULL, n = NULL) {
+.simulate_response <- function(family, x = NULL, beta = NULL, n = NULL,
+                               seed = 1L) {
   if (is.character(family)) family <- tolower(family)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = beta, type = "numeric", dim = ncol(x))
   .assert(x = n, type = "integer", min = 1L)
+  .assert(x = seed, type = "integer")
+  set.seed(as.integer(round(seed)))
   if (!is.null(x) && !is.null(beta) && is.null(n)) {
     eta <- as.numeric(x %*% as.vector(beta))
     n <- nrow(x)
