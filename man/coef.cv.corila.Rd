@@ -27,6 +27,7 @@ to combine positive and negative coefficients
 and \code{\link[=.backscale]{.backscale()}} to bring coefficients back to the original scale.
 }
 \examples{
+warning("Re-activate examples.")
 data <- simulate_data()
 model <- cv.corila(x = data$x_train,
                    y = data$y_train,

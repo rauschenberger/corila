@@ -159,6 +159,7 @@ is indicated by \eqn{p_k},
 with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 }
 \examples{
+warning("Re-activate examples.")
 data <- simulate_data()
 model <- cv.corila(x = data$x_train,
                    y = data$y_train,

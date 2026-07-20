@@ -19,6 +19,7 @@ Returns an \eqn{(1 + p)}-dimensional vector of estimated coefficients
 Extracts coefficients from a multi-penalty ridge regression model.
 }
 \examples{
+warning("Re-activate examples.")
 data <- simulate_data()
 
 ## standard model fitting

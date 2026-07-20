@@ -36,6 +36,7 @@ for bringing predicted values back to the original scale
 (if \code{family="gaussian"}).
 }
 \examples{
+warning("Re-activate examples.")
 data <- simulate_data()
 model <- cv.corila(x = data$x_train,
                    y = data$y_train,

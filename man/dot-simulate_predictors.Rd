@@ -4,7 +4,7 @@
 \alias{.simulate_predictors}
 \title{Simulate predictors}
 \usage{
-.simulate_predictors(n, p = NULL, group = NULL, rho = 0)
+.simulate_predictors(n, p = NULL, group = NULL, rho = 0, seed = 1L)
 }
 \arguments{
 \item{n}{number of observations (positive integer)}
@@ -14,7 +14,12 @@
 \item{group}{integer vector (length \eqn{p}, minimum 1, maximum \eqn{p})}
 
 \item{rho}{correlation coefficient for predictors within the same group:
-numeric scalar in the unit interval (minimum 0, maximum 1)}
+numeric scalar in the unit interval
+(minimum 0 leads to uncorrelated predictors within each group,
+maximum 1 leads to identical predictors within each group)}
+
+\item{seed}{random seed for reproducibility:
+integer scalar (unrestricted)}
 }
 \value{
 Returns a numeric matrix with \eqn{n} rows (observations)
@@ -24,6 +29,7 @@ and \eqn{p} columns (predictors).
 Simulates predictor matrix.
 }
 \examples{
+warning("Re-activate examples.")
 #\dontshow{.simulate_predictors <- corila:::.simulate_predictors}
 #.simulate_predictors(n = 5L, p = 7L)
 

@@ -21,22 +21,28 @@ simulate_data(
 }
 \arguments{
 \item{n0}{number of training observations
-(positive integer)}
+(non-negative integer,
+minimum 0 makes model training impossible)}
 
 \item{n1}{number of testing observations
-(positive integer)}
+(non-negative integer,
+minimum 0 makes model testing impossible)}
 
 \item{p}{number of predictors
-(positive integer)}
+(positive integer,
+minimum 1 leads to a single predictor)}
 
 \item{q}{number of predictor groups
-(positive integer)}
+(positive integer,
+minimum 1 assigns all predictors to the same group)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
 
 \item{rho}{correlation coefficient for predictors within the same group:
-numeric scalar in the unit interval (minimum 0, maximum 1)}
+numeric scalar in the unit interval
+(minimum 0 leads to uncorrelated predictors within each group,
+maximum 1 leads to identical predictors within each group)}
 
 \item{prob_primary}{probability for each predictor to be primary (rather than auxiliary):
 numeric scalar in the unit interval
@@ -54,7 +60,7 @@ numeric scalar in the unit interval}
 numeric scalar in the unit interval}
 
 \item{seed}{random seed for reproducibility:
-integer scalar}
+integer scalar (unrestricted)}
 }
 \value{
 Returns a list with multiple slots:

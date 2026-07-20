@@ -24,6 +24,7 @@ or an \eqn{n_1}-dimensional vector of predicted values.
 Makes predictions from a multi-penalty ridge regression model.
 }
 \examples{
+warning("Re-activate examples.")
 data <- simulate_data()
 
 ## standard model fitting

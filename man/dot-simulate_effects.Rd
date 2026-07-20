@@ -8,7 +8,8 @@
   group,
   prob_group = 0.5,
   prob_predictor = 0.8,
-  signal_strength = 1
+  signal_strength = 1,
+  seed = 1L
 )
 }
 \arguments{
@@ -23,6 +24,9 @@ numeric scalar in the unit interval}
 \item{signal_strength}{non-negative numeric scalar (default: \code{signal_strength=1})
 for multiplying the effect sizes
 (to increase or decrease the signal strength)}
+
+\item{seed}{random seed for reproducibility:
+integer scalar (unrestricted)}
 }
 \value{
 Returns a numeric vector of length \eqn{p}.
@@ -32,7 +36,9 @@ Simulates effect vector.
 }
 \examples{
 \dontshow{.simulate_effects <- corila:::.simulate_effects}
-.simulate_effects(group = rep(c(1L:5L), each = 3L))
+group <- rep(c(1L:5L), each = 3L)
+.simulate_effects(group = group)
+.simulate_effects(group = group, signal_strength = 1.5)
 
 }
 \seealso{

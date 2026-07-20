@@ -4,7 +4,7 @@
 \alias{.simulate_response}
 \title{Simulate outcome}
 \usage{
-.simulate_response(family, x = NULL, beta = NULL, n = NULL)
+.simulate_response(family, x = NULL, beta = NULL, n = NULL, seed = 1L)
 }
 \arguments{
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
@@ -19,6 +19,9 @@ numeric vector of length \eqn{q}}
 
 \item{n}{sample size:
 positive integer scalar or \code{NULL}}
+
+\item{seed}{random seed for reproducibility:
+integer scalar (unrestricted)}
 }
 \value{
 Returns an \eqn{n}-dimensional response vector.
@@ -32,6 +35,7 @@ Simulates outcome vector.
 .simulate_response(family = "gaussian", n = 10L)
 
 # simulate dependent response
+set.seed(1L)
 n <- 10L
 p <- 20L
 x <- matrix(rnorm(n * p), n, p)
