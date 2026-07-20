@@ -160,15 +160,25 @@ with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 }
 \examples{
 data <- simulate_data()
-\dontshow{model <- cv.corila(x = data$x_train,
-                             y = data$y_train,
-                             group = data$group,
-                             primary = data$primary,
-                             tune = "none")}
-\donttest{model <- cv.corila(x = data$x_train,
-                             y = data$y_train,
-                             group = data$group,
-                             primary = data$primary)}
+model <- cv.corila(x = data$x_train,
+                   y = data$y_train,
+                   group = data$group,
+                   primary = data$primary,
+                   tune = "none")
+
+#\dontshow{
+#model <- cv.corila(x = data$x_train,
+#                    y = data$y_train,
+#                    group = data$group,
+#                    primary = data$primary,
+#                    tune = "none")
+# }
+# \donttest{
+# model <- cv.corila(x = data$x_train,
+#                    y = data$y_train,
+#                    group = data$group,
+#                    primary = data$primary)
+# }
 
 }
 \references{

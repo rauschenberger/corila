@@ -105,8 +105,8 @@ Predicted values can be compared with \code{y_test}.
 }
 }
 \examples{
-data <- simulate_data(n0 = 100, n1 = 10000)
-utils::str(data, vec.len = 2)
+data <- simulate_data()
+utils::str(data, vec.len = 2L)
 
 }
 \seealso{

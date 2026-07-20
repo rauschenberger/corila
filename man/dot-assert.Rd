@@ -22,12 +22,12 @@
 \code{"nominal"}, or \code{"logical"}}
 
 \item{dim}{vector containing positive integers defining the dimensionality:
-\code{dim = 1} for a scalar,
+\code{dim = 1L} for a scalar,
 \code{dim = Inf} for a vector of arbitrary length,
 \code{dim = c(Inf, Inf)} for a matrix of arbitrary dimensions,
 \code{dim = c(Inf, Inf, Inf)} for an array of arbitrary dimensions,
-\code{dim = 100} for a vector of length 100,
-\code{dim = c(Inf, 100)} for a matrix with 100 columns, etc.}
+\code{dim = 100L} for a vector of length 100,
+\code{dim = c(Inf, 100L)} for a matrix with 100 columns, etc.}
 
 \item{na.rm}{logical;
 \code{FALSE}: missing values are not allowed,
@@ -56,12 +56,12 @@ This function is called by multiple function of the \link{corila-package}.
 .assert(x = NULL)
 .assert(x = rnorm(n = 1L))
 .assert(x = "A", type = "nominal", support = LETTERS)
-.assert(x = rexp(n= 10L), dim = Inf, type = "numeric", min = 0)
-.assert(x = c(NA, rpois(n = 9L, lambda = 4)), dim = 10L,
+.assert(x = rexp(n= 10L), dim = Inf, type = "numeric", min = 0.0)
+.assert(x = c(NA, rpois(n = 9L, lambda = 4.0)), dim = 10L,
        type = "integer", na.rm = TRUE)
 .assert(x = NA, na.rm = TRUE)
-.assert(x = 1, na.rm = FALSE)
-.assert(x = rpois(n = 10L, lambda = 4), dim = Inf,
+.assert(x = 1.0, na.rm = FALSE)
+.assert(x = rpois(n = 10L, lambda = 4.0), dim = Inf,
        family = "poisson")
 
 }
