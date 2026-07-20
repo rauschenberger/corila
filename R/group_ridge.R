@@ -95,7 +95,7 @@
 #'
 #' @examples
 #' data <- simulate_data()
-#' 
+#'
 #' # standard model fitting
 #' model <- multiridge(x = data$x_train, y = data$y_train, group = data$group)
 #'
