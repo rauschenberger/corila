@@ -137,7 +137,8 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   if (!is.null(foldid)) foldid <- as.integer(foldid)
   .assert(x = nfolds, type = "integer", min = 2L, max = nrow(x))
   nfolds <- as.integer(nfolds)
-  .assert(x = penalties, type = "numeric", dim = length(unique(group)), min = 0)
+  .assert(x = penalties, type = "numeric", dim = length(unique(group)),
+          min = 0.0)
   #.validate(x = x, y = y, group = NULL, family = family)
   # --- initial regression ---
   scale <- .forescale(x = x, y = y, family = family)

@@ -124,7 +124,8 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
 set.seed(1L)
 testthat::test_that("initial coefficients are estimated", {
   family <- c("gaussian", "binomial", "poisson", "cox")
-  alpha <- list(0.0, 0.5, 1, "pearson", "spearman", "kendall", "multiridge", NA)
+  alpha <- list(0.0, 0.5, 1.0,
+                "pearson", "spearman", "kendall", "multiridge", NA)
   n <- 20L
   p <- 10L
   x <- matrix(rnorm(n * p), nrow = n, ncol = p)

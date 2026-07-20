@@ -13,12 +13,12 @@
 #'
 #' @param dim
 #' vector containing positive integers defining the dimensionality:
-#' `dim = 1` for a scalar,
+#' `dim = 1L` for a scalar,
 #' `dim = Inf` for a vector of arbitrary length,
 #' `dim = c(Inf, Inf)` for a matrix of arbitrary dimensions,
 #' `dim = c(Inf, Inf, Inf)` for an array of arbitrary dimensions,
-#' `dim = 100` for a vector of length 100,
-#' `dim = c(Inf, 100)` for a matrix with 100 columns, etc.
+#' `dim = 100L` for a vector of length 100,
+#' `dim = c(Inf, 100L)` for a matrix with 100 columns, etc.
 #'
 #' @param type
 #' character `"numeric"` (default), `"integer"`,
@@ -53,12 +53,12 @@
 #' .assert(x = NULL)
 #' .assert(x = rnorm(n = 1L))
 #' .assert(x = "A", type = "nominal", support = LETTERS)
-#' .assert(x = rexp(n= 10L), dim = Inf, type = "numeric", min = 0)
-#' .assert(x = c(NA, rpois(n = 9L, lambda = 4)), dim = 10L,
+#' .assert(x = rexp(n= 10L), dim = Inf, type = "numeric", min = 0.0)
+#' .assert(x = c(NA, rpois(n = 9L, lambda = 4.0)), dim = 10L,
 #'        type = "integer", na.rm = TRUE)
 #' .assert(x = NA, na.rm = TRUE)
-#' .assert(x = 1, na.rm = FALSE)
-#' .assert(x = rpois(n = 10L, lambda = 4), dim = Inf,
+#' .assert(x = 1.0, na.rm = FALSE)
+#' .assert(x = rpois(n = 10L, lambda = 4.0), dim = Inf,
 #'        family = "poisson")
 #'
 #' @keywords internal
@@ -310,7 +310,7 @@
 #' n0 <- 100L; n1 <- 50L; p <- 3L
 #' n <- n0 + n1
 #' fold <- rep(c(0L, 1L), times = c(n0, n1))
-#' sd <- stats::rpois(n = p, lambda = 5)
+#' sd <- stats::rpois(n = p, lambda = 5.0)
 #' x <- data.frame(x = sapply(X = sd,
 #'                            FUN = function(x) stats::rnorm(n = n, sd = x)))
 #' beta <- stats::rnorm(n = p)
@@ -318,27 +318,27 @@
 #' if (identical(family, "gaussian")) {
 #'   y <- stats::rnorm(n = n, mean = eta)
 #' } else if (identical(family, "binomial")) {
-#'   y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+#'   y <- stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
 #' } else if (identical(family, "poisson")) {
 #'   y <- stats::rpois(n = n, lambda = exp(eta))
 #' } else if (identical(family, "cox")) {
 #'   time <- stats::rexp(n = n, rate = exp(eta))
-#'   status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+#'   status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
 #'   y <- survival::Surv(time = time, event = status)
 #' }
 #'
 #' # regression without standardisation
 #' if (identical(family, "cox")) {
-#'   lm1 <- survival::coxph(y[fold == 0]~., data=x[fold == 0, ])
+#'   lm1 <- survival::coxph(y[fold == 0L]~., data=x[fold == 0L, ])
 #' } else {
-#'   lm1 <- stats::glm(y[fold == 0]~., data=x[fold == 0, ], family=family)
+#'   lm1 <- stats::glm(y[fold == 0L]~., data=x[fold == 0L, ], family=family)
 #' }
 #' coef1 <- stats::coef(lm1)
-#' yhat1 <- predict(lm1, newdata = x[fold == 1, ])
+#' yhat1 <- predict(lm1, newdata = x[fold == 1L, ])
 #'
 #' # regression with standardisation
-#' scale <- .forescale(x = as.matrix(x)[fold == 0, ],
-#'                     y = y[fold == 0],
+#' scale <- .forescale(x = as.matrix(x)[fold == 0L, ],
+#'                     y = y[fold == 0L],
 #'                     family = family)
 #' if (identical(family, "cox")) {
 #'   lm2 <- survival::coxph(scale$y~., data = data.frame(scale$x))
@@ -346,7 +346,7 @@
 #'   lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
 #' }
 #' coef_temp <- stats::coef(lm2)
-#' newx_temp <- .forescale(x = as.matrix(x)[fold == 1, ],
+#' newx_temp <- .forescale(x = as.matrix(x)[fold == 1L, ],
 #'                         pars = scale$pars)$x
 #' yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
 #' result <- .backscale(pars = scale$pars,
@@ -379,7 +379,7 @@
   .assert(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0.0)
   .assert(x = pars$mu.y, type = "numeric")
   .assert(x = pars$sd.y, type = "numeric", min = 0.0)
-  dim <- rep(x = Inf, times = 1 + is.matrix(y))
+  dim <- rep(x = Inf, times = 1L + is.matrix(y))
   .assert(x = y, type = "numeric", dim = dim)
   dim <- length(pars$mu.x) + !identical(pars$family, "cox")
   .assert(x = coef, type = "numeric", dim = dim)
@@ -399,7 +399,7 @@
                             no = pars$sd.y / pars$sd.x)
     } else {
       factor <- ifelse(test = pars$sd.x < .Machine$double.eps,
-                       yes = 0,
+                       yes = 0.0,
                        no = pars$mu.x / pars$sd.x)
       alpha <- pars$mu.y + pars$sd.y * (coef[1L] - sum(coef[-1L] * factor))
       beta <- coef[-1L] * ifelse(test = pars$sd.x < .Machine$double.eps,
@@ -581,7 +581,7 @@
   # --- calculate deviance ---
   eps <- 1e-06
   if (identical(family, "gaussian")) {
-    2.0 * mean((y - y_hat)^2)
+    2.0 * mean((y - y_hat)^2.0)
   } else if (identical(family, "binomial")) {
     2.0 * mean(
       -y * log(pmax(y_hat, eps)) - (1.0 - y) * log(1.0 - pmin(y_hat, 1.0 - eps))

@@ -149,12 +149,12 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     X = unique(group$vector),
     FUN = function(x) names_covs[which(group$vector == x)]
   )
-  group$matrix <- 1 * outer(X = group$vector,
-                            Y = group$vector,
-                            FUN = "==")
+  group$matrix <- 1L * outer(X = group$vector,
+                             Y = group$vector,
+                             FUN = "==")
   model <- lapply(X = group, FUN = function(x) NULL)
   for (i in seq_along(group)) {
-    set.seed(1)
+    set.seed(1L)
     model[[i]] <- cv.corila(x = data$x_train,
                             y = data$y_train,
                             group = group[[i]],
@@ -226,10 +226,10 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     ),
     code = {
       if (family == "cox") {
-        data$x_test[is.na(data$x_test)] <- 0
+        data$x_test[is.na(data$x_test)] <- 0.0
         eta <- data$x_test %*% coef$vector
       } else {
-        data$x_test[is.na(data$x_test)] <- 0
+        data$x_test[is.na(data$x_test)] <- 0.0
         eta <- cbind(1.0, data$x_test) %*% coef$vector
       }
       if (family == "gaussian") {
@@ -281,7 +281,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   x$scaled <- scale(x$original)
   y_hat <- list()
   for (i in seq_along(x)) {
-    set.seed(1)
+    set.seed(1L)
     object <- cv.corila(x = x[[i]],
                         y = y,
                         group = rep(1L:5L, each = 10L),
@@ -360,7 +360,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 testthat::test_that("complete case analysis works with NAs in predictors", {
   family <- "gaussian"
-  data <- simulate_data(family = family, prob_primary = 1)
+  data <- simulate_data(family = family, prob_primary = 1.0)
   foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
   missing <- stats::rbinom(n = nrow(data$x_train), size = 1L, prob = 0.2) == 1L
   data$x_train[missing, 1L] <- NA
@@ -386,7 +386,7 @@ testthat::test_that("complete case analysis works with NAs in predictors", {
 
 testthat::test_that("complete case analysis works with NAs in response", {
   family <- "gaussian"
-  data <- simulate_data(family = family, prob_primary = 1)
+  data <- simulate_data(family = family, prob_primary = 1.0)
   foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
   missing <- stats::rbinom(n = nrow(data$x_train), size = 1L, prob = 0.2) == 1L
   data$y_train[missing] <- NA
@@ -422,7 +422,7 @@ testthat::test_that("complete case analysis works with NAs in response", {
 #' @srrstats {G5.4} *correctness test with glmnet*
 #' @srrstats {G5.4a} *trivial comparison in setting without groups*
 
-for (i in 1:3) {
+for (i in 1L:3L) {
   set.seed(i)
   n <- 100L
   p <- 10L
@@ -430,7 +430,7 @@ for (i in 1:3) {
   alpha <- stats::rnorm(n = 1L)
   beta <- stats::rnorm(n = p)
   y <- as.numeric(x %*% beta)
-  foldid <- sample(1:10, size = n, replace = TRUE)
+  foldid <- sample(1L:10L, size = n, replace = TRUE)
   glmnet <- glmnet::cv.glmnet(x = x, y = y, foldid = foldid)
   model0 <- cv.corila(x = x[1L:(n / 4L), ], y = y[1L:(n / 4L)],
                       group = seq_len(p))

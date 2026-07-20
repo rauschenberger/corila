@@ -23,7 +23,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_length(object = beta_hat, n = p + (family != "cox"))
     testthat::expect_true(all(is.finite(beta_hat)))
     testthat::expect_error(object = coef(object, s = "lambda.1se"))
-    testthat::expect_error(object = coef(object, s = -1))
+    testthat::expect_error(object = coef(object, s = -1.0))
   })
   testthat::test_that("function 'predict.cv.corila' returns finite n-vector", {
     y_hat <- predict(object, newx = data$x_train, s = "lambda.min")

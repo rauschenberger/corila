@@ -34,15 +34,16 @@
 #'
 calc_sign_prec <- function(truth, estim) {
   .assert(x = truth, type = "integer", dim = Inf,
-          min = -1, max = 1, na.rm = TRUE)
+          min = -1L, max = 1L, na.rm = TRUE)
   truth <- as.integer(truth)
   .assert(x = estim, type = "integer", dim = length(truth),
-          min = -1, max = 1, na.rm = TRUE)
+          min = -1L, max = 1L, na.rm = TRUE)
   estim <- as.integer(estim)
-  if (all(is.na(estim) | estim == 0)) {
+  if (all(is.na(estim) | estim == 0L)) {
     NA
   } else {
-    sum(estim != 0 & truth != 0 & sign(estim) == sign(truth)) / sum(estim != 0)
+    sum(estim != 0L & truth != 0L &
+          sign(estim) == sign(truth)) / sum(estim != 0L)
   }
 }
 
@@ -151,7 +152,7 @@ calc_sign_prec <- function(truth, estim) {
 #'
 #' @examples
 #' data <- simulate_data()
-#' utils::str(data, vec.len = 2)
+#' utils::str(data, vec.len = 2L)
 #'
 #' @srrstats {G5.1} *data set for tests and examples is exported*
 #'
@@ -251,8 +252,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 .simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0) {
   if (is.null(p) == is.null(group)) stop("Provide either p or group.")
-  .assert(x = n, type = "integer", min = 2)
-  .assert(x = p, type = "integer", min = 2)
+  .assert(x = n, type = "integer", min = 2L)
+  .assert(x = p, type = "integer", min = 2L)
   if (is.null(group)) group <- seq_len(p)
   .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
   group <- as.integer(group)

@@ -364,7 +364,7 @@ predict.corila <- function(object, newx, index, s, ...) {
           dim = c(Inf, length(object$scale$mu.x)))
   .assert(x = index, type = "integer", min = 1L, max = length(object$model))
   index <- as.integer(index)
-  .assert(x = s, type = "numeric", dim = Inf, min = 0)
+  .assert(x = s, type = "numeric", dim = Inf, min = 0.0)
   # --- make predictions ---
   newx_stand <- .forescale(x = newx, pars = object$scale)$x
   y_hat_stand <- stats::predict(object = object$model[[index]],
@@ -460,7 +460,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'                  hyper = hyper,
 #'                  lambda_init = NULL)
 #'
-#' y_hat <- stats::predict(object, newx = x, index = 1L, s = 0)
+#' y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)
 #' }
 #'
 #' @keywords internal
@@ -527,8 +527,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       X = weight,
       FUN = function(x) p * ifelse(test = x == 0.0, yes = 0.0, no = x / sum(x))
     )
-    pf_ext <- 1 / (weight$local * hyper$wgt_local[i] +
-                     weight$global * hyper$wgt_global[i])
+    pf_ext <- 1.0 / (weight$local * hyper$wgt_local[i] +
+                       weight$global * hyper$wgt_global[i])
     pf_ext[!c(primary, primary)] <- Inf # exclude auxiliary features
     .assert(x = pf_ext, type = "numeric", dim = 2L * p, min = 0.0)
     model[[i]] <- suppressMessages(
@@ -644,7 +644,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   if (!is.null(hyper)) {
     hyper <- as.matrix(hyper)
   }
-  .assert(x = hyper, type = "numeric", dim = c(Inf, length(slots)), min = 0)
+  .assert(x = hyper, type = "numeric", dim = c(Inf, length(slots)), min = 0.0)
   if (is.character(alpha_init)) {
     .assert(x = alpha_init, type = "nominal",
             support = c("pearson", "spearman", "kendall", "multiridge"))
@@ -705,8 +705,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
                         wgt_global = 1.0 - wgt_cand,
                         exp_global = 1.0)
   } else if (identical(tune, "exponent")) {
-    exp_cand <- c(0.0, 0.1, 0.25, 1 / 3, 0.5, 1.0, 2.0, 3.0, 4.0, 10.0, Inf)
-    hyper <- data.frame(wgt_local = 1,
+    exp_cand <- c(0.0, 0.1, 0.25, 1.0 / 3.0, 0.5, 1.0, 2.0, 3.0, 4.0, 10.0, Inf)
+    hyper <- data.frame(wgt_local = 1.0,
                         exp_local = exp_cand,
                         wgt_global = 0.0,
                         exp_global = Inf)
@@ -720,7 +720,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
     hyper$exp_local <- hyper$exp_global <- exp_cand
   } else if (identical(tune, "factorial")) {
-    wgt_cand <- seq(from = 0, to = 1, by = 0.25)
+    wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.25)
     exp_cand <- c(0.1, 0.5, 1.0, 2.0, 10.0)
     hyper <- expand.grid(wgt_local = wgt_cand,
                          exp_local = exp_cand,
@@ -837,7 +837,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   # --- estimate initial coefficients ---
   is_slope <- rep(c(FALSE, TRUE), times = c(family != "cox", p))
   if (all(is.na(alpha_init))) {
-    coef <- rep(x = 1, times = p)
+    coef <- rep(x = 1.0, times = p)
   } else if (is.character(alpha_init) && identical(alpha_init, "multiridge")) {
     if (is.null(lambda)) {
       model <- multiridge(x = x,

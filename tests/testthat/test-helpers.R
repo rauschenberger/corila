@@ -8,7 +8,7 @@ n <- 5L
 p <- 10L
 
 set.seed(1L)
-sd <- seq(from = 0L, to = 1L, length.out = p)
+sd <- seq(from = 0.0, to = 1.0, length.out = p)
 x <- vapply(X = sd,
             FUN = function(x) stats::rnorm(n = n, sd = x),
             FUN.VALUE = numeric(n))
@@ -24,7 +24,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     time_survival <- stats::rexp(n = n, rate = 1.0)
     time_censoring <- stats::rexp(n = n, rate = 1.0)
     time <- pmin(time_survival, time_censoring)
-    event <- 1 * (time_survival <= time_censoring)
+    event <- 1L * (time_survival <= time_censoring)
     y <- survival::Surv(time = time, event = event)
   }
   scale <- .forescale(x = x, y = y, family = family, pars = NULL)
@@ -39,7 +39,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_equal(object = y_back, expected = y) # !!!
   })
   testthat::test_that("func '.backscale' errors under wrong arg 'pars'", {
-    testthat::expect_error(.backscale(pars = scale$pars[-1], y = scale$y))
+    testthat::expect_error(.backscale(pars = scale$pars[-1L], y = scale$y))
   })
   # coefficients
   beta <- stats::rnorm(p + (family != "cox"))
@@ -153,7 +153,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox", "gamma")) {
   testthat::test_that("mean shift does not change cox deviance", {
     testthat::skip_if_not(family == "cox")
     dev0 <- .deviance(y = y, y_hat = exp(y_hat), family = family)
-    dev1 <- .deviance(y = y, y_hat = exp(y_hat + stats::rnorm(1)),
+    dev1 <- .deviance(y = y, y_hat = exp(y_hat + stats::rnorm(1L)),
                       family = family)
     testthat::expect_equal(object = dev1, expected = dev0)
   })

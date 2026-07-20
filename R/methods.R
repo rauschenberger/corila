@@ -349,7 +349,7 @@ print.cv.corila <- function(x, ...) {
   cat("object of class", sQuote("cv.corila"), "\n")
   content <- ifelse(length(x$model) == 1L, "an object", "multiple objects")
   cat("(contains ", content, " of class ", sQuote("cv.glmnet"), ")\n", sep = "")
-  nzero <- sum(stats::coef(x, s = "lambda.min")[-1L] != 0)
+  nzero <- sum(stats::coef(x, s = "lambda.min")[-1L] != 0.0)
   cat("selected", nzero, "from", x$args$p, "predictors")
   invisible(x)
 }
