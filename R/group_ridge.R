@@ -94,20 +94,20 @@
 #' with \eqn{k} in \eqn{\{1, \ldots, q\}}.
 #'
 #' @examples
-#' # minimal example
-#' n <- 50L; p <- 20L; q <- 5L
-#' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
-#' y <- rnorm(n)
-#' group <- rep(seq_len(q), length.out = p)
-#' model <- multiridge(x = x, y = y, group = group)
+#' data <- simulate_data()
+#' 
+#' # standard model fitting
+#' model <- multiridge(x = data$x_train, y = data$y_train, group = data$group)
 #'
 #' # fitting with given folds
-#' foldid <- sample(seq_len(10L), size = n, replace = TRUE)
-#' model <- multiridge(x = x, y = y, group = group, foldid = foldid)
+#' foldid <- sample(seq_len(10L), size = nrow(data$x_train), replace = TRUE)
+#' model <- multiridge(x = data$x_train, y = data$y_train, group = data$group,
+#'                     foldid = foldid)
 #'
 #' # fitting with given penalties
-#' penalties <- abs(rnorm(q))
-#' model <- multiridge(x = x, y = y, group = group, penalties = penalties)
+#' penalties <- abs(rnorm(length(unique(data$group))))
+#' model <- multiridge(x = data$x_train, y = data$y_train, group = data$group,
+#'                     penalties = penalties)
 #'
 #' @keywords methods models regression classif
 #'
@@ -143,7 +143,8 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   scale <- .forescale(x = x, y = y, family = family)
   table <- c(gaussian = "linear", binomial = "logistic")
   model <- if (family %in% names(table)) table[[family]] else family
-  xx <- lapply(X = unique(group), FUN = function(i) scale$x[, group == i])
+  xx <- lapply(X = unique(group),
+               FUN = function(i) scale$x[, group == i, drop = FALSE])
   xxblocks <- multiridge::createXXblocks(datablocks = xx)
   invisible(utils::capture.output({
     init <- multiridge::fastCV2(XXblocks = xxblocks,
