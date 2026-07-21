@@ -295,7 +295,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   sigma <- rho * outer(X = group, Y = group, FUN = "==") +
     (1.0 - rho) * diag(rep(x = 1.0, times = p))
   x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
-  if (n == 1) x <- matrix(data = x, ncol = 1)
+  if (n == 1L) x <- matrix(data = x, ncol = 1L)
   x
 }
 
@@ -337,17 +337,23 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   set.seed(as.integer(round(seed)))
   p <- length(group)
   q <- length(unique(group))
+  order <- order(group)
+  size <- table(group)
   beta_group <-
     sign(stats::rnorm(n = q)) *
     stats::rbinom(n = q, size = 1L, prob = prob_group)
-  beta <- rep(x = NA, times = p)
-  for (i in seq_len(q)) {
-    beta[group == i] <-
-      beta_group[i] * signal_strength *
-      abs(stats::rnorm(n = sum(group == i))) *
-      stats::rbinom(n = sum(group == i), size = 1L, prob = prob_predictor)
-  }
-  beta
+  #beta <- rep(x = NA, times = p)
+  #for (i in seq_len(q)) {
+  #  beta[group == i] <-
+  #    beta_group[i] * signal_strength *
+  #    abs(stats::rnorm(n = sum(group == i))) *
+  #    stats::rbinom(n = sum(group == i), size = 1L, prob = prob_predictor)
+  #}
+  #beta
+  beta_ordered <- signal_strength * rep(x = beta_group, times = size) *
+    abs(stats::rnorm(n = p)) *
+    stats::rbinom(n = p, size = 1L, prob = prob_predictor)
+  beta_ordered[order]
 }
 
 #' @title
