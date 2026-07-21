@@ -60,27 +60,27 @@ calc_sign_prec <- function(truth, estim) {
 #' @inheritParams cv.corila family
 #'
 #' @param n0
-#' number of training observations
-#' (non-negative integer scalar,
-#' minimum 0 makes model training impossible,
+#' number of training observations:
+#' positive integer scalar
+#' (minimum 1,
 #' maximum \eqn{1\,000\,000})
 #'
 #' @param n1
-#' number of testing observations
-#' (non-negative integer scalar,
-#' minimum 0 makes model testing impossible,
+#' number of testing observations:
+#' non-negative integer scalar
+#' (minimum 0,
 #' maximum \eqn{1\,000\,000})
 #'
 #' @param p
-#' number of predictors
-#' (positive integer scalar,
-#' minimum 1 leads to a single predictor,
+#' number of predictors:
+#' positive integer scalar
+#' (minimum 1 leads to a single predictor,
 #' maximum \eqn{1\,000\,000})
 #'
 #' @param q
-#' number of predictor groups
-#' (positive integer scalar,
-#' minimum 1 assigns all predictors to the same group.
+#' number of predictor groups:
+#' positive integer scalar
+#' (minimum 1 assigns all predictors to the same group.
 #' maximum `p` assigns each predictor to its own group)
 #'
 #' @param rho
@@ -102,12 +102,16 @@ calc_sign_prec <- function(truth, estim) {
 #' minimum 0 sets all effect sizes to 0)
 #'
 #' @param prob_group
-#' probability for each group to be active:
+#' probability for each predictor group to be active:
 #' numeric scalar in the unit interval
+#' (minimum 0 makes all groups inactive,
+#' maximum 1 makes all groups active)
 #'
 #' @param prob_predictor
 #' probability for each predictor in an active group to be active:
 #' numeric scalar in the unit interval
+#' (minimum 0 makes all predictors inactive,
+#' maximum 1 makes all predictors in active groups active)
 #'
 #' @param seed
 #' random seed for reproducibility:
@@ -172,10 +176,11 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                           prob_primary = 0.5, signal_strength = 1.0,
                           prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
   # argument checks
-  .assert(x = n0, type = "integer", min = 0L, max = 1e06L)
+  .assert(x = n0, type = "integer", min = 1L, max = 1e06L)
   n0 <- as.integer(n0)
   .assert(x = n1, type = "integer", min = 0L, max = 1e06L)
   n1 <- as.integer(n1)
+  .assert(x = n0 + n1, type = "integer", min = 1L, max = 1e06L)
   .assert(x = p, type = "integer", min = 1L, max = 1e06L)
   p <- as.integer(p)
   .assert(x = q, type = "integer", min = 1L, max = p)
@@ -184,12 +189,17 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
   .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
+  rho <- round(rho, digits = 6L)
   .assert(x = prob_primary, type = "numeric", min = 0.0, max = 1.0)
+  prob_primary <- round(prob_primary, digits = 6L)
   .assert(x = signal_strength, type = "numeric", min = 0.0)
+  signal_strength <- round(signal_strength, digits = 6L)
   .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
+  prob_group <- round(prob_group, digits = 6L)
   .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
+  prob_predictor <- round(prob_predictor, digits = 6L)
   .assert(x = seed, type = "integer")
-  seed <- as.integer(round(seed))
+  set.seed(as.integer(round(seed)))
   # simulation
   n <- n0 + n1
   group <- sort(c(seq_len(q),
@@ -242,13 +252,17 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' @inheritParams simulate_data p rho seed
 #'
 #' @param n
-#' number of observations (positive integer)
-#'
-#' @param p
-#' number of predictors (positive integer)
+#' number of observations:
+#' positive integer
+#' (minimum 1, maximum \eqn{1\,000\,000})
 #'
 #' @param group
-#' integer vector (length \eqn{p}, minimum 1, maximum \eqn{p})
+#' group indicator:
+#' integer vector of length \eqn{p} with entries between 1 and \eqn{q},
+#' where \eqn{p} is the number of predictors
+#' and \eqn{q} is the number of predictor groups
+#' (maximum length \eqn{1\,000\,000},
+#' minimum entry 1, maximum entry \eqn{1\,000\,000})
 #'
 #' @return
 #' Returns a numeric matrix with \eqn{n} rows (observations)
@@ -260,19 +274,18 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' @keywords internal
 #'
 #' @examples
-#' warning("Re-activate examples.")
-#' #\dontshow{.simulate_predictors <- corila:::.simulate_predictors}
-#' #.simulate_predictors(n = 5L, p = 7L)
-#'
-#' #.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
+#' \dontshow{.simulate_predictors <- corila:::.simulate_predictors}
+#' .simulate_predictors(n = 5L, p = 7L)
+#' .simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
 #'
 .simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0,
                                  seed = 1L) {
   if (is.null(p) == is.null(group)) stop("Provide either p or group.")
-  .assert(x = n, type = "integer", min = 2L)
-  .assert(x = p, type = "integer", min = 2L)
+  .assert(x = n, type = "integer", min = 1L, max = 1e06L)
+  .assert(x = p, type = "integer", min = 1L, max = 1e06L)
   if (is.null(group)) group <- seq_len(p)
   .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
+  .assert(x = length(group), type = "integer", min = 1L, max = 1e06L)
   group <- as.integer(group)
   .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
   .assert(x = seed, type = "integer")
@@ -281,7 +294,9 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   mu <- rep(x = 0.0, times = p)
   sigma <- rho * outer(X = group, Y = group, FUN = "==") +
     (1.0 - rho) * diag(rep(x = 1.0, times = p))
-  MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
+  x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
+  if (n == 1) x <- matrix(data = x, ncol = 1)
+  x
 }
 
 #' @title
@@ -311,12 +326,13 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                               signal_strength = 1.0, seed = 1L) {
   .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
   group <- as.integer(group)
+  .assert(x = length(group), type = "integer", min = 1L, max = 1e06L)
   .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
   prob_group <- round(prob_group, digits = 6L)
   .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
   prob_predictor <- round(prob_predictor, digits = 6L)
   .assert(x = signal_strength, type = "numeric", min = 0.0)
-  signal_strength <- as.double(signal_strength)
+  signal_strength <- round(signal_strength, digits = 6L)
   .assert(x = seed, type = "integer")
   set.seed(as.integer(round(seed)))
   p <- length(group)
