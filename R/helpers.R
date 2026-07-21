@@ -125,13 +125,9 @@
       length(max) == 1L && is.numeric(max) && !is.na(max)
   )
   type <- tolower(type)
-  if (!is.null(family)) {
-    family <- tolower(family)
-  }
-  support <- tolower(support)
-  if (type == "nominal") {
-    x <- tolower(x)
-  }
+  if (!is.null(family)) family <- tolower(family)
+  if (!is.null(support)) support <- tolower(support)
+  if (type == "nominal") x <- tolower(x)
   na.rm <- as.logical(na.rm)
   stopifnot(
     "expected vector"  =
