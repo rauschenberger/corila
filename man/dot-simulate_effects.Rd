@@ -17,8 +17,8 @@
 integer vector of length \eqn{p} with entries between 1 and \eqn{q},
 where \eqn{p} is the number of predictors
 and \eqn{q} is the number of predictor groups
-(maximum length \eqn{1\,000\,000},
-minimum entry 1, maximum entry \eqn{1\,000\,000})}
+(maximum length \eqn{1\,000},
+minimum entry 1, maximum entry \eqn{1\,000})}
 
 \item{prob_group}{probability for each predictor group to be active:
 numeric scalar in the unit interval
@@ -33,7 +33,8 @@ maximum 1 makes all predictors in active groups active)}
 \item{signal_strength}{non-negative numeric scalar
 for multiplying the effect sizes
 (default: \code{signal_strength=1.0},
-minimum 0 sets all effect sizes to 0)}
+minimum 0 sets all effect sizes to 0,
+maximum 2 to avoid undefined values)}
 
 \item{seed}{random seed for reproducibility:
 integer scalar (unrestricted)}

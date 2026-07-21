@@ -19,7 +19,7 @@ numeric vector of length \eqn{p}}
 
 \item{n}{sample size:
 positive integer scalar or \code{NULL}
-(minimum 1, maximum \eqn{1\,000\,000})}
+(minimum 1, maximum \eqn{100\,000})}
 
 \item{seed}{random seed for reproducibility:
 integer scalar (unrestricted)}

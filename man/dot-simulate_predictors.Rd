@@ -9,19 +9,19 @@
 \arguments{
 \item{n}{number of observations:
 positive integer
-(minimum 1, maximum \eqn{1\,000\,000})}
+(minimum 1, maximum \eqn{110\,000})}
 
 \item{p}{number of predictors:
 positive integer scalar
 (minimum 1 leads to a single predictor,
-maximum \eqn{1\,000\,000})}
+maximum \eqn{1\,000})}
 
 \item{group}{group indicator:
 integer vector of length \eqn{p} with entries between 1 and \eqn{q},
 where \eqn{p} is the number of predictors
 and \eqn{q} is the number of predictor groups
-(maximum length \eqn{1\,000\,000},
-minimum entry 1, maximum entry \eqn{1\,000\,000})}
+(maximum length \eqn{1\,000},
+minimum entry 1, maximum entry \eqn{1\,000})}
 
 \item{rho}{correlation coefficient for predictors within the same group:
 numeric scalar in the unit interval

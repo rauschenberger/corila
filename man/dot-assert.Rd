@@ -5,7 +5,7 @@
 \title{Assertions}
 \usage{
 .assert(
-  x = NULL,
+  x,
   type = "numeric",
   dim = 1L,
   na.rm = FALSE,
@@ -16,31 +16,49 @@
 )
 }
 \arguments{
-\item{x}{scalar, vector, matrix, or array to be checked}
+\item{x}{scalar, vector (of length \code{dim}),
+matrix (of dimensions \code{dim}),
+or array (of dimensions \code{dim}) to be checked
+\itemize{
+\item \code{type = "numeric"}: numeric
+\item \code{type = "integer"}: integer
+\item \code{type = "nominal"}: character
+\item \code{type = "logical"}: logical
+\item \code{family = "binomial"}: integers 0 or 1
+\item \code{family = "poisson"}: non-negative integers
+\item \code{family = "cox"}: object created with \link[survival:Surv]{survival::Surv}
+}}
 
-\item{type}{character \code{"numeric"} (default), \code{"integer"},
+\item{type}{character scalar \code{"numeric"} (default), \code{"integer"},
 \code{"nominal"}, or \code{"logical"}}
 
-\item{dim}{vector containing positive integers defining the dimensionality:
-\code{dim = 1L} for a scalar,
-\code{dim = Inf} for a vector of arbitrary length,
-\code{dim = c(Inf, Inf)} for a matrix of arbitrary dimensions,
-\code{dim = c(Inf, Inf, Inf)} for an array of arbitrary dimensions,
-\code{dim = 100L} for a vector of length 100,
-\code{dim = c(Inf, 100L)} for a matrix with 100 columns, etc.}
+\item{dim}{vector of length 1, 2 or 3 containing positive integers
+(minimum 1, maximum \eqn{100,000})
+defining the dimensionality:
+\itemize{
+\item scalar \code{x}: \code{dim = 1}
+\item vector \code{x} of length 100: \code{dim = 100}
+\item vector \code{x} of arbitrary length: \code{dim = Inf}
+\item matrix \code{x} with 100 rows: \code{dim = c(100, Inf)}
+\item matrix \code{x} of arbitrary dimensions: \code{dim = c(Inf, Inf)}
+\item array \code{x} of arbitrary dimensions: \code{dim = c(Inf, Inf, Inf)}
+}}
 
-\item{na.rm}{logical;
-\code{FALSE}: missing values are not allowed,
-\code{TRUE}: missing values are allowed}
+\item{na.rm}{logical scalar (or numeric 0/1):
+\itemize{
+\item \code{na.rm=FALSE} (or \code{na.rm=0}): missing values are not allowed
+\item \code{na.rm=TRUE} (or \code{na.rm=1}): missing values are allowed
+}}
 
-\item{support}{character vector (only used for \code{type = "nominal"})}
+\item{support}{character vector (only used for \code{type = "nominal"}),
+(matching with \code{x} is case-insensitive)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
 \code{"poisson"}, or \code{"cox"}}
 
-\item{min}{numerical value (not used for \code{type = "nominal"})}
+\item{min}{numeric scalar (not used for \code{type = "nominal"})}
 
-\item{max}{numerical value (not used for \code{type = "nominal"})}
+\item{max}{numeric scalar (not used for \code{type = "nominal"})}
 }
 \value{
 Returns \code{NULL} invisibly, or throws an error.
@@ -53,16 +71,23 @@ This function is called by multiple function of the \link{corila-package}.
 }
 \examples{
 \dontshow{.assert <- corila:::.assert}
-.assert(x = NULL)
-.assert(x = rnorm(n = 1L))
-.assert(x = "A", type = "nominal", support = LETTERS)
-.assert(x = rexp(n= 10L), dim = Inf, type = "numeric", min = 0.0)
-.assert(x = c(NA, rpois(n = 9L, lambda = 4.0)), dim = 10L,
-       type = "integer", na.rm = TRUE)
-.assert(x = NA, na.rm = TRUE)
-.assert(x = 1.0, na.rm = FALSE)
-.assert(x = rpois(n = 10L, lambda = 4.0), dim = Inf,
-       family = "poisson")
+n <- 3L; p <- 4L
+.assert(x = matrix(rnorm(n = n * p), nrow = n, ncol = p),
+        dim = c(n, p),
+        type = "numeric",
+        family = "gaussian")
+.assert(x = rpois(n = n, lambda = 4.0),
+        dim = n,
+        type = "integer",
+        family = "poisson")
+.assert(x = rbinom(n = n, size = 1L, prob = 0.5),
+        dim = n,
+        type = "integer",
+        family = "binomial")
+.assert(x = "a",
+        dim = 1L,
+        type = "nominal",
+        support = letters)
 
 }
 \seealso{

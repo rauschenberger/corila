@@ -2,7 +2,6 @@
 % Please edit documentation in R/simulate.R
 \name{simulate_data}
 \alias{simulate_data}
-\alias{simulate}
 \title{Data simulation}
 \usage{
 simulate_data(
@@ -23,17 +22,17 @@ simulate_data(
 \item{n0}{number of training observations:
 positive integer scalar
 (minimum 1,
-maximum \eqn{1\,000\,000})}
+maximum \eqn{10\,000})}
 
 \item{n1}{number of testing observations:
 non-negative integer scalar
 (minimum 0,
-maximum \eqn{1\,000\,000})}
+maximum \eqn{100\,000})}
 
 \item{p}{number of predictors:
 positive integer scalar
 (minimum 1 leads to a single predictor,
-maximum \eqn{1\,000\,000})}
+maximum \eqn{1\,000})}
 
 \item{q}{number of predictor groups:
 positive integer scalar
@@ -56,7 +55,8 @@ maximum 1 leads to primary predictors only)}
 \item{signal_strength}{non-negative numeric scalar
 for multiplying the effect sizes
 (default: \code{signal_strength=1.0},
-minimum 0 sets all effect sizes to 0)}
+minimum 0 sets all effect sizes to 0,
+maximum 2 to avoid undefined values)}
 
 \item{prob_group}{probability for each predictor group to be active:
 numeric scalar in the unit interval
@@ -72,7 +72,7 @@ maximum 1 makes all predictors in active groups active)}
 integer scalar (unrestricted)}
 }
 \value{
-Returns a list with multiple slots:
+Returns a named list with the following slots:
 \itemize{
 \item \code{x_train}:
 predictor matrix of the training observations
@@ -95,6 +95,19 @@ numeric vector of the effects of the predictors on the response
 \item \code{y_test}:
 response vector for the test observations of length \eqn{n_1}
 }
+}
+\description{
+Simulates a predictor matrix, an effect vector and a response vector.
+The simulated datasets can be used for modelling a response based on
+grouped and correlated primary and auxiliary predictors.
+}
+\details{
+Use the objects \code{x_train}, \code{y_train}, \code{group}, and \code{primary}
+for model training.
+Estimated coefficients can be compared with \code{beta}.
+
+Use the object \code{x_test} for model testing.
+Predicted values can be compared with \code{y_test}.
 
 Training and testing observations are named \code{train_} or \code{test_},
 respectively, followed by a number indexing the observations
@@ -105,23 +118,14 @@ followed by a number indexing the predictor groups, a point,
 and a number indexing the predictors within this group
 (e.g., \code{pri_1.1} or \code{aux_1.1}).
 }
-\description{
-Simulates a predictor matrix, an effect vector and a response vector.
-The simulated datasets can be used for modelling a response based on
-grouped and correlated primary and auxiliary predictors.
-}
-\details{
-\itemize{
-\item Use the objects \code{x_train}, \code{y_train}, \code{group}, and \code{primary}
-for model training.
-Estimated coefficients can be compared with \code{beta}.
-\item Use the object \code{x_test} for model testing.
-Predicted values can be compared with \code{y_test}.
-}
-}
 \examples{
 data <- simulate_data()
 utils::str(data, vec.len = 2L)
+
+data <- simulate_data(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
+                     family = "gaussian", rho = 0.5,
+                     prob_primary = 0.5, signal_strength = 1.0,
+                     prob_group = 0.5, prob_predictor = 0.8, seed = 1L)
 
 }
 \seealso{
