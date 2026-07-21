@@ -954,6 +954,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   p <- as.integer(p)
   .assert(x = names, type = "nominal", dim = p)
   if (is.atomic(group) && is.null(dim(group))) {
+    if (is.numeric(group)) group <- as.integer(group)
     if (length(group) != p) {
       stop("Vector 'group' should have length p.")
     }
