@@ -10,22 +10,30 @@
 #'
 #' @param x
 #' scalar, vector, matrix, or array to be checked
+#' - `type = "numeric"`: numeric
+#' - `type = "integer"`: integer
+#' - `type = "nominal"`: character
+#' - `type = "logical"`: logical
+#' - `family = "binomial"`: integers 0 or 1
+#' - `family = "poisson"`: non-negative integers
+#' - `family = "cox"`: object created with [survival::Surv]
 #'
 #' @param dim
-#' vector containing positive integers defining the dimensionality:
-#' `dim = 1L` for a scalar,
-#' `dim = Inf` for a vector of arbitrary length,
-#' `dim = c(Inf, Inf)` for a matrix of arbitrary dimensions,
-#' `dim = c(Inf, Inf, Inf)` for an array of arbitrary dimensions,
-#' `dim = 100L` for a vector of length 100,
-#' `dim = c(Inf, 100L)` for a matrix with 100 columns, etc.
+#' vector of length 1, 2 or 3 containing positive integers
+#' defining the dimensionality:
+#' - scalar `x`: dim = 1`
+#' - vector `x` of length 100: `dim = 100`
+#' - vector `x` of arbitrary length: `dim = Inf`
+#' - matrix `x` with 100 rows: `dim = c(100, Inf)`
+#' - matrix `x` of arbitrary dimensions: `dim = c(Inf, Inf)` 
+#' - array `x` of arbitrary dimensions: `dim = c(Inf, Inf, Inf)`
 #'
 #' @param type
-#' character `"numeric"` (default), `"integer"`,
+#' character scalar `"numeric"` (default), `"integer"`,
 #' `"nominal"`, or `"logical"`
 #'
 #' @param na.rm
-#' logical;
+#' logical scalar;
 #' `FALSE`: missing values are not allowed,
 #' `TRUE`: missing values are allowed
 #'
@@ -33,10 +41,10 @@
 #' character vector (only used for `type = "nominal"`)
 #'
 #' @param min
-#' numerical value (not used for `type = "nominal"`)
+#' numeric scalar (not used for `type = "nominal"`)
 #'
 #' @param max
-#' numerical value (not used for `type = "nominal"`)
+#' numeric scalar (not used for `type = "nominal"`)
 #'
 #' @details
 #' This function is called by multiple function of the [corila-package].
@@ -52,14 +60,11 @@
 #' \dontshow{.assert <- corila:::.assert}
 #' .assert(x = NULL)
 #' .assert(x = rnorm(n = 1L))
-#' .assert(x = "A", type = "nominal", support = LETTERS)
-#' .assert(x = rexp(n= 10L), dim = Inf, type = "numeric", min = 0.0)
-#' .assert(x = c(NA, rpois(n = 9L, lambda = 4.0)), dim = 10L,
-#'        type = "integer", na.rm = TRUE)
-#' .assert(x = NA, na.rm = TRUE)
-#' .assert(x = 1.0, na.rm = FALSE)
-#' .assert(x = rpois(n = 10L, lambda = 4.0), dim = Inf,
-#'        family = "poisson")
+#' n <- 3L; p <- 4L
+#' .assert(x = matrix(rnorm(n = n * p), nrow = n, ncol = p), dim = c(n, p))
+#' .assert(x = rpois(n = 1L, lambda = 4.0), family = "poisson")
+#' .assert(x = rbinom(n = 1L, size = 1L, prob = 0.5), family = "binomial")
+#' .assert(x = "A", type = "nominal", support = c("A", "B", "C"))
 #'
 #' @keywords internal
 #'
@@ -72,7 +77,7 @@
 #' @srrstats {G5.2a} *messages are unique*
 #' @srrstats {RE1.4} *tests assumptions for input data*
 #'
-.assert <- function(x = NULL, type = "numeric", dim = 1L, na.rm = FALSE,
+.assert <- function(x, type = "numeric", dim = 1L, na.rm = FALSE,
                     support = NULL, family = NULL, min = -Inf, max = Inf) {
   eps <- 1e-06
   if (is.null(x)) return(invisible(NULL))
@@ -82,28 +87,43 @@
   stopifnot(
     "require argument 'type' to be a character scalar" =
       length(type) == 1L && is.character(type) && !is.na(type),
+    "require argument `type` to be inside support" =
+      tolower(type) %in% c("numeric", "integer", "nominal", "logical"),
     "require argument 'support' to be a character vector" =
       is.null(support) || (is.character(support) && is.atomic(support)),
     "require argument support = NULL unless argument type = 'nominal'" =
       tolower(type) == "nominal" || is.null(support),
     "require argument 'family' to be a character scalar" =
-      is.null(family) || (length(family) == 1L && is.character(family)),
+      is.null(family) ||
+      (length(family) == 1L && is.character(family) && !is.na(family)),
+    "require argument 'family' to be inside support" = 
+      is.null(family) ||
+      tolower(family) %in% c("gaussian", "binomial", "poisson", "cox"),
     "require argument 'dim' to be an integer vector" =
       is.atomic(dim) && all(dim > 0L) &&
-      all(abs(dim - round(dim)) < eps | is.infinite(dim)),
+      all(abs(dim - round(dim)) < eps | is.infinite(dim)) && all(!is.na(dim)),
+    "require argument 'dim' to have length 1, 2, or 3" =
+      length(dim) %in% c(1L, 2L, 3L),
     "require argument 'na.rm' to be a logical scalar" =
-      length(na.rm) == 1L && is.logical(na.rm) && !is.na(na.rm),
+      length(na.rm) == 1L &&
+      (is.logical(na.rm) || (is.integer(na.rm) && na.rm %in% c(0L, 1L))) &&
+      !is.na(na.rm),
     "require argument 'min' to be a numeric scalar" =
       length(min) == 1L && is.numeric(min) && !is.na(min),
     "require argument 'max' to be a numeric scalar" =
       length(max) == 1L && is.numeric(max) && !is.na(max)
   )
-  type <- match.arg(arg = tolower(type),
-                    choices = c("numeric", "integer", "nominal", "logical"))
+  #choices <- c("numeric", "integer", "nominal", "logical")
+  #type <- match.arg(arg = tolower(type), choices = choices)
+  #if (!type %in% choices) stop("Argument 'type' must be in range.")
+  type <- tolower(type)
+  #choices <- c("gaussian", "binomial", "poisson", "cox")
   if (!is.null(family)) {
-    family <- match.arg(arg = tolower(family),
-                        choices = c("gaussian", "binomial", "poisson", "cox"))
+    #family <- match.arg(arg = tolower(family), choices = choices)
+    family <- tolower(family)
+    #if (!family %in% choices) stop("Argument 'family' must be in range.")
   }
+  na.rm <- as.logical(na.rm)
   stopifnot(
     "expected vector"  =
       length(dim) != 1L || (is.atomic(x) && is.null(dim(x))) ||

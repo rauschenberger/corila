@@ -63,19 +63,19 @@ calc_sign_prec <- function(truth, estim) {
 #' number of training observations:
 #' positive integer scalar
 #' (minimum 1,
-#' maximum \eqn{1\,000\,000})
+#' maximum \eqn{10\,000})
 #'
 #' @param n1
 #' number of testing observations:
 #' non-negative integer scalar
 #' (minimum 0,
-#' maximum \eqn{1\,000\,000})
+#' maximum \eqn{100\,000})
 #'
 #' @param p
 #' number of predictors:
 #' positive integer scalar
 #' (minimum 1 leads to a single predictor,
-#' maximum \eqn{1\,000\,000})
+#' maximum \eqn{1\,000})
 #'
 #' @param q
 #' number of predictor groups:
@@ -176,12 +176,11 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                           prob_primary = 0.5, signal_strength = 1.0,
                           prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
   # argument checks
-  .assert(x = n0, type = "integer", min = 1L, max = 1e06L)
+  .assert(x = n0, type = "integer", min = 1L, max = 1e04L)
   n0 <- as.integer(n0)
-  .assert(x = n1, type = "integer", min = 0L, max = 1e06L)
+  .assert(x = n1, type = "integer", min = 0L, max = 1e05L)
   n1 <- as.integer(n1)
-  .assert(x = n0 + n1, type = "integer", min = 1L, max = 1e06L)
-  .assert(x = p, type = "integer", min = 1L, max = 1e06L)
+  .assert(x = p, type = "integer", min = 1L, max = 1e03L)
   p <- as.integer(p)
   .assert(x = q, type = "integer", min = 1L, max = p)
   q <- as.integer(q)
@@ -254,15 +253,15 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' @param n
 #' number of observations:
 #' positive integer
-#' (minimum 1, maximum \eqn{1\,000\,000})
+#' (minimum 1, maximum \eqn{110\,000})
 #'
 #' @param group
 #' group indicator:
 #' integer vector of length \eqn{p} with entries between 1 and \eqn{q},
 #' where \eqn{p} is the number of predictors
 #' and \eqn{q} is the number of predictor groups
-#' (maximum length \eqn{1\,000\,000},
-#' minimum entry 1, maximum entry \eqn{1\,000\,000})
+#' (maximum length \eqn{1\,000},
+#' minimum entry 1, maximum entry \eqn{1\,000})
 #'
 #' @return
 #' Returns a numeric matrix with \eqn{n} rows (observations)
@@ -281,13 +280,14 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 .simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0,
                                  seed = 1L) {
   if (is.null(p) == is.null(group)) stop("Provide either p or group.")
-  .assert(x = n, type = "integer", min = 1L, max = 1e06L)
-  .assert(x = p, type = "integer", min = 1L, max = 1e06L)
+  .assert(x = n, type = "integer", min = 1L, max = 11e04L)
+  .assert(x = p, type = "integer", min = 1L, max = 1e03L)
   if (is.null(group)) group <- seq_len(p)
   .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
-  .assert(x = length(group), type = "integer", min = 1L, max = 1e06L)
+  .assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
   group <- as.integer(group)
   .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
+  rho <- round(rho, digits = 6L)
   .assert(x = seed, type = "integer")
   set.seed(as.integer(round(seed)))
   p <- length(group)
@@ -295,6 +295,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   sigma <- rho * outer(X = group, Y = group, FUN = "==") +
     (1.0 - rho) * diag(rep(x = 1.0, times = p))
   x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
+  #x <- mvtnorm::rmvnorm(n = n, mean = mu, sigma = sigma)
   if (n == 1L) x <- matrix(data = x, ncol = 1L)
   x
 }
@@ -326,7 +327,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                               signal_strength = 1.0, seed = 1L) {
   .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
   group <- as.integer(group)
-  .assert(x = length(group), type = "integer", min = 1L, max = 1e06L)
+  .assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
   .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
   prob_group <- round(prob_group, digits = 6L)
   .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
@@ -336,9 +337,9 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   .assert(x = seed, type = "integer")
   set.seed(as.integer(round(seed)))
   p <- length(group)
-  q <- length(unique(group))
   order <- order(group)
-  size <- table(group)
+  size <- tabulate(group[order])
+  q <- length(size)
   beta_group <-
     sign(stats::rnorm(n = q)) *
     stats::rbinom(n = q, size = 1L, prob = prob_group)
@@ -350,10 +351,11 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   #    stats::rbinom(n = sum(group == i), size = 1L, prob = prob_predictor)
   #}
   #beta
-  beta_ordered <- signal_strength * rep(x = beta_group, times = size) *
+  beta <- numeric(p)
+  beta[order] <- signal_strength * rep(x = beta_group, times = size) *
     abs(stats::rnorm(n = p)) *
     stats::rbinom(n = p, size = 1L, prob = prob_predictor)
-  beta_ordered[order]
+  beta
 }
 
 #' @title
@@ -376,7 +378,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' @param n
 #' sample size:
 #' positive integer scalar or \code{NULL}
-#' (minimum 1, maximum \eqn{1\,000\,000})
+#' (minimum 1, maximum \eqn{100\,000})
 #'
 #' @return
 #' Returns an \eqn{n}-dimensional response vector.
@@ -409,7 +411,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   }
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
   .assert(x = beta, type = "numeric", dim = ncol(x))
-  .assert(x = n, type = "integer", min = 1L, max = 1e06L)
+  .assert(x = n, type = "integer", min = 1L, max = 1e05L)
   .assert(x = seed, type = "integer")
   set.seed(as.integer(round(seed)))
   if (!is.null(x) && !is.null(beta) && is.null(n)) {
