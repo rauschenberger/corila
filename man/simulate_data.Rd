@@ -20,24 +20,24 @@ simulate_data(
 )
 }
 \arguments{
-\item{n0}{number of training observations
-(non-negative integer scalar,
-minimum 0 makes model training impossible,
+\item{n0}{number of training observations:
+positive integer scalar
+(minimum 1,
 maximum \eqn{1\,000\,000})}
 
-\item{n1}{number of testing observations
-(non-negative integer scalar,
-minimum 0 makes model testing impossible,
+\item{n1}{number of testing observations:
+non-negative integer scalar
+(minimum 0,
 maximum \eqn{1\,000\,000})}
 
-\item{p}{number of predictors
-(positive integer scalar,
-minimum 1 leads to a single predictor,
+\item{p}{number of predictors:
+positive integer scalar
+(minimum 1 leads to a single predictor,
 maximum \eqn{1\,000\,000})}
 
-\item{q}{number of predictor groups
-(positive integer scalar,
-minimum 1 assigns all predictors to the same group.
+\item{q}{number of predictor groups:
+positive integer scalar
+(minimum 1 assigns all predictors to the same group.
 maximum \code{p} assigns each predictor to its own group)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"},
@@ -58,11 +58,15 @@ for multiplying the effect sizes
 (default: \code{signal_strength=1.0},
 minimum 0 sets all effect sizes to 0)}
 
-\item{prob_group}{probability for each group to be active:
-numeric scalar in the unit interval}
+\item{prob_group}{probability for each predictor group to be active:
+numeric scalar in the unit interval
+(minimum 0 makes all groups inactive,
+maximum 1 makes all groups active)}
 
 \item{prob_predictor}{probability for each predictor in an active group to be active:
-numeric scalar in the unit interval}
+numeric scalar in the unit interval
+(minimum 0 makes all predictors inactive,
+maximum 1 makes all predictors in active groups active)}
 
 \item{seed}{random seed for reproducibility:
 integer scalar (unrestricted)}

@@ -7,11 +7,21 @@
 .simulate_predictors(n, p = NULL, group = NULL, rho = 0, seed = 1L)
 }
 \arguments{
-\item{n}{number of observations (positive integer)}
+\item{n}{number of observations:
+positive integer
+(minimum 1, maximum \eqn{1\,000\,000})}
 
-\item{p}{number of predictors (positive integer)}
+\item{p}{number of predictors:
+positive integer scalar
+(minimum 1 leads to a single predictor,
+maximum \eqn{1\,000\,000})}
 
-\item{group}{integer vector (length \eqn{p}, minimum 1, maximum \eqn{p})}
+\item{group}{group indicator:
+integer vector of length \eqn{p} with entries between 1 and \eqn{q},
+where \eqn{p} is the number of predictors
+and \eqn{q} is the number of predictor groups
+(maximum length \eqn{1\,000\,000},
+minimum entry 1, maximum entry \eqn{1\,000\,000})}
 
 \item{rho}{correlation coefficient for predictors within the same group:
 numeric scalar in the unit interval
@@ -29,11 +39,9 @@ and \eqn{p} columns (predictors).
 Simulates predictor matrix.
 }
 \examples{
-warning("Re-activate examples.")
-#\dontshow{.simulate_predictors <- corila:::.simulate_predictors}
-#.simulate_predictors(n = 5L, p = 7L)
-
-#.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
+\dontshow{.simulate_predictors <- corila:::.simulate_predictors}
+.simulate_predictors(n = 5L, p = 7L)
+.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
 
 }
 \seealso{

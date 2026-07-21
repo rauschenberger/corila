@@ -13,13 +13,22 @@
 )
 }
 \arguments{
-\item{group}{integer vector (length \eqn{p}, minimum 1, maximum \eqn{p})}
+\item{group}{group indicator:
+integer vector of length \eqn{p} with entries between 1 and \eqn{q},
+where \eqn{p} is the number of predictors
+and \eqn{q} is the number of predictor groups
+(maximum length \eqn{1\,000\,000},
+minimum entry 1, maximum entry \eqn{1\,000\,000})}
 
-\item{prob_group}{probability for each group to be active:
-numeric scalar in the unit interval}
+\item{prob_group}{probability for each predictor group to be active:
+numeric scalar in the unit interval
+(minimum 0 makes all groups inactive,
+maximum 1 makes all groups active)}
 
 \item{prob_predictor}{probability for each predictor in an active group to be active:
-numeric scalar in the unit interval}
+numeric scalar in the unit interval
+(minimum 0 makes all predictors inactive,
+maximum 1 makes all predictors in active groups active)}
 
 \item{signal_strength}{non-negative numeric scalar
 for multiplying the effect sizes
