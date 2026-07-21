@@ -99,7 +99,8 @@ calc_sign_prec <- function(truth, estim) {
 #' non-negative numeric scalar
 #' for multiplying the effect sizes
 #' (default: `signal_strength=1.0`,
-#' minimum 0 sets all effect sizes to 0)
+#' minimum 0 sets all effect sizes to 0,
+#' maximum 2 to avoid undefined values)
 #'
 #' @param prob_group
 #' probability for each predictor group to be active:
@@ -117,10 +118,8 @@ calc_sign_prec <- function(truth, estim) {
 #' random seed for reproducibility:
 #' integer scalar (unrestricted)
 #'
-#' @aliases simulate
-#'
 #' @return
-#' Returns a list with multiple slots:
+#' Returns a named list with the following slots:
 #' - `x_train`:
 #'   predictor matrix of the training observations
 #'   (\eqn{n_0} rows, \eqn{p} columns)
@@ -142,6 +141,14 @@ calc_sign_prec <- function(truth, estim) {
 #' - `y_test`:
 #'   response vector for the test observations of length \eqn{n_1}
 #'
+#' @details
+#' Use the objects `x_train`, `y_train`, `group`, and `primary`
+#' for model training.
+#' Estimated coefficients can be compared with `beta`.
+#'
+#' Use the object `x_test` for model testing.
+#' Predicted values can be compared with `y_test`.
+#'
 #' Training and testing observations are named `train_` or `test_`,
 #' respectively, followed by a number indexing the observations
 #' (e.g., `train_1` or `test_1`).
@@ -150,13 +157,6 @@ calc_sign_prec <- function(truth, estim) {
 #' followed by a number indexing the predictor groups, a point,
 #' and a number indexing the predictors within this group
 #' (e.g., `pri_1.1` or `aux_1.1`).
-#'
-#' @details
-#' - Use the objects `x_train`, `y_train`, `group`, and `primary`
-#'   for model training.
-#'   Estimated coefficients can be compared with `beta`.
-#' - Use the object `x_test` for model testing.
-#'   Predicted values can be compared with `y_test`.
 #'
 #' @seealso
 #' This function calls the internal functions [.simulate_predictors()],
@@ -168,6 +168,11 @@ calc_sign_prec <- function(truth, estim) {
 #' @examples
 #' data <- simulate_data()
 #' utils::str(data, vec.len = 2L)
+#'
+#' data <- simulate_data(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
+#'                      family = "gaussian", rho = 0.5,
+#'                      prob_primary = 0.5, signal_strength = 1.0,
+#'                      prob_group = 0.5, prob_predictor = 0.8, seed = 1L)
 #'
 #' @srrstats {G5.1} *data set for tests and examples is exported*
 #'
@@ -191,7 +196,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   rho <- round(rho, digits = 6L)
   .assert(x = prob_primary, type = "numeric", min = 0.0, max = 1.0)
   prob_primary <- round(prob_primary, digits = 6L)
-  .assert(x = signal_strength, type = "numeric", min = 0.0)
+  .assert(x = signal_strength, type = "numeric", min = 0.0, max = 2.0)
   signal_strength <- round(signal_strength, digits = 6L)
   .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
   prob_group <- round(prob_group, digits = 6L)
@@ -296,7 +301,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
     (1.0 - rho) * diag(rep(x = 1.0, times = p))
   x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
   #x <- mvtnorm::rmvnorm(n = n, mean = mu, sigma = sigma)
-  if (n == 1L) x <- matrix(data = x, ncol = 1L)
+  if (n == 1L) x <- matrix(data = x, nrow = 1L)
   x
 }
 

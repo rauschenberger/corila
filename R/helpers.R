@@ -14,7 +14,7 @@
 #' or array (of dimensions `dim`) to be checked
 #' - `type = "numeric"`: numeric
 #' - `type = "integer"`: integer
-#' - `type = "nominal"`: character (matching with `support` is case-sensitive)
+#' - `type = "nominal"`: character
 #' - `type = "logical"`: logical
 #' - `family = "binomial"`: integers 0 or 1
 #' - `family = "poisson"`: non-negative integers
@@ -42,7 +42,7 @@
 #'
 #' @param support
 #' character vector (only used for `type = "nominal"`),
-#' (matching with `x` is case-sensitive)
+#' (matching with `x` is case-insensitive)
 #'
 #' @param min
 #' numeric scalar (not used for `type = "nominal"`)
@@ -52,7 +52,6 @@
 #'
 #' @details
 #' This function is called by multiple function of the [corila-package].
-#' Matching of the values in `x` with those in `support` is case-sensitive.
 #'
 #' @return
 #' Returns `NULL` invisibly, or throws an error.
@@ -76,15 +75,10 @@
 #'         dim = n,
 #'         type = "integer",
 #'         family = "binomial")
-#' .assert(x = "A",
+#' .assert(x = "a",
 #'         dim = 1L,
 #'         type = "nominal",
-#'         support = c("A", "B", "C"))
-#' .assert(x = 1.0,
-#'         dim = 1L,
-#'         type = "numeric",
-#'         family = "gaussian",
-#'         na.rm = TRUE)
+#'         support = letters)
 #'
 #' @keywords internal
 #'
@@ -101,9 +95,6 @@
                     support = NULL, family = NULL, min = -Inf, max = Inf) {
   eps <- 1e-06
   if (is.null(x)) return(invisible(NULL))
-  #if (length(type)==1 && is.character(type)) type <- tolower(type)
-  #if (is.numeric(na.rm) && na.rm %in% c(0, 1)) na.rm <- as.logical(na.rm)
-  #if (length(family) == 1 && is.character(family)) family <- tolower(family)
   stopifnot(
     "require argument 'type' to be a character scalar" =
       length(type) == 1L && is.character(type) && !is.na(type),
@@ -133,15 +124,13 @@
     "require argument 'max' to be a numeric scalar" =
       length(max) == 1L && is.numeric(max) && !is.na(max)
   )
-  #choices <- c("numeric", "integer", "nominal", "logical")
-  #type <- match.arg(arg = tolower(type), choices = choices)
-  #if (!type %in% choices) stop("Argument 'type' must be in range.")
   type <- tolower(type)
-  #choices <- c("gaussian", "binomial", "poisson", "cox")
   if (!is.null(family)) {
-    #family <- match.arg(arg = tolower(family), choices = choices)
     family <- tolower(family)
-    #if (!family %in% choices) stop("Argument 'family' must be in range.")
+  }
+  support <- tolower(support)
+  if (type == "nominal") {
+    x <- tolower(x)
   }
   na.rm <- as.logical(na.rm)
   stopifnot(
@@ -154,12 +143,10 @@
       length(dim) <= 2L || is.array(x),
     "expected vector with other length" =
       length(dim) != 1L || dim == Inf || abs(length(x) - dim) < eps,
-    # was length(x) == dim
     "expected matrix/array with other number of dimensions" =
       length(dim) == 1L || length(dim) == length(dim(x)),
     "expected matrix/array with other dimensions" =
       length(dim) == 1L || all((dim == Inf | abs(dim(x) - dim) < eps)),
-    # was dim(x) == dim
     "expected no missing values" =
       na.rm || !anyNA(x),
     "expected numeric values" =
@@ -172,7 +159,8 @@
     "expected logical values" =
       type != "logical" || is.logical(x),
     "expected values inside support" =
-      type != "nominal" || is.null(support) || all(x[!is.na(x)] %in% support),
+      type != "nominal" || is.null(support) ||
+      all(x[!is.na(x)] %in% support),
     "expected values greater than or equal to minimum" =
       type == "nominal" || min == -Inf || all(x >= min - eps, na.rm = TRUE),
     "expected values less than or equal to maximum" =
