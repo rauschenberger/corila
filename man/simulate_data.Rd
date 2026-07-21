@@ -119,13 +119,11 @@ and a number indexing the predictors within this group
 (e.g., \code{pri_1.1} or \code{aux_1.1}).
 }
 \examples{
-data <- simulate_data()
-utils::str(data, vec.len = 2L)
-
 data <- simulate_data(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                      family = "gaussian", rho = 0.5,
                      prob_primary = 0.5, signal_strength = 1.0,
                      prob_group = 0.5, prob_predictor = 0.8, seed = 1L)
+utils::str(data, vec.len = 2L)
 
 }
 \seealso{
