@@ -9,10 +9,12 @@
 #' @inheritParams cv.corila family
 #'
 #' @param x
-#' scalar, vector, matrix, or array to be checked
+#' scalar, vector (of length `dim`),
+#' matrix (of dimensions `dim`),
+#' or array (of dimensions `dim`) to be checked
 #' - `type = "numeric"`: numeric
 #' - `type = "integer"`: integer
-#' - `type = "nominal"`: character
+#' - `type = "nominal"`: character (matching with `support` is case-sensitive)
 #' - `type = "logical"`: logical
 #' - `family = "binomial"`: integers 0 or 1
 #' - `family = "poisson"`: non-negative integers
@@ -20,12 +22,13 @@
 #'
 #' @param dim
 #' vector of length 1, 2 or 3 containing positive integers
+#' (minimum 1, maximum \eqn{100,000})
 #' defining the dimensionality:
-#' - scalar `x`: dim = 1`
+#' - scalar `x`: `dim = 1`
 #' - vector `x` of length 100: `dim = 100`
 #' - vector `x` of arbitrary length: `dim = Inf`
 #' - matrix `x` with 100 rows: `dim = c(100, Inf)`
-#' - matrix `x` of arbitrary dimensions: `dim = c(Inf, Inf)` 
+#' - matrix `x` of arbitrary dimensions: `dim = c(Inf, Inf)`
 #' - array `x` of arbitrary dimensions: `dim = c(Inf, Inf, Inf)`
 #'
 #' @param type
@@ -33,12 +36,13 @@
 #' `"nominal"`, or `"logical"`
 #'
 #' @param na.rm
-#' logical scalar;
-#' `FALSE`: missing values are not allowed,
-#' `TRUE`: missing values are allowed
+#' logical scalar (or numeric 0/1):
+#' - `na.rm=FALSE` (or `na.rm=0`): missing values are not allowed
+#' - `na.rm=TRUE` (or `na.rm=1`): missing values are allowed
 #'
 #' @param support
-#' character vector (only used for `type = "nominal"`)
+#' character vector (only used for `type = "nominal"`),
+#' (matching with `x` is case-sensitive)
 #'
 #' @param min
 #' numeric scalar (not used for `type = "nominal"`)
@@ -48,6 +52,7 @@
 #'
 #' @details
 #' This function is called by multiple function of the [corila-package].
+#' Matching of the values in `x` with those in `support` is case-sensitive.
 #'
 #' @return
 #' Returns `NULL` invisibly, or throws an error.
@@ -58,13 +63,28 @@
 #'
 #' @examples
 #' \dontshow{.assert <- corila:::.assert}
-#' .assert(x = NULL)
-#' .assert(x = rnorm(n = 1L))
 #' n <- 3L; p <- 4L
-#' .assert(x = matrix(rnorm(n = n * p), nrow = n, ncol = p), dim = c(n, p))
-#' .assert(x = rpois(n = 1L, lambda = 4.0), family = "poisson")
-#' .assert(x = rbinom(n = 1L, size = 1L, prob = 0.5), family = "binomial")
-#' .assert(x = "A", type = "nominal", support = c("A", "B", "C"))
+#' .assert(x = matrix(rnorm(n = n * p), nrow = n, ncol = p),
+#'         dim = c(n, p),
+#'         type = "numeric",
+#'         family = "gaussian")
+#' .assert(x = rpois(n = n, lambda = 4.0),
+#'         dim = n,
+#'         type = "integer",
+#'         family = "poisson")
+#' .assert(x = rbinom(n = n, size = 1L, prob = 0.5),
+#'         dim = n,
+#'         type = "integer",
+#'         family = "binomial")
+#' .assert(x = "A",
+#'         dim = 1L,
+#'         type = "nominal",
+#'         support = c("A", "B", "C"))
+#' .assert(x = 1.0,
+#'         dim = 1L,
+#'         type = "numeric",
+#'         family = "gaussian",
+#'         na.rm = TRUE)
 #'
 #' @keywords internal
 #'
@@ -96,7 +116,7 @@
     "require argument 'family' to be a character scalar" =
       is.null(family) ||
       (length(family) == 1L && is.character(family) && !is.na(family)),
-    "require argument 'family' to be inside support" = 
+    "require argument 'family' to be inside support" =
       is.null(family) ||
       tolower(family) %in% c("gaussian", "binomial", "poisson", "cox"),
     "require argument 'dim' to be an integer vector" =
@@ -106,7 +126,7 @@
       length(dim) %in% c(1L, 2L, 3L),
     "require argument 'na.rm' to be a logical scalar" =
       length(na.rm) == 1L &&
-      (is.logical(na.rm) || (is.integer(na.rm) && na.rm %in% c(0L, 1L))) &&
+      (is.logical(na.rm) || (abs(na.rm - 1L) < eps | abs(na.rm - 0L) < eps)) &&
       !is.na(na.rm),
     "require argument 'min' to be a numeric scalar" =
       length(min) == 1L && is.numeric(min) && !is.na(min),
@@ -133,11 +153,13 @@
     "expected array" =
       length(dim) <= 2L || is.array(x),
     "expected vector with other length" =
-      length(dim) != 1L || dim == Inf || length(x) == dim,
+      length(dim) != 1L || dim == Inf || abs(length(x) - dim) < eps,
+    # was length(x) == dim
     "expected matrix/array with other number of dimensions" =
       length(dim) == 1L || length(dim) == length(dim(x)),
     "expected matrix/array with other dimensions" =
-      length(dim) == 1L || all((dim == Inf | dim(x) == dim)),
+      length(dim) == 1L || all((dim == Inf | abs(dim(x) - dim) < eps)),
+    # was dim(x) == dim
     "expected no missing values" =
       na.rm || !anyNA(x),
     "expected numeric values" =
