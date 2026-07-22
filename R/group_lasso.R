@@ -179,6 +179,7 @@ if (FALSE) {
 #'                    y = data$y_train,
 #'                    group = data$group,
 #'                    primary = data$primary,
+#'                    alpha_init = 0.0,
 #'                    tune = "none",
 #'                    foldid = foldid)
 #'
