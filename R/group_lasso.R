@@ -2,24 +2,24 @@
 
 #----- model fitting with cross-validation -----
 
-if(FALSE){
-data <- simulate_data()
-noise <- stats::rnorm(n = length(data$group), sd = 1e-09)
-a <- .is_adjacent(group = data$group, j = 1, p = length(data$group),
-               names = names(data$group))
-b <- .is_adjacent(group = data$group + noise, j = 1, p = length(data$group),
-               names = names(data$group))
-all(a == b)
+if (FALSE) {
+  data <- simulate_data()
+  noise <- stats::rnorm(n = length(data$group), sd = 1e-09)
+  a <- .is_adjacent(group = data$group, j = 1, p = length(data$group),
+                    names = names(data$group))
+  b <- .is_adjacent(group = data$group + noise, j = 1, p = length(data$group),
+                    names = names(data$group))
+  all(a == b)
 
-set.seed(1)
-model <- cv.corila(x = data$x_train, y = data$y_train,
+  set.seed(1)
+  model <- cv.corila(x = data$x_train, y = data$y_train,
                      group = data$group)
-a <- coef(model)
-set.seed(1)
-model <- cv.corila(x = data$x_train, y = data$y_train,
+  a <- coef(model)
+  set.seed(1)
+  model <- cv.corila(x = data$x_train, y = data$y_train,
                      group = data$group + noise)
-b <- coef(model)
-all(a == b)
+  b <- coef(model)
+  all(a == b)
 }
 
 #' @title
@@ -859,14 +859,14 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
             na.rm = TRUE)
     alpha_init <- pmax(0.0, pmin(alpha_init, 1.0))
   }
-  .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
-  group <- as.integer(round(group))
   .assert(x = foldid, type = "integer", dim = n,
           min = 1L, max = n)
   if (!is.null(foldid)) foldid <- as.integer(round(foldid))
   .assert(x = nfolds, type = "integer", min = 3L, max = n)
   if (!is.null(nfolds)) nfolds <- as.integer(round(nfolds))
   if (identical(alpha_init, "multiridge")) {
+    .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
+    group <- as.integer(round(group))
     dim <- length(unique(group))
   } else {
     dim <- 1L
