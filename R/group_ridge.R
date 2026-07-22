@@ -256,7 +256,9 @@ predict.multiridge <- function(object, newx, ...) {
 #'
 #' @return
 #' Returns an \eqn{(1 + p)}-dimensional vector of estimated coefficients
-#' (estimated intercept and estimated slopes).
+#' (estimated intercept and estimated slopes)
+#' if `family="gaussian"` and `family="binomial"`
+#' and a \eqn{p}-dimensional vector of estimated slopes if `family="cox"`.
 #'
 #' @seealso
 #' Fit models with [multiridge()]
