@@ -24,6 +24,6 @@ jobs:
       - name: autotest
         run: |
           x <- autotest::autotest_package(test=TRUE)
-          print(x, n = 99)
+          print(x)
           if (!is.null(x)) stop("autotest failed")
         shell: Rscript {0}
