@@ -502,10 +502,18 @@
       y <- y[, "status"]
     }
     foldid <- rep(x = NA, times = length(y))
-    foldid[y == 0L] <- sample(x = rep(x = seq_len(nfolds),
-                                      length.out = sum(y == 0L)))
-    foldid[y == 1L] <- sample(x = rep(x = rev(seq_len(nfolds)),
-                                      length.out = sum(y == 1L)))
+    if (sum(y == 0L) == 1) {
+      foldid[y == 0L] <- 1L
+    } else {
+      foldid[y == 0L] <- sample(x = rep(x = seq_len(nfolds),
+                                        length.out = sum(y == 0L)))
+    }
+    if (sum(y == 1L) == 1) {
+      foldid[y == 1L] <- nfolds
+    } else {
+      foldid[y == 1L] <- sample(x = rep(x = rev(seq_len(nfolds)),
+                                        length.out = sum(y == 1L)))
+    }
   } else {
     foldid <- sample(x = rep(x = sample(x = seq_len(nfolds)),
                              length.out = length(y)))
