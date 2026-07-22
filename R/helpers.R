@@ -112,7 +112,7 @@
       tolower(family) %in% c("gaussian", "binomial", "poisson", "cox"),
     "require argument 'dim' to be an integer vector" =
       is.atomic(dim) && all(dim > 0L) &&
-      all(abs(dim - round(dim)) < eps | is.infinite(dim)) && !any(is.na(dim)),
+      all(abs(dim - round(dim)) < eps | is.infinite(dim)) && !anyNA(dim),
     "require argument 'dim' to have length 1, 2, or 3" =
       length(dim) %in% c(1L, 2L, 3L),
     "require argument 'na.rm' to be a logical scalar" =
