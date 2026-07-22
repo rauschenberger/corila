@@ -539,6 +539,7 @@ nobs.cv.corila <- function(object, ...) {
 .combine_slopes <- function(alpha, beta) {
   .assert(x = alpha, type = "numeric")
   .assert(x = beta, type = "numeric", dim = Inf, min = 0.0)
+  if (length(beta) %% 2 != 0) stop("Requires 'beta' with even length.")
   beta_positive <- beta[1L:(length(beta) / 2L)]
   beta_negative <- beta[(length(beta) / 2L + 1L):(length(beta))]
   eps <- 1e-06
