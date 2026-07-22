@@ -632,7 +632,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   .assert(x = y, type = "numeric", dim = n, na.rm = na.rm, family = family)
   # --- group indicator ---
   if (is.vector(group) && is.atomic(group)) {
-    q <- length(unique(group))
     if (is.numeric(group)) {
       .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
       group <- as.integer(round(group))
@@ -642,8 +641,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       stop("If argument 'group' is a vector, ",
            "it must be of class 'numeric' or 'character'.")
     }
+    q <- length(unique(group))
   } else if (is.list(group)) {
-    q <- length(group)
     for (i in seq_along(group)) {
       if (is.numeric(group[[i]])) {
         .assert(x = group[[i]], type = "integer", dim = Inf,
@@ -658,10 +657,12 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
              "numeric or character vectors.")
       }
     }
+    q <- length(group)
   } else if (is.matrix(group)) {
-    q <- NA
     .assert(x = group, type = "integer", dim = c(p, p), min = 0L, max = 1L)
-    group <- as.integer(round(group))
+    group <- round(group)
+    class(group) <- "integer"
+    q <- NA
   } else {
     stop("Argument 'group' must be a vector, ",
          "a list, or a matrix.")
@@ -773,6 +774,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @description
 #' Estimate initial coefficients.
 #'
+#' @inheritParams multiridge group
 #' @inheritParams cv.corila
 #'
 #' @param lambda
@@ -857,6 +859,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
             na.rm = TRUE)
     alpha_init <- pmax(0.0, pmin(alpha_init, 1.0))
   }
+  .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
+  group <- as.integer(round(group))
   .assert(x = foldid, type = "integer", dim = n,
           min = 1L, max = n)
   if (!is.null(foldid)) foldid <- as.integer(round(foldid))
