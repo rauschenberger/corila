@@ -492,11 +492,11 @@
   #  stop("Require object of class 'Surv'.")
   #}
   .assert(x = nfolds, type = "integer", min = 2L, max = length(y))
-  nfolds <- as.integer(nfolds)
+  nfolds <- as.integer(round(nfolds))
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
     if (family %in% c("binomial", "logistic")) {
-      y <- as.integer(y)
+      y <- as.integer(round(y))
     }
     if (identical(family, "cox")) {
       y <- y[, "status"]
@@ -599,11 +599,11 @@
   .assert(x = y, type = "numeric", dim = Inf, family = family)
   if (identical(family, "binomial")) {
     .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
-    y <- as.integer(y)
+    y <- as.integer(round(y))
     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0, max = 1.0)
   } else if (identical(family, "poisson")) {
     .assert(x = y, type = "integer", dim = Inf, min = 0L)
-    y <- as.integer(y)
+    y <- as.integer(round(y))
     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0)
   } else {
     .assert(x = y, type = "numeric", dim = Inf)

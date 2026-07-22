@@ -130,14 +130,14 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   .assert(x = y, type = "numeric", dim = nrow(x))
   .assert(x = group, type = "integer", dim = ncol(x),
           min = 1L, max = length(unique(group)))
-  group <- as.integer(group)
+  group <- as.integer(round(group))
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "cox"))
   .assert(x = foldid, type = "integer", dim = nrow(x),
           min = 1L, max = nrow(x))
-  if (!is.null(foldid)) foldid <- as.integer(foldid)
+  if (!is.null(foldid)) foldid <- as.integer(round(foldid))
   .assert(x = nfolds, type = "integer", min = 2L, max = nrow(x))
-  nfolds <- as.integer(nfolds)
+  nfolds <- as.integer(round(nfolds))
   .assert(x = penalties, type = "numeric", dim = length(unique(group)),
           min = 0.0)
   #.validate(x = x, y = y, group = NULL, family = family)

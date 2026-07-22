@@ -180,13 +180,13 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                           prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
   # argument checks
   .assert(x = n0, type = "integer", min = 1L, max = 1e04L)
-  n0 <- as.integer(n0)
+  n0 <- as.integer(round(n0))
   .assert(x = n1, type = "integer", min = 0L, max = 1e05L)
-  n1 <- as.integer(n1)
+  n1 <- as.integer(round(n1))
   .assert(x = p, type = "integer", min = 1L, max = 1e03L)
-  p <- as.integer(p)
+  p <- as.integer(round(p))
   .assert(x = q, type = "integer", min = 1L, max = p)
-  q <- as.integer(q)
+  q <- as.integer(round(q))
   if (is.character(family)) family <- tolower(family)
   .assert(x = family, type = "nominal",
           support = c("gaussian", "binomial", "poisson", "cox"))
@@ -288,7 +288,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   if (is.null(group)) group <- seq_len(p)
   .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
   .assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
-  group <- as.integer(group)
+  group <- as.integer(round(group))
   .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
   rho <- round(rho, digits = 6L)
   .assert(x = seed, type = "integer")
@@ -329,7 +329,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 .simulate_effects <- function(group, prob_group = 0.5, prob_predictor = 0.8,
                               signal_strength = 1.0, seed = 1L) {
   .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
-  group <- as.integer(group)
+  group <- as.integer(round(group))
   .assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
   .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
   prob_group <- round(prob_group, digits = 6L)

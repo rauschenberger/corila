@@ -2,6 +2,26 @@
 
 #----- model fitting with cross-validation -----
 
+if(FALSE){
+data <- simulate_data()
+noise <- stats::rnorm(n = length(data$group), sd = 1e-09)
+a <- .is_adjacent(group = data$group, j = 1, p = length(data$group),
+               names = names(data$group))
+b <- .is_adjacent(group = data$group + noise, j = 1, p = length(data$group),
+               names = names(data$group))
+all(a == b)
+
+set.seed(1)
+model <- cv.corila(x = data$x_train, y = data$y_train,
+                     group = data$group)
+a <- coef(model)
+set.seed(1)
+model <- cv.corila(x = data$x_train, y = data$y_train,
+                     group = data$group + noise)
+b <- coef(model)
+all(a == b)
+}
+
 #' @title
 #' Sparse group lasso regression
 #'
@@ -373,7 +393,7 @@ predict.corila <- function(object, newx, index, s, ...) {
   .assert(x = newx, type = "numeric",
           dim = c(Inf, length(object$scale$mu.x)))
   .assert(x = index, type = "integer", min = 1L, max = length(object$model))
-  index <- as.integer(index)
+  index <- as.integer(round(index))
   .assert(x = s, type = "numeric", dim = Inf, min = 0.0)
   # --- make predictions ---
   newx_stand <- .forescale(x = newx, pars = object$scale)$x
@@ -615,7 +635,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     q <- length(unique(group))
     if (is.numeric(group)) {
       .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
-      group <- as.integer(group)
+      group <- as.integer(round(group))
     } else if (is.character(group)) {
       .assert(x = group, type = "nominal", dim = p)
     } else {
@@ -628,7 +648,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       if (is.numeric(group[[i]])) {
         .assert(x = group[[i]], type = "integer", dim = Inf,
                 min = 1L, max = p)
-        group[[i]] <- as.integer(group[[i]])
+        group[[i]] <- as.integer(round(group[[i]]))
       } else if (is.character(group[[i]])) {
         .assert(x = group[[i]], type = "nominal", dim = Inf,
                 support = colnames(x))
@@ -641,7 +661,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   } else if (is.matrix(group)) {
     q <- NA
     .assert(x = group, type = "integer", dim = c(p, p), min = 0L, max = 1L)
-    group <- as.integer(group)
+    group <- as.integer(round(group))
   } else {
     stop("Argument 'group' must be a vector, ",
          "a list, or a matrix.")
@@ -839,9 +859,9 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   }
   .assert(x = foldid, type = "integer", dim = n,
           min = 1L, max = n)
-  if (!is.null(foldid)) foldid <- as.integer(foldid)
+  if (!is.null(foldid)) foldid <- as.integer(round(foldid))
   .assert(x = nfolds, type = "integer", min = 3L, max = n)
-  nfolds <- as.integer(nfolds)
+  if (!is.null(nfolds)) nfolds <- as.integer(round(nfolds))
   if (identical(alpha_init, "multiridge")) {
     dim <- length(unique(group))
   } else {
@@ -949,15 +969,20 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'
 .is_adjacent <- function(group, j, p, names) {
   .assert(x = j, type = "integer", min = 1L)
-  j <- as.integer(j)
+  j <- as.integer(round(j))
   .assert(x = p, type = "integer", min = j)
-  p <- as.integer(p)
+  p <- as.integer(round(p))
   .assert(x = names, type = "nominal", dim = p)
   if (is.atomic(group) && is.null(dim(group))) {
-    if (is.numeric(group)) group <- as.integer(group)
-    if (length(group) != p) {
-      stop("Vector 'group' should have length p.")
+    if (is.numeric(group)) {
+      .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
+      group <- as.integer(round(group))
+    } else {
+      .assert(x = group, type = "nominal", dim = p)
     }
+    #if (length(group) != p) {
+    #  stop("Vector 'group' should have length p.")
+    #}
     group[j] == group
   } else if (is.list(group)) {
     if (length(group) == 0L) {
