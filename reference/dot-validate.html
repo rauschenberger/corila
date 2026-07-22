@@ -114,8 +114,7 @@ or must be excluded from the final model
 
 
 <dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
-<dd><p>character string <code>"gaussian"</code>, <code>"binomial"</code>,
-<code>"poisson"</code>, or <code>"cox"</code></p></dd>
+<dd><p>character string <code>"gaussian"</code>, <code>"binomial"</code>, <code>"poisson"</code>, or <code>"cox"</code></p></dd>
 
 
 <dt id="arg-alpha-init">alpha_init<a class="anchor" aria-label="anchor" href="#arg-alpha-init"></a></dt>
@@ -157,12 +156,13 @@ entries between \(-1\) and \(+1\))</p></dd>
 
 <dt id="arg-nfolds">nfolds<a class="anchor" aria-label="anchor" href="#arg-nfolds"></a></dt>
 <dd><p>positive integer specifying the number of folds
-(minimum \(3\), maximum \(n\))</p></dd>
+(minimum \(3\), maximum \(n\))</p>
+<p>NB: If <code>foldid</code> is provided, <code>nfolds</code> is overwritten by <code>max(foldid)</code>.</p></dd>
 
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
-<dd><p>Should messages from <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
-be suppressed? (<code>FALSE</code> or <code>TRUE</code>)</p></dd>
+<dd><p>Should messages from <code><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
+be suppressed? (logical scalar, <code>FALSE</code> or <code>TRUE</code>)</p></dd>
 
 </dl></div>
     <div class="section level2">

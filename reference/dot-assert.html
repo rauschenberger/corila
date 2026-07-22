@@ -47,7 +47,7 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.assert</span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">x</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"numeric"</span>,</span>
 <span>  dim <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -63,50 +63,61 @@
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>scalar, vector, matrix, or array to be checked</p></dd>
+<dd><p>scalar, vector (of length <code>dim</code>),
+matrix (of dimensions <code>dim</code>),
+or array (of dimensions <code>dim</code>) to be checked</p><ul><li><p><code>type = "numeric"</code>: numeric</p></li>
+<li><p><code>type = "integer"</code>: integer</p></li>
+<li><p><code>type = "nominal"</code>: character</p></li>
+<li><p><code>type = "logical"</code>: logical</p></li>
+<li><p><code>family = "binomial"</code>: integers 0 or 1</p></li>
+<li><p><code>family = "poisson"</code>: non-negative integers</p></li>
+<li><p><code>family = "cox"</code>: object created with <a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">survival::Surv</a></p></li>
+</ul></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>character <code>"numeric"</code> (default), <code>"integer"</code>,
+<dd><p>character scalar <code>"numeric"</code> (default), <code>"integer"</code>,
 <code>"nominal"</code>, or <code>"logical"</code></p></dd>
 
 
 <dt id="arg-dim">dim<a class="anchor" aria-label="anchor" href="#arg-dim"></a></dt>
-<dd><p>vector containing positive integers defining the dimensionality:
-<code>dim = 1</code> for a scalar,
-<code>dim = Inf</code> for a vector of arbitrary length,
-<code>dim = c(Inf, Inf)</code> for a matrix of arbitrary dimensions,
-<code>dim = c(Inf, Inf, Inf)</code> for an array of arbitrary dimensions,
-<code>dim = 100</code> for a vector of length 100,
-<code>dim = c(Inf, 100)</code> for a matrix with 100 columns, etc.</p></dd>
+<dd><p>vector of length 1, 2 or 3 containing positive integers
+(minimum 1, maximum \(100,000\))
+defining the dimensionality:</p><ul><li><p>scalar <code>x</code>: <code>dim = 1</code></p></li>
+<li><p>vector <code>x</code> of length 100: <code>dim = 100</code></p></li>
+<li><p>vector <code>x</code> of arbitrary length: <code>dim = Inf</code></p></li>
+<li><p>matrix <code>x</code> with 100 rows: <code>dim = c(100, Inf)</code></p></li>
+<li><p>matrix <code>x</code> of arbitrary dimensions: <code>dim = c(Inf, Inf)</code></p></li>
+<li><p>array <code>x</code> of arbitrary dimensions: <code>dim = c(Inf, Inf, Inf)</code></p></li>
+</ul></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
-<dd><p>logical;
-<code>FALSE</code>: missing values are not allowed,
-<code>TRUE</code>: missing values are allowed</p></dd>
+<dd><p>logical scalar (or numeric 0/1):</p><ul><li><p><code>na.rm=FALSE</code> (or <code>na.rm=0</code>): missing values are not allowed</p></li>
+<li><p><code>na.rm=TRUE</code> (or <code>na.rm=1</code>): missing values are allowed</p></li>
+</ul></dd>
 
 
 <dt id="arg-support">support<a class="anchor" aria-label="anchor" href="#arg-support"></a></dt>
-<dd><p>character vector (only used for <code>type = "nominal"</code>)</p></dd>
+<dd><p>character vector (only used for <code>type = "nominal"</code>),
+(matching with <code>x</code> is case-insensitive)</p></dd>
 
 
 <dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
-<dd><p>character string <code>"gaussian"</code>, <code>"binomial"</code>,
-<code>"poisson"</code>, or <code>"cox"</code></p></dd>
+<dd><p>character string <code>"gaussian"</code>, <code>"binomial"</code>, <code>"poisson"</code>, or <code>"cox"</code></p></dd>
 
 
 <dt id="arg-min">min<a class="anchor" aria-label="anchor" href="#arg-min"></a></dt>
-<dd><p>numerical value (not used for <code>type = "nominal"</code>)</p></dd>
+<dd><p>numeric scalar (not used for <code>type = "nominal"</code>)</p></dd>
 
 
 <dt id="arg-max">max<a class="anchor" aria-label="anchor" href="#arg-max"></a></dt>
-<dd><p>numerical value (not used for <code>type = "nominal"</code>)</p></dd>
+<dd><p>numeric scalar (not used for <code>type = "nominal"</code>)</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns <code>NULL</code> invisibly, or an error message.</p>
+    <p>Returns <code>NULL</code> invisibly, or throws an error.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -120,16 +131,23 @@ have compatible dimensions (number of samples and features).</p></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"A"</span>, type <span class="op">=</span> <span class="st">"nominal"</span>, support <span class="op">=</span> <span class="va">LETTERS</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">rexp</a></span><span class="op">(</span>n<span class="op">=</span> <span class="fl">10L</span><span class="op">)</span>, dim <span class="op">=</span> <span class="cn">Inf</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, min <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">9L</span>, lambda <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span>, dim <span class="op">=</span> <span class="fl">10L</span>,</span></span>
-<span class="r-in"><span>       type <span class="op">=</span> <span class="st">"integer"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NA</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span>, na.rm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10L</span>, lambda <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, dim <span class="op">=</span> <span class="cn">Inf</span>,</span></span>
-<span class="r-in"><span>       family <span class="op">=</span> <span class="st">"poisson"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">3L</span>; <span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">4L</span></span></span>
+<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="va">p</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">p</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        type <span class="op">=</span> <span class="st">"numeric"</span>,</span></span>
+<span class="r-in"><span>        family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>, lambda <span class="op">=</span> <span class="fl">4.0</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        dim <span class="op">=</span> <span class="va">n</span>,</span></span>
+<span class="r-in"><span>        type <span class="op">=</span> <span class="st">"integer"</span>,</span></span>
+<span class="r-in"><span>        family <span class="op">=</span> <span class="st">"poisson"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>, size <span class="op">=</span> <span class="fl">1L</span>, prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        dim <span class="op">=</span> <span class="va">n</span>,</span></span>
+<span class="r-in"><span>        type <span class="op">=</span> <span class="st">"integer"</span>,</span></span>
+<span class="r-in"><span>        family <span class="op">=</span> <span class="st">"binomial"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">.assert</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"a"</span>,</span></span>
+<span class="r-in"><span>        dim <span class="op">=</span> <span class="fl">1L</span>,</span></span>
+<span class="r-in"><span>        type <span class="op">=</span> <span class="st">"nominal"</span>,</span></span>
+<span class="r-in"><span>        support <span class="op">=</span> <span class="va">letters</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

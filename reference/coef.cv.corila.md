@@ -54,96 +54,22 @@ and make predictions with
 ## Examples
 
 ``` r
-#data(corila_data)
-#\dontshow{model <- cv.corila(x = corila_data$x_train,
-#                             y = corila_data$y_train,
-#                             group = corila_data$group,
-#                             primary = corila_data$primary,
-#                             tune = "none")}
-#\donttest{model <- cv.corila(x = corila_data$x_train,
-#                             y = corila_data$y_train,
-#                             group = corila_data$group,
-#                             primary = corila_data$primary)}
-
-# minimal example
-set.seed(1L)
-n <- 50L; p <- 20L; q <- 5L
-x <- matrix(rnorm(n * p), nrow = n , ncol = p)
-y <- rnorm(n)
-group <- rep(seq_len(q), length.out = p)
-primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 # \donttest{
-model <- cv.corila(x = x, y = y, group = group, primary = primary)# }
-
-# \donttest{
-# simulation
-set.seed(1L)
-n0 <- 100
-n1 <- 10000
-n <- n0 + n1
-p <- c(100, 50)
-z <- rep(x = seq_along(p), times = p)
-x <- sapply(X = z, FUN = function(x) stats::rnorm(n = n, sd = x))
-beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
-        stats::rbinom(n = sum(p), size = 1, prob = 0.2)
-eta <- x %*% beta
-family <- "gaussian"
-if (identical(family, "gaussian")) {
-  y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
-} else if (identical(family, "binomial")) {
-  y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
-} else if (identical(family, "cox")) {
-  time <- stats::rexp(n = n, rate = exp(eta))
-  status <- stats::rbinom(n = n, prob = 0.5, size = 1)
-  y <- survival::Surv(time = time, event = status)
-}
-cond <- rep(x = c(TRUE, FALSE), times = c(n0, n1))
-
-y_hat <- coef <- list()
-
-# standard lasso regression
-object <- glmnet::cv.glmnet(x = x[cond, ], y = y[cond],
-                            family = family, alpha = 1)
-coef$glmnet <- stats::coef(object = object, s = "lambda.min")
-y_hat$glmnet <- stats::predict(object = object, newx = x[!cond, ],
-                               type = "response", s = "lambda.min")
-
-# flexible group lasso regression
-object <- cv.corila(x = x[cond, ], y = y[cond], group = z, family = family)
-coef$corila <- stats::coef(object = object)
-y_hat$corila <- stats::predict(object = object, newx = x[!cond, ])
-
-# selection performance
-sapply(coef, function(x) mean(sign(x[-1]) == sign(beta)))
-#>    glmnet    corila 
-#> 0.8066667 0.7866667 
-sapply(coef, function(x) {
-  sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0.0)
-})
-#>    glmnet    corila 
-#> 0.5675676 0.5227273 
-
-# predictive performance
-if (identical(family, "gaussian")) {
-  metric <- sapply(X = y_hat, FUN = function(x)
-    mean((x-y[!cond])^2))
-} else if (identical(family, "binomial")) {
-  metric <- sapply(X = y_hat, FUN = function(x)
-    pROC::auc(response = y[!cond],
-              predictor = as.vector(x),
-              levels = c(0L, 1L),
-              direction = "<"))
-} else if (identical(family, "cox")) {
-  metric <- sapply(X = y_hat, FUN = function(x)
-    survival::concordance(y[!cond]~I(-x))$concordance)
-}
-metric
-#>   glmnet   corila 
-#> 61.23431 49.25623 
-
-# privileged information
-#primary <- stats::rbinom(n = sum(p), size = 1L, prob = 0.5) == 1L
-#object <- cv.corila(x = x[cond, ], y = y[cond], group = z,
-#                     primary = primary, family = family)
+data <- simulate_data()
+model <- cv.corila(x = data$x_train,
+                   y = data$y_train,
+                   group = data$group,
+                   primary = data$primary)
+beta_hat <- coef(object = model)
+y_hat <- predict(object = model, newx = data$x_test)
 # }
+
+# example for automatic mutation testing (with the R package autotest)
+data <- simulate_data()
+model <- cv.corila(x = data$x_train,
+                   y = data$y_train,
+                   group = as.double(data$group),
+                   primary = data$primary,
+                   alpha_init = 0.0,
+                   foldid = rep(1:10, length.out = nrow(data$x_train)))
 ```

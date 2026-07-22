@@ -115,8 +115,7 @@ or must be excluded from the final model
 
 
 <dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
-<dd><p>character string <code>"gaussian"</code>, <code>"binomial"</code>,
-<code>"poisson"</code>, or <code>"cox"</code></p></dd>
+<dd><p>character string <code>"gaussian"</code>, <code>"binomial"</code>, <code>"poisson"</code>, or <code>"cox"</code></p></dd>
 
 
 <dt id="arg-hyper">hyper<a class="anchor" aria-label="anchor" href="#arg-hyper"></a></dt>
@@ -165,7 +164,8 @@ entries between \(-1\) and \(+1\))</p></dd>
 
 <dt id="arg-nfolds">nfolds<a class="anchor" aria-label="anchor" href="#arg-nfolds"></a></dt>
 <dd><p>positive integer specifying the number of folds
-(minimum \(3\), maximum \(n\))</p></dd>
+(minimum \(3\), maximum \(n\))</p>
+<p>NB: If <code>foldid</code> is provided, <code>nfolds</code> is overwritten by <code>max(foldid)</code>.</p></dd>
 
 
 <dt id="arg-lambda-init">lambda_init<a class="anchor" aria-label="anchor" href="#arg-lambda-init"></a></dt>
@@ -174,8 +174,8 @@ or <code>NULL</code> (cross-validation)</p></dd>
 
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
-<dd><p>Should messages from <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
-be suppressed? (<code>FALSE</code> or <code>TRUE</code>)</p></dd>
+<dd><p>Should messages from <code><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
+be suppressed? (logical scalar, <code>FALSE</code> or <code>TRUE</code>)</p></dd>
 
 
 <dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
@@ -221,7 +221,7 @@ respectively,
 <code><a href="dot-folds.html">.folds()</a></code> for splitting samples into folds,
 <code><a href="dot-estim_initial_coefs.html">.estim_initial_coefs()</a></code> for obtaining initial coefficients,
 <code><a href="dot-is_adjacent.html">.is_adjacent()</a></code> for identifying adjacent predictors,
-and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code>
+and <code><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code> and <code><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet::glmnet()</a></code>
 for adaptive lasso regression.</p></div>
     </div>
 
@@ -252,7 +252,7 @@ for adaptive lasso regression.</p></div>
 <span class="r-in"><span>                 hyper <span class="op">=</span> <span class="va">hyper</span>,</span></span>
 <span class="r-in"><span>                 lambda_init <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span>, index <span class="op">=</span> <span class="fl">1L</span>, s <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span>, index <span class="op">=</span> <span class="fl">1L</span>, s <span class="op">=</span> <span class="fl">0.0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

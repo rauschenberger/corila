@@ -46,10 +46,10 @@
 - [`predict(`*`<multiridge>`*`)`](https://rauschenberger.github.io/corila/reference/predict.multiridge.md)
   : Make predictions
 
-## Example dataset
+## Simulation
 
-- [`corila_data`](https://rauschenberger.github.io/corila/reference/corila_data.md)
-  : Example data
+- [`simulate_data()`](https://rauschenberger.github.io/corila/reference/simulate_data.md)
+  : Data simulation
 
 ## Internal functions
 
@@ -81,7 +81,11 @@
   : Deviance Residuals
 - [`.set_candidates()`](https://rauschenberger.github.io/corila/reference/dot-set_candidates.md)
   : Candidate values
-- [`.simulate_outcome()`](https://rauschenberger.github.io/corila/reference/dot-simulate_outcome.md)
+- [`.simulate_effects()`](https://rauschenberger.github.io/corila/reference/dot-simulate_effects.md)
+  : Simulate effects
+- [`.simulate_predictors()`](https://rauschenberger.github.io/corila/reference/dot-simulate_predictors.md)
+  : Simulate predictors
+- [`.simulate_response()`](https://rauschenberger.github.io/corila/reference/dot-simulate_response.md)
   : Simulate outcome
 - [`.type()`](https://rauschenberger.github.io/corila/reference/dot-type.md)
   : Name method (helper function)
@@ -91,8 +95,6 @@
   : predict (S3 method)
 - [`print(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/print.cv.corila.md)
   : print (S3 method)
-- [`simulate()`](https://rauschenberger.github.io/corila/reference/simulate.md)
-  : Data simulation
 - [`summary(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
   [`print(`*`<summary.cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
   : Summarising sparse group lasso (S3 method)

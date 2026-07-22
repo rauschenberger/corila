@@ -28,6 +28,8 @@ Splits observations into balanced and stratified folds.
   positive integer specifying the number of folds (minimum \\3\\,
   maximum \\n\\)
 
+  NB: If `foldid` is provided, `nfolds` is overwritten by `max(foldid)`.
+
 ## Value
 
 Returns an \\n_0\\-dimensional vector with entries in \\\\1, \ldots,
@@ -58,8 +60,8 @@ foldid <- .folds(y = y, family = "binomial", nfolds = 10L)
 table(y, foldid)
 #>    foldid
 #> y   1 2 3 4 5 6 7 8 9 10
-#>   0 9 9 8 8 8 8 8 8 8  8
-#>   1 1 1 2 2 2 2 2 2 2  2
+#>   0 8 8 8 8 8 8 8 7 7  7
+#>   1 2 2 2 2 2 2 2 3 3  3
 
 # \donttest{
 # Cox model

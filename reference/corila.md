@@ -115,6 +115,8 @@ corila(
   positive integer specifying the number of folds (minimum \\3\\,
   maximum \\n\\)
 
+  NB: If `foldid` is provided, `nfolds` is overwritten by `max(foldid)`.
+
 - lambda_init:
 
   regularisation hyperparameter(s), or `NULL` (cross-validation)
@@ -122,10 +124,9 @@ corila(
 - silent:
 
   Should messages from
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-  and
-  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-  be suppressed? (`FALSE` or `TRUE`)
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) and
+  [`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+  be suppressed? (logical scalar, `FALSE` or `TRUE`)
 
 - threshold:
 
@@ -173,10 +174,9 @@ for splitting samples into folds,
 for obtaining initial coefficients,
 [`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/dot-is_adjacent.md)
 for identifying adjacent predictors, and
-[`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-and
-[`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-for adaptive lasso regression.
+[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+and [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
+adaptive lasso regression.
 
 ## Examples
 
@@ -206,6 +206,6 @@ object <- corila(x = x,
                  hyper = hyper,
                  lambda_init = NULL)
 
-y_hat <- stats::predict(object, newx = x, index = 1L, s = 0)
+y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)
 # }
 ```

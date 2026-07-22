@@ -58,15 +58,15 @@ object <- cv.corila(x = x, y = y, group = group, primary = primary)
 print(object)
 #> object of class ‘cv.corila’ 
 #> (contains multiple objects of class ‘cv.glmnet’)
-#> selected 0 from 20 predictors
+#> selected 1 from 20 predictors
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (9 primary and 11 auxiliary features)
+#> 20 features (12 primary and 8 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 0.986 
+#> optimised regularisation parameter: lambda.min = 1.075 
 #> selected weights: local = 1, global = 0
 #> selected exponents: local = 0, global = Inf
-#> 1 non-zero coefficients (including intercept)
+#> 2 non-zero coefficients (including intercept)
 ```

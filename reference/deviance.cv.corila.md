@@ -27,7 +27,7 @@ Returns a scalar.
 ## Details
 
 Returns the deviance calculated by
-[`glmnet::deviance.glmnet()`](https://glmnet.stanford.edu/reference/deviance.glmnet.html)
+[`glmnet::deviance.glmnet()`](https://rdrr.io/pkg/glmnet/man/deviance.glmnet.html)
 for the model with the optimised mixing and regularisation
 hyperparameters.
 
@@ -59,32 +59,37 @@ object <- cv.corila(x = x, y = y, group = group, primary = primary)
 
 # using S3 methods
 coef(object)
-#>  [1] 0.3193801 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
-#>  [8] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
-#> [15] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
+#> (intercept)        <NA>        <NA>        <NA>        <NA>        <NA> 
+#>  0.10235956  0.00000000  0.00000000  0.00000000  0.00000000 -0.20630263 
+#>        <NA>        <NA>        <NA>        <NA>        <NA>        <NA> 
+#>  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000 
+#>        <NA>        <NA>        <NA>        <NA>        <NA>        <NA> 
+#>  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000 
+#>        <NA>        <NA>        <NA> 
+#>  0.00000000  0.01934724  0.00000000 
 predict(object, newx = x)
-#>  [1] 0.3193801 0.3193801 0.3193801 0.3193801 0.3193801 0.3193801 0.3193801
-#>  [8] 0.3193801 0.3193801 0.3193801
+#>  [1]  0.236149175  0.205475646 -0.194471656  0.231808305  0.158599736
+#>  [6]  0.205573215  0.121881660  0.171022293  0.007657089  0.130715548
 fitted(object)
-#>  [1] 0.3193801 0.3193801 0.3193801 0.3193801 0.3193801 0.3193801 0.3193801
-#>  [8] 0.3193801 0.3193801 0.3193801
+#>  [1]  0.236149175  0.205475646 -0.194471656  0.231808305  0.158599736
+#>  [6]  0.205573215  0.121881660  0.171022293  0.007657089  0.130715548
 residuals(object)
-#>  [1] -0.03769785 -0.88136412  0.69344059  0.45409974 -0.68050515  0.81391340
-#>  [7]  0.53959657 -0.16148370 -0.47280549 -0.26719399
+#>  [1] -0.49508176  0.18890352 -0.65738544  2.41735858 -0.00258806  0.92463405
+#>  [7] -2.41100564  0.56997886 -1.32390225  0.78908813
 plot(object)
 
 print(object)
 #> object of class ‘cv.corila’ 
 #> (contains multiple objects of class ‘cv.glmnet’)
-#> selected 0 from 20 predictors
+#> selected 2 from 20 predictors
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (12 primary and 8 auxiliary features)
+#> 20 features (11 primary and 9 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 0.9783 
+#> optimised regularisation parameter: lambda.min = 0.6963 
 #> selected weights: local = 0, global = 1
 #> selected exponents: local = Inf, global = 1
-#> 1 non-zero coefficients (including intercept)
+#> 3 non-zero coefficients (including intercept)
 ```

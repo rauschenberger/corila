@@ -31,13 +31,13 @@ for detailed examples.
 ``` r
 
 library(corila)
-data(corila_data)
-object <- cv.corila(x = corila_data$x_train,
-                    y = corila_data$y_train,
-                    group = corila_data$group,
-                    primary = corila_data$primary)
+data <- simulate_data()
+object <- cv.corila(x = data$x_train,
+                    y = data$y_train,
+                    group = data$group,
+                    primary = data$primary)
 coef(object)
-predict(object, newx = corila_data$x_test)
+predict(object, newx = data$x_test)
 ```
 
 ## Reference
@@ -116,10 +116,10 @@ license](https://rauschenberger.github.io/corila/LICENSE.md).
 - [`predict(`*`<multiridge>`*`)`](https://rauschenberger.github.io/corila/reference/predict.multiridge.md)
   : Make predictions
 
-## Example dataset
+## Simulation
 
-- [`corila_data`](https://rauschenberger.github.io/corila/reference/corila_data.md)
-  : Example data
+- [`simulate_data()`](https://rauschenberger.github.io/corila/reference/simulate_data.md)
+  : Data simulation
 
 ## Internal functions
 
@@ -151,7 +151,11 @@ license](https://rauschenberger.github.io/corila/LICENSE.md).
   : Deviance Residuals
 - [`.set_candidates()`](https://rauschenberger.github.io/corila/reference/dot-set_candidates.md)
   : Candidate values
-- [`.simulate_outcome()`](https://rauschenberger.github.io/corila/reference/dot-simulate_outcome.md)
+- [`.simulate_effects()`](https://rauschenberger.github.io/corila/reference/dot-simulate_effects.md)
+  : Simulate effects
+- [`.simulate_predictors()`](https://rauschenberger.github.io/corila/reference/dot-simulate_predictors.md)
+  : Simulate predictors
+- [`.simulate_response()`](https://rauschenberger.github.io/corila/reference/dot-simulate_response.md)
   : Simulate outcome
 - [`.type()`](https://rauschenberger.github.io/corila/reference/dot-type.md)
   : Name method (helper function)
@@ -161,8 +165,6 @@ license](https://rauschenberger.github.io/corila/LICENSE.md).
   : predict (S3 method)
 - [`print(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/print.cv.corila.md)
   : print (S3 method)
-- [`simulate()`](https://rauschenberger.github.io/corila/reference/simulate.md)
-  : Data simulation
 - [`summary(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
   [`print(`*`<summary.cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
   : Summarising sparse group lasso (S3 method)

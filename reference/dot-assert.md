@@ -6,7 +6,7 @@ Check whether provided arguments satisfy expectations.
 
 ``` r
 .assert(
-  x = NULL,
+  x,
   type = "numeric",
   dim = 1L,
   na.rm = FALSE,
@@ -21,30 +21,58 @@ Check whether provided arguments satisfy expectations.
 
 - x:
 
-  scalar, vector, matrix, or array to be checked
+  scalar, vector (of length `dim`), matrix (of dimensions `dim`), or
+  array (of dimensions `dim`) to be checked
+
+  - `type = "numeric"`: numeric
+
+  - `type = "integer"`: integer
+
+  - `type = "nominal"`: character
+
+  - `type = "logical"`: logical
+
+  - `family = "binomial"`: integers 0 or 1
+
+  - `family = "poisson"`: non-negative integers
+
+  - `family = "cox"`: object created with
+    [survival::Surv](https://rdrr.io/pkg/survival/man/Surv.html)
 
 - type:
 
-  character `"numeric"` (default), `"integer"`, `"nominal"`, or
+  character scalar `"numeric"` (default), `"integer"`, `"nominal"`, or
   `"logical"`
 
 - dim:
 
-  vector containing positive integers defining the dimensionality:
-  `dim = 1` for a scalar, `dim = Inf` for a vector of arbitrary length,
-  `dim = c(Inf, Inf)` for a matrix of arbitrary dimensions,
-  `dim = c(Inf, Inf, Inf)` for an array of arbitrary dimensions,
-  `dim = 100` for a vector of length 100, `dim = c(Inf, 100)` for a
-  matrix with 100 columns, etc.
+  vector of length 1, 2 or 3 containing positive integers (minimum 1,
+  maximum \\100,000\\) defining the dimensionality:
+
+  - scalar `x`: `dim = 1`
+
+  - vector `x` of length 100: `dim = 100`
+
+  - vector `x` of arbitrary length: `dim = Inf`
+
+  - matrix `x` with 100 rows: `dim = c(100, Inf)`
+
+  - matrix `x` of arbitrary dimensions: `dim = c(Inf, Inf)`
+
+  - array `x` of arbitrary dimensions: `dim = c(Inf, Inf, Inf)`
 
 - na.rm:
 
-  logical; `FALSE`: missing values are not allowed, `TRUE`: missing
-  values are allowed
+  logical scalar (or numeric 0/1):
+
+  - `na.rm=FALSE` (or `na.rm=0`): missing values are not allowed
+
+  - `na.rm=TRUE` (or `na.rm=1`): missing values are allowed
 
 - support:
 
-  character vector (only used for `type = "nominal"`)
+  character vector (only used for `type = "nominal"`), (matching with
+  `x` is case-insensitive)
 
 - family:
 
@@ -52,15 +80,15 @@ Check whether provided arguments satisfy expectations.
 
 - min:
 
-  numerical value (not used for `type = "nominal"`)
+  numeric scalar (not used for `type = "nominal"`)
 
 - max:
 
-  numerical value (not used for `type = "nominal"`)
+  numeric scalar (not used for `type = "nominal"`)
 
 ## Value
 
-Returns `NULL` invisibly, or an error message.
+Returns `NULL` invisibly, or throws an error.
 
 ## Details
 
@@ -77,14 +105,21 @@ of samples and features).
 ## Examples
 
 ``` r
-.assert(x = NULL)
-.assert(x = rnorm(n = 1L))
-.assert(x = "A", type = "nominal", support = LETTERS)
-.assert(x = rexp(n= 10L), dim = Inf, type = "numeric", min = 0)
-.assert(x = c(NA, rpois(n = 9L, lambda = 4)), dim = 10L,
-       type = "integer", na.rm = TRUE)
-.assert(x = NA, na.rm = TRUE)
-.assert(x = 1, na.rm = FALSE)
-.assert(x = rpois(n = 10L, lambda = 4), dim = Inf,
-       family = "poisson")
+n <- 3L; p <- 4L
+.assert(x = matrix(rnorm(n = n * p), nrow = n, ncol = p),
+        dim = c(n, p),
+        type = "numeric",
+        family = "gaussian")
+.assert(x = rpois(n = n, lambda = 4.0),
+        dim = n,
+        type = "integer",
+        family = "poisson")
+.assert(x = rbinom(n = n, size = 1L, prob = 0.5),
+        dim = n,
+        type = "integer",
+        family = "binomial")
+.assert(x = "a",
+        dim = 1L,
+        type = "nominal",
+        support = letters)
 ```

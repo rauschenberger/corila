@@ -8,13 +8,13 @@ Estimate initial coefficients.
 .estim_initial_coefs(
   x,
   y,
-  family,
-  alpha_init,
-  group,
-  foldid,
-  nfolds,
-  lambda,
-  silent
+  family = "gaussian",
+  alpha_init = 0,
+  group = NULL,
+  foldid = NULL,
+  nfolds = 10L,
+  lambda = NULL,
+  silent = FALSE
 )
 ```
 
@@ -61,18 +61,7 @@ Estimate initial coefficients.
 
 - group:
 
-  group structure (multiple options):
-
-  - \\p\\-dimensional vector of group indices (in \\\\1, \ldots, q\\\\)
-    or labels,
-
-  - list with \\q\\ slots containing the variable indices (in \\\\1,
-    \ldots, p\\\\) or labels,
-
-  - \\p \times p\\ matrix, where the entry in the \\j^{\text{th}}\\ row
-    and the \\k^{\text{th}}\\ column indicates whether information
-    should be transferred from the \\j^{\text{th}}\\ to the
-    \\k^{\text{th}}\\ variable
+  \\p\\-dimensional integer vector with entries in \\\\1, \ldots, q\\\\
 
 - foldid:
 
@@ -84,6 +73,8 @@ Estimate initial coefficients.
   positive integer specifying the number of folds (minimum \\3\\,
   maximum \\n\\)
 
+  NB: If `foldid` is provided, `nfolds` is overwritten by `max(foldid)`.
+
 - lambda:
 
   numeric scalar, or `NULL` (determined by cross-validation)
@@ -91,10 +82,9 @@ Estimate initial coefficients.
 - silent:
 
   Should messages from
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-  and
-  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-  be suppressed? (`FALSE` or `TRUE`)
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) and
+  [`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+  be suppressed? (logical scalar, `FALSE` or `TRUE`)
 
 ## Value
 
@@ -110,10 +100,9 @@ Returns a list with two slots:
 This function is called by
 [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md).
 It calls
-[`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-or
-[`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-for an initial lasso, ridge, or elastic net regression,
+[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+or [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
+an initial lasso, ridge, or elastic net regression,
 [`multiridge()`](https://rauschenberger.github.io/corila/reference/multiridge.md)
 for an initial multi-penalty ridge regression, or
 [`stats::cor()`](https://rdrr.io/r/stats/cor.html) for initial
@@ -123,7 +112,8 @@ correlation coefficients.
 
 ``` r
 # simulate data
-n <- 20L
+set.seed(1)
+n <- 50L
 p <- 10L
 x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 beta <- rbinom(n = p, size = 1L, prob = 0.5) * rnorm(p)
@@ -139,8 +129,8 @@ y <- drop(x %*% beta)
                      nfolds = 10L,
                      lambda = NULL)
 #> $coef
-#>  [1] -0.04210526  0.58947368 -0.38646617  0.26466165  0.04511278 -0.13834586
-#>  [7] -0.32781955  0.18646617 -0.11278195  0.75187970
+#>  [1]  0.53478992 -0.50991597  0.31870348  0.19558223 -0.09483794 -0.02713085
+#>  [7] -0.18953181 -0.42223289 -0.03990396 -0.30554622
 #> 
 #> $lambda
 #> NULL
@@ -155,15 +145,14 @@ foldid <- sample(seq_len(10L), size = n, replace = TRUE)
                      group = NULL,
                      foldid = foldid,
                      nfolds = 10L,
-                     lambda = NULL)
-#> Warning: number of rows of result is not a multiple of vector length (arg 1)
-#> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
+                     lambda = NULL,
+                     silent = TRUE)
 #> $coef
-#>  [1] -0.02515595  1.04723119 -0.36371329  0.07573726  0.05057138 -0.03498746
-#>  [7] -0.89062638  0.07621415 -0.22428786  1.34885909
+#>  [1]  1.47303510 -1.30312590  0.04308875  1.05078015 -0.02502813 -0.02995143
+#>  [7] -0.85606093 -0.92824916  0.04838767 -0.39441178
 #> 
 #> $lambda
-#> [1] 0.1763745
+#> [1] 0.126489
 #> 
 
 # initial regression coefficients (using fixed lambda)
@@ -176,8 +165,8 @@ foldid <- sample(seq_len(10L), size = n, replace = TRUE)
                      nfolds = 10L,
                      lambda = 0.2)
 #> $coef
-#>  [1] -0.02760918  1.03400885 -0.36489326  0.08274210  0.05476363 -0.03841544
-#>  [7] -0.87535485  0.08259835 -0.21968587  1.33762730
+#>  [1]  1.41315853 -1.26524541  0.06226520  0.99767196 -0.03630484 -0.04342165
+#>  [7] -0.81640523 -0.90602485  0.04799027 -0.38908914
 #> 
 #> $lambda
 #> [1] 0.2

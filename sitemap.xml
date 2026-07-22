@@ -12,7 +12,6 @@
 <url><loc>https://rauschenberger.github.io/corila/reference/coef.multiridge.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/corila-package.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/corila.html</loc></url>
-<url><loc>https://rauschenberger.github.io/corila/reference/corila_data.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/cv.corila.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/deviance.cv.corila.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/dot-assert.html</loc></url>
@@ -27,7 +26,9 @@
 <url><loc>https://rauschenberger.github.io/corila/reference/dot-mean_function.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/dot-residuals.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/dot-set_candidates.html</loc></url>
-<url><loc>https://rauschenberger.github.io/corila/reference/dot-simulate_outcome.html</loc></url>
+<url><loc>https://rauschenberger.github.io/corila/reference/dot-simulate_effects.html</loc></url>
+<url><loc>https://rauschenberger.github.io/corila/reference/dot-simulate_predictors.html</loc></url>
+<url><loc>https://rauschenberger.github.io/corila/reference/dot-simulate_response.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/dot-type.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/dot-validate.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/fitted.cv.corila.html</loc></url>
@@ -41,7 +42,7 @@
 <url><loc>https://rauschenberger.github.io/corila/reference/predict.multiridge.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/print.cv.corila.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/residuals.cv.corila.html</loc></url>
-<url><loc>https://rauschenberger.github.io/corila/reference/simulate.html</loc></url>
+<url><loc>https://rauschenberger.github.io/corila/reference/simulate_data.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/summary.cv.corila.html</loc></url>
 </urlset>
 

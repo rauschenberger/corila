@@ -118,13 +118,14 @@ and
   positive integer specifying the number of folds (minimum \\3\\,
   maximum \\n\\)
 
+  NB: If `foldid` is provided, `nfolds` is overwritten by `max(foldid)`.
+
 - silent:
 
   Should messages from
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-  and
-  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
-  be suppressed? (`FALSE` or `TRUE`)
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) and
+  [`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+  be suppressed? (logical scalar, `FALSE` or `TRUE`)
 
 ## Value
 
