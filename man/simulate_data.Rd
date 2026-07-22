@@ -39,8 +39,7 @@ positive integer scalar
 (minimum 1 assigns all predictors to the same group.
 maximum \code{p} assigns each predictor to its own group)}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"},
-\code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
 \item{rho}{correlation coefficient for predictors within the same group:
 numeric scalar in the unit interval

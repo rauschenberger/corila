@@ -7,8 +7,7 @@
 .simulate_response(family, x = NULL, beta = NULL, n = NULL, seed = 1L)
 }
 \arguments{
-\item{family}{character string \code{"gaussian"}, \code{"binomial"},
-\code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
 \item{x}{predictors:
 numeric matrix with \eqn{n} rows (observations)

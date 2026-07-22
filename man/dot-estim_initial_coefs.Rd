@@ -29,8 +29,7 @@ binary values (\code{family="binomial"}),
 or a survival object created with \code{survival::Surv()} (\code{family="cox"}),
 where \eqn{n_0} is the number of observations used for model training}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"},
-\code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
 \item{alpha_init}{A scalar specifying the method used for obtaining initial coefficients:
 \itemize{
@@ -54,7 +53,9 @@ with one penalty for each group
 (minimum \eqn{1}, maximum \code{nfolds})}
 
 \item{nfolds}{positive integer specifying the number of folds
-(minimum \eqn{3}, maximum \eqn{n})}
+(minimum \eqn{3}, maximum \eqn{n})
+
+NB: If \code{foldid} is provided, \code{nfolds} is overwritten by \code{max(foldid)}.}
 
 \item{lambda}{numeric scalar, or \code{NULL}
 (determined by cross-validation)}

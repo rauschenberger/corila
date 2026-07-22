@@ -53,8 +53,7 @@ defining the dimensionality:
 \item{support}{character vector (only used for \code{type = "nominal"}),
 (matching with \code{x} is case-insensitive)}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"},
-\code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
 \item{min}{numeric scalar (not used for \code{type = "nominal"})}
 

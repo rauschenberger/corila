@@ -20,8 +20,7 @@ with entries on the real range (\code{family="gaussian"} or \code{family="cox"})
 in the unit interval (\code{family="binomial"}),
 or on the non-negative real range (\code{family="poisson"})}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"},
-\code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 }
 \value{
 Returns the deviance (a numeric scalar).

@@ -30,7 +30,9 @@ multiridge(
 (minimum \eqn{1}, maximum \code{nfolds})}
 
 \item{nfolds}{positive integer specifying the number of folds
-(minimum \eqn{3}, maximum \eqn{n})}
+(minimum \eqn{3}, maximum \eqn{n})
+
+NB: If \code{foldid} is provided, \code{nfolds} is overwritten by \code{max(foldid)}.}
 
 \item{penalties}{\eqn{q}-dimensional vector of non-negative penalty parameters,
 or \code{NULL} (cross-validation)}

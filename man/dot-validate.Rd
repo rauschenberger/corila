@@ -59,8 +59,7 @@ indicating whether a predictor may be included in the final model
 or must be excluded from the final model
 (\code{FALSE} for "auxiliary predictors")}
 
-\item{family}{character string \code{"gaussian"}, \code{"binomial"},
-\code{"poisson"}, or \code{"cox"}}
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
 \item{alpha_init}{A scalar specifying the method used for obtaining initial coefficients:
 \itemize{
@@ -94,7 +93,9 @@ entries between \eqn{-1} and \eqn{+1})}
 (minimum \eqn{1}, maximum \code{nfolds})}
 
 \item{nfolds}{positive integer specifying the number of folds
-(minimum \eqn{3}, maximum \eqn{n})}
+(minimum \eqn{3}, maximum \eqn{n})
+
+NB: If \code{foldid} is provided, \code{nfolds} is overwritten by \code{max(foldid)}.}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
 be suppressed? (logical scalar, \code{FALSE} or \code{TRUE})}
