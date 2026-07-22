@@ -548,7 +548,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
       weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
       # ad-hoc solution for features that are in no group (unreachable?)
-      # weight$local[is.na(weight$local)] <- 0
+      # weight$local[is.na(weight$local)] <- 0.0
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * init$coef
       weight$global[j] <- sum(pmax(0.0, temp)) / p
       weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
@@ -857,6 +857,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   } else {
     .assert(x = alpha_init, type = "numeric", min = 0.0, max = 1.0,
             na.rm = TRUE)
+    alpha_init <- round(alpha_init, digits = 6L)
     alpha_init <- pmax(0.0, pmin(alpha_init, 1.0))
   }
   .assert(x = foldid, type = "integer", dim = n,
@@ -993,6 +994,10 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       stop("List 'group' should not have length 0.")
     }
     if (is.numeric(unlist(group))) {
+      for (i in seq_along(group)) {
+        .assert(x = group[[i]], type = "integer", dim = Inf, min = 0L, max = p)
+        group[[i]] <- as.integer(round(group[[i]]))
+      }
       group_cond <- vapply(X = group,
                            FUN = function(slot) j %in% slot,
                            FUN.VALUE = logical(1L))

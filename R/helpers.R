@@ -487,7 +487,7 @@
   support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
   .assert(x = family, type = "nominal", support = support)
   .assert(x = y, type = "numeric", dim = Inf, family = family)
-  if (length(y) < 2) stop("Require at least 2 observations.")
+  if (length(y) < 2L) stop("Require at least 2 observations.")
   #if(identical(family, "cox") && !inherits(y, "Surv")){
   #  stop("Require object of class 'Surv'.")
   #}
@@ -502,13 +502,13 @@
       y <- y[, "status"]
     }
     foldid <- rep(x = NA, times = length(y))
-    if (sum(y == 0L) == 1) {
+    if (sum(y == 0L) == 1L) {
       foldid[y == 0L] <- 1L
     } else {
       foldid[y == 0L] <- sample(x = rep(x = seq_len(nfolds),
                                         length.out = sum(y == 0L)))
     }
-    if (sum(y == 1L) == 1) {
+    if (sum(y == 1L) == 1L) {
       foldid[y == 1L] <- nfolds
     } else {
       foldid[y == 1L] <- sample(x = rep(x = rev(seq_len(nfolds)),
