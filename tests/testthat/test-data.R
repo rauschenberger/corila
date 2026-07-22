@@ -37,7 +37,7 @@ testthat::test_that("data have consistent row names", {
   testthat::expect_named(object = data$y_train,
                          expected = rownames(data$x_train))
   testthat::expect_named(object = data$y_test,
-                        expected = rownames(data$x_test))
+                         expected = rownames(data$x_test))
 })
 
 testthat::test_that("data have consistent column names", {
