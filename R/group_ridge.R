@@ -27,8 +27,8 @@
 #' \eqn{p}-dimensional integer vector with entries in \eqn{\{1, \ldots, q\}}
 #'
 #' @param family
-#' character `"linear"` (or `"gaussian"`),
-#' `"logistic"` (or `"binomial"`), or `"cox"`
+#' character `"gaussian"` (not `"linear"`),
+#' `"binomial"` (not `"logistic"`), or `"cox"`
 #'
 #' @param penalties
 #' \eqn{q}-dimensional vector of non-negative penalty parameters,
