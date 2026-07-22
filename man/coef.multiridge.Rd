@@ -13,7 +13,9 @@
 }
 \value{
 Returns an \eqn{(1 + p)}-dimensional vector of estimated coefficients
-(estimated intercept and estimated slopes).
+(estimated intercept and estimated slopes)
+if \code{family="gaussian"} and \code{family="binomial"}
+and a \eqn{p}-dimensional vector of estimated slopes if \code{family="cox"}.
 }
 \description{
 Extracts coefficients from a multi-penalty ridge regression model.

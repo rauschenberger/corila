@@ -23,8 +23,8 @@ multiridge(
 
 \item{group}{\eqn{p}-dimensional integer vector with entries in \eqn{\{1, \ldots, q\}}}
 
-\item{family}{character \code{"linear"} (or \code{"gaussian"}),
-\code{"logistic"} (or \code{"binomial"}), or \code{"cox"}}
+\item{family}{character \code{"gaussian"} (not \code{"linear"}),
+\code{"binomial"} (not \code{"logistic"}), or \code{"cox"}}
 
 \item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers
 (minimum \eqn{1}, maximum \code{nfolds})}

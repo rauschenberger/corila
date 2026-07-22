@@ -48,18 +48,7 @@ with one penalty for each group
 \item \code{NA} to set all initial coefficients equal to 1
 }}
 
-\item{group}{group structure (multiple options):
-\itemize{
-\item \eqn{p}-dimensional vector of group indices
-(in \eqn{\{1, \ldots, q\}}) or labels,
-\item list with \eqn{q} slots containing the variable indices
-(in \eqn{\{1, \ldots, p\}}) or labels,
-\item \eqn{p \times p} matrix,
-where the entry in the \eqn{j^{\text{th}}} row
-and the \eqn{k^{\text{th}}} column
-indicates whether information should be transferred
-from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
-}}
+\item{group}{\eqn{p}-dimensional integer vector with entries in \eqn{\{1, \ldots, q\}}}
 
 \item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers
 (minimum \eqn{1}, maximum \code{nfolds})}
