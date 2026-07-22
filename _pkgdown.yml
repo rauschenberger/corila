@@ -38,9 +38,9 @@ reference:
   - multiridge
   - coef.multiridge
   - predict.multiridge
-- title: "Example dataset"
+- title: "Simulation"
   contents:
-  - data
+  - simulate_data
 - title: "Internal functions"
   contents:
   - has_keyword("internal")
