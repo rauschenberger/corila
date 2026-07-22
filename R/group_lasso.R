@@ -1011,6 +1011,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     }
   } else if (is.matrix(group)) {
     .assert(x = group, type = "integer", dim = c(p, p), min = 0L, max = 1L)
+    group <- round(group)
     class(group) <- "integer"
     group[, j] == 1L
   } else {
