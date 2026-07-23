@@ -690,6 +690,7 @@
 }
 
 .validate_response <- function(y, family, ...) {
+  eps <- 1e-06
   checkmate::assert_choice(
     x = family, choices = c("gaussian", "binomial", "poisson", "cox")
   )
@@ -697,10 +698,10 @@
     x = y, min.len = 1L, all.missing = FALSE, ...
   )
   if (identical(family, "binomial")) {
-    checkmate::assert_integerish(x = y, lower = 0L, upper = 1L)
+    checkmate::assert_integerish(x = y, lower = - eps, upper = 1.0 + eps)
     as.integer(round(y))
   } else if (identical(family, "poisson")) {
-    checkmate::assert_integerish(x = y, lower = 0L)
+    checkmate::assert_integerish(x = y, lower = - eps)
     as.integer(round(y))
   } else {
     y
@@ -708,6 +709,7 @@
 }
 
 .validate_fitted <- function(y_hat, family, ...) {
+  eps <- 1e-06
   checkmate::assert_choice(
     x = family, choices = c("gaussian", "binomial", "poisson", "cox")
   )
@@ -715,9 +717,11 @@
     x = y_hat, min.len = 1L, any.missing = FALSE, ...
   )
   if (identical(family, "binomial")) {
-    checkmate::assert_numeric(x = y_hat, lower = 0.0, upper = 1.0)
+    checkmate::assert_numeric(x = y_hat, lower = - eps, upper = 1.0 + eps)
+    pmax(0, pmin(y_hat, 1))
   } else if (identical(family, "poisson")) {
-    checkmate::assert_numeric(x = y_hat, lower = 0.0)
+    checkmate::assert_numeric(x = y_hat, lower = - eps)
+    pmax(0, y_hat)
   } else {
     y_hat
   }

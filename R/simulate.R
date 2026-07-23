@@ -33,14 +33,12 @@
 #' @keywords internal
 #'
 calc_sign_prec <- function(truth, estim) {
-  #.assert(x = truth, type = "integer", dim = Inf,
-  #        min = -1L, max = 1L, na.rm = TRUE)
-  checkmate::assert_integerish(x = truth, lower = -1L, upper = 1L)
+  eps <- 1e-06
+  checkmate::assert_integerish(x = truth, min.len = 1L,
+                               lower = - 1.0 - eps, upper = 1.0 + eps)
   truth <- as.integer(round(truth))
-  #.assert(x = estim, type = "integer", dim = length(truth),
-  #        min = -1L, max = 1L, na.rm = TRUE)
-  checkmate::assert_integerish(x = estim, lower = -1L, upper = 1L,
-                               len = length(truth))
+  checkmate::assert_integerish(x = estim, len = length(truth),
+                               lower = -1.0 - eps, upper = 1.0 + eps)
   estim <- as.integer(round(estim))
   if (all(is.na(estim) | estim == 0L)) {
     NA
@@ -297,6 +295,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 .simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0,
                                  seed = 1L) {
+  eps <- 1e-06
   if (is.null(p) == is.null(group)) stop("Provide either p or group.")
   #.assert(x = n, type = "integer", min = 1L, max = 11e04L)
   checkmate::assert_int(x = n, lower = 1L, upper = 11e04L)
@@ -311,9 +310,9 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                                null.ok = TRUE)
   group <- as.integer(round(group))
   #.assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
-  checkmate::assert_number(x = rho)
+  checkmate::assert_number(x = rho, lower = - eps, upper = 1.0 + eps)
   rho <- round(rho, digits = 6L)
-  checkmate::assert_number(x = rho, lower = 0.0, upper = 1.0)
+  #checkmate::assert_number(x = rho, lower = 0.0, upper = 1.0)
   #.assert(x = seed, type = "integer")
   checkmate::assert_int(x = seed)
   set.seed(as.integer(round(seed)))

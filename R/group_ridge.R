@@ -133,7 +133,7 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                            min.rows = 1L, min.cols = 1L, any.missing = FALSE)
   #.assert(x = y, type = "numeric", dim = nrow(x))
   y <- .validate_response(y = y, family = family,
-                          len = (1 + (family == "cox")) * nrow(x))
+                          len = (1L + (family == "cox")) * nrow(x))
   #.assert(x = group, type = "integer", dim = ncol(x),
   #        min = 1L, max = length(unique(group)))
   checkmate::assert_integer(x = group,
