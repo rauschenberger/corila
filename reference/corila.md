@@ -124,8 +124,9 @@ corila(
 - silent:
 
   Should messages from
-  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) and
-  [`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  and
+  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
   be suppressed? (logical scalar, `FALSE` or `TRUE`)
 
 - threshold:
@@ -174,9 +175,10 @@ for splitting samples into folds,
 for obtaining initial coefficients,
 [`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/dot-is_adjacent.md)
 for identifying adjacent predictors, and
-[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
-and [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
-adaptive lasso regression.
+[`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
+and
+[`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+for adaptive lasso regression.
 
 ## Examples
 
