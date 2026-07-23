@@ -117,6 +117,24 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       regexp = "at least three complete observations"
     )
   })
+  testthat::test_that("cv.corila rejects wrong argument foldid", {
+    foldid <- list()
+    foldid[[1L]] <- rep(seq_len(5L), length.out = nrow(data$x_train))
+    foldid[[1L]][foldid[[1L]] == 1L] <- 2L
+    foldid[[2L]] <- rep(seq_len(2L), length.out = nrow(data$x_train))
+    foldid[[3L]] <- rep(seq_len(5L), length.out = nrow(data$x_train))
+    foldid[[3L]][foldid[[3L]] == 5L] <- 6L
+    for(i in seq_along(foldid)) {
+      testthat::expect_error(
+        object = cv.corila(x = data$x_train,
+                           y = data$y_train,
+                           group = data$group,
+                           family = family_data,
+                           foldid = foldid[[i]]),
+        regexp = "foldid"
+      )
+    }
+  })
 }
 
 ## function ".estim_initial_coefs" ---------------------------------------------
