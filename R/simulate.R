@@ -179,28 +179,40 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                           prob_primary = 0.5, signal_strength = 1.0,
                           prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
   # argument checks
-  .assert(x = n0, type = "integer", min = 1L, max = 1e04L)
+  #.assert(x = n0, type = "integer", min = 1L, max = 1e04L)
+  checkmate::assert_int(x = n0, lower = 1L, upper = 1e04L)
   n0 <- as.integer(round(n0))
-  .assert(x = n1, type = "integer", min = 0L, max = 1e05L)
+  #.assert(x = n1, type = "integer", min = 0L, max = 1e05L)
+  checkmate::assert_int(x = n1, lower = 0L, upper = 1e05L)
   n1 <- as.integer(round(n1))
-  .assert(x = p, type = "integer", min = 1L, max = 1e03L)
+  #.assert(x = p, type = "integer", min = 1L, max = 1e03L)
+  checkmate::assert_int(x = p, lower = 1L, upper = 1e03L)
   p <- as.integer(round(p))
-  .assert(x = q, type = "integer", min = 1L, max = p)
+  #.assert(x = q, type = "integer", min = 1L, max = p)
+  checkmate::assert_int(x = q, lower = 1L, upper = p)
   q <- as.integer(round(q))
   if (is.character(family)) family <- tolower(family)
-  .assert(x = family, type = "nominal",
-          support = c("gaussian", "binomial", "poisson", "cox"))
-  .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = family, type = "nominal",
+  #        support = c("gaussian", "binomial", "poisson", "cox"))
+  checkmate::assert_choice(x = family, choices = c("gaussian", "binomial",
+                                                   "poisson", "cox"))
+  #.assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
+  checkmate::assert_number(x = rho, lower = 0.0, upper = 1.0)
   rho <- round(rho, digits = 6L)
-  .assert(x = prob_primary, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = prob_primary, type = "numeric", min = 0.0, max = 1.0)
+  checkmate::assert_number(x = prob_primary, lower = 0.0, upper = 1.0)
   prob_primary <- round(prob_primary, digits = 6L)
-  .assert(x = signal_strength, type = "numeric", min = 0.0, max = 2.0)
+  #.assert(x = signal_strength, type = "numeric", min = 0.0, max = 2.0)
+  checkmate::assert_number(x = signal_strength, lower = 0.0, upper = 2.0)
   signal_strength <- round(signal_strength, digits = 6L)
-  .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
+  checkmate::assert_number(x = prob_group, lower = 0.0, upper = 1.0)
   prob_group <- round(prob_group, digits = 6L)
-  .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
+  checkmate::assert_number(x = prob_predictor, lower = 0.0, upper = 1.0)
   prob_predictor <- round(prob_predictor, digits = 6L)
-  .assert(x = seed, type = "integer")
+  #.assert(x = seed, type = "integer")
+  checkmate::assert_int(x = seed)
   set.seed(as.integer(round(seed)))
   # simulation
   n <- n0 + n1
@@ -283,15 +295,22 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 .simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0,
                                  seed = 1L) {
   if (is.null(p) == is.null(group)) stop("Provide either p or group.")
-  .assert(x = n, type = "integer", min = 1L, max = 11e04L)
-  .assert(x = p, type = "integer", min = 1L, max = 1e03L)
+  #.assert(x = n, type = "integer", min = 1L, max = 11e04L)
+  checkmate::assert_int(x = n, lower = 1L, upper = 11e04L)
+  #.assert(x = p, type = "integer", min = 1L, max = 1e03L)
+  checkmate::assert_int(x = p, lower = 1L, upper = 1e03L, null.ok = TRUE)
   if (is.null(group)) group <- seq_len(p)
-  .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
-  .assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
+  #.assert(x = group, type = "integer", dim = Inf, min = 1L,
+  #        max = length(group))
+  #.assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
+  checkmate::assert_integer(x = group, min.len = 1L, max.len = 1e03L,
+                            lower = 1L, upper = length(group), null.ok = TRUE)
   group <- as.integer(round(group))
-  .assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
+  checkmate::assert_number(x = rho, lower = 0.0, upper = 1.0)
   rho <- round(rho, digits = 6L)
-  .assert(x = seed, type = "integer")
+  #.assert(x = seed, type = "integer")
+  checkmate::assert_int(x = seed)
   set.seed(as.integer(round(seed)))
   p <- length(group)
   mu <- rep(x = 0.0, times = p)
@@ -328,16 +347,23 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 .simulate_effects <- function(group, prob_group = 0.5, prob_predictor = 0.8,
                               signal_strength = 1.0, seed = 1L) {
-  .assert(x = group, type = "integer", dim = Inf, min = 1L, max = length(group))
+  #.assert(x = group, type = "integer", dim = Inf, min = 1L,
+  #        max = length(group))
+  #.assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
+  checkmate::assert_integer(x = group, min.len = 1L, max.len = 1e03L,
+                            lower = 1L, upper = length(group))
   group <- as.integer(round(group))
-  .assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
-  .assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
+  checkmate::assert_number(x = prob_group, lower = 0.0, upper = 1.0)
   prob_group <- round(prob_group, digits = 6L)
-  .assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = prob_predictor, type = "numeric", min = 0.0, max = 1.0)
+  checkmate::assert_number(x = prob_predictor, lower = 0.0, upper = 1.0)
   prob_predictor <- round(prob_predictor, digits = 6L)
-  .assert(x = signal_strength, type = "numeric", min = 0.0)
+  #.assert(x = signal_strength, type = "numeric", min = 0.0)
+  checkmate::assert_number(x = signal_strength, lower = 0.0, upper = 2.0)
   signal_strength <- round(signal_strength, digits = 6L)
-  .assert(x = seed, type = "integer")
+  checkmate::assert_int(x = seed)
+  #.assert(x = seed, type = "integer")
   set.seed(as.integer(round(seed)))
   p <- length(group)
   order <- order(group)
@@ -407,15 +433,25 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 .simulate_response <- function(family, x = NULL, beta = NULL, n = NULL,
                                seed = 1L) {
   if (is.character(family)) family <- tolower(family)
-  .assert(x = family, type = "nominal",
-          support = c("gaussian", "binomial", "poisson", "cox"))
+  #.assert(x = family, type = "nominal",
+  #        support = c("gaussian", "binomial", "poisson", "cox"))
+  checkmate::assert_choice(x = family, choices = c("gaussian", "binomial",
+                                                   "poisson", "cox"))
   if (is.null(x) != is.null(beta)) {
     stop("Provide either none or both of 'x' and 'beta'.")
   }
-  .assert(x = x, type = "numeric", dim = c(Inf, Inf))
-  .assert(x = beta, type = "numeric", dim = ncol(x))
-  .assert(x = n, type = "integer", min = 1L, max = 1e05L)
-  .assert(x = seed, type = "integer")
+  #.assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  checkmate::assert_matrix(x = x, mode = "numeric",
+                           min.rows = 1L, max.rows = 1e05L,
+                           min.cols = 1L,
+                           any.missing = FALSE, null.ok = TRUE)
+  #.assert(x = beta, type = "numeric", dim = ncol(x))
+  checkmate::assert_numeric(x = beta, len = ncol(x), any.missing = FALSE,
+                            null.ok = TRUE)
+  #.assert(x = n, type = "integer", min = 1L, max = 1e05L)
+  checkmate::assert_int(x = n, lower = 1L, upper = 1e05L, null.ok = TRUE)
+  #.assert(x = seed, type = "integer")
+  checkmate::assert_int(x = seed)
   set.seed(as.integer(round(seed)))
   if (!is.null(x) && !is.null(beta) && is.null(n)) {
     eta <- as.numeric(x %*% as.vector(beta))
