@@ -33,11 +33,14 @@
 #' @keywords internal
 #'
 calc_sign_prec <- function(truth, estim) {
-  .assert(x = truth, type = "integer", dim = Inf,
-          min = -1L, max = 1L, na.rm = TRUE)
+  #.assert(x = truth, type = "integer", dim = Inf,
+  #        min = -1L, max = 1L, na.rm = TRUE)
+  checkmate::assert_integerish(x = truth, lower = -1L, upper = 1L)
   truth <- as.integer(round(truth))
-  .assert(x = estim, type = "integer", dim = length(truth),
-          min = -1L, max = 1L, na.rm = TRUE)
+  #.assert(x = estim, type = "integer", dim = length(truth),
+  #        min = -1L, max = 1L, na.rm = TRUE)
+  checkmate::assert_integerish(x = estim, lower = -1L, upper = 1L,
+                               len = length(truth))
   estim <- as.integer(round(estim))
   if (all(is.na(estim) | estim == 0L)) {
     NA

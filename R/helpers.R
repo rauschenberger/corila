@@ -418,19 +418,38 @@
   #.assert(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0.0)
   #.assert(x = pars$mu.y, type = "numeric")
   #.assert(x = pars$sd.y, type = "numeric", min = 0.0)
-  checkmate::assert_list(x = pars, len = 5L, null.ok = TRUE)
+  if (is.null(y) && is.null(coef)) {
+    stop("Provide 'y' or 'coef'.")
+  }
+  checkmate::assert_list(x = pars, len = 5L)
   checkmate::assert_names(x = names(pars), identical.to = slots)
-  checkmate::assert_choice(x = pars$family, choices = families, null.ok = TRUE)
+  checkmate::assert_choice(x = pars$family, choices = families)
   checkmate::assert_numeric(x = pars$mu.x, min.len = 1L)
   checkmate::assert_numeric(x = pars$sd.x, len = length(pars$mu.x), lower = 0.0)
   checkmate::assert_number(x = pars$mu.y)
   checkmate::assert_number(x = pars$sd.y, lower = 0.0)
-  dim <- rep(x = Inf, times = 1L + is.matrix(y))
-  .assert(x = y, type = "numeric", dim = dim)
-  #checkmate::assert_numeric(x = y, )
-  dim <- length(pars$mu.x) + !identical(pars$family, "cox")
-  .assert(x = coef, type = "numeric", dim = dim)
-  #checkmate::assert_numeric(x = coef, len = 1L + is.matrix(y))
+  #dim <- rep(x = Inf, times = 1L + is.matrix(y))
+  #.assert(x = y, type = "numeric", dim = dim)
+  if (is.matrix(y)) {
+    checkmate::assert_matrix(x = y, min.rows = 1L, min.cols = 1L,
+                             any.missing = FALSE, null.ok = TRUE)
+  } else {
+    checkmate::assert_numeric(x = y, min.len = 1L, any.missing = FALSE,
+                              null.ok = TRUE)
+  }
+  #checkmate::assert(
+  #  checkmate::check_numeric(x = y, min.len = 1L, any.missing = FALSE),
+  #  checkmate::check_matrix(x = y, min.rows = 1L, min.cols = 1L,
+  #                           any.missing = FALSE),
+  #  combine = "or"
+  #)
+  #dim <- length(pars$mu.x) + !identical(pars$family, "cox")
+  #.assert(x = coef, type = "numeric", dim = dim)
+  checkmate::assert_numeric(
+    x = coef,
+    len = length(pars$mu.x) + !identical(pars$family, "cox"),
+    null.ok = TRUE
+  )
   # --- transform target ---
   list <- list()
   if (!is.null(y) && identical(pars$family, "gaussian")) {
@@ -670,12 +689,12 @@
   }
 }
 
-.validate_response <- function(y, family, na.rm = FALSE) {
+.validate_response <- function(y, family, ...) {
   checkmate::assert_choice(
     x = family, choices = c("gaussian", "binomial", "poisson", "cox")
   )
   checkmate::assert_numeric(
-    x = y, min.len = 1L, all.missing = FALSE, any.missing = na.rm
+    x = y, min.len = 1L, all.missing = FALSE, ...
   )
   if (identical(family, "binomial")) {
     checkmate::assert_integerish(x = y, lower = 0L, upper = 1L)
@@ -688,12 +707,12 @@
   }
 }
 
-.validate_fitted <- function(y_hat, family) {
+.validate_fitted <- function(y_hat, family, ...) {
   checkmate::assert_choice(
     x = family, choices = c("gaussian", "binomial", "poisson", "cox")
   )
   checkmate::assert_numeric(
-    x = y_hat, min.len = 1L, any.missing = FALSE
+    x = y_hat, min.len = 1L, any.missing = FALSE, ...
   )
   if (identical(family, "binomial")) {
     checkmate::assert_numeric(x = y_hat, lower = 0.0, upper = 1.0)
@@ -716,4 +735,8 @@
 #  }
 #
 #  list(n = nfolds, id = foldid)
-#}
+# }
+
+# .validate_group <- function(group) {
+#
+# }

@@ -656,22 +656,24 @@ nobs.cv.corila <- function(object, ...) {
   checkmate::assert_choice(x = family,
                            choices = c("gaussian", "binomial", "poisson"))
   eps <- 1e-06
+  y_obs <- .validate_response(y = y_obs, family = family)
+  y_fit <- .validate_fitted(y_hat = y_fit, family = family, len = length(y_obs))
   if (identical(family, "gaussian")) {
-    .assert(x = y_obs, type = "numeric", dim = Inf)
-    .assert(x = y_fit, type = "numeric", dim = length(y_obs))
+    #.assert(x = y_obs, type = "numeric", dim = Inf)
+    #.assert(x = y_fit, type = "numeric", dim = length(y_obs))
     y_obs - y_fit
   } else if (identical(family, "binomial")) {
-    .assert(x = y_obs, type = "integer", dim = Inf, min = 0L, max = 1L)
-    y_obs <- as.integer(round(y_obs))
-    .assert(x = y_fit, type = "numeric", dim = length(y_obs),
-            min = 0.0, max = 1.0)
+    #.assert(x = y_obs, type = "integer", dim = Inf, min = 0L, max = 1L)
+    #y_obs <- as.integer(round(y_obs))
+    #.assert(x = y_fit, type = "numeric", dim = length(y_obs),
+    #        min = 0.0, max = 1.0)
     y_fit <- pmax(eps, pmin(y_fit, 1.0 - eps))
     sign(y_obs - y_fit) * sqrt(2.0) *
       sqrt(- y_obs * log(y_fit) - (1.0 - y_obs) * log(1.0 - y_fit))
   } else if (identical(family, "poisson")) {
-    .assert(x = y_obs, type = "integer", dim = Inf, min = 0L)
-    y_obs <- as.integer(round(y_obs))
-    .assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0.0)
+    #.assert(x = y_obs, type = "integer", dim = Inf, min = 0L)
+    #y_obs <- as.integer(round(y_obs))
+    #.assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0.0)
     sign(y_obs - y_fit) *
       sqrt((2.0 * (ifelse(test = abs(y_obs) < .Machine$double.eps,
                           yes = 0.0,

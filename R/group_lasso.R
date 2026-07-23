@@ -715,8 +715,9 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @keywords internal
 #'
 .set_candidates <- function(tune) {
-  if (is.character(tune)) tune <- tolower(tune)
-  .assert(x = tune, type = "nominal")
+  checkmate::assert_character(x = tune)
+  tune <- tolower(tune)
+  #.assert(x = tune, type = "nominal")
   if (identical(tune, "none")) {
     hyper <- data.frame(wgt_local = 1.0,
                         exp_local = 1.0,
@@ -838,12 +839,21 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
   methods <- c("pearson", "spearman", "kendall", "multiridge")
-  .assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  #.assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  checkmate::assert_matrix(x = x, mode = "numeric", min.rows = 1, min.cols = 1,
+                           any.missing = FALSE)
   n <- nrow(x)
   p <- ncol(x)
-  .assert(x = y, type = "numeric", dim = n)
-  .assert(x = family, type = "nominal",
-          support = c("gaussian", "binomial", "poisson", "cox"))
+  #.assert(x = y, type = "numeric", dim = n)
+  #checkmate::assert_numeric(x = y, len = n, any.missing = FALSE)
+  #.assert(x = family, type = "nominal",
+  #        support = c("gaussian", "binomial", "poisson", "cox"))
+  checkmate::assert_choice(
+    x = family,
+    choices = c("gaussian", "binomial", "poisson", "cox")
+  )
+  y <- .validate_response(y = y, family = family,
+                          len =  (1 + (family == "cox")) * n)
   if (is.character(alpha_init)) {
     alpha_init <- tolower(alpha_init)
     .assert(x = alpha_init, type = "nominal", support = methods)
@@ -865,8 +875,10 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   } else {
     dim <- 1L
   }
-  .assert(x = lambda, type = "numeric", dim = dim, min = 0.0)
-  .assert(x = silent, type = "logical")
+  #.assert(x = lambda, type = "numeric", dim = dim, min = 0.0)
+  checkmate::assert_numeric(x = lambda, len = dim, lower = 0.0, null.ok = TRUE)
+  #.assert(x = silent, type = "logical")
+  checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
   # --- estimate initial coefficients ---
   is_slope <- rep(c(FALSE, TRUE), times = c(family != "cox", p))
   if (all(is.na(alpha_init))) {
@@ -966,11 +978,14 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' @keywords internal
 #'
 .is_adjacent <- function(group, j, p, names) {
-  .assert(x = j, type = "integer", min = 1L)
-  j <- as.integer(round(j))
-  .assert(x = p, type = "integer", min = j)
+  #.assert(x = p, type = "integer", min = j)
+  checkmate::assert_int(x = p, lower = 1L)
   p <- as.integer(round(p))
-  .assert(x = names, type = "nominal", dim = p)
+  #.assert(x = j, type = "integer", min = 1L)
+  checkmate::assert_int(x = j, lower = 1L, upper = p)
+  j <- as.integer(round(j))
+  #.assert(x = names, type = "nominal", dim = p)
+  checkmate::assert_character(x = names, len = p, null.ok = TRUE)
   if (is.atomic(group) && is.null(dim(group))) {
     if (is.numeric(group)) {
       .assert(x = group, type = "integer", dim = p, min = 1L, max = p)

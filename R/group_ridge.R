@@ -117,6 +117,8 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                        nfolds = 10L, penalties = NULL) {
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
+  checkmate::assert_choice(x = family,
+                           choices =  c("gaussian", "binomial", "cox"))
   if (is.matrix(x) && ncol(x) != length(group)) {
     stop("For each variable, 'x' should have one column, ",
          "and 'group' should have one entry.")
@@ -129,7 +131,9 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   #.assert(x = x, type = "numeric", dim = c(Inf, Inf))
   checkmate::assert_matrix(x = x, mode = "numeric",
                            min.rows = 1L, min.cols = 1L, any.missing = FALSE)
-  .assert(x = y, type = "numeric", dim = nrow(x))
+  #.assert(x = y, type = "numeric", dim = nrow(x))
+  y <- .validate_response(y = y, family = family,
+                          len = (1 + (family == "cox")) * nrow(x))
   #.assert(x = group, type = "integer", dim = ncol(x),
   #        min = 1L, max = length(unique(group)))
   checkmate::assert_integer(x = group,
@@ -138,8 +142,6 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   group <- as.integer(round(group))
   #.assert(x = family, type = "nominal",
   #        support = c("gaussian", "binomial", "cox"))
-  checkmate::assert_choice(x = family,
-                           choices =  c("gaussian", "binomial", "cox"))
   #.assert(x = foldid, type = "integer", dim = nrow(x),
   #        min = 1L, max = nrow(x))
   checkmate::assert_integer(x = foldid, len = nrow(x),
