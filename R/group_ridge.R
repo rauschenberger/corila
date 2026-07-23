@@ -139,7 +139,7 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   #.assert(x = family, type = "nominal",
   #        support = c("gaussian", "binomial", "cox"))
   checkmate::assert_choice(x = family,
-                          choices =  c("gaussian", "binomial", "cox"))
+                           choices =  c("gaussian", "binomial", "cox"))
   #.assert(x = foldid, type = "integer", dim = nrow(x),
   #        min = 1L, max = nrow(x))
   checkmate::assert_integer(x = foldid, len = nrow(x),

@@ -537,8 +537,10 @@ nobs.cv.corila <- function(object, ...) {
 #' @keywords internal
 #'
 .combine_slopes <- function(alpha, beta) {
-  .assert(x = alpha, type = "numeric")
-  .assert(x = beta, type = "numeric", dim = Inf, min = 0.0)
+  #.assert(x = alpha, type = "numeric")
+  checkmate::assert_number(x = alpha, null.ok = TRUE)
+  #.assert(x = beta, type = "numeric", dim = Inf, min = 0.0)
+  checkmate::assert_numeric(x = beta, min.len = 2L, lower = 0.0)
   if (length(beta) %% 2 != 0) stop("Requires 'beta' with even length.")
   beta_positive <- beta[1L:(length(beta) / 2L)]
   beta_negative <- beta[(length(beta) / 2L + 1L):(length(beta))]
@@ -587,12 +589,17 @@ nobs.cv.corila <- function(object, ...) {
 #' @keywords internal
 #'
 .expand_auxiliary <- function(x, primary) {
-  .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
-  .assert(x = primary, type = "logical", dim = Inf)
+  #.assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
+  checkmate::assert_matrix(x = x, mode = "numeric",
+                           min.rows = 1L, min.cols = 1L)
+  #.assert(x = primary, type = "logical", dim = Inf)
+  checkmate::assert_logical(x = primary, any.missing = FALSE, min.len = 1L)
   if (ncol(x) == length(primary)) {
+    checkmate::assert_matrix(x = x, all.missing = FALSE)
     x[, !primary] <- 0.0
     x
   } else if (ncol(x) == sum(primary)) {
+    checkmate::assert_matrix(x = x, any.missing = FALSE)
     full <- matrix(data = 0.0, nrow = nrow(x), ncol = length(primary))
     full[, primary] <- x
     if (!is.null(rownames(x))) rownames(full) <- rownames(x)
@@ -644,8 +651,10 @@ nobs.cv.corila <- function(object, ...) {
 #'
 .residuals <- function(y_obs, y_fit, family) {
   if (is.character(family)) family <- tolower(family)
-  .assert(x = family, type = "nominal",
-          support = c("gaussian", "binomial", "poisson"))
+  #.assert(x = family, type = "nominal",
+  #        support = c("gaussian", "binomial", "poisson"))
+  checkmate::assert_choice(x = family,
+                           choices = c("gaussian", "binomial", "poisson"))
   eps <- 1e-06
   if (identical(family, "gaussian")) {
     .assert(x = y_obs, type = "numeric", dim = Inf)
@@ -698,6 +707,7 @@ nobs.cv.corila <- function(object, ...) {
 #' @keywords internal
 #'
 .type <- function(alpha) {
+  checkmate::assert_scalar(x = alpha, na.ok = TRUE)
   if (is.na(alpha)) {
     "none"
   } else if (is.numeric(alpha)) {
@@ -708,7 +718,7 @@ nobs.cv.corila <- function(object, ...) {
     } else if (alpha > 0.0 && alpha < 1.0) {
       "elastic net regression"
     } else {
-      stop("If argument 'alpha' is numeric, ",
+      stop("If argument 'alpha' is of type 'numeric', ",
            "it should be in the unit interval.")
     }
   } else {

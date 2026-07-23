@@ -47,9 +47,9 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   sd_x <- rep(x = 1.0, times = p)
   mu_y <- 0.0
   sd_y <- 1.0
-  pars <- list(mu.x = mu_x, sd.x = sd_x,
-               mu.y = mu_y, sd.y = sd_y,
-               family = family)
+  pars <- list(family = family,
+               mu.x = mu_x, sd.x = sd_x,
+               mu.y = mu_y, sd.y = sd_y)
   coef <- .backscale(pars = pars, coef = beta)$coef
   testthat::test_that("func '.backscale' returns finite n-vector coef", {
     testthat::expect_type(object = coef, type = "double")

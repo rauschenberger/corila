@@ -234,24 +234,34 @@
 .forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
-  .assert(x = x, type = "numeric", dim = c(Inf, Inf))
-  #checkmate::assert_matrix(x = x, mode = "numeric", any.missing = FALSE,
-  #                         min.rows = 0L)
+  #.assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  checkmate::assert_matrix(x = x, mode = "numeric", any.missing = FALSE,
+                           min.rows = 1L, min.cols = 1L)
   if (is.null(family) == is.null(pars)) {
     stop('Expect either "family" or "pars".')
   }
   families <- c("gaussian", "binomial", "poisson", "cox")
-  .assert(x = family, type = "nominal", support = families)
-  slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
-  .assert(x = names(pars), type = "nominal", dim = length(slots),
-          support = slots)
-  .assert(x = pars$family, type = "nominal", support = families)
-  .assert(x = pars$mu.x, type = "numeric", dim = ncol(x))
-  .assert(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0.0)
-  .assert(x = pars$mu.y, type = "numeric")
-  .assert(x = pars$sd.y, type = "numeric", min = 0.0)
-  .assert(x = y, type = "numeric", dim = nrow(x),
-          family = c(family, pars$family))
+  #.assert(x = family, type = "nominal", support = families)
+  slots <- c("family", "mu.x", "sd.x", "mu.y", "sd.y")
+  #.assert(x = names(pars), type = "nominal", dim = length(slots),
+  #        support = slots)
+  #.assert(x = pars$family, type = "nominal", support = families)
+  #.assert(x = pars$mu.x, type = "numeric", dim = ncol(x))
+  #.assert(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0.0)
+  #.assert(x = pars$mu.y, type = "numeric")
+  #.assert(x = pars$sd.y, type = "numeric", min = 0.0)
+  checkmate::assert_choice(x = family, choices = families, null.ok = TRUE)
+  checkmate::assert_list(x = pars, len = 5L, null.ok = TRUE)
+  if (!is.null(pars)) {
+    checkmate::assert_names(x = names(pars), identical.to = slots)
+    checkmate::assert_numeric(x = pars$mu.x, len = ncol(x))
+    checkmate::assert_numeric(x = pars$sd.x, len = ncol(x), lower = 0.0)
+    checkmate::assert_number(x = pars$mu.y)
+    checkmate::assert_number(x = pars$sd.y, lower = 0.0)
+  }
+  #.assert(x = y, type = "numeric", dim = nrow(x),
+  #        family = c(family, pars$family))
+  checkmate::assert_choice(x = c(family, pars$family), choices = families)
   # --- estimate parameters ---
   if (is.null(family)) {
     family <- pars$family
@@ -399,19 +409,28 @@
 #'
 .backscale <- function(pars, y = NULL, coef = NULL) {
   # --- check arguments ---
-  slots <- c("family", "sd.x", "mu.x", "sd.y", "mu.y")
-  .assert(x = names(pars), type = "nominal", dim = length(slots),
-          support = slots)
+  slots <- c("family", "mu.x", "sd.x", "mu.y", "sd.y")
+  #.assert(x = names(pars), type = "nominal", dim = length(slots),
+  #        support = slots)
   families <- c("gaussian", "binomial", "poisson", "cox")
-  .assert(x = pars$family, type = "nominal", support = families)
-  .assert(x = pars$mu.x, type = "numeric", dim = Inf)
-  .assert(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0.0)
-  .assert(x = pars$mu.y, type = "numeric")
-  .assert(x = pars$sd.y, type = "numeric", min = 0.0)
+  #.assert(x = pars$family, type = "nominal", support = families)
+  #.assert(x = pars$mu.x, type = "numeric", dim = Inf)
+  #.assert(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0.0)
+  #.assert(x = pars$mu.y, type = "numeric")
+  #.assert(x = pars$sd.y, type = "numeric", min = 0.0)
+  checkmate::assert_list(x = pars, len = 5L, null.ok = TRUE)
+  checkmate::assert_names(x = names(pars), identical.to = slots)
+  checkmate::assert_choice(x = pars$family, choices = families, null.ok = TRUE)
+  checkmate::assert_numeric(x = pars$mu.x, min.len = 1L)
+  checkmate::assert_numeric(x = pars$sd.x, len = length(pars$mu.x), lower = 0.0)
+  checkmate::assert_number(x = pars$mu.y)
+  checkmate::assert_number(x = pars$sd.y, lower = 0.0)
   dim <- rep(x = Inf, times = 1L + is.matrix(y))
   .assert(x = y, type = "numeric", dim = dim)
+  #checkmate::assert_numeric(x = y, )
   dim <- length(pars$mu.x) + !identical(pars$family, "cox")
   .assert(x = coef, type = "numeric", dim = dim)
+  #checkmate::assert_numeric(x = coef, len = 1L + is.matrix(y))
   # --- transform target ---
   list <- list()
   if (!is.null(y) && identical(pars$family, "gaussian")) {
@@ -486,14 +505,17 @@
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
-  support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
-  .assert(x = family, type = "nominal", support = support)
+  #support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
+  support <- c("gaussian", "binomial", "poisson", "cox")
+  #.assert(x = family, type = "nominal", support = support)
+  checkmate::assert_choice(x = family, choices = support)
   .assert(x = y, type = "numeric", dim = Inf, family = family)
   if (length(y) < 2L) stop("Require at least 2 observations.")
   #if(identical(family, "cox") && !inherits(y, "Surv")){
   #  stop("Require object of class 'Surv'.")
   #}
-  .assert(x = nfolds, type = "integer", min = 2L, max = length(y))
+  #.assert(x = nfolds, type = "integer", min = 2L, max = length(y))
+  checkmate::assert_int(x = nfolds, lower = 2L, upper = length(y))
   nfolds <- as.integer(round(nfolds))
   # --- set fold identifiers ---
   if (family %in% c("binomial", "logistic", "cox")) {
@@ -549,8 +571,10 @@
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
   support <- c("gaussian", "binomial", "poisson", "cox")
-  .assert(x = x, type = "numeric", dim = Inf)
-  .assert(x = family, type = "nominal", support = support)
+  #.assert(x = x, type = "numeric", dim = Inf)
+  checkmate::assert_numeric(x = x, min.len = 1L)
+  #.assert(x = family, type = "nominal", support = support)
+  checkmate::assert_choice(x = family, choices = support)
   # --- transform target ---
   if (family %in% c("gaussian", "cox")) {
     x
@@ -605,8 +629,8 @@
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
   support <- c("gaussian", "binomial", "poisson", "cox")
-  .assert(x = family, type = "nominal", support = support)
-  #checkmate::assert_choice(x = family, choice = support)
+  #.assert(x = family, type = "nominal", support = support)
+  checkmate::assert_choice(x = family, choice = support)
   .assert(x = y, type = "numeric", dim = Inf, family = family)
   #checkmate::assert_numeric(x = y, )
   if (identical(family, "binomial")) {
@@ -639,3 +663,24 @@
     glmnet::coxnet.deviance(pred = log(y_hat), y = y)
   }
 }
+
+# .validate_response <- function(x, family, na.ok = FALSE) {
+#   checkmate::assert_choice(
+#     x = family,
+#     choices = c("gaussian", "binomial", "poisson", "cox")
+#   )
+#   checkmate::assert_numeric(x = y, min.len = 1L)
+#   if (identical(family, "binomial")) {
+#     .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
+#     y <- as.integer(round(y))
+#     .assert(x = y_hat, type = "numeric", dim = length(y),
+#             min = 0.0, max = 1.0)
+#   } else if (identical(family, "poisson")) {
+#     .assert(x = y, type = "integer", dim = Inf, min = 0L)
+#     y <- as.integer(round(y))
+#     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0)
+#   } else {
+#     .assert(x = y, type = "numeric", dim = Inf)
+#     .assert(x = y_hat, type = "numeric", dim = length(y))
+#   }
+# }
