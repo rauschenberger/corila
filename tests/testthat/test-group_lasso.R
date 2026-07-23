@@ -135,6 +135,17 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       )
     }
   })
+  testthat::test_that("cv.corila rejects wrong argument group", {
+    for(i in seq_along(foldid)) {
+      testthat::expect_error(
+        object = cv.corila(x = data$x_train,
+                           y = data$y_train,
+                           group = array(data = NA, dim = c(2L, 2L, 2L)),
+                           family = family_data),
+        regexp = "a vector, a list, or a matrix"
+      )
+    }
+  })
 }
 
 ## function ".estim_initial_coefs" ---------------------------------------------
