@@ -1,7 +1,7 @@
 
 #----- function .simulate_predictors -------------------------------------------
 
-testthat::test_that(".simulate_response requires either p or group", {
+testthat::test_that(".simulate_predictors requires either p or group", {
   testthat::expect_error(
     object = .simulate_predictors(n = 2L, p = NULL, group = NULL),
     regexp = "either p or group"
@@ -13,7 +13,7 @@ testthat::test_that(".simulate_response requires either p or group", {
 }
 )
 
-testthat::test_that(".simulate_response handles single sample", {
+testthat::test_that(".simulate_predictors handles single sample", {
   x <- .simulate_predictors(n = 1L, group = c(1L, 1L), rho = 1.0)
   testthat::expect_type(object = x, type = "double")
   testthat::expect_equal(object = x[1L], expected = x[2L])
@@ -21,12 +21,19 @@ testthat::test_that(".simulate_response handles single sample", {
 }
 )
 
-testthat::test_that(".simulate_response handles two samples", {
+testthat::test_that(".simulate_predictors handles multiple samples", {
   x <- .simulate_predictors(n = 10L, group = c(1L, 1L, 2L), rho = 1.0)
   testthat::expect_type(object = x, type = "double")
   testthat::expect_equal(object = x[, 1L], expected = x[, 2L],
                          tolerance = 1e-06)
   testthat::expect_shape(object = x, dim = c(10L, 3L))
+}
+)
+
+testthat::test_that(".simulate_predictors works with p and group", {
+  x0 <- .simulate_predictors(n = 10L, p = 5L)
+  x1 <- .simulate_predictors(n = 10L, group = seq_len(5L))
+  testthat::expect_equal(object = x0, expected = x1)
 }
 )
 
