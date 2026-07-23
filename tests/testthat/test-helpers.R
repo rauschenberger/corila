@@ -266,6 +266,23 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       testthat::expect_error(.folds(y = y, family = "gamma", nfolds = nfolds))
     }
   )
+  testthat::test_that(
+    desc = "function '.folds' throws an error if y has one entry",
+    code = {
+      testthat::expect_error(
+        object = .folds(y = y[1L], family = family, nfolds = 1L),
+        regexp = "at least 2 observations"
+      )
+    }
+  )
+  foldid <- .folds(y = y[1L:2L], family = family, nfolds = 2L)
+  testthat::test_that(
+    desc = "function '.folds' works if y has two entries",
+    code = {
+      testthat::expect_length(object = foldid, n = 2L)
+      testthat::expect_setequal(object = foldid, expected = c(1L, 2L))
+    }
+  )
   foldid <- .folds(y = y, family = family, nfolds = nfolds)
   testthat::test_that("fold identifiers are in finite vector", {
     testthat::expect_type(object = foldid, type = "integer")
