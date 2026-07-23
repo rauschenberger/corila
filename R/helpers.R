@@ -235,6 +235,8 @@
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
   .assert(x = x, type = "numeric", dim = c(Inf, Inf))
+  #checkmate::assert_matrix(x = x, mode = "numeric", any.missing = FALSE,
+  #                         min.rows = 0L)
   if (is.null(family) == is.null(pars)) {
     stop('Expect either "family" or "pars".')
   }
@@ -604,7 +606,9 @@
   if (is.character(family)) family <- tolower(family)
   support <- c("gaussian", "binomial", "poisson", "cox")
   .assert(x = family, type = "nominal", support = support)
+  #checkmate::assert_choice(x = family, choice = support)
   .assert(x = y, type = "numeric", dim = Inf, family = family)
+  #checkmate::assert_numeric(x = y, )
   if (identical(family, "binomial")) {
     .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
     y <- as.integer(round(y))
