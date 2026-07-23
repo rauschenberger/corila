@@ -258,7 +258,8 @@ testthat::test_that("slopes do not change", {
 testthat::test_that("reject beta of odd length", {
   testthat::expect_error(
     object = .combine_slopes(alpha = 1.0, beta = abs(rnorm(3L))),
-    regexp = "with even length")
+    regexp = "with even length"
+  )
 })
 
 ## function ".expand_auxiliary" ------------------------------------------------
