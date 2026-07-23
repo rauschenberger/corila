@@ -509,7 +509,8 @@
   support <- c("gaussian", "binomial", "poisson", "cox")
   #.assert(x = family, type = "nominal", support = support)
   checkmate::assert_choice(x = family, choices = support)
-  .assert(x = y, type = "numeric", dim = Inf, family = family)
+  #.assert(x = y, type = "numeric", dim = Inf, family = family)
+  y <- .validate_response(y = y, family = family)
   if (length(y) < 2L) stop("Require at least 2 observations.")
   #if(identical(family, "cox") && !inherits(y, "Surv")){
   #  stop("Require object of class 'Surv'.")
@@ -631,20 +632,25 @@
   support <- c("gaussian", "binomial", "poisson", "cox")
   #.assert(x = family, type = "nominal", support = support)
   checkmate::assert_choice(x = family, choice = support)
-  .assert(x = y, type = "numeric", dim = Inf, family = family)
-  #checkmate::assert_numeric(x = y, )
-  if (identical(family, "binomial")) {
-    .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
-    y <- as.integer(round(y))
-    .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0, max = 1.0)
-  } else if (identical(family, "poisson")) {
-    .assert(x = y, type = "integer", dim = Inf, min = 0L)
-    y <- as.integer(round(y))
-    .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0)
-  } else {
-    .assert(x = y, type = "numeric", dim = Inf)
-    .assert(x = y_hat, type = "numeric", dim = length(y))
+  y <- .validate_response(y = y, family = family)
+  y_hat <- .validate_fitted(y_hat = y_hat, family = family)
+  if (length(y) != length(y_hat)) {
+    stop("Arguments 'y' and 'y_hat' must have the same length.")
   }
+  #.assert(x = y, type = "numeric", dim = Inf, family = family)
+  #checkmate::assert_numeric(x = y, )
+  #if (identical(family, "binomial")) {
+  #  .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
+  #  y <- as.integer(round(y))
+  #  .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0, max = 1.0)
+  #} else if (identical(family, "poisson")) {
+  #  .assert(x = y, type = "integer", dim = Inf, min = 0L)
+  #  y <- as.integer(round(y))
+  #  .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0)
+  #} else {
+  #  .assert(x = y, type = "numeric", dim = Inf)
+  #  .assert(x = y_hat, type = "numeric", dim = length(y))
+  #}
   # --- calculate deviance ---
   eps <- 1e-06
   if (identical(family, "gaussian")) {
@@ -664,23 +670,50 @@
   }
 }
 
-# .validate_response <- function(x, family, na.ok = FALSE) {
-#   checkmate::assert_choice(
-#     x = family,
-#     choices = c("gaussian", "binomial", "poisson", "cox")
-#   )
-#   checkmate::assert_numeric(x = y, min.len = 1L)
-#   if (identical(family, "binomial")) {
-#     .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
-#     y <- as.integer(round(y))
-#     .assert(x = y_hat, type = "numeric", dim = length(y),
-#             min = 0.0, max = 1.0)
-#   } else if (identical(family, "poisson")) {
-#     .assert(x = y, type = "integer", dim = Inf, min = 0L)
-#     y <- as.integer(round(y))
-#     .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0)
+.validate_response <- function(y, family, na.rm = FALSE) {
+  checkmate::assert_choice(
+    x = family, choices = c("gaussian", "binomial", "poisson", "cox")
+  )
+  checkmate::assert_numeric(
+    x = y, min.len = 1L, all.missing = FALSE, any.missing = na.rm
+  )
+  if (identical(family, "binomial")) {
+    checkmate::assert_integerish(x = y, lower = 0L, upper = 1L)
+    as.integer(round(y))
+  } else if (identical(family, "poisson")) {
+    checkmate::assert_integerish(x = y, lower = 0L)
+    as.integer(round(y))
+  } else {
+    y
+  }
+}
+
+.validate_fitted <- function(y_hat, family) {
+  checkmate::assert_choice(
+    x = family, choices = c("gaussian", "binomial", "poisson", "cox")
+  )
+  checkmate::assert_numeric(
+    x = y_hat, min.len = 1L, any.missing = FALSE
+  )
+  if (identical(family, "binomial")) {
+    checkmate::assert_numeric(x = y_hat, lower = 0.0, upper = 1.0)
+  } else if (identical(family, "poisson")) {
+    checkmate::assert_numeric(x = y_hat, lower = 0.0)
+  } else {
+    y_hat
+  }
+}
+
+# .validate_foldid <- function(foldid, y, family) {
+#   checkmate::assert_numeric()
+#   checkmate::assert_integerish(x = foldid, lower = 1L, upper = length(foldid),
+#                                min.len = 1L, null.ok = TRUE)
+#   if (is.null(foldid)) {
+#     nfolds <- as.integer(round(nfolds))
 #   } else {
-#     .assert(x = y, type = "numeric", dim = Inf)
-#     .assert(x = y_hat, type = "numeric", dim = length(y))
-#   }
-# }
+#     foldid <- as.integer(round(foldid))
+#     nfolds <- max(foldid)
+#  }
+#
+#  list(n = nfolds, id = foldid)
+#}

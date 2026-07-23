@@ -363,11 +363,15 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
 #'
 predict.corila <- function(object, newx, index, s, ...) {
   # --- check arguments ---
-  .assert(x = newx, type = "numeric",
-          dim = c(Inf, length(object$scale$mu.x)))
-  .assert(x = index, type = "integer", min = 1L, max = length(object$model))
+  #.assert(x = newx, type = "numeric",
+  #        dim = c(Inf, length(object$scale$mu.x)))
+  checkmate::assert_matrix(x = newx, mode = "numeric",
+                           min.rows = 1, ncols = length(object$scale$mu.x))
+  #.assert(x = index, type = "integer", min = 1L, max = length(object$model))
+  checkmate::assert_int(x = index, lower = 1L, upper = length(object$model))
   index <- as.integer(round(index))
-  .assert(x = s, type = "numeric", dim = Inf, min = 0.0)
+  #.assert(x = s, type = "numeric", dim = Inf, min = 0.0)
+  checkmate::assert_numeric(x = s, min.len = 1L, lower = 0.0)
   # --- make predictions ---
   newx_stand <- .forescale(x = newx, pars = object$scale)$x
   y_hat_stand <- stats::predict(object = object$model[[index]],
@@ -533,7 +537,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     pf_ext <- 1.0 / (weight$local * hyper$wgt_local[i] +
                        weight$global * hyper$wgt_global[i])
     pf_ext[!c(primary, primary)] <- Inf # exclude auxiliary features
-    .assert(x = pf_ext, type = "numeric", dim = 2L * p, min = 0.0)
+    #.assert(x = pf_ext, type = "numeric", dim = 2L * p, min = 0.0)
+    checkmate::assert_numeric(x = pf_ext, len = 2L * p, min = 0.0)
     model[[i]] <- suppressMessages(
       glmnet::glmnet(x = cbind(scale$x, -scale$x),
                      y = scale$y,

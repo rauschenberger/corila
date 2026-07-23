@@ -353,7 +353,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   #        max = length(group))
   #.assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
   checkmate::assert_integerish(x = group, min.len = 1L, max.len = 1e03L,
-                            lower = 1L, upper = length(group))
+                               lower = 1L, upper = length(group))
   group <- as.integer(round(group))
   #.assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
   checkmate::assert_number(x = prob_group, lower = 0.0, upper = 1.0)
