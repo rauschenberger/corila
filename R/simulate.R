@@ -303,12 +303,14 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   #.assert(x = group, type = "integer", dim = Inf, min = 1L,
   #        max = length(group))
   #.assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
-  checkmate::assert_integer(x = group, min.len = 1L, max.len = 1e03L,
-                            lower = 1L, upper = length(group), null.ok = TRUE)
+  checkmate::assert_integerish(x = group, min.len = 1L, max.len = 1e03L,
+                               lower = 1L, upper = length(group),
+                               null.ok = TRUE)
   group <- as.integer(round(group))
   #.assert(x = rho, type = "numeric", min = 0.0, max = 1.0)
-  checkmate::assert_number(x = rho, lower = 0.0, upper = 1.0)
+  checkmate::assert_number(x = rho)
   rho <- round(rho, digits = 6L)
+  checkmate::assert_number(x = rho, lower = 0.0, upper = 1.0)
   #.assert(x = seed, type = "integer")
   checkmate::assert_int(x = seed)
   set.seed(as.integer(round(seed)))
@@ -350,7 +352,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   #.assert(x = group, type = "integer", dim = Inf, min = 1L,
   #        max = length(group))
   #.assert(x = length(group), type = "integer", min = 1L, max = 1e03L)
-  checkmate::assert_integer(x = group, min.len = 1L, max.len = 1e03L,
+  checkmate::assert_integerish(x = group, min.len = 1L, max.len = 1e03L,
                             lower = 1L, upper = length(group))
   group <- as.integer(round(group))
   #.assert(x = prob_group, type = "numeric", min = 0.0, max = 1.0)
