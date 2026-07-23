@@ -124,7 +124,7 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
     foldid[[2L]] <- rep(seq_len(2L), length.out = nrow(data$x_train))
     foldid[[3L]] <- rep(seq_len(5L), length.out = nrow(data$x_train))
     foldid[[3L]][foldid[[3L]] == 5L] <- 6L
-    for(i in seq_along(foldid)) {
+    for (i in seq_along(foldid)) {
       testthat::expect_error(
         object = cv.corila(x = data$x_train,
                            y = data$y_train,
@@ -136,7 +136,6 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
     }
   })
   testthat::test_that("cv.corila rejects wrong argument group", {
-    for(i in seq_along(foldid)) {
       testthat::expect_error(
         object = cv.corila(x = data$x_train,
                            y = data$y_train,
@@ -144,7 +143,6 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
                            family = family_data),
         regexp = "a vector, a list, or a matrix"
       )
-    }
   })
 }
 
