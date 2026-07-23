@@ -223,7 +223,16 @@ testthat::test_that("adjacency is detected", {
   #)
   factor_list <- lapply(group$label_list, as.factor)
   testthat::expect_error(
-    .is_adjacent(group = factor_list, j = 1L, p = p, names = NULL)
+    object = .is_adjacent(group = factor_list, j = 1L, p = p, names = NULL),
+    regexp = "slots of type numeric or character"
+  )
+  testthat::expect_error(
+    object = .is_adjacent(group = list(), j = 1L, p = p, names = NULL),
+    regexp = "not have length 0"
+  )
+  testthat::expect_error(
+    object = .is_adjacent(group = array(), j = 1L, p = p, names = NULL),
+    regexp = "a vector, a list, or a matrix"
   )
 })
 
