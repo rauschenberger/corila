@@ -703,5 +703,12 @@
 # }
 
 # .validate_group <- function(group) {
-#
+#   check all three option
 # }
+
+# .validate_family <- function(family, poisson = TRUE) {
+#   tolower
+#   check wether inside support
+# }
+
+# in function residuals: rename y_fit to y_hat and y_obs to y
