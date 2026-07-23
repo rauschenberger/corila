@@ -128,30 +128,19 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   if (cond) {
     stop("Argument 'penalties' must have one entry for each group.")
   }
-  #.assert(x = x, type = "numeric", dim = c(Inf, Inf))
   checkmate::assert_matrix(x = x, mode = "numeric",
                            min.rows = 1L, min.cols = 1L, any.missing = FALSE)
-  #.assert(x = y, type = "numeric", dim = nrow(x))
   y <- .validate_response(y = y, family = family,
                           len = (1L + (family == "cox")) * nrow(x))
-  #.assert(x = group, type = "integer", dim = ncol(x),
-  #        min = 1L, max = length(unique(group)))
   checkmate::assert_integer(x = group,
                             lower = 1L, upper = length(unique(group)),
                             len = ncol(x))
   group <- as.integer(round(group))
-  #.assert(x = family, type = "nominal",
-  #        support = c("gaussian", "binomial", "cox"))
-  #.assert(x = foldid, type = "integer", dim = nrow(x),
-  #        min = 1L, max = nrow(x))
   checkmate::assert_integer(x = foldid, len = nrow(x),
                             lower = 1L, upper = nrow(x), null.ok = TRUE)
   if (!is.null(foldid)) foldid <- as.integer(round(foldid))
-  #.assert(x = nfolds, type = "integer", min = 2L, max = nrow(x))
   checkmate::assert_int(x = nfolds, lower = 2L, upper = nrow(x))
   nfolds <- as.integer(round(nfolds))
-  #.assert(x = penalties, type = "numeric", dim = length(unique(group)),
-  #        min = 0.0)
   checkmate::assert_numeric(x = penalties, lower = 0.0,
                             len = length(unique(group)), null.ok = TRUE)
   #.validate(x = x, y = y, group = NULL, family = family)
@@ -238,7 +227,6 @@ predict.multiridge <- function(object, newx, ...) {
     stop("Argument 'newx' must have one column",
          "for each variable used in model fitting.")
   }
-  #.assert(x = newx, type = "numeric", dim = c(Inf, length(object$group)))
   checkmate::assert_matrix(x = newx, mode = "numeric", min.rows = 1L,
                            ncols = length(object$group))
   # --- make predictions ---

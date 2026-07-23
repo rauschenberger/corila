@@ -537,9 +537,7 @@ nobs.cv.corila <- function(object, ...) {
 #' @keywords internal
 #'
 .combine_slopes <- function(alpha, beta) {
-  #.assert(x = alpha, type = "numeric")
   checkmate::assert_number(x = alpha, null.ok = TRUE)
-  #.assert(x = beta, type = "numeric", dim = Inf, min = 0.0)
   checkmate::assert_numeric(x = beta, min.len = 2L, lower = 0.0)
   if (length(beta) %% 2 != 0) stop("Requires 'beta' with even length.")
   beta_positive <- beta[1L:(length(beta) / 2L)]
@@ -589,10 +587,8 @@ nobs.cv.corila <- function(object, ...) {
 #' @keywords internal
 #'
 .expand_auxiliary <- function(x, primary) {
-  #.assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
   checkmate::assert_matrix(x = x, mode = "numeric",
                            min.rows = 1L, min.cols = 1L)
-  #.assert(x = primary, type = "logical", dim = Inf)
   checkmate::assert_logical(x = primary, any.missing = FALSE, min.len = 1L)
   if (ncol(x) == length(primary)) {
     checkmate::assert_matrix(x = x, all.missing = FALSE)
@@ -651,29 +647,18 @@ nobs.cv.corila <- function(object, ...) {
 #'
 .residuals <- function(y_obs, y_fit, family) {
   if (is.character(family)) family <- tolower(family)
-  #.assert(x = family, type = "nominal",
-  #        support = c("gaussian", "binomial", "poisson"))
   checkmate::assert_choice(x = family,
                            choices = c("gaussian", "binomial", "poisson"))
   eps <- 1e-06
   y_obs <- .validate_response(y = y_obs, family = family)
   y_fit <- .validate_fitted(y_hat = y_fit, family = family, len = length(y_obs))
   if (identical(family, "gaussian")) {
-    #.assert(x = y_obs, type = "numeric", dim = Inf)
-    #.assert(x = y_fit, type = "numeric", dim = length(y_obs))
     y_obs - y_fit
   } else if (identical(family, "binomial")) {
-    #.assert(x = y_obs, type = "integer", dim = Inf, min = 0L, max = 1L)
-    #y_obs <- as.integer(round(y_obs))
-    #.assert(x = y_fit, type = "numeric", dim = length(y_obs),
-    #        min = 0.0, max = 1.0)
     y_fit <- pmax(eps, pmin(y_fit, 1.0 - eps))
     sign(y_obs - y_fit) * sqrt(2.0) *
       sqrt(- y_obs * log(y_fit) - (1.0 - y_obs) * log(1.0 - y_fit))
   } else if (identical(family, "poisson")) {
-    #.assert(x = y_obs, type = "integer", dim = Inf, min = 0L)
-    #y_obs <- as.integer(round(y_obs))
-    #.assert(x = y_fit, type = "numeric", dim = length(y_obs), min = 0.0)
     sign(y_obs - y_fit) *
       sqrt((2.0 * (ifelse(test = abs(y_obs) < .Machine$double.eps,
                           yes = 0.0,

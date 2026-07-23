@@ -234,22 +234,13 @@
 .forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
-  #.assert(x = x, type = "numeric", dim = c(Inf, Inf))
   checkmate::assert_matrix(x = x, mode = "numeric", any.missing = FALSE,
                            min.rows = 1L, min.cols = 1L)
   if (is.null(family) == is.null(pars)) {
     stop('Expect either "family" or "pars".')
   }
   families <- c("gaussian", "binomial", "poisson", "cox")
-  #.assert(x = family, type = "nominal", support = families)
   slots <- c("family", "mu.x", "sd.x", "mu.y", "sd.y")
-  #.assert(x = names(pars), type = "nominal", dim = length(slots),
-  #        support = slots)
-  #.assert(x = pars$family, type = "nominal", support = families)
-  #.assert(x = pars$mu.x, type = "numeric", dim = ncol(x))
-  #.assert(x = pars$sd.x, type = "numeric", dim = ncol(x), min = 0.0)
-  #.assert(x = pars$mu.y, type = "numeric")
-  #.assert(x = pars$sd.y, type = "numeric", min = 0.0)
   checkmate::assert_choice(x = family, choices = families, null.ok = TRUE)
   checkmate::assert_list(x = pars, len = 5L, null.ok = TRUE)
   if (!is.null(pars)) {
@@ -259,8 +250,6 @@
     checkmate::assert_number(x = pars$mu.y)
     checkmate::assert_number(x = pars$sd.y, lower = 0.0)
   }
-  #.assert(x = y, type = "numeric", dim = nrow(x),
-  #        family = c(family, pars$family))
   checkmate::assert_choice(x = c(family, pars$family), choices = families)
   # --- estimate parameters ---
   if (is.null(family)) {
@@ -410,14 +399,7 @@
 .backscale <- function(pars, y = NULL, coef = NULL) {
   # --- check arguments ---
   slots <- c("family", "mu.x", "sd.x", "mu.y", "sd.y")
-  #.assert(x = names(pars), type = "nominal", dim = length(slots),
-  #        support = slots)
   families <- c("gaussian", "binomial", "poisson", "cox")
-  #.assert(x = pars$family, type = "nominal", support = families)
-  #.assert(x = pars$mu.x, type = "numeric", dim = Inf)
-  #.assert(x = pars$sd.x, type = "numeric", dim = length(pars$mu.x), min = 0.0)
-  #.assert(x = pars$mu.y, type = "numeric")
-  #.assert(x = pars$sd.y, type = "numeric", min = 0.0)
   if (is.null(y) && is.null(coef)) {
     stop("Provide 'y' or 'coef'.")
   }
@@ -428,8 +410,6 @@
   checkmate::assert_numeric(x = pars$sd.x, len = length(pars$mu.x), lower = 0.0)
   checkmate::assert_number(x = pars$mu.y)
   checkmate::assert_number(x = pars$sd.y, lower = 0.0)
-  #dim <- rep(x = Inf, times = 1L + is.matrix(y))
-  #.assert(x = y, type = "numeric", dim = dim)
   if (is.matrix(y)) {
     checkmate::assert_matrix(x = y, min.rows = 1L, min.cols = 1L,
                              any.missing = FALSE, null.ok = TRUE)
@@ -443,8 +423,6 @@
   #                           any.missing = FALSE),
   #  combine = "or"
   #)
-  #dim <- length(pars$mu.x) + !identical(pars$family, "cox")
-  #.assert(x = coef, type = "numeric", dim = dim)
   checkmate::assert_numeric(
     x = coef,
     len = length(pars$mu.x) + !identical(pars$family, "cox"),
@@ -524,17 +502,12 @@
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
-  #support <- c("gaussian", "linear", "binomial", "logistic", "poisson", "cox")
-  support <- c("gaussian", "binomial", "poisson", "cox")
-  #.assert(x = family, type = "nominal", support = support)
-  checkmate::assert_choice(x = family, choices = support)
-  #.assert(x = y, type = "numeric", dim = Inf, family = family)
+  checkmate::assert_choice(
+    x = family,
+    choices = c("gaussian", "binomial", "poisson", "cox")
+  )
   y <- .validate_response(y = y, family = family)
   if (length(y) < 2L) stop("Require at least 2 observations.")
-  #if(identical(family, "cox") && !inherits(y, "Surv")){
-  #  stop("Require object of class 'Surv'.")
-  #}
-  #.assert(x = nfolds, type = "integer", min = 2L, max = length(y))
   checkmate::assert_int(x = nfolds, lower = 2L, upper = length(y))
   nfolds <- as.integer(round(nfolds))
   # --- set fold identifiers ---
@@ -591,9 +564,7 @@
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
   support <- c("gaussian", "binomial", "poisson", "cox")
-  #.assert(x = x, type = "numeric", dim = Inf)
   checkmate::assert_numeric(x = x, min.len = 1L)
-  #.assert(x = family, type = "nominal", support = support)
   checkmate::assert_choice(x = family, choices = support)
   # --- transform target ---
   if (family %in% c("gaussian", "cox")) {
@@ -648,28 +619,15 @@
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
-  support <- c("gaussian", "binomial", "poisson", "cox")
-  #.assert(x = family, type = "nominal", support = support)
-  checkmate::assert_choice(x = family, choice = support)
+  checkmate::assert_choice(
+    x = family,
+    choice = c("gaussian", "binomial", "poisson", "cox")
+  )
   y <- .validate_response(y = y, family = family)
   y_hat <- .validate_fitted(y_hat = y_hat, family = family)
   if (length(y) != length(y_hat)) {
     stop("Arguments 'y' and 'y_hat' must have the same length.")
   }
-  #.assert(x = y, type = "numeric", dim = Inf, family = family)
-  #checkmate::assert_numeric(x = y, )
-  #if (identical(family, "binomial")) {
-  #  .assert(x = y, type = "integer", dim = Inf, min = 0L, max = 1L)
-  #  y <- as.integer(round(y))
-  #  .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0, max = 1.0)
-  #} else if (identical(family, "poisson")) {
-  #  .assert(x = y, type = "integer", dim = Inf, min = 0L)
-  #  y <- as.integer(round(y))
-  #  .assert(x = y_hat, type = "numeric", dim = length(y), min = 0.0)
-  #} else {
-  #  .assert(x = y, type = "numeric", dim = Inf)
-  #  .assert(x = y_hat, type = "numeric", dim = length(y))
-  #}
   # --- calculate deviance ---
   eps <- 1e-06
   if (identical(family, "gaussian")) {
@@ -697,6 +655,9 @@
   checkmate::assert_numeric(
     x = y, min.len = 1L, all.missing = FALSE, ...
   )
+  if(identical(family, "cox") != inherits(y, "Surv")){
+    stop("Expects survival response if and only if Cox model.")
+  }
   if (identical(family, "binomial")) {
     checkmate::assert_integerish(x = y, lower = - eps, upper = 1.0 + eps)
     as.integer(round(y))
