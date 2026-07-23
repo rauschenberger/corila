@@ -255,6 +255,11 @@ testthat::test_that("intercept does not change", {
 testthat::test_that("slopes do not change", {
   testthat::expect_identical(object = coef[-1L], expected = temp)
 })
+testthat::test_that("reject beta of odd length", {
+  testthat::expect_error(
+    object = .combine_slopes(alpha = 1.0, beta = abs(rnorm(3L))),
+    regexp = "with even length")
+})
 
 ## function ".expand_auxiliary" ------------------------------------------------
 
