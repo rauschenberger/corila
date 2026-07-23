@@ -55,14 +55,14 @@ for (i in seq_along(family)) {
       testthat::expect_error(object = .simulate_response(),
                              regexp = "is missing")
       testthat::expect_error(object = .simulate_response(family = "gamma"),
-                             regexp = "inside support")
+                             regexp = "element of set")
       testthat::expect_error(object = .simulate_response(family = family[i]),
                              regexp = "Provide either")
       testthat::skip_if(j == 1L)
       testthat::expect_error(object = .simulate_response(x = x,
                                                          beta = beta[-1L],
                                                          family = family[i]),
-                             regexp = "other length")
+                             regexp = "failed: Must have length")
       testthat::expect_error(
         object = .simulate_response(x = NULL, beta = beta, family = family[i]),
         regexp = "either none or both"
