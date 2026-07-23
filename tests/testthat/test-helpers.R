@@ -275,7 +275,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       )
     }
   )
-  foldid <- .folds(y = y[1L:2L], family = family, nfolds = 2L)
+  foldid <- .folds(y = unique(y)[1L:2L], family = family, nfolds = 2L)
   testthat::test_that(
     desc = "function '.folds' works if y has two entries",
     code = {
