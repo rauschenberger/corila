@@ -138,8 +138,8 @@ x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
 
 # model fitting
-hyper <- data.frame(exp_local = 1.0, wgt_local = 0.5,
-                    exp_global = 1.0, wgt_global = 0.5)
+hyper <- data.frame(wgt_local = 0.5, exp_local = 1.0, 
+                    wgt_global = 0.5, exp_global = 1.0)
 object <- corila(x = x,
                  y = y,
                  group = group,
