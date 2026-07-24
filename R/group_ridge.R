@@ -131,7 +131,8 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   }
   checkmate::assert_matrix(x = x, mode = "numeric",
                            min.rows = 1L, min.cols = 1L, any.missing = FALSE)
-  y <- .validate_y(y = y, family = family, n = nrow(x), na_action = "error")
+  y <- .validate_y(y = y, family = family, n = nrow(x), na_action = "error",
+                   names = rownames(x))
   checkmate::assert_integer(x = group,
                             lower = 1L, upper = length(unique(group)),
                             len = ncol(x))

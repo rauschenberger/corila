@@ -652,7 +652,7 @@ nobs.cv.corila <- function(object, ...) {
   family <- .validate_family(family = family)
   eps <- 1e-06
   y <- .validate_y(y = y, family = family, n = NULL,
-                   na_action = "complete_cases")
+                   na_action = "complete_cases", names = NULL)
   y_hat <- .validate_y_hat(y_hat = y_hat, family = family, n = length(y))
   if (identical(family, "gaussian")) {
     y - y_hat

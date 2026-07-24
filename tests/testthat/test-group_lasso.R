@@ -71,21 +71,21 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_error(
       object = cv.corila(x = data$x_train[0L, ], y = data$y_train[0L],
                          group = data$group, family = family_data),
-      regexp = "at least three observations"
+      regexp = "at least 3 rows"
     )
     testthat::expect_error(
       object = cv.corila(x = data$x_train[1L, , drop = FALSE],
                          y = data$y_train[1L],
                          group = data$group,
                          family = family_data),
-      regexp = "at least three observations"
+      regexp = "at least 3 rows"
     )
     testthat::expect_error(
       object = cv.corila(x = data$x_train[1L:2L, ],
                          y = data$y_train[1L:2L],
                          group = data$group,
                          family = family_data),
-      regexp = "at least three observations"
+      regexp = "at least 3 rows"
     )
   })
   #' @srrstats {G5.8d} *rejects data outside the scope of the algorithm*
@@ -95,14 +95,14 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
                          y = data$y_train,
                          group = integer(),
                          family = family_data),
-      regexp = "at least two predictors"
+      regexp = "at least 2 cols"
     )
     testthat::expect_error(
       object = cv.corila(x = data$x_train[, 1L, drop = FALSE],
                          y = data$y_train,
                          group = 1L,
                          family = family_data),
-      regexp = "at least two predictors"
+      regexp = "at least 2 cols"
     )
   })
   #' @srrstats {G5.8c} *rejects data without complete observations*

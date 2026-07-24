@@ -506,7 +506,8 @@
   #  choices = c("gaussian", "binomial", "poisson", "cox")
   #)
   family <- .validate_family(family = family)
-  y <- .validate_y(y = y, family = family, n = NULL, na_action = "error")
+  y <- .validate_y(y = y, family = family, n = NULL, na_action = "error",
+                   names = NULL)
   if (length(y) < 2L) stop("Require at least 2 observations.")
   checkmate::assert_int(x = nfolds, lower = 2L, upper = length(y))
   nfolds <- as.integer(round(nfolds))
@@ -626,7 +627,7 @@
   #)
   family <- .validate_family(family = family)
   y <- .validate_y(y = y, family = family, n = NULL,
-                   na_action = "complete_cases")
+                   na_action = "complete_cases", names = NULL)
   y_hat <- .validate_y_hat(y_hat = y_hat, family = family, n = length(y))
   #if (length(y) != length(y_hat)) {
   #  stop("Arguments 'y' and 'y_hat' must have the same length.")
@@ -678,26 +679,35 @@
   checkmate::assert_matrix(x = x, mode = "numeric",
                            any.missing = (na_action == "complete_cases"),
                            all.missing = FALSE,
-                           min.rows = 3, min.cols = 3)
+                           min.rows = 3L, min.cols = 2L)
+  checkmate::assert_character(x = rownames(x), unique = TRUE,
+                              null.ok = TRUE, any.missing = FALSE)
+  checkmate::assert_character(x = colnames(x), unique = TRUE,
+                              null.ok = TRUE, any.missing = FALSE)
+  x
 }
 
-.validate_y <- function(y, family, n, na_action) {
+.validate_y <- function(y, family, n, na_action, names) {
   checkmate::assert_count(x = n, positive = TRUE, null.ok = TRUE)
-  if (length(y) > 1) y <- drop(y)
+  checkmate::assert_character(x = names, len = n, null.ok = TRUE)
+  if (length(y) > 1L) y <- drop(y)
   eps <- 1e-06
-  if (!is.null(n) && family == "cox") n <- 2 * n
+  if (!is.null(n) && family == "cox") n <- 2L * n
   checkmate::assert_numeric(
     x = y, all.missing = FALSE,
     any.missing = (na_action == "complete_cases"), len = n
   )
+  if (!is.null(names) && !is.null(names(y))) {
+    checkmate::assert_names(x = names(y), identical.to = names)
+  }
   if (identical(family, "cox") != inherits(y, "Surv")) {
     stop("Expects survival response if and only if Cox model.")
   }
   if (identical(family, "binomial")) {
-    checkmate::assert_integerish(x = y, lower = - eps, upper = 1.0 + eps)
+    checkmate::assert_integerish(x = y, lower = 0.0 - eps, upper = 1.0 + eps)
     as.integer(round(y))
   } else if (identical(family, "poisson")) {
-    checkmate::assert_integerish(x = y, lower = - eps)
+    checkmate::assert_integerish(x = y, lower = 0.0 - eps)
     as.integer(round(y))
   } else {
     y
@@ -709,10 +719,10 @@
   eps <- 1e-06
   checkmate::assert_numeric(x = y_hat, any.missing = FALSE, len = n)
   if (identical(family, "binomial")) {
-    checkmate::assert_numeric(x = y_hat, lower = - eps, upper = 1.0 + eps)
-    pmax(0, pmin(y_hat, 1))
+    checkmate::assert_numeric(x = y_hat, lower = 0.0 - eps, upper = 1.0 + eps)
+    pmax(0.0, pmin(y_hat, 1.0))
   } else if (identical(family, "poisson")) {
-    checkmate::assert_numeric(x = y_hat, lower = - eps)
+    checkmate::assert_numeric(x = y_hat, lower = 0.0 - eps)
     pmax(0, y_hat)
   } else {
     y_hat
@@ -733,37 +743,38 @@
 #  list(n = nfolds, id = foldid)
 # }
 
-# .validate_group <- function(group) {
-#   check all three option
-# }
-
-.validate_primary <- function(primary, p) {
+.validate_primary <- function(primary, p, names) {
   checkmate::assert_count(x = p, positive = TRUE)
+  checkmate::assert_character(x = names, len = p, null.ok = TRUE)
   if (is.null(primary)) {
-    rep(x = TRUE, times = p)
+    stats::setNames(object = rep(x = TRUE, times = p), nm = names)
   } else {
     checkmate::assert_logical(x = primary, any.missing = FALSE, len = p)
     checkmate::assert_count(x = sum(primary))
+    if (!is.null(names) && !is.null(names(primary))) {
+      checkmate::assert_names(x = names(primary), identical.to = names)
+    }
     drop(primary)
   }
 }
 
-.validate_cor <- function(cor, p) {
+.validate_cor <- function(cor, p, names) {
   eps <- 1e-06
   checkmate::assert_count(x = p, positive = TRUE)
+  checkmate::assert_character(x = names, len = p, null.ok = TRUE)
   if (is.character(cor)) {
     cor <- tolower(cor)
     checkmate::assert_choice(x = cor,
                              choices = c("pearson", "spearman", "kendall"))
   } else if (is.matrix(cor)) {
     checkmate::assert_matrix(x = cor, mode = "numeric", any.missing = FALSE,
-                             lower = - 1.0 - eps, upper = 1.0 + eps,
                              nrows = p, ncols = p)
+    checkmate::assert_numeric(x = cor, lower = - 1.0 - eps, upper = 1.0 + eps)
     checkmate::assert_numeric(x = diag(cor), lower = 1.0 - eps,
                               upper = 1.0 + eps)
     pmax(-1.0, pmin(cor, 1.0))
   } else {
-    stop("Argument 'cor' must be either a character or a matrix.")
+    stop("Argument 'cor' must be either a single character or a matrix.")
   }
 }
 
@@ -783,9 +794,9 @@
   } else if (is.numeric(alpha)) {
     checkmate::assert_number(x = alpha,
                              lower = 0.0 - eps, upper = 1.0 + eps)
-    pmax(0, pmin(alpha, 1))
+    pmax(0.0, pmin(alpha, 1.0))
   } else {
-    stop("Argument 'cor' must be ",
+    stop("Argument 'alpha' must be ",
          "either a single character or a single numeric.")
   }
 }
@@ -793,6 +804,7 @@
 .validate_group <- function(group, p, names) {
   eps <- 1e-06
   checkmate::assert_count(x = p, positive = TRUE)
+  checkmate::assert_character(x = names, len = p, null.ok = TRUE)
   group <- drop(group)
   if (is.vector(group) && is.atomic(group)) {
     if (is.numeric(group)) {
@@ -815,7 +827,8 @@
       )
       lapply(X = group, FUN = function(x) as.integer(round(x)))
     } else if (all(is.character(values))) {
-      checkmate::assert_character(x = names, any.missing = FALSE, len = p)
+      checkmate::assert_character(x = names, any.missing = FALSE, len = p,
+                                  unique = TRUE)
       checkmate::assert_character(x = values, any.missing = FALSE,
                                   min.len = 1L, .var.name = "unlist(group)")
       checkmate::assert_subset(x = values, choices = names,
@@ -828,8 +841,14 @@
     }
   } else if (is.matrix(group)) {
     checkmate::assert_matrix(x = group, mode = "integerish",
-                             lower = 0.0 - eps, upper = 1.0 + eps,
                              nrows = p, ncols = p)
+    if (!is.null(names) && !is.null(rownames(group))) {
+      checkmate::assert_names(x = rownames(group), identical.to = names)
+    }
+    if (!is.null(names) && !is.null(colnames(group))) {
+      checkmate::assert_names(x = colnames(group), identical.to = names)
+    }
+    checkmate::assert_numeric(x = group, lower = 0.0 - eps, upper = 1.0 + eps)
     group <- round(group)
     class(group) <- "integer"
     group
@@ -859,4 +878,30 @@
   foldid <- as.integer(round(foldid))
   checkmate::assert_int(x = max(foldid), lower = 3L, upper = n)
   checkmate::assert_set_equal(x = unique(foldid), y = seq_len(max(foldid)))
+  if (family == "binomial") {
+    rest0 <- sum(!y) - tapply(X = y, INDEX = foldid, FUN = function(x) sum(!x))
+    if (any(rest0 < 2L)) {
+      stop("Each fold must leave at least ",
+           "two observations from class 0 for the other folds.")
+    }
+    rest1 <- sum(y) - tapply(X = y, INDEX = foldid, FUN = function(x) sum(x))
+    if (any(rest1 < 2L)) {
+      stop("Each fold must leave at least ",
+           "two observations from class 1 for the other folds.")
+    }
+  } else if (family == "cox") {
+    rest <- sum(y[, "status"]) - tapply(X = y, INDEX = foldid,
+                                        FUN = function(x) sum(x[, "status"]))
+    if (any(rest < 2L)) {
+      stop("Each fold must leave at least ",
+           "two uncensored observations for the other folds.")
+    }
+  } else {
+    rest <- n - tabulate(foldid)
+    if (any(rest < 2L)) {
+      stop("Each fold must leave at least two observations ",
+           "for the other folds.")
+    }
+  }
+  foldid
 }

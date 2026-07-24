@@ -9,13 +9,13 @@ cv.corila(
   y,
   group,
   primary = NULL,
-  alpha_init = 0,
-  alpha_final = 1,
   family = "gaussian",
-  nfolds = 10L,
+  alpha_init = 0,
   cor = "spearman",
-  tune = "weight",
+  alpha_final = 1,
+  nfolds = 10L,
   foldid = NULL,
+  tune = "weight",
   na_action = "error",
   silent = FALSE
 )
@@ -52,6 +52,8 @@ indicating whether a predictor may be included in the final model
 or must be excluded from the final model
 (\code{FALSE} for "auxiliary predictors")}
 
+\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
+
 \item{alpha_init}{A scalar specifying the method used for obtaining initial coefficients:
 \itemize{
 \item a numeric scalar in the unit interval
@@ -68,24 +70,25 @@ with one penalty for each group
 \item \code{NA} to set all initial coefficients equal to 1
 }}
 
-\item{alpha_final}{elastic net mixing parameter for final regression:
-numeric between 0 for ridge penalisation
-and 1 for lasso penalisation
-(default: lasso penalisation with \code{alpha_final}=1)}
-
-\item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
-
-\item{nfolds}{positive integer specifying the number of folds
-(minimum \eqn{3}, maximum \eqn{n})
-
-NB: If \code{foldid} is provided, \code{nfolds} is overwritten by \code{max(foldid)}.}
-
 \item{cor}{character string \code{"pearson"},
 \code{"spearman"} (default),
 or \code{"kendall"};
 or a correlation matrix
 (\eqn{p} rows, \eqn{p} columns,
 entries between \eqn{-1} and \eqn{+1})}
+
+\item{alpha_final}{elastic net mixing parameter for final regression:
+numeric between 0 for ridge penalisation
+and 1 for lasso penalisation
+(default: lasso penalisation with \code{alpha_final}=1)}
+
+\item{nfolds}{positive integer specifying the number of folds
+(minimum \eqn{3}, maximum \eqn{n})
+
+NB: If \code{foldid} is provided, \code{nfolds} is overwritten by \code{max(foldid)}.}
+
+\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers
+(minimum \eqn{1}, maximum \code{nfolds})}
 
 \item{tune}{character string for determining the candidate values
 for the hyperparameters:
@@ -106,11 +109,8 @@ tuning \code{wgt_local}=1-\code{wgt_global} and \code{exp_local}=\code{exp_globa
 tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
 }
 
-(to implement: list with slots
+(to implement: data frame with columns
 \code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global})}
-
-\item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers
-(minimum \eqn{1}, maximum \code{nfolds})}
 
 \item{na_action}{character \code{"error"} to trigger an error
 if any observation has a missing predictor or a missing response

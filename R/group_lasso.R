@@ -101,7 +101,7 @@
 #' - `"factorial"`:
 #' tuning `wgt_local`, `exp_local`, `wgt_global`, `exp_global`
 #'
-#' (to implement: list with slots
+#' (to implement: data frame with columns
 #' `wgt_local`, `exp_local`, `wgt_global`, and `exp_global`)
 #'
 #' @param na_action
@@ -189,17 +189,18 @@
 #' @srrstats {RE4.0} *returns a "model" object (@return)*
 #' @srrstats {RE4.8} *returns response variable in slot "y"*
 #'
-cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
-                      alpha_final = 1.0, family = "gaussian",
-                      nfolds = 10L, cor = "spearman", tune = "weight",
-                      foldid = NULL, na_action = "error", silent = FALSE) {
+cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
+                      alpha_init = 0.0, cor = "spearman", alpha_final = 1.0,
+                      nfolds = 10L, foldid = NULL, tune = "weight",
+                      na_action = "error", silent = FALSE) {
   family <- .validate_family(family = family)
   na_action <- .validate_na_action(na_action = na_action)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
   x <- .validate_x(x = x, na_action = na_action)
   n <- nrow(x)
   p <- ncol(x)
-  y <- .validate_y(y = y, family = family, n = n, na_action = na_action)
+  y <- .validate_y(y = y, family = family, n = n, na_action = na_action,
+                   names = rownames(x))
   #y <- drop(y) # move to .validate_y
   group <- .validate_group(group = group, p = p, names = colnames(x))
   #group <- drop(group)
@@ -211,7 +212,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
   #  cor <- match.arg(arg = tolower(cor),
   #                   choices = c("pearson", "spearman", "kendall"))
   #}
-  cor <- .validate_cor(cor = cor, p = p)
+  cor <- .validate_cor(cor = cor, p = p, names = colnames(x))
   alpha_init <- .validate_alpha(alpha = alpha_init, init = TRUE)
   alpha_final <- .validate_alpha(alpha = alpha_final, init = FALSE)
   #tune <- match.arg(arg = tolower(tune),
@@ -240,7 +241,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
   #if (is.null(primary)) {
   #  primary <- rep(x = TRUE, times = ncol(x)) # move to .validate_primary
   #}
-  primary <- .validate_primary(primary = primary, p = p)
+  primary <- .validate_primary(primary = primary, p = p, names = colnames(x))
   #if (is.null(foldid) == is.null(nfolds))stop("Provide either foldid or fold.")
   #alpha_final <- pmax(0.0, pmin(alpha_final, 1.0))
   if (identical(na_action, "complete_cases")) {
@@ -254,11 +255,11 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
   }
   if (is.null(foldid)) {
     checkmate::assert_count(x = nfolds, positive = TRUE)
-    foldid <- .folds(y = y, family = family, nfolds = nfolds)
+    foldid <- .folds(y = y[complete], family = family, nfolds = nfolds)
     # only generate folds for complete observations
     # (and avoid subsetting further below)
   } else {
-    foldid <- .validate_foldid(x = foldid[complete], y = y[complete],
+    foldid <- .validate_foldid(foldid = foldid[complete], y = y[complete],
                                family = family)
     nfolds <- max(foldid)
   }
@@ -271,7 +272,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
                        alpha_init = alpha_init,
                        alpha_final = alpha_final,
                        cor = cor,
-                       foldid = foldid[complete],
+                       foldid = foldid,
                        nfolds = NULL,
                        hyper = hyper,
                        lambda_init = NULL,
@@ -856,7 +857,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   #  choices = c("gaussian", "binomial", "poisson", "cox")
   #)
   family <- .validate_family(family = family)
-  y <- .validate_y(y = y, family = family, n = n, na_action = "error")
+  y <- .validate_y(y = y, family = family, n = n, na_action = "error",
+                   names = rownames(x))
   if (is.character(alpha_init)) {
     alpha_init <- tolower(alpha_init)
     .assert(x = alpha_init, type = "nominal", support = methods)

@@ -26,7 +26,7 @@ tuning \code{wgt_local}=1-\code{wgt_global} and \code{exp_local}=\code{exp_globa
 tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
 }
 
-(to implement: list with slots
+(to implement: data frame with columns
 \code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global})}
 }
 \value{
