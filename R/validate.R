@@ -7,7 +7,7 @@
 #' of the function [cv.corila()], its helper functions, and its S3 methods.
 #' They check whether the provided arguments satisfy expectations,
 #' and return them in standardised forms
-#' (e.g., as integers instead of integerish numerics).
+#' (e.g., as integers instead of integer-like numerics).
 #'
 #' @inheritParams cv.corila
 #' @inheritParams .residuals
@@ -275,7 +275,7 @@ NULL
       stop("Each fold must leave at least ",
            "two observations from class 0 for the other folds.")
     }
-    rest1 <- sum(y) - tapply(X = y, INDEX = foldid, FUN = function(x) sum(x))
+    rest1 <- sum(y) - tapply(X = y, INDEX = foldid, FUN = sum)
     if (any(rest1 < 2L)) {
       stop("Each fold must leave at least ",
            "two observations from class 1 for the other folds.")
