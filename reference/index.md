@@ -57,8 +57,6 @@
   : Precision for sign variable
 - [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md)
   : Sparse group lasso regression (without cross-validation)
-- [`.assert()`](https://rauschenberger.github.io/corila/reference/dot-assert.md)
-  : Assertions
 - [`.backscale()`](https://rauschenberger.github.io/corila/reference/dot-backscale.md)
   : Inverse standardisation
 - [`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/dot-combine_slopes.md)
@@ -89,8 +87,6 @@
   : Simulate outcome
 - [`.type()`](https://rauschenberger.github.io/corila/reference/dot-type.md)
   : Name method (helper function)
-- [`.validate()`](https://rauschenberger.github.io/corila/reference/dot-validate.md)
-  : Argument check
 - [`predict(`*`<corila>`*`)`](https://rauschenberger.github.io/corila/reference/predict.corila.md)
   : predict (S3 method)
 - [`print(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/print.cv.corila.md)

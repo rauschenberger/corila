@@ -207,7 +207,9 @@ object <- corila(x = x,
                  nfolds = 10L,
                  hyper = hyper,
                  lambda_init = NULL)
+#> Error in .validate_hyper(hyper = hyper): Assertion on 'names(hyper)' failed: Names must be a identical to set {'wgt_local','exp_local','wgt_global','exp_global'}, but is {'exp_local','wgt_local','exp_global','wgt_global'}.
 
 y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)
+#> Error: object 'object' not found
 # }
 ```

@@ -84,8 +84,8 @@ and \(p\) estimated coefficients for negative effects</p></dd>
 <span class="r-in"><span><span class="va">temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">temp</span>, <span class="op">-</span><span class="va">temp</span><span class="op">)</span>, <span class="fl">0.0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">.combine_slopes</span><span class="op">(</span>alpha <span class="op">=</span> <span class="va">alpha</span>, beta <span class="op">=</span> <span class="va">beta</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -1.51103873 -0.01808686 -0.88018810 -1.19747710  1.06875896  1.16673686</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  2.02995850  0.50017274 -1.82274978  0.48916106 -0.69388940</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -1.0225909  2.5957718  0.3031988  0.9087474  0.2078499  0.1780140</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.1657650  0.5571036  1.4443344  0.9013571 -0.2220350</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
