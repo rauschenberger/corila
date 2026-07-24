@@ -465,26 +465,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   cor <- .validate_cor(cor = cor, p = p, names = colnames(x))
   alpha_final <- .validate_alpha(alpha = alpha_final, init = FALSE)
   hyper <- .validate_hyper(hyper = hyper)
+  checkmate::assert_number(x = lambda_init, lower = 0.0, null.ok = TRUE)
   checkmate::assert_number(x = threshold, lower = 0.0, upper = 1.0)
-  #args <- .validate(
-  #  x = x,
-  #  y = y,
-  #  group = group,
-  #  primary = primary,
-  #  family = family,
-  #  hyper = hyper,
-  #  alpha_init = alpha_init,
-  #  alpha_final = alpha_final,
-  #  cor = cor,
-  #  foldid = NULL,
-  #  nfolds = NULL,
-  #  lambda_init = lambda_init,
-  #  na_action = "error",
-  #  silent = silent
-  #)
-  #args <- as.list(match.call())[-1L]
-  #do.call(what = .validate, args = args)
-  #p <- args$p
   args <- c(n = n, p = p, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
@@ -548,136 +530,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     ),
     class = "corila"
   )
-}
-
-#----- class-specific helper functions -----
-
-#' @title
-#' Argument check
-#'
-#' @description
-#' Checks arguments of functions [corila()] and [cv.corila()].
-#'
-#' @inheritParams cv.corila
-#'
-#' @details
-#' This function is called by [corila()] and [cv.corila()].
-#' It repeatedly calls [.assert()].
-#'
-#' @return
-#' Returns a list with slots `n`, `p`, and `q` or an error message.
-#'
-#' @seealso
-#' Use [.assert()] to validate individual arguments.
-#'
-#' @keywords internal
-#'
-#' @srrstats {G2.4} *verifying data types:*
-#' @srrstats {G2.4a} *- integer*
-#' @srrstats {G2.4b} *- numeric*
-#' @srrstats {G2.4c} *- character*
-#'
-.validate <- function(na_action, x, y, group, primary, family, hyper,
-                      alpha_init, alpha_final, cor,
-                      foldid, nfolds, lambda_init, silent) {
-  #--- na action ---
-  .assert(x = na_action, type = "nominal",
-          support = c("error", "complete_cases"))
-  na.rm <- identical(na_action, "complete_cases")
-  # --- feature matrix ---
-  .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = na.rm)
-  n <- nrow(x) # sample size
-  if (n < 3L) {
-    stop("Provide at least three observations.")
-  }
-  p <- ncol(x) # number of features
-  if (p < 2L) {
-    stop("Provide at least two predictors.")
-  }
-  # --- target vector ---
-  .assert(x = family, type = "nominal",
-          support = c("gaussian", "binomial", "poisson", "cox"))
-  .assert(x = y, type = "numeric", dim = n, na.rm = na.rm, family = family)
-  # --- group indicator ---
-  if (is.vector(group) && is.atomic(group)) {
-    if (is.numeric(group)) {
-      .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
-      group <- as.integer(round(group))
-    } else if (is.character(group)) {
-      .assert(x = group, type = "nominal", dim = p)
-    } else {
-      stop("If argument 'group' is a vector, ",
-           "it must be of class 'numeric' or 'character'.")
-    }
-    q <- length(unique(group))
-  } else if (is.list(group)) {
-    for (i in seq_along(group)) {
-      if (is.numeric(group[[i]])) {
-        .assert(x = group[[i]], type = "integer", dim = Inf,
-                min = 1L, max = p)
-        group[[i]] <- as.integer(round(group[[i]]))
-      } else if (is.character(group[[i]])) {
-        .assert(x = group[[i]], type = "nominal", dim = Inf,
-                support = colnames(x))
-      } else {
-        stop("If argument 'group' is a list, ",
-             "it must be a list of ",
-             "numeric or character vectors.")
-      }
-    }
-    q <- length(group)
-  } else if (is.matrix(group)) {
-    .assert(x = group, type = "integer", dim = c(p, p), min = 0L, max = 1L)
-    group <- round(group)
-    class(group) <- "integer"
-    q <- NA
-  } else {
-    stop("Argument 'group' must be a vector, ",
-         "a list, or a matrix.")
-  }
-  # --- other arguments ---
-  .assert(x = primary, type = "logical", dim = p)
-  slots <- c("wgt_local", "wgt_global", "exp_local", "exp_global")
-  .assert(x = names(hyper), type = "nominal", dim = length(slots),
-          support = slots)
-  if (!is.null(hyper)) {
-    hyper <- as.matrix(hyper)
-  }
-  .assert(x = hyper, type = "numeric", dim = c(Inf, length(slots)), min = 0.0)
-  if (is.character(alpha_init)) {
-    .assert(x = alpha_init, type = "nominal",
-            support = c("pearson", "spearman", "kendall", "multiridge"))
-  } else {
-    .assert(x = alpha_init, type = "numeric",
-            min = 0.0, max = 1.0, na.rm = TRUE)
-  }
-  .assert(x = alpha_final, type = "numeric", min = 0.0, max = 1.0)
-  if (is.character(cor)) {
-    .assert(x = cor, type = "nominal",
-            support = c("pearson", "spearman", "kendall"))
-  } else {
-    .assert(x = cor, type = "numeric", dim = c(p, p), min = 0.0, max = 1.0)
-  }
-  .assert(x = foldid, type = "integer", dim = n, min = 1L, max = n)
-  if (is.null(foldid)) {
-    .assert(x = nfolds, type = "integer", min = 3L, max = n)
-  } else {
-    .assert(x = nfolds, type = "integer")
-    nfolds <- length(unique(foldid))
-    if (nfolds < 3) {
-      stop("Argument 'foldid' must define at least 3 folds.")
-    }
-    foldid <- as.integer(round(foldid))
-    if (!all(foldid %in% seq_len(nfolds))) {
-      stop("All entries of vector 'foldid' must be in {1, ..., nfolds}.")
-    }
-    if (!all(seq_len(nfolds) %in% foldid)) {
-      stop("All values in {1, ..., nfolds} must appear in 'foldid'.")
-    }
-  }
-  .assert(x = lambda_init, type = "numeric", min = 0.0)
-  .assert(x = silent, type = "logical")
-  list(n = n, p = p, q = q)
 }
 
 #' @title
@@ -832,30 +684,41 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
                            any.missing = FALSE)
   n <- nrow(x)
   p <- ncol(x)
-  #checkmate::assert_choice(
-  #  x = family,
-  #  choices = c("gaussian", "binomial", "poisson", "cox")
-  #)
   family <- .validate_family(family = family)
   y <- .validate_y(y = y, family = family, n = n, na_action = "error",
                    names = rownames(x))
-  if (is.character(alpha_init)) {
-    alpha_init <- tolower(alpha_init)
-    .assert(x = alpha_init, type = "nominal", support = methods)
-  } else {
-    .assert(x = alpha_init, type = "numeric", min = 0.0, max = 1.0,
-            na.rm = TRUE)
-    alpha_init <- round(alpha_init, digits = 6L)
-    alpha_init <- pmax(0.0, pmin(alpha_init, 1.0))
+  #if (is.character(alpha_init)) {
+  #  alpha_init <- tolower(alpha_init)
+  #  .assert(x = alpha_init, type = "nominal", support = methods)
+  #} else {
+  #  .assert(x = alpha_init, type = "numeric", min = 0.0, max = 1.0,
+  #          na.rm = TRUE)
+  #  alpha_init <- round(alpha_init, digits = 6L)
+  #  alpha_init <- pmax(0.0, pmin(alpha_init, 1.0))
+  #}
+  alpha_init <- .validate_alpha(alpha = alpha_init, init = TRUE)
+  #.assert(x = foldid, type = "integer", dim = n,
+  #        min = 1L, max = n)
+  #if (!is.null(foldid)) foldid <- as.integer(round(foldid))
+  #.assert(x = nfolds, type = "integer", min = 3L, max = n)
+  #if (!is.null(nfolds)) nfolds <- as.integer(round(nfolds))
+  #if (is.null(foldid)) {
+  #  foldid <- .folds(y = y, family = family, nfolds = nfolds)
+  #} else {
+  #  foldid <- .validate_foldid(foldid = foldid, y = y, family = family)
+  #  nfolds <- max(foldid)
+  #}
+  #if (!is.null(lambda) == (!is.null(foldid) || !is.null(nfolds))) {
+  #  stop("Either provide 'lambda' or provide 'foldid' or 'nfolds'.")
+  #}
+  if (!is.null(foldid)) {
+    foldid <- .validate_foldid(foldid = foldid, y = y, family = family)
   }
-  .assert(x = foldid, type = "integer", dim = n,
-          min = 1L, max = n)
-  if (!is.null(foldid)) foldid <- as.integer(round(foldid))
-  .assert(x = nfolds, type = "integer", min = 3L, max = n)
-  if (!is.null(nfolds)) nfolds <- as.integer(round(nfolds))
+  checkmate::assert_count(x = nfolds, positive = TRUE, null.ok = TRUE)
   if (identical(alpha_init, "multiridge")) {
-    .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
-    group <- as.integer(round(group))
+    #.assert(x = group, type = "integer", dim = p, min = 1L, max = p)
+    #group <- as.integer(round(group))
+    checkmate::assert_integer(x = group)
     dim <- length(unique(group))
   } else {
     dim <- 1L
@@ -966,23 +829,24 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   checkmate::assert_int(x = j, lower = 1L, upper = p)
   j <- as.integer(round(j))
   checkmate::assert_character(x = names, len = p, null.ok = TRUE)
+  group <- .validate_group(group = group, p = p, names = names)
   if (is.atomic(group) && is.null(dim(group))) {
-    if (is.numeric(group)) {
-      .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
-      group <- as.integer(round(group))
-    } else {
-      .assert(x = group, type = "nominal", dim = p)
-    }
+    #if (is.numeric(group)) {
+    #  .assert(x = group, type = "integer", dim = p, min = 1L, max = p)
+    #  group <- as.integer(round(group))
+    #} else {
+    #  .assert(x = group, type = "nominal", dim = p)
+    #}
     group[j] == group
   } else if (is.list(group)) {
-    if (length(group) == 0L) {
-      stop("List 'group' should not have length 0.")
-    }
+    #if (length(group) == 0L) {
+    #  stop("List 'group' should not have length 0.")
+    #}
     if (is.numeric(unlist(group))) {
-      for (i in seq_along(group)) {
-        .assert(x = group[[i]], type = "integer", dim = Inf, min = 0L, max = p)
-        group[[i]] <- as.integer(round(group[[i]]))
-      }
+      #for (i in seq_along(group)) {
+      #  .assert(x = group[[i]], type = "integer", dim = Inf, min = 0L, max = p)
+      #  group[[i]] <- as.integer(round(group[[i]]))
+      #}
       group_cond <- vapply(X = group,
                            FUN = function(slot) j %in% slot,
                            FUN.VALUE = logical(1L))
@@ -1000,7 +864,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       stop("List 'group' should have slots of type numeric or character.")
     }
   } else if (is.matrix(group)) {
-    .assert(x = group, type = "integer", dim = c(p, p), min = 0L, max = 1L)
+    #.assert(x = group, type = "integer", dim = c(p, p), min = 0L, max = 1L)
     group <- round(group)
     class(group) <- "integer"
     group[, j] == 1L

@@ -3,7 +3,11 @@
 #' Validation functions
 #'
 #' @description
-#' Validate the arguments of the function [cv.corila()] (and others).
+#' These functions validate the arguments
+#' of the function [cv.corila()], its helper functions, and its S3 methods.
+#' They check whether the provided arguments satisfy expectations,
+#' and return them in standardised forms
+#' (e.g., as integers instead of integerish numerics).
 #'
 #' @inheritParams cv.corila
 #' @inheritParams .residuals
@@ -13,11 +17,28 @@
 #' of length \eqn{n} or \eqn{p}
 #' for names of observations or predictors
 #'
+#' @details
+#' These functions are called by [cv.corila()],
+#' its helper functions, and its S3 methods.
+#'
 #' @return
 #' Return the first argument invisibly.
 #' Throw an error for invalid arguments.
 #'
 #' @keywords internal
+#'
+#' @srrstats {G2.0} *implements assertions on lengths of inputs*
+#' @srrstats {G2.1} *rejects unexpected input types*
+#' @srrstats {G2.2} *rejects multivariate input if expecting univariate input*
+#' @srrstats {G2.15} *rejects missing values by default*
+#' @srrstats {G2.3a} *rejects unexpected values*
+#' @srrstats {G2.4} *verifying data types:*
+#' @srrstats {G2.4a} *- integer*
+#' @srrstats {G2.4b} *- numeric*
+#' @srrstats {G2.4c} *- character*
+#' @srrstats {G2.13} *checks for missing data*
+#' @srrstats {G5.2a} *messages are unique*
+#' @srrstats {RE1.4} *tests assumptions for input data*
 #'
 #' @name validate
 NULL
@@ -160,6 +181,8 @@ NULL
     checkmate::assert_number(x = alpha,
                              lower = 0.0 - eps, upper = 1.0 + eps)
     pmax(0.0, pmin(alpha, 1.0))
+  } else if (is.logical(alpha) && length(alpha) == 1 && is.na(alpha)) {
+    NA
   } else {
     stop("Argument 'alpha' must be ",
          "either a single character or a single numeric.")

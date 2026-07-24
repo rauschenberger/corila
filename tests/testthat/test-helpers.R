@@ -330,16 +330,8 @@ testthat::test_that("outcomes are simulated", {
       }
       testthat::expect_length(object = y, n = n)
       testthat::expect_no_error(
-        object = {
-          .validate(na_action = NULL,
-                    x = matrix(data = 0.0, nrow = n, ncol = p),
-                    y = y,
-                    group = rep(x = 1L, times = p),
-                    primary = NULL,
-                    family = family[i], hyper = NULL, alpha_init = NULL,
-                    alpha_final = NULL, cor = NULL, foldid = NULL,
-                    nfolds = NULL, lambda_init = NULL, silent = FALSE)
-        }
+        .validate_y(y = y, family = family[i], names = NULL,
+                    n = n, na_action = "error")
       )
     }
   }

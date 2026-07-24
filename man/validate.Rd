@@ -98,6 +98,14 @@ Return the first argument invisibly.
 Throw an error for invalid arguments.
 }
 \description{
-Validate the arguments of the function \code{\link[=cv.corila]{cv.corila()}} (and others).
+These functions validate the arguments
+of the function \code{\link[=cv.corila]{cv.corila()}}, its helper functions, and its S3 methods.
+They check whether the provided arguments satisfy expectations,
+and return them in standardised forms
+(e.g., as integers instead of integerish numerics).
+}
+\details{
+These functions are called by \code{\link[=cv.corila]{cv.corila()}},
+its helper functions, and its S3 methods.
 }
 \keyword{internal}
