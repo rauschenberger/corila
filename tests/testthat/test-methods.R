@@ -13,7 +13,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   testthat::test_that("function 'cv.corila' returns a list", {
     testthat::expect_type(object = object, type = "list")
     names <- c("model", "lambda_init", "scale", "args", "hyper",
-               "id_hyper", "lambda.min", "y_obs", "y_fit")
+               "id_hyper", "lambda.min", "y", "y_hat")
     testthat::expect_length(object = object, n = length(names))
     testthat::expect_named(object = object, expected = names)
   })

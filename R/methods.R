@@ -222,7 +222,7 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' @srrstats {RE4.9} *access fitted values*
 #'
 fitted.cv.corila <- function(object, ...) {
-  object$y_fit
+  object$y_hat
 }
 
 #' @title
@@ -250,8 +250,8 @@ fitted.cv.corila <- function(object, ...) {
 #' @srrstats {RE4.10} *model residuals*
 #'
 residuals.cv.corila <- function(object, ...) {
-  .residuals(y_obs = object$y_obs,
-             y_fit = as.numeric(object$y_fit),
+  .residuals(y = object$y,
+             y_hat = as.numeric(object$y_hat),
              family = object$args$family)
 }
 
@@ -287,25 +287,25 @@ residuals.cv.corila <- function(object, ...) {
 #' @srrstats {RE6.2} *plot fitted values*
 #'
 plot.cv.corila <- function(x, ...) {
-  y_obs <- x$y_obs
-  y_fit <- x$y_fit
+  y <- x$y
+  y_hat <- x$y_hat
   beta <- stats::coef(x, s = "lambda.min")[-1L]
   graphics::par(mfrow = c(1L, 2L))
   if (x$args$family %in% c("gaussian", "poisson")) {
-    max <- max(abs(c(y_obs, y_fit)))
+    max <- max(abs(c(y, y_hat)))
     lim <- c(-max, max)
-    graphics::plot(x = y_obs,
-                   y = y_fit,
+    graphics::plot(x = y,
+                   y = y_hat,
                    xlab = "observed values",
                    ylab = "fitted values",
                    xlim = lim, ylim = lim)
     graphics::abline(a = 0.0, b = 1.0, lty = 2L)
   } else if (identical(x$args$family, "binomial")) {
-    graphics::boxplot(y_fit ~ y_obs,
+    graphics::boxplot(y_hat ~ y,
                       xlab = "observed class",
                       ylab = "fitted probabilities", ylim = c(0.0, 1.0))
   } else if (identical(x$args$family, "cox")) {
-    graphics::hist(y_fit,
+    graphics::hist(y_hat,
                    xlab = "fitted relative risks",
                    ylab = "frequency",
                    main = "")
@@ -612,10 +612,10 @@ nobs.cv.corila <- function(object, ...) {
 #' @description
 #' Calculates the deviance residuals.
 #'
-#' @param y_obs
+#' @param y
 #' \eqn{n}-dimensional vector of observed values
 #'
-#' @param y_fit
+#' @param y_hat
 #' \eqn{n}-dimensional vector of fitted values or probabilities
 #'
 #' @param family
@@ -631,38 +631,38 @@ nobs.cv.corila <- function(object, ...) {
 #' \dontshow{.residuals <- corila:::.residuals}
 #' n <- 10L
 #'
-#' y_obs <- stats::rnorm(n = n)
-#' y_fit <- stats::rnorm(n = n)
-#' .residuals(y_obs = y_obs, y_fit = y_fit, family = "gaussian")
+#' y <- stats::rnorm(n = n)
+#' y_hat <- stats::rnorm(n = n)
+#' .residuals(y = y, y_hat = y_hat, family = "gaussian")
 #'
-#' y_obs <- stats::rbinom(n = n, size = 1L, prob = 0.2)
-#' y_fit <- stats::runif(n = n)
-#' .residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
+#' y <- stats::rbinom(n = n, size = 1L, prob = 0.2)
+#' y_hat <- stats::runif(n = n)
+#' .residuals(y = y, y_hat = y_hat, family = "binomial")
 #'
-#' y_obs <- stats::rpois(n = n, lambda = 4.0)
-#' y_fit <- stats::rexp(n = n, rate = 0.25)
-#' .residuals(y_obs = y_obs, y_fit = y_fit, family = "poisson")
+#' y <- stats::rpois(n = n, lambda = 4.0)
+#' y_hat <- stats::rexp(n = n, rate = 0.25)
+#' .residuals(y = y, y_hat = y_hat, family = "poisson")
 #'
 #' @keywords internal
 #'
-.residuals <- function(y_obs, y_fit, family) {
+.residuals <- function(y, y_hat, family) {
   if (is.character(family)) family <- tolower(family)
   checkmate::assert_choice(x = family,
                            choices = c("gaussian", "binomial", "poisson"))
   eps <- 1e-06
-  y_obs <- .validate_response(y = y_obs, family = family)
-  y_fit <- .validate_fitted(y_hat = y_fit, family = family, len = length(y_obs))
+  y <- .validate_response(y = y, family = family)
+  y_hat <- .validate_fitted(y_hat = y_hat, family = family, len = length(y))
   if (identical(family, "gaussian")) {
-    y_obs - y_fit
+    y - y_hat
   } else if (identical(family, "binomial")) {
-    y_fit <- pmax(eps, pmin(y_fit, 1.0 - eps))
-    sign(y_obs - y_fit) * sqrt(2.0) *
-      sqrt(- y_obs * log(y_fit) - (1.0 - y_obs) * log(1.0 - y_fit))
+    y_hat <- pmax(eps, pmin(y_hat, 1.0 - eps))
+    sign(y - y_hat) * sqrt(2.0) *
+      sqrt(- y * log(y_hat) - (1.0 - y) * log(1.0 - y_hat))
   } else if (identical(family, "poisson")) {
-    sign(y_obs - y_fit) *
-      sqrt((2.0 * (ifelse(test = abs(y_obs) < .Machine$double.eps,
+    sign(y - y_hat) *
+      sqrt((2.0 * (ifelse(test = abs(y) < .Machine$double.eps,
                           yes = 0.0,
-                          no = y_obs * log(y_obs / y_fit)) - y_obs + y_fit)))
+                          no = y * log(y / y_hat)) - y + y_hat)))
   }
 }
 

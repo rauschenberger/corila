@@ -618,16 +618,17 @@
 #'
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---
-  if (is.character(family)) family <- tolower(family)
-  checkmate::assert_choice(
-    x = family,
-    choice = c("gaussian", "binomial", "poisson", "cox")
-  )
+  #if (is.character(family)) family <- tolower(family)
+  #checkmate::assert_choice(
+  #  x = family,
+  #  choice = c("gaussian", "binomial", "poisson", "cox")
+  #)
+  family <- .validate_family(family = family)
   y <- .validate_response(y = y, family = family)
-  y_hat <- .validate_fitted(y_hat = y_hat, family = family)
-  if (length(y) != length(y_hat)) {
-    stop("Arguments 'y' and 'y_hat' must have the same length.")
-  }
+  y_hat <- .validate_fitted(y_hat = y_hat, family = family, len = length(y))
+  #if (length(y) != length(y_hat)) {
+  #  stop("Arguments 'y' and 'y_hat' must have the same length.")
+  #}
   # --- calculate deviance ---
   eps <- 1e-06
   if (identical(family, "gaussian")) {
@@ -648,6 +649,7 @@
 }
 
 .validate_response <- function(y, family, ...) {
+  if (length(y) > 1) y <- drop(y)
   eps <- 1e-06
   checkmate::assert_choice(
     x = family, choices = c("gaussian", "binomial", "poisson", "cox")
@@ -655,7 +657,7 @@
   checkmate::assert_numeric(
     x = y, min.len = 1L, all.missing = FALSE, ...
   )
-  if(identical(family, "cox") != inherits(y, "Surv")){
+  if (identical(family, "cox") != inherits(y, "Surv")) {
     stop("Expects survival response if and only if Cox model.")
   }
   if (identical(family, "binomial")) {
@@ -706,9 +708,19 @@
 #   check all three option
 # }
 
-# .validate_family <- function(family, poisson = TRUE) {
-#   tolower
-#   check wether inside support
-# }
-
-# in function residuals: rename y_fit to y_hat and y_obs to y
+.validate_family <- function(family, poisson = TRUE) {
+  checkmate::assert_logical(x = poisson, any.missing = FALSE, len = 1L)
+  if (is.character(family)) family <- tolower(family)
+  checkmate::assert_choice(
+    x = family,
+    choices = c("gaussian", "linear", "binomial", "logistic",
+                "poisson"[poisson], "cox")
+  )
+  if (family == "linear") {
+    "gaussian"
+  } else if (family == "logistic") {
+    "binomial"
+  } else {
+    family
+  }
+}

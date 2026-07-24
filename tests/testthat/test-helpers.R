@@ -362,7 +362,7 @@ testthat::test_that("residuals match those from stats::residuals", {
     }
     glm <- stats::glm(y ~ x, family = family)
     y_hat <- fitted(glm)
-    resid <- .residuals(y_obs = y, y_fit = y_hat, family = family)
+    resid <- .residuals(y = y, y_hat = y_hat, family = family)
     names(resid) <- seq_len(n)
     testthat::expect_type(object = resid, type = "double")
     testthat::expect_length(object = resid, n = n)

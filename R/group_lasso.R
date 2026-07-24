@@ -187,19 +187,19 @@
 #' @srrstats {RE1.4} *documents assumptions for input data*
 #' @srrstats {RE3.1} *convergence messages can be suppressed (@param silent)*
 #' @srrstats {RE4.0} *returns a "model" object (@return)*
-#' @srrstats {RE4.8} *returns response variable in slot "y_obs"*
+#' @srrstats {RE4.8} *returns response variable in slot "y"*
 #'
 cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
                       alpha_final = 1.0, family = "gaussian",
                       nfolds = 10L, cor = "spearman", tune = "weight",
                       foldid = NULL, na_action = "error", silent = FALSE) {
-  y <- drop(y)
+  y <- drop(y) # move to .validate_response
   group <- drop(group)
   primary <- drop(primary)
   # match arguments
   family <- match.arg(arg = tolower(family),
                       choices = c("gaussian", "binomial", "poisson", "cox"))
-  if (is.character(cor)) {
+  if (is.character(cor)) { # move to .validate_cor
     cor <- match.arg(arg = tolower(cor),
                      choices = c("pearson", "spearman", "kendall"))
   }
@@ -227,7 +227,7 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
     silent = silent
   )
   if (is.null(primary)) {
-    primary <- rep(x = TRUE, times = ncol(x))
+    primary <- rep(x = TRUE, times = ncol(x)) # move to .validate_primary
   }
   #if (is.null(foldid) == is.null(nfolds))stop("Provide either foldid or fold.")
   if (is.null(foldid)) {
@@ -315,11 +315,11 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
   object$id_hyper <- id_hyper
   object$lambda.min <- lambda.min
   class(object) <- "cv.corila"
-  object$y_obs <- y
+  object$y <- y
   complete_x <- stats::complete.cases(x = x)
-  object$y_fit <- stats::setNames(object = rep(x = NA, times = n),
+  object$y_hat <- stats::setNames(object = rep(x = NA, times = n),
                                   nm = rownames(x))
-  object$y_fit[complete_x] <- stats::predict(object = object,
+  object$y_hat[complete_x] <- stats::predict(object = object,
                                              newx = x[complete_x, ])
   object
 }
