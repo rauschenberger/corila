@@ -82,5 +82,4 @@ model <- cv.corila(x = data$x_train,
                    primary = data$primary,
                    alpha_init = 0.0,
                    foldid = rep(1:10, length.out = nrow(data$x_train)))
-#> Error in .validate_foldid(x = foldid[complete], y = y[complete], family = family): unused argument (x = foldid[complete])
 ```

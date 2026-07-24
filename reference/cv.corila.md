@@ -11,13 +11,13 @@ cv.corila(
   y,
   group,
   primary = NULL,
-  alpha_init = 0,
-  alpha_final = 1,
   family = "gaussian",
-  nfolds = 10L,
+  alpha_init = 0,
   cor = "spearman",
-  tune = "weight",
+  alpha_final = 1,
+  nfolds = 10L,
   foldid = NULL,
+  tune = "weight",
   na_action = "error",
   silent = FALSE
 )
@@ -62,6 +62,10 @@ cv.corila(
   included in the final model (`TRUE` for "primary predictors") or must
   be excluded from the final model (`FALSE` for "auxiliary predictors")
 
+- family:
+
+  character string `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
+
 - alpha_init:
 
   A scalar specifying the method used for obtaining initial
@@ -81,15 +85,17 @@ cv.corila(
 
   - `NA` to set all initial coefficients equal to 1
 
+- cor:
+
+  character string `"pearson"`, `"spearman"` (default), or `"kendall"`;
+  or a correlation matrix (\\p\\ rows, \\p\\ columns, entries between
+  \\-1\\ and \\+1\\)
+
 - alpha_final:
 
   elastic net mixing parameter for final regression: numeric between 0
   for ridge penalisation and 1 for lasso penalisation (default: lasso
   penalisation with `alpha_final`=1)
-
-- family:
-
-  character string `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 
 - nfolds:
 
@@ -98,11 +104,10 @@ cv.corila(
 
   NB: If `foldid` is provided, `nfolds` is overwritten by `max(foldid)`.
 
-- cor:
+- foldid:
 
-  character string `"pearson"`, `"spearman"` (default), or `"kendall"`;
-  or a correlation matrix (\\p\\ rows, \\p\\ columns, entries between
-  \\-1\\ and \\+1\\)
+  \\n_0\\-dimensional vector containing the fold identifiers (minimum
+  \\1\\, maximum `nfolds`)
 
 - tune:
 
@@ -124,13 +129,8 @@ cv.corila(
   - `"factorial"`: tuning `wgt_local`, `exp_local`, `wgt_global`,
     `exp_global`
 
-  (to implement: list with slots `wgt_local`, `exp_local`, `wgt_global`,
-  and `exp_global`)
-
-- foldid:
-
-  \\n_0\\-dimensional vector containing the fold identifiers (minimum
-  \\1\\, maximum `nfolds`)
+  (to implement: data frame with columns `wgt_local`, `exp_local`,
+  `wgt_global`, and `exp_global`)
 
 - na_action:
 
@@ -220,5 +220,4 @@ model <- cv.corila(x = data$x_train,
                    primary = data$primary,
                    alpha_init = 0.0,
                    foldid = rep(1:10, length.out = nrow(data$x_train)))
-#> Error in .validate_foldid(x = foldid[complete], y = y[complete], family = family): unused argument (x = foldid[complete])
 ```

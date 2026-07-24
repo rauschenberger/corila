@@ -51,13 +51,13 @@
 <span>  <span class="va">y</span>,</span>
 <span>  <span class="va">group</span>,</span>
 <span>  primary <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  alpha_init <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  alpha_final <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"gaussian"</span>,</span>
-<span>  nfolds <span class="op">=</span> <span class="fl">10L</span>,</span>
+<span>  alpha_init <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  cor <span class="op">=</span> <span class="st">"spearman"</span>,</span>
-<span>  tune <span class="op">=</span> <span class="st">"weight"</span>,</span>
+<span>  alpha_final <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  nfolds <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  foldid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tune <span class="op">=</span> <span class="st">"weight"</span>,</span>
 <span>  na_action <span class="op">=</span> <span class="st">"error"</span>,</span>
 <span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -104,6 +104,10 @@ or must be excluded from the final model
 (<code>FALSE</code> for "auxiliary predictors")</p></dd>
 
 
+<dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
+<dd><p>character string <code>"gaussian"</code>, <code>"binomial"</code>, <code>"poisson"</code>, or <code>"cox"</code></p></dd>
+
+
 <dt id="arg-alpha-init">alpha_init<a class="anchor" aria-label="anchor" href="#arg-alpha-init"></a></dt>
 <dd><p>A scalar specifying the method used for obtaining initial coefficients:</p><ul><li><p>a numeric scalar in the unit interval
 (\(0 \leq\) <code>alpha_init</code> \(\leq 1\))
@@ -120,15 +124,20 @@ with one penalty for each group
 </ul></dd>
 
 
+<dt id="arg-cor">cor<a class="anchor" aria-label="anchor" href="#arg-cor"></a></dt>
+<dd><p>character string <code>"pearson"</code>,
+<code>"spearman"</code> (default),
+or <code>"kendall"</code>;
+or a correlation matrix
+(\(p\) rows, \(p\) columns,
+entries between \(-1\) and \(+1\))</p></dd>
+
+
 <dt id="arg-alpha-final">alpha_final<a class="anchor" aria-label="anchor" href="#arg-alpha-final"></a></dt>
 <dd><p>elastic net mixing parameter for final regression:
 numeric between 0 for ridge penalisation
 and 1 for lasso penalisation
 (default: lasso penalisation with <code>alpha_final</code>=1)</p></dd>
-
-
-<dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
-<dd><p>character string <code>"gaussian"</code>, <code>"binomial"</code>, <code>"poisson"</code>, or <code>"cox"</code></p></dd>
 
 
 <dt id="arg-nfolds">nfolds<a class="anchor" aria-label="anchor" href="#arg-nfolds"></a></dt>
@@ -137,13 +146,9 @@ and 1 for lasso penalisation
 <p>NB: If <code>foldid</code> is provided, <code>nfolds</code> is overwritten by <code>max(foldid)</code>.</p></dd>
 
 
-<dt id="arg-cor">cor<a class="anchor" aria-label="anchor" href="#arg-cor"></a></dt>
-<dd><p>character string <code>"pearson"</code>,
-<code>"spearman"</code> (default),
-or <code>"kendall"</code>;
-or a correlation matrix
-(\(p\) rows, \(p\) columns,
-entries between \(-1\) and \(+1\))</p></dd>
+<dt id="arg-foldid">foldid<a class="anchor" aria-label="anchor" href="#arg-foldid"></a></dt>
+<dd><p>\(n_0\)-dimensional vector containing the fold identifiers
+(minimum \(1\), maximum <code>nfolds</code>)</p></dd>
 
 
 <dt id="arg-tune">tune<a class="anchor" aria-label="anchor" href="#arg-tune"></a></dt>
@@ -162,13 +167,8 @@ tuning <code>exp_local</code></p></li>
 tuning <code>wgt_local</code>=1-<code>wgt_global</code> and <code>exp_local</code>=<code>exp_global</code></p></li>
 <li><p><code>"factorial"</code>:
 tuning <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, <code>exp_global</code></p></li>
-</ul><p>(to implement: list with slots
+</ul><p>(to implement: data frame with columns
 <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, and <code>exp_global</code>)</p></dd>
-
-
-<dt id="arg-foldid">foldid<a class="anchor" aria-label="anchor" href="#arg-foldid"></a></dt>
-<dd><p>\(n_0\)-dimensional vector containing the fold identifiers
-(minimum \(1\), maximum <code>nfolds</code>)</p></dd>
 
 
 <dt id="arg-na-action">na_action<a class="anchor" aria-label="anchor" href="#arg-na-action"></a></dt>
@@ -254,7 +254,6 @@ with different values for the regularisation and mixing hyperparameters.</p></di
 <span class="r-in"><span>                   primary <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">primary</span>,</span></span>
 <span class="r-in"><span>                   alpha_init <span class="op">=</span> <span class="fl">0.0</span>,</span></span>
 <span class="r-in"><span>                   foldid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">x_train</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .validate_foldid(x = foldid[complete], y = y[complete], family = family):</span> unused argument (x = foldid[complete])</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

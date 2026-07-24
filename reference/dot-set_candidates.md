@@ -30,8 +30,8 @@ Sets candidate values for hyperparameters.
   - `"factorial"`: tuning `wgt_local`, `exp_local`, `wgt_global`,
     `exp_global`
 
-  (to implement: list with slots `wgt_local`, `exp_local`, `wgt_global`,
-  and `exp_global`)
+  (to implement: data frame with columns `wgt_local`, `exp_local`,
+  `wgt_global`, and `exp_global`)
 
 ## Value
 
