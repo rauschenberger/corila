@@ -233,28 +233,27 @@
 #'
 .forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   # --- check arguments ---
-  if (is.character(family)) family <- tolower(family)
+  #if (is.character(family)) family <- tolower(family)
   checkmate::assert_matrix(x = x, mode = "numeric", any.missing = FALSE,
                            min.rows = 1L, min.cols = 1L)
   if (is.null(family) == is.null(pars)) {
     stop('Expect either "family" or "pars".')
   }
-  families <- c("gaussian", "binomial", "poisson", "cox")
-  slots <- c("family", "mu.x", "sd.x", "mu.y", "sd.y")
-  checkmate::assert_choice(x = family, choices = families, null.ok = TRUE)
-  checkmate::assert_list(x = pars, len = 5L, null.ok = TRUE)
+  #families <- c("gaussian", "binomial", "poisson", "cox")
+  #checkmate::assert_choice(x = family, choices = families, null.ok = TRUE)
   if (!is.null(pars)) {
+    slots <- c("family", "mu.x", "sd.x", "mu.y", "sd.y")
+    checkmate::assert_list(x = pars, len = 5L)
     checkmate::assert_names(x = names(pars), identical.to = slots)
     checkmate::assert_numeric(x = pars$mu.x, len = ncol(x))
     checkmate::assert_numeric(x = pars$sd.x, len = ncol(x), lower = 0.0)
     checkmate::assert_number(x = pars$mu.y)
     checkmate::assert_number(x = pars$sd.y, lower = 0.0)
   }
-  checkmate::assert_choice(x = c(family, pars$family), choices = families)
+  #checkmate::assert_choice(x = c(family, pars$family), choices = families)
+  family <- .validate_family(family = c(family, pars$family))
   # --- estimate parameters ---
-  if (is.null(family)) {
-    family <- pars$family
-  } else {
+  if (is.null(pars)) {
     pars <- list()
     pars$family <- family
     cond <- rep(x = TRUE, times = length(y))
@@ -501,12 +500,13 @@
 #'
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
-  if (is.character(family)) family <- tolower(family)
-  checkmate::assert_choice(
-    x = family,
-    choices = c("gaussian", "binomial", "poisson", "cox")
-  )
-  y <- .validate_response(y = y, family = family)
+  #if (is.character(family)) family <- tolower(family)
+  #checkmate::assert_choice(
+  #  x = family,
+  #  choices = c("gaussian", "binomial", "poisson", "cox")
+  #)
+  family <- .validate_family(family = family)
+  y <- .validate_y(y = y, family = family, n = NULL, na_action = "error")
   if (length(y) < 2L) stop("Require at least 2 observations.")
   checkmate::assert_int(x = nfolds, lower = 2L, upper = length(y))
   nfolds <- as.integer(round(nfolds))
@@ -562,10 +562,11 @@
 #'
 .mean_function <- function(x, family) {
   # --- check arguments ---
-  if (is.character(family)) family <- tolower(family)
-  support <- c("gaussian", "binomial", "poisson", "cox")
+  #if (is.character(family)) family <- tolower(family)
+  #support <- c("gaussian", "binomial", "poisson", "cox")
+  #checkmate::assert_choice(x = family, choices = support)
   checkmate::assert_numeric(x = x, min.len = 1L)
-  checkmate::assert_choice(x = family, choices = support)
+  family <- .validate_family(family = family)
   # --- transform target ---
   if (family %in% c("gaussian", "cox")) {
     x
@@ -624,8 +625,9 @@
   #  choice = c("gaussian", "binomial", "poisson", "cox")
   #)
   family <- .validate_family(family = family)
-  y <- .validate_response(y = y, family = family)
-  y_hat <- .validate_fitted(y_hat = y_hat, family = family, len = length(y))
+  y <- .validate_y(y = y, family = family, n = NULL,
+                   na_action = "complete_cases")
+  y_hat <- .validate_y_hat(y_hat = y_hat, family = family, n = length(y))
   #if (length(y) != length(y_hat)) {
   #  stop("Arguments 'y' and 'y_hat' must have the same length.")
   #}
@@ -648,14 +650,45 @@
   }
 }
 
-.validate_response <- function(y, family, ...) {
+.validate_na_action <- function(na_action) {
+  if (is.character(na_action)) na_action <- tolower(na_action)
+  checkmate::assert_choice(
+    x = na_action, choices = c("error", "complete_cases")
+  )
+}
+
+.validate_family <- function(family, poisson = TRUE) {
+  checkmate::assert_logical(x = poisson, any.missing = FALSE, len = 1L)
+  if (is.character(family)) family <- tolower(family)
+  checkmate::assert_choice(
+    x = family,
+    choices = c("gaussian", "linear", "binomial", "logistic",
+                "poisson"[poisson], "cox")
+  )
+  if (family == "linear") {
+    "gaussian"
+  } else if (family == "logistic") {
+    "binomial"
+  } else {
+    family
+  }
+}
+
+.validate_x <- function(x, na_action) {
+  checkmate::assert_matrix(x = x, mode = "numeric",
+                           any.missing = (na_action == "complete_cases"),
+                           all.missing = FALSE,
+                           min.rows = 3, min.cols = 3)
+}
+
+.validate_y <- function(y, family, n, na_action) {
+  checkmate::assert_count(x = n, positive = TRUE, null.ok = TRUE)
   if (length(y) > 1) y <- drop(y)
   eps <- 1e-06
-  checkmate::assert_choice(
-    x = family, choices = c("gaussian", "binomial", "poisson", "cox")
-  )
+  if (!is.null(n) && family == "cox") n <- 2 * n
   checkmate::assert_numeric(
-    x = y, min.len = 1L, all.missing = FALSE, ...
+    x = y, all.missing = FALSE,
+    any.missing = (na_action == "complete_cases"), len = n
   )
   if (identical(family, "cox") != inherits(y, "Surv")) {
     stop("Expects survival response if and only if Cox model.")
@@ -671,14 +704,10 @@
   }
 }
 
-.validate_fitted <- function(y_hat, family, ...) {
+.validate_y_hat <- function(y_hat, family, n) {
+  checkmate::assert_count(x = n, positive = TRUE)
   eps <- 1e-06
-  checkmate::assert_choice(
-    x = family, choices = c("gaussian", "binomial", "poisson", "cox")
-  )
-  checkmate::assert_numeric(
-    x = y_hat, min.len = 1L, any.missing = FALSE, ...
-  )
+  checkmate::assert_numeric(x = y_hat, any.missing = FALSE, len = n)
   if (identical(family, "binomial")) {
     checkmate::assert_numeric(x = y_hat, lower = - eps, upper = 1.0 + eps)
     pmax(0, pmin(y_hat, 1))
@@ -708,19 +737,126 @@
 #   check all three option
 # }
 
-.validate_family <- function(family, poisson = TRUE) {
-  checkmate::assert_logical(x = poisson, any.missing = FALSE, len = 1L)
-  if (is.character(family)) family <- tolower(family)
-  checkmate::assert_choice(
-    x = family,
-    choices = c("gaussian", "linear", "binomial", "logistic",
-                "poisson"[poisson], "cox")
-  )
-  if (family == "linear") {
-    "gaussian"
-  } else if (family == "logistic") {
-    "binomial"
+.validate_primary <- function(primary, p) {
+  checkmate::assert_count(x = p, positive = TRUE)
+  if (is.null(primary)) {
+    rep(x = TRUE, times = p)
   } else {
-    family
+    checkmate::assert_logical(x = primary, any.missing = FALSE, len = p)
+    checkmate::assert_count(x = sum(primary))
+    drop(primary)
   }
+}
+
+.validate_cor <- function(cor, p) {
+  eps <- 1e-06
+  checkmate::assert_count(x = p, positive = TRUE)
+  if (is.character(cor)) {
+    cor <- tolower(cor)
+    checkmate::assert_choice(x = cor,
+                             choices = c("pearson", "spearman", "kendall"))
+  } else if (is.matrix(cor)) {
+    checkmate::assert_matrix(x = cor, mode = "numeric", any.missing = FALSE,
+                             lower = - 1.0 - eps, upper = 1.0 + eps,
+                             nrows = p, ncols = p)
+    checkmate::assert_numeric(x = diag(cor), lower = 1.0 - eps,
+                              upper = 1.0 + eps)
+    pmax(-1.0, pmin(cor, 1.0))
+  } else {
+    stop("Argument 'cor' must be either a character or a matrix.")
+  }
+}
+
+.validate_alpha <- function(alpha, init) {
+  checkmate::assert_logical(x = init, any.missing = FALSE, len = 1L)
+  eps <- 1e-06
+  if (is.character(alpha)) {
+    choices <- c("ridge", "lasso")
+    if (init) {
+      choices <- c(choices, c("pearson", "spearman", "kendall", "multiridge"))
+    }
+    alpha <- tolower(alpha)
+    checkmate::assert_choice(x = alpha, choices = choices)
+    if (alpha == "ridge") alpha <- 0.0
+    if (alpha == "lasso") alpha <- 1.0
+    alpha
+  } else if (is.numeric(alpha)) {
+    checkmate::assert_number(x = alpha,
+                             lower = 0.0 - eps, upper = 1.0 + eps)
+    pmax(0, pmin(alpha, 1))
+  } else {
+    stop("Argument 'cor' must be ",
+         "either a single character or a single numeric.")
+  }
+}
+
+.validate_group <- function(group, p, names) {
+  eps <- 1e-06
+  checkmate::assert_count(x = p, positive = TRUE)
+  group <- drop(group)
+  if (is.vector(group) && is.atomic(group)) {
+    if (is.numeric(group)) {
+      checkmate::assert_integerish(x = group, len = p,
+                                   lower = 1.0 - eps, upper = p + eps)
+      as.integer(round(group))
+    } else if (is.character(group)) {
+      checkmate::assert_character(x = group, any.missing = FALSE, len = p)
+    } else {
+      stop("If argument 'group' is a vector, ",
+           "it must be of class 'numeric' or 'character'.")
+    }
+  } else if (is.list(group)) {
+    checkmate::assert_list(x = group, min.len = 1L, any.missing = FALSE)
+    values <- unlist(group)
+    if (all(is.numeric(values))) {
+      checkmate::assert_integerish(
+        x = values, lower = 1.0 - eps, upper = p + eps,
+        any.missing = FALSE, .var.name = "unlist(group)"
+      )
+      lapply(X = group, FUN = function(x) as.integer(round(x)))
+    } else if (all(is.character(values))) {
+      checkmate::assert_character(x = names, any.missing = FALSE, len = p)
+      checkmate::assert_character(x = values, any.missing = FALSE,
+                                  min.len = 1L, .var.name = "unlist(group)")
+      checkmate::assert_subset(x = values, choices = names,
+                               .var.name = "unlist(group)")
+      group
+    } else {
+      stop("If argument 'group' is a list, ",
+           "it must be a list of ",
+           "either numeric vectors or character vectors.")
+    }
+  } else if (is.matrix(group)) {
+    checkmate::assert_matrix(x = group, mode = "integerish",
+                             lower = 0.0 - eps, upper = 1.0 + eps,
+                             nrows = p, ncols = p)
+    group <- round(group)
+    class(group) <- "integer"
+    group
+  } else {
+    stop("Argument 'group' must be a vector, ",
+         "a list, or a matrix.")
+  }
+}
+
+.validate_hyper <- function(hyper) {
+  eps <- 1e-06
+  slots <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
+  checkmate::assert_data_frame(x = hyper, types = "numeric",
+                               any.missing = FALSE,
+                               min.rows = 1L, ncols = 4L)
+  checkmate::assert_names(x = names(hyper), identical.to = slots)
+  checkmate::assert_numeric(x = unlist(hyper), lower = 0.0 - eps)
+  hyper[hyper < 0.0] <- 0.0
+  hyper
+}
+
+.validate_foldid <- function(foldid, y, family) {
+  eps <- 1e-06
+  n <- length(y)
+  checkmate::assert_integerish(x = foldid, lower = 1.0 - eps,
+                               upper =  n + eps, len = n, any.missing = FALSE)
+  foldid <- as.integer(round(foldid))
+  checkmate::assert_int(x = max(foldid), lower = 3L, upper = n)
+  checkmate::assert_set_equal(x = unique(foldid), y = seq_len(max(foldid)))
 }

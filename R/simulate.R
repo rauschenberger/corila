@@ -188,9 +188,10 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   p <- as.integer(round(p))
   checkmate::assert_int(x = q, lower = 1L, upper = p)
   q <- as.integer(round(q))
-  if (is.character(family)) family <- tolower(family)
-  checkmate::assert_choice(x = family, choices = c("gaussian", "binomial",
-                                                   "poisson", "cox"))
+  #if (is.character(family)) family <- tolower(family)
+  #checkmate::assert_choice(x = family, choices = c("gaussian", "binomial",
+  #                                                 "poisson", "cox"))\
+  family <- .validate_family(family = family)
   checkmate::assert_number(x = rho, lower = 0.0, upper = 1.0)
   rho <- round(rho, digits = 6L)
   checkmate::assert_number(x = prob_primary, lower = 0.0, upper = 1.0)
@@ -409,9 +410,10 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 .simulate_response <- function(family, x = NULL, beta = NULL, n = NULL,
                                seed = 1L) {
-  if (is.character(family)) family <- tolower(family)
-  checkmate::assert_choice(x = family, choices = c("gaussian", "binomial",
-                                                   "poisson", "cox"))
+  #if (is.character(family)) family <- tolower(family)
+  #checkmate::assert_choice(x = family, choices = c("gaussian", "binomial",
+  #                                                 "poisson", "cox"))
+  family <- .validate_family(family = family)
   if (is.null(x) != is.null(beta)) {
     stop("Provide either none or both of 'x' and 'beta'.")
   }

@@ -4,12 +4,12 @@
 \alias{.residuals}
 \title{Deviance Residuals}
 \usage{
-.residuals(y_obs, y_fit, family)
+.residuals(y, y_hat, family)
 }
 \arguments{
-\item{y_obs}{\eqn{n}-dimensional vector of observed values}
+\item{y}{\eqn{n}-dimensional vector of observed values}
 
-\item{y_fit}{\eqn{n}-dimensional vector of fitted values or probabilities}
+\item{y_hat}{\eqn{n}-dimensional vector of fitted values or probabilities}
 
 \item{family}{character \code{"gaussian"}, \code{"binomial"}, or \code{"poisson"}}
 }
@@ -26,17 +26,17 @@ This function is called by \code{\link[=residuals.cv.corila]{residuals.cv.corila
 \dontshow{.residuals <- corila:::.residuals}
 n <- 10L
 
-y_obs <- stats::rnorm(n = n)
-y_fit <- stats::rnorm(n = n)
-.residuals(y_obs = y_obs, y_fit = y_fit, family = "gaussian")
+y <- stats::rnorm(n = n)
+y_hat <- stats::rnorm(n = n)
+.residuals(y = y, y_hat = y_hat, family = "gaussian")
 
-y_obs <- stats::rbinom(n = n, size = 1L, prob = 0.2)
-y_fit <- stats::runif(n = n)
-.residuals(y_obs = y_obs, y_fit = y_fit, family = "binomial")
+y <- stats::rbinom(n = n, size = 1L, prob = 0.2)
+y_hat <- stats::runif(n = n)
+.residuals(y = y, y_hat = y_hat, family = "binomial")
 
-y_obs <- stats::rpois(n = n, lambda = 4.0)
-y_fit <- stats::rexp(n = n, rate = 0.25)
-.residuals(y_obs = y_obs, y_fit = y_fit, family = "poisson")
+y <- stats::rpois(n = n, lambda = 4.0)
+y_hat <- stats::rexp(n = n, rate = 0.25)
+.residuals(y = y, y_hat = y_hat, family = "poisson")
 
 }
 \keyword{internal}

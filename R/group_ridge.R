@@ -116,9 +116,10 @@
 multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                        nfolds = 10L, penalties = NULL) {
   # --- check arguments ---
-  if (is.character(family)) family <- tolower(family)
-  checkmate::assert_choice(x = family,
-                           choices =  c("gaussian", "binomial", "cox"))
+  #if (is.character(family)) family <- tolower(family)
+  #checkmate::assert_choice(x = family,
+  #                         choices =  c("gaussian", "binomial", "cox"))
+  family <- .validate_family(family = family, poisson = FALSE)
   if (is.matrix(x) && ncol(x) != length(group)) {
     stop("For each variable, 'x' should have one column, ",
          "and 'group' should have one entry.")
@@ -130,8 +131,7 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   }
   checkmate::assert_matrix(x = x, mode = "numeric",
                            min.rows = 1L, min.cols = 1L, any.missing = FALSE)
-  y <- .validate_response(y = y, family = family,
-                          len = (1L + (family == "cox")) * nrow(x))
+  y <- .validate_y(y = y, family = family, n = nrow(x), na_action = "error")
   checkmate::assert_integer(x = group,
                             lower = 1L, upper = length(unique(group)),
                             len = ncol(x))

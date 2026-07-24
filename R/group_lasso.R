@@ -193,60 +193,74 @@ cv.corila <- function(x, y, group, primary = NULL, alpha_init = 0.0,
                       alpha_final = 1.0, family = "gaussian",
                       nfolds = 10L, cor = "spearman", tune = "weight",
                       foldid = NULL, na_action = "error", silent = FALSE) {
-  y <- drop(y) # move to .validate_response
-  group <- drop(group)
-  primary <- drop(primary)
+  family <- .validate_family(family = family)
+  na_action <- .validate_na_action(na_action = na_action)
+  checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
+  x <- .validate_x(x = x, na_action = na_action)
+  n <- nrow(x)
+  p <- ncol(x)
+  y <- .validate_y(y = y, family = family, n = n, na_action = na_action)
+  #y <- drop(y) # move to .validate_y
+  group <- .validate_group(group = group, p = p, names = colnames(x))
+  #group <- drop(group)
+  #primary <- drop(primary)
   # match arguments
-  family <- match.arg(arg = tolower(family),
-                      choices = c("gaussian", "binomial", "poisson", "cox"))
-  if (is.character(cor)) { # move to .validate_cor
-    cor <- match.arg(arg = tolower(cor),
-                     choices = c("pearson", "spearman", "kendall"))
-  }
-  tune <- match.arg(arg = tolower(tune),
-                    choices = c("none", "weight", "exponent", "bivariate",
-                                "factorial"))
-  na_action <- match.arg(arg = tolower(na_action),
-                         choices = c("error", "complete_cases"))
+  #family <- match.arg(arg = tolower(family),
+  #                    choices = c("gaussian", "binomial", "poisson", "cox"))
+  #if (is.character(cor)) { # move to .validate_cor
+  #  cor <- match.arg(arg = tolower(cor),
+  #                   choices = c("pearson", "spearman", "kendall"))
+  #}
+  cor <- .validate_cor(cor = cor, p = p)
+  alpha_init <- .validate_alpha(alpha = alpha_init, init = TRUE)
+  alpha_final <- .validate_alpha(alpha = alpha_final, init = FALSE)
+  #tune <- match.arg(arg = tolower(tune),
+  #                  choices = c("none", "weight", "exponent", "bivariate",
+  #                              "factorial"))
+  #na_action <- match.arg(arg = tolower(na_action),
+  #                       choices = c("error", "complete_cases"))
   # set default parameters
   hyper <- .set_candidates(tune = tune)
-  .validate(
-    x = x,
-    y = y,
-    group = group,
-    primary = primary,
-    family = family,
-    na_action = na_action,
-    alpha_init = alpha_init,
-    alpha_final = alpha_final,
-    cor = cor,
-    foldid = foldid,
-    nfolds = nfolds,
-    lambda_init = NULL,
-    hyper = hyper,
-    silent = silent
-  )
-  if (is.null(primary)) {
-    primary <- rep(x = TRUE, times = ncol(x)) # move to .validate_primary
-  }
+  #.validate(
+  #  x = x,
+  #  y = y,
+  #  group = group,
+  #  primary = primary,
+  #  family = family,
+  #  na_action = na_action,
+  #  alpha_init = alpha_init,
+  #  alpha_final = alpha_final,
+  #  cor = cor,
+  #  foldid = foldid,
+  #  nfolds = nfolds,
+  #  lambda_init = NULL,
+  #  hyper = hyper,
+  #  silent = silent
+  #)
+  #if (is.null(primary)) {
+  #  primary <- rep(x = TRUE, times = ncol(x)) # move to .validate_primary
+  #}
+  primary <- .validate_primary(primary = primary, p = p)
   #if (is.null(foldid) == is.null(nfolds))stop("Provide either foldid or fold.")
-  if (is.null(foldid)) {
-    foldid <- .folds(y = y, family = family, nfolds = nfolds)
-  } else {
-    nfolds <- max(foldid)
-  }
-  alpha_final <- pmax(0.0, pmin(alpha_final, 1.0))
+  #alpha_final <- pmax(0.0, pmin(alpha_final, 1.0))
   if (identical(na_action, "complete_cases")) {
     complete <- stats::complete.cases(x = x, y = y)
     if (sum(complete) < 3L) {
       stop("Requires at least three complete observations.")
     }
     warning("Ignoring ", sum(!complete), " observations with missing data.")
-    #x <- x[complete, ]
-    #y <- y[complete]
-    #foldid <- foldid[complete]
   } else {
     complete <- rep(x = TRUE, times = nrow(x))
+  }
+  if (is.null(foldid)) {
+    checkmate::assert_count(x = nfolds, positive = TRUE)
+    foldid <- .folds(y = y, family = family, nfolds = nfolds)
+    # only generate folds for complete observations
+    # (and avoid subsetting further below)
+  } else {
+    foldid <- .validate_foldid(x = foldid[complete], y = y[complete],
+                               family = family)
+    nfolds <- max(foldid)
   }
   # fit model on all folds
   object_ext <- corila(x = x[complete, , drop = FALSE],
@@ -837,12 +851,12 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
                            any.missing = FALSE)
   n <- nrow(x)
   p <- ncol(x)
-  checkmate::assert_choice(
-    x = family,
-    choices = c("gaussian", "binomial", "poisson", "cox")
-  )
-  y <- .validate_response(y = y, family = family,
-                          len =  (1 + (family == "cox")) * n)
+  #checkmate::assert_choice(
+  #  x = family,
+  #  choices = c("gaussian", "binomial", "poisson", "cox")
+  #)
+  family <- .validate_family(family = family)
+  y <- .validate_y(y = y, family = family, n = n, na_action = "error")
   if (is.character(alpha_init)) {
     alpha_init <- tolower(alpha_init)
     .assert(x = alpha_init, type = "nominal", support = methods)

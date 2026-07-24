@@ -646,12 +646,14 @@ nobs.cv.corila <- function(object, ...) {
 #' @keywords internal
 #'
 .residuals <- function(y, y_hat, family) {
-  if (is.character(family)) family <- tolower(family)
-  checkmate::assert_choice(x = family,
-                           choices = c("gaussian", "binomial", "poisson"))
+  #if (is.character(family)) family <- tolower(family)
+  #checkmate::assert_choice(x = family,
+  #                         choices = c("gaussian", "binomial", "poisson"))
+  family <- .validate_family(family = family)
   eps <- 1e-06
-  y <- .validate_response(y = y, family = family)
-  y_hat <- .validate_fitted(y_hat = y_hat, family = family, len = length(y))
+  y <- .validate_y(y = y, family = family, n = NULL,
+                   na_action = "complete_cases")
+  y_hat <- .validate_y_hat(y_hat = y_hat, family = family, n = length(y))
   if (identical(family, "gaussian")) {
     y - y_hat
   } else if (identical(family, "binomial")) {
