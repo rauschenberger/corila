@@ -199,6 +199,10 @@ This user function repeatedly calls
 [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md)
 with different values for the regularisation and mixing hyperparameters.
 
+The arguments of this function are validated with the helper functions
+listed
+[here](https://rauschenberger.github.io/corila/reference/validate.md).
+
 ## Examples
 
 ``` r
