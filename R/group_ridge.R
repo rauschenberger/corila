@@ -115,10 +115,7 @@
 #' @export
 multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                        nfolds = 10L, penalties = NULL) {
-  # --- check arguments ---
-  #if (is.character(family)) family <- tolower(family)
-  #checkmate::assert_choice(x = family,
-  #                         choices =  c("gaussian", "binomial", "cox"))
+  # --- validate arguments ---
   family <- .validate_family(family = family, poisson = FALSE)
   if (is.matrix(x) && ncol(x) != length(group)) {
     stop("For each variable, 'x' should have one column, ",
@@ -144,7 +141,6 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   nfolds <- as.integer(round(nfolds))
   checkmate::assert_numeric(x = penalties, lower = 0.0,
                             len = length(unique(group)), null.ok = TRUE)
-  #.validate(x = x, y = y, group = NULL, family = family)
   # --- initial regression ---
   scale <- .forescale(x = x, y = y, family = family)
   table <- c(gaussian = "linear", binomial = "logistic")

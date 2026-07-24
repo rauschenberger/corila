@@ -646,9 +646,6 @@ nobs.cv.corila <- function(object, ...) {
 #' @keywords internal
 #'
 .residuals <- function(y, y_hat, family) {
-  #if (is.character(family)) family <- tolower(family)
-  #checkmate::assert_choice(x = family,
-  #                         choices = c("gaussian", "binomial", "poisson"))
   family <- .validate_family(family = family)
   eps <- 1e-06
   y <- .validate_y(y = y, family = family, n = NULL,

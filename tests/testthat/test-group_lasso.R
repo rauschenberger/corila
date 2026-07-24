@@ -1,5 +1,5 @@
 
-## function ".validate" --------------------------------------------------------
+## function "cv.corila" --------------------------------------------------------
 
 #' @srrstats {G5.2} *error and warning behaviour is tested*
 #' @srrstats {G5.2b} *error messages are tested*
@@ -11,7 +11,7 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
   set.seed(1L)
   data <- simulate_data(family = family_data, n0 = n, n1 = n, q = 3L, p = 5L)
   p <- ncol(data$x_train)
-  testthat::test_that("function '.validate' rejects wrong family", {
+  testthat::test_that("function 'cv.corila' rejects wrong family", {
     for (family_model in c("gaussian", "binomial", "poisson", "cox")) {
       expect_error <-
         identical(family_data, "cox") ||
@@ -45,7 +45,7 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       }
     }
   })
-  testthat::test_that(".validate rejects wrong group object", {
+  testthat::test_that("'cv.corila' rejects wrong group object", {
     group <- list(
       A = data$group > 5.0,
       B = array(data = 2L * outer(data$group, data$group, "=="),
@@ -60,7 +60,7 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       )
     }
   })
-  testthat::test_that(".validate rejects wrong alpha_init", {
+  testthat::test_that("'cv.corila' rejects wrong alpha_init", {
     testthat::expect_error(
       cv.corila(x = data$x_train, y = data$y_train, group = data$group,
                 family = family_data, alpha_init = "elastic-net")

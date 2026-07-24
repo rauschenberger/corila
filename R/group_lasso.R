@@ -452,26 +452,40 @@ predict.corila <- function(object, newx, index, s, ...) {
 corila <- function(x, y, group, primary, family, hyper, alpha_init,
                    alpha_final, cor, foldid,
                    nfolds, lambda_init, silent = FALSE, threshold = 0.0) {
-  args <- .validate(
-    x = x,
-    y = y,
-    group = group,
-    primary = primary,
-    family = family,
-    hyper = hyper,
-    alpha_init = alpha_init,
-    alpha_final = alpha_final,
-    cor = cor,
-    foldid = NULL,
-    nfolds = NULL,
-    lambda_init = lambda_init,
-    na_action = "error",
-    silent = silent
-  )
+  family <- .validate_family(family = family)
+  checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
+  x <- .validate_x(x = x, na_action = "error")
+  n <- nrow(x)
+  p <- ncol(x)
+  y <- .validate_y(y = y, family = family, n = n, na_action = "error",
+                   names = rownames(x))
+  group <- .validate_group(group = group, p = p, names = colnames(x))
+  primary <- .validate_primary(primary = primary, p = p, names = colnames(x))
+  alpha_init <- .validate_alpha(alpha = alpha_init, init = TRUE)
+  cor <- .validate_cor(cor = cor, p = p, names = colnames(x))
+  alpha_final <- .validate_alpha(alpha = alpha_final, init = FALSE)
+  hyper <- .validate_hyper(hyper = hyper)
+  checkmate::assert_number(x = threshold, lower = 0.0, upper = 1.0)
+  #args <- .validate(
+  #  x = x,
+  #  y = y,
+  #  group = group,
+  #  primary = primary,
+  #  family = family,
+  #  hyper = hyper,
+  #  alpha_init = alpha_init,
+  #  alpha_final = alpha_final,
+  #  cor = cor,
+  #  foldid = NULL,
+  #  nfolds = NULL,
+  #  lambda_init = lambda_init,
+  #  na_action = "error",
+  #  silent = silent
+  #)
   #args <- as.list(match.call())[-1L]
   #do.call(what = .validate, args = args)
-  p <- args$p
-  args <- c(args, mget(setdiff(names(formals(corila)), c("x", "y"))))
+  #p <- args$p
+  args <- c(n = n, p = p, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
   # --- initial coefficients ---
