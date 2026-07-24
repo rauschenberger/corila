@@ -66,8 +66,8 @@ x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
 
 # model fitting
-hyper <- data.frame(exp_local = 1.0, wgt_local = 0.5,
-                    exp_global = 1.0, wgt_global = 0.5)
+hyper <- data.frame(wgt_local = 0.5, exp_local = 1.0, 
+                    wgt_global = 0.5, exp_global = 1.0)
 object <- corila(x = x,
                  y = y,
                  group = group,
@@ -80,9 +80,7 @@ object <- corila(x = x,
                  nfolds = 10L,
                  hyper = hyper,
                  lambda_init = NULL)
-#> Error in .validate_hyper(hyper = hyper): Assertion on 'names(hyper)' failed: Names must be a identical to set {'wgt_local','exp_local','wgt_global','exp_global'}, but is {'exp_local','wgt_local','exp_global','wgt_global'}.
 
 y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)
-#> Error: object 'object' not found
 # }
 ```
