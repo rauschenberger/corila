@@ -4,7 +4,7 @@ These functions validate the arguments of the function
 [`cv.corila()`](https://rauschenberger.github.io/corila/reference/cv.corila.md),
 its helper functions, and its S3 methods. They check whether the
 provided arguments satisfy expectations, and return them in standardised
-forms (e.g., as integers instead of integerish numerics).
+forms (e.g., as integers instead of integer-like numerics).
 
 ## Usage
 

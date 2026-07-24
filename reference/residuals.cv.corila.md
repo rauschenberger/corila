@@ -29,7 +29,7 @@ observation).
 
 This function extracts the observed and fitted values from the fitted
 model and calls the internal function
-[`.residuals()`](https://rauschenberger.github.io/corila/reference/dot-residuals.md)
+[`.residuals()`](https://rauschenberger.github.io/corila/reference/residuals.md)
 to calculate the residuals.
 
 ## Examples
@@ -54,37 +54,37 @@ object <- cv.corila(x = x, y = y, group = group, primary = primary)
 
 # using S3 methods
 coef(object)
-#>  (intercept)         <NA>         <NA>         <NA>         <NA>         <NA> 
-#> -0.515475587  0.000000000  0.000000000  0.000000000  0.684670470  0.000000000 
-#>         <NA>         <NA>         <NA>         <NA>         <NA>         <NA> 
-#>  0.000000000  0.000000000  0.000000000  0.000000000  0.000000000  0.000000000 
-#>         <NA>         <NA>         <NA>         <NA>         <NA>         <NA> 
-#>  0.000000000  0.000000000  0.000000000  0.003283113  0.000000000  0.000000000 
-#>         <NA>         <NA>         <NA> 
-#>  0.000000000  0.000000000  0.000000000 
+#> (intercept)        <NA>        <NA>        <NA>        <NA>        <NA> 
+#>   0.3447973   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000 
+#>        <NA>        <NA>        <NA>        <NA>        <NA>        <NA> 
+#>   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000 
+#>        <NA>        <NA>        <NA>        <NA>        <NA>        <NA> 
+#>   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000 
+#>        <NA>        <NA>        <NA> 
+#>   0.0000000   0.0000000   0.0000000 
 predict(object, newx = x)
-#>  [1] -0.634177946  0.693666118  0.003064403  0.252989249 -1.150475708
-#>  [6] -0.402590808  0.287708686 -0.557814814 -1.972376167 -0.283003936
+#>  [1] 0.3447973 0.3447973 0.3447973 0.3447973 0.3447973 0.3447973 0.3447973
+#>  [8] 0.3447973 0.3447973 0.3447973
 fitted(object)
-#>  [1] -0.634177946  0.693666118  0.003064403  0.252989249 -1.150475708
-#>  [6] -0.402590808  0.287708686 -0.557814814 -1.972376167 -0.283003936
+#>  [1] 0.3447973 0.3447973 0.3447973 0.3447973 0.3447973 0.3447973 0.3447973
+#>  [8] 0.3447973 0.3447973 0.3447973
 residuals(object)
-#>  [1] -1.567604376 -0.301692374  0.493896549 -0.477863964  0.033332542
-#>  [6]  0.007596205  1.262121657 -0.185699666 -0.359335951  1.095249378
+#>  [1] -0.05713017 -1.85019844  1.17449970  0.02261204  1.35506510  0.29939967
+#>  [7] -2.03259834  0.30284868  0.10399691  0.68150485
 plot(object)
 
 print(object)
 #> object of class ‘cv.corila’ 
 #> (contains multiple objects of class ‘cv.glmnet’)
-#> selected 2 from 20 predictors
+#> selected 0 from 20 predictors
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (7 primary and 13 auxiliary features)
+#> 20 features (9 primary and 11 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 1.019 
-#> selected weights: local = 0, global = 1
-#> selected exponents: local = Inf, global = 1
-#> 3 non-zero coefficients (including intercept)
+#> optimised regularisation parameter: lambda.min = 1.277 
+#> selected weights: local = 1, global = 0
+#> selected exponents: local = 0, global = Inf
+#> 1 non-zero coefficients (including intercept)
 ```

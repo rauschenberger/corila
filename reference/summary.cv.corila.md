@@ -36,7 +36,7 @@ Returns an invisible list with multiple slots.
 `print.summary.cv.corila()` uses the output from `summary.cv.corila()`
 to print readable information to the console. It calls the helper
 function
-[`.type()`](https://rauschenberger.github.io/corila/reference/dot-type.md)
+[`.type()`](https://rauschenberger.github.io/corila/reference/type.md)
 to name the methods used to estimate initial and final coefficients.
 
 ## See also
@@ -62,11 +62,11 @@ print(object)
 summary(object)
 #> --- object of class “cv.corila” --- 
 #> generalised linear model with gaussian family 
-#> 20 features (12 primary and 8 auxiliary features)
+#> 20 features (9 primary and 11 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 1.075 
-#> selected weights: local = 1, global = 0
-#> selected exponents: local = 0, global = Inf
+#> optimised regularisation parameter: lambda.min = 0.9959 
+#> selected weights: local = 0.1, global = 0.9
+#> selected exponents: local = 0, global = 1
 #> 2 non-zero coefficients (including intercept)
 ```

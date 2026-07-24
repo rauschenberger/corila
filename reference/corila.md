@@ -164,16 +164,16 @@ Make predictions for a range of hyperparameters with
 [predict()](https://rauschenberger.github.io/corila/reference/predict.corila.md).
 
 This function calls
-[`.forescale()`](https://rauschenberger.github.io/corila/reference/dot-forescale.md)
+[`.forescale()`](https://rauschenberger.github.io/corila/reference/forescale.md)
 and
-[`.backscale()`](https://rauschenberger.github.io/corila/reference/dot-backscale.md)
+[`.backscale()`](https://rauschenberger.github.io/corila/reference/backscale.md)
 for standardising data and bringing results back to the original scale,
 respectively,
-[`.folds()`](https://rauschenberger.github.io/corila/reference/dot-folds.md)
+[`.folds()`](https://rauschenberger.github.io/corila/reference/folds.md)
 for splitting samples into folds,
-[`.estim_initial_coefs()`](https://rauschenberger.github.io/corila/reference/dot-estim_initial_coefs.md)
+[`.estim_initial_coefs()`](https://rauschenberger.github.io/corila/reference/estim_initial_coefs.md)
 for obtaining initial coefficients,
-[`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/dot-is_adjacent.md)
+[`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/is_adjacent.md)
 for identifying adjacent predictors, and
 [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
 and
@@ -193,7 +193,7 @@ x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
 y <- rnorm(n = n)
 
 # model fitting
-hyper <- data.frame(wgt_local = 0.5, exp_local = 1.0, 
+hyper <- data.frame(wgt_local = 0.5, exp_local = 1.0,
                     wgt_global = 0.5, exp_global = 1.0)
 object <- corila(x = x,
                  y = y,

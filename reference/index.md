@@ -53,47 +53,47 @@
 
 ## Internal functions
 
+- [`.backscale()`](https://rauschenberger.github.io/corila/reference/backscale.md)
+  : Inverse standardisation
 - [`calc_sign_prec()`](https://rauschenberger.github.io/corila/reference/calc_sign_prec.md)
   : Precision for sign variable
+- [`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/combine_slopes.md)
+  : Combine coefficients
 - [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md)
   : Sparse group lasso regression (without cross-validation)
-- [`.backscale()`](https://rauschenberger.github.io/corila/reference/dot-backscale.md)
-  : Inverse standardisation
-- [`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/dot-combine_slopes.md)
-  : Combine coefficients
-- [`.deviance()`](https://rauschenberger.github.io/corila/reference/dot-deviance.md)
+- [`.deviance()`](https://rauschenberger.github.io/corila/reference/deviance.md)
   : Deviance
-- [`.estim_initial_coefs()`](https://rauschenberger.github.io/corila/reference/dot-estim_initial_coefs.md)
+- [`.estim_initial_coefs()`](https://rauschenberger.github.io/corila/reference/estim_initial_coefs.md)
   : Initial coefficients
-- [`.expand_auxiliary()`](https://rauschenberger.github.io/corila/reference/dot-expand_auxiliary.md)
+- [`.expand_auxiliary()`](https://rauschenberger.github.io/corila/reference/expand_auxiliary.md)
   : Expand auxiliary features
-- [`.folds()`](https://rauschenberger.github.io/corila/reference/dot-folds.md)
+- [`.folds()`](https://rauschenberger.github.io/corila/reference/folds.md)
   : Fold identifiers
-- [`.forescale()`](https://rauschenberger.github.io/corila/reference/dot-forescale.md)
+- [`.forescale()`](https://rauschenberger.github.io/corila/reference/forescale.md)
   : Standardisation
-- [`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/dot-is_adjacent.md)
+- [`.is_adjacent()`](https://rauschenberger.github.io/corila/reference/is_adjacent.md)
   : Adjacency indicator
-- [`.mean_function()`](https://rauschenberger.github.io/corila/reference/dot-mean_function.md)
+- [`.mean_function()`](https://rauschenberger.github.io/corila/reference/mean_function.md)
   : Mean function
-- [`.residuals()`](https://rauschenberger.github.io/corila/reference/dot-residuals.md)
-  : Deviance Residuals
-- [`.set_candidates()`](https://rauschenberger.github.io/corila/reference/dot-set_candidates.md)
-  : Candidate values
-- [`.simulate_effects()`](https://rauschenberger.github.io/corila/reference/dot-simulate_effects.md)
-  : Simulate effects
-- [`.simulate_predictors()`](https://rauschenberger.github.io/corila/reference/dot-simulate_predictors.md)
-  : Simulate predictors
-- [`.simulate_response()`](https://rauschenberger.github.io/corila/reference/dot-simulate_response.md)
-  : Simulate outcome
-- [`.type()`](https://rauschenberger.github.io/corila/reference/dot-type.md)
-  : Name method (helper function)
 - [`predict(`*`<corila>`*`)`](https://rauschenberger.github.io/corila/reference/predict.corila.md)
   : predict (S3 method)
 - [`print(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/print.cv.corila.md)
   : print (S3 method)
+- [`.residuals()`](https://rauschenberger.github.io/corila/reference/residuals.md)
+  : Deviance Residuals
+- [`.set_candidates()`](https://rauschenberger.github.io/corila/reference/set_candidates.md)
+  : Candidate values
+- [`.simulate_effects()`](https://rauschenberger.github.io/corila/reference/simulate_effects.md)
+  : Simulate effects
+- [`.simulate_predictors()`](https://rauschenberger.github.io/corila/reference/simulate_predictors.md)
+  : Simulate predictors
+- [`.simulate_response()`](https://rauschenberger.github.io/corila/reference/simulate_response.md)
+  : Simulate outcome
 - [`summary(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
   [`print(`*`<summary.cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/summary.cv.corila.md)
   : Summarising sparse group lasso (S3 method)
+- [`.type()`](https://rauschenberger.github.io/corila/reference/type.md)
+  : Name method (helper function)
 - [`.validate_na_action()`](https://rauschenberger.github.io/corila/reference/validate.md)
   [`.validate_family()`](https://rauschenberger.github.io/corila/reference/validate.md)
   [`.validate_x()`](https://rauschenberger.github.io/corila/reference/validate.md)

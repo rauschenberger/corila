@@ -167,7 +167,7 @@ slots:
 - `lambda.min` optimised regularisation hyperparameter
 
 - `scale`: output from
-  [`.forescale()`](https://rauschenberger.github.io/corila/reference/dot-forescale.md)
+  [`.forescale()`](https://rauschenberger.github.io/corila/reference/forescale.md)
 
 - `y_hat`: \\n\\-dimensional vector of fitted values
 

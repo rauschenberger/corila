@@ -33,9 +33,9 @@ are the estimated slopes.
 ## Details
 
 This function calls
-[`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/dot-combine_slopes.md)
+[`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/combine_slopes.md)
 to combine positive and negative coefficients and
-[`.backscale()`](https://rauschenberger.github.io/corila/reference/dot-backscale.md)
+[`.backscale()`](https://rauschenberger.github.io/corila/reference/backscale.md)
 to bring coefficients back to the original scale.
 
 ## References

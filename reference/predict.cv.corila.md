@@ -38,11 +38,11 @@ Returns fitted or predicted values in an \\n_0 \times m\\-dimensional or
 ## Details
 
 This function calls
-[`.expand_auxiliary()`](https://rauschenberger.github.io/corila/reference/dot-expand_auxiliary.md)
+[`.expand_auxiliary()`](https://rauschenberger.github.io/corila/reference/expand_auxiliary.md)
 for handling auxiliary predictors,
-[`.forescale()`](https://rauschenberger.github.io/corila/reference/dot-forescale.md)
+[`.forescale()`](https://rauschenberger.github.io/corila/reference/forescale.md)
 for standardising the predictor matrix, and
-[`.backscale()`](https://rauschenberger.github.io/corila/reference/dot-backscale.md)
+[`.backscale()`](https://rauschenberger.github.io/corila/reference/backscale.md)
 for bringing predicted values back to the original scale (if
 `family="gaussian"`).
 

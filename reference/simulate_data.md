@@ -127,10 +127,10 @@ point, and a number indexing the predictors within this group (e.g.,
 ## See also
 
 This function calls the internal functions
-[`.simulate_predictors()`](https://rauschenberger.github.io/corila/reference/dot-simulate_predictors.md),
-[`.simulate_effects()`](https://rauschenberger.github.io/corila/reference/dot-simulate_effects.md),
+[`.simulate_predictors()`](https://rauschenberger.github.io/corila/reference/simulate_predictors.md),
+[`.simulate_effects()`](https://rauschenberger.github.io/corila/reference/simulate_effects.md),
 and
-[`.simulate_response()`](https://rauschenberger.github.io/corila/reference/dot-simulate_response.md)
+[`.simulate_response()`](https://rauschenberger.github.io/corila/reference/simulate_response.md)
 for simulating the predictor matrix, the effect vector, or the response
 vector, respectively.
 
