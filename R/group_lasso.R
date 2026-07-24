@@ -147,6 +147,8 @@
 #' This user function repeatedly calls [corila()]
 #' with different values for the regularisation and mixing hyperparameters.
 #'
+#' The arguments of this function are validated
+#' with the helper functions listed [here][validate].
 #' @examples
 #' \donttest{
 #' data <- simulate_data()
@@ -193,6 +195,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
                       alpha_init = 0.0, cor = "spearman", alpha_final = 1.0,
                       nfolds = 10L, foldid = NULL, tune = "weight",
                       na_action = "error", silent = FALSE) {
+  # validate arguments
   family <- .validate_family(family = family)
   na_action <- .validate_na_action(na_action = na_action)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
@@ -201,49 +204,13 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   p <- ncol(x)
   y <- .validate_y(y = y, family = family, n = n, na_action = na_action,
                    names = rownames(x))
-  #y <- drop(y) # move to .validate_y
   group <- .validate_group(group = group, p = p, names = colnames(x))
-  #group <- drop(group)
-  #primary <- drop(primary)
-  # match arguments
-  #family <- match.arg(arg = tolower(family),
-  #                    choices = c("gaussian", "binomial", "poisson", "cox"))
-  #if (is.character(cor)) { # move to .validate_cor
-  #  cor <- match.arg(arg = tolower(cor),
-  #                   choices = c("pearson", "spearman", "kendall"))
-  #}
-  cor <- .validate_cor(cor = cor, p = p, names = colnames(x))
-  alpha_init <- .validate_alpha(alpha = alpha_init, init = TRUE)
-  alpha_final <- .validate_alpha(alpha = alpha_final, init = FALSE)
-  #tune <- match.arg(arg = tolower(tune),
-  #                  choices = c("none", "weight", "exponent", "bivariate",
-  #                              "factorial"))
-  #na_action <- match.arg(arg = tolower(na_action),
-  #                       choices = c("error", "complete_cases"))
-  # set default parameters
-  hyper <- .set_candidates(tune = tune)
-  #.validate(
-  #  x = x,
-  #  y = y,
-  #  group = group,
-  #  primary = primary,
-  #  family = family,
-  #  na_action = na_action,
-  #  alpha_init = alpha_init,
-  #  alpha_final = alpha_final,
-  #  cor = cor,
-  #  foldid = foldid,
-  #  nfolds = nfolds,
-  #  lambda_init = NULL,
-  #  hyper = hyper,
-  #  silent = silent
-  #)
-  #if (is.null(primary)) {
-  #  primary <- rep(x = TRUE, times = ncol(x)) # move to .validate_primary
-  #}
   primary <- .validate_primary(primary = primary, p = p, names = colnames(x))
-  #if (is.null(foldid) == is.null(nfolds))stop("Provide either foldid or fold.")
-  #alpha_final <- pmax(0.0, pmin(alpha_final, 1.0))
+  alpha_init <- .validate_alpha(alpha = alpha_init, init = TRUE)
+  cor <- .validate_cor(cor = cor, p = p, names = colnames(x))
+  alpha_final <- .validate_alpha(alpha = alpha_final, init = FALSE)
+  hyper <- .set_candidates(tune = tune)
+  # handle missing values
   if (identical(na_action, "complete_cases")) {
     complete <- stats::complete.cases(x = x, y = y)
     if (sum(complete) < 3L) {
@@ -251,13 +218,12 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
     }
     warning("Ignoring ", sum(!complete), " observations with missing data.")
   } else {
-    complete <- rep(x = TRUE, times = nrow(x))
+    complete <- rep(x = TRUE, times = n)
   }
+  # split observations into folds
+  checkmate::assert_count(x = nfolds, positive = TRUE)
   if (is.null(foldid)) {
-    checkmate::assert_count(x = nfolds, positive = TRUE)
     foldid <- .folds(y = y[complete], family = family, nfolds = nfolds)
-    # only generate folds for complete observations
-    # (and avoid subsetting further below)
   } else {
     foldid <- .validate_foldid(foldid = foldid[complete], y = y[complete],
                                family = family)
@@ -310,7 +276,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
       )
     }
   }
-  # select the hyperparameters
+  # select hyperparameters
   cvm <- list()
   for (l in seq_len(nrow(hyper))) {
     cvm[[l]] <- apply(

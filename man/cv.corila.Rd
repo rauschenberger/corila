@@ -193,6 +193,9 @@ and make predictions with \link[=predict.cv.corila]{predict()}.
 
 This user function repeatedly calls \code{\link[=corila]{corila()}}
 with different values for the regularisation and mixing hyperparameters.
+
+The arguments of this function are validated
+with the helper functions listed \link[=validate]{here}.
 }
 \keyword{classif}
 \keyword{methods}
