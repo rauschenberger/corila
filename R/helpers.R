@@ -56,6 +56,8 @@
 #'
 #' @keywords internal
 #'
+#' @rdname forescale
+#'
 #' @srrstats {RE2.3} *data are centred internally*
 #' @srrstats {RE4.12} *function to transform input data, and inverse function*
 #'
@@ -223,6 +225,8 @@
 #'
 #' @keywords internal
 #'
+#' @rdname backscale
+#'
 .backscale <- function(pars, y = NULL, coef = NULL) {
   # --- check arguments ---
   slots <- c("family", "mu.x", "sd.x", "mu.y", "sd.y")
@@ -326,6 +330,8 @@
 #'
 #' @keywords internal
 #'
+#' @rdname folds
+#'
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
   #if (is.character(family)) family <- tolower(family)
@@ -389,6 +395,8 @@
 #'
 #' @keywords internal
 #'
+#' @rdname mean_function
+#'
 .mean_function <- function(x, family) {
   # --- check arguments ---
   #if (is.character(family)) family <- tolower(family)
@@ -445,6 +453,8 @@
 #' .deviance(y = y, y_hat = y_hat, family = "poisson")
 #'
 #' @keywords internal
+#'
+#' @rdname deviance
 #'
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---

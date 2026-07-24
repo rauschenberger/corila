@@ -449,6 +449,8 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 #' @keywords internal
 #'
+#' @rdname corila
+#'
 corila <- function(x, y, group, primary, family, hyper, alpha_init,
                    alpha_final, cor, foldid,
                    nfolds, lambda_init, silent = FALSE, threshold = 0.0) {
@@ -555,6 +557,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' .set_candidates(tune = "none")
 #'
 #' @keywords internal
+#'
+#' @rdname set_candidates
 #'
 .set_candidates <- function(tune) {
   checkmate::assert_character(x = tune)
@@ -673,6 +677,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #'                      lambda = 0.2)
 #'
 #' @keywords internal
+#'
+#' @rdname estim_initial_coefs
 #'
 .estim_initial_coefs <- function(x, y, family = "gaussian", alpha_init = 0.0,
                                  group = NULL, foldid = NULL, nfolds = 10L,
@@ -800,6 +806,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' .is_adjacent(group = group[[1L]], j = 3L, p = p, names = names)
 #'
 #' @keywords internal
+#'
+#' @rdname is_adjacent
 #'
 .is_adjacent <- function(group, j, p, names) {
   checkmate::assert_int(x = p, lower = 1L)

@@ -1,53 +1,4 @@
 
-#----- extra -----
-
-# Functions for the manuscript are in the folder "scripts".
-
-#' @title
-#' Precision for sign variable
-#'
-#' @description
-#' Calculates precision for ternary variables with support \eqn{\{-1, 0, 1\}},
-#' i.e., the proportion of positive or negative estimated signs
-#' that match the true sign.
-#'
-#' @param truth
-#' integer vector with values in \eqn{\{-1, 0, 1\}}
-#'
-#' @param estim
-#' integer vector of same length with values in \eqn{\{-1, 0, 1\}}
-#'
-#' @return
-#' Returns a scalar between 0 (minimum precision) and 1 (maximum precision),
-#' or `NA` if all estimated signs equal 0.
-#'
-#' @examples
-#' \dontshow{calc_sign_prec <- corila:::calc_sign_prec}
-#' truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
-#' estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
-#' calc_sign_prec(truth = truth, estim = estim) # observed value
-#' calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
-#' calc_sign_prec(truth = truth, estim = truth) # upper limit 1
-#' calc_sign_prec(truth = truth, estim = 0L * estim) # not defined
-#'
-#' @keywords internal
-#'
-calc_sign_prec <- function(truth, estim) {
-  eps <- 1e-06
-  checkmate::assert_integerish(x = truth, min.len = 1L,
-                               lower = - 1.0 - eps, upper = 1.0 + eps)
-  truth <- as.integer(round(truth))
-  checkmate::assert_integerish(x = estim, len = length(truth),
-                               lower = -1.0 - eps, upper = 1.0 + eps)
-  estim <- as.integer(round(estim))
-  if (all(is.na(estim) | estim == 0L)) {
-    NA
-  } else {
-    sum(estim != 0L & truth != 0L &
-          sign(estim) == sign(truth)) / sum(estim != 0L)
-  }
-}
-
 #----- simulation -----
 
 #' @title
@@ -277,6 +228,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 #' @keywords internal
 #'
+#' @rdname simulate_predictors
+#'
 #' @examples
 #' \dontshow{.simulate_predictors <- corila:::.simulate_predictors}
 #' .simulate_predictors(n = 5L, p = 7L)
@@ -323,6 +276,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' This function is called by [simulate_data()].
 #'
 #' @keywords internal
+#'
+#' @rdname simulate_effects
 #'
 #' @examples
 #' \dontshow{.simulate_effects <- corila:::.simulate_effects}
@@ -395,6 +350,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 #' @keywords internal
 #'
+#' @rdname simulate_response
+#'
 #' @examples
 #' \dontshow{.simulate_response <- corila:::.simulate_response}
 #' # simulate independent response
@@ -444,5 +401,56 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
     survival::Surv(time = time, event = status)
   } else if (identical(family, "poisson")) {
     stats::rpois(n = n, lambda = exp(eta))
+  }
+}
+
+#----- extra -----
+
+# Functions for the manuscript are in the folder "scripts".
+
+#' @title
+#' Precision for sign variable
+#'
+#' @description
+#' Calculates precision for ternary variables with support \eqn{\{-1, 0, 1\}},
+#' i.e., the proportion of positive or negative estimated signs
+#' that match the true sign.
+#'
+#' @param truth
+#' integer vector with values in \eqn{\{-1, 0, 1\}}
+#'
+#' @param estim
+#' integer vector of same length with values in \eqn{\{-1, 0, 1\}}
+#'
+#' @return
+#' Returns a scalar between 0 (minimum precision) and 1 (maximum precision),
+#' or `NA` if all estimated signs equal 0.
+#'
+#' @examples
+#' \dontshow{calc_sign_prec <- corila:::calc_sign_prec}
+#' truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+#' estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+#' calc_sign_prec(truth = truth, estim = estim) # observed value
+#' calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
+#' calc_sign_prec(truth = truth, estim = truth) # upper limit 1
+#' calc_sign_prec(truth = truth, estim = 0L * estim) # not defined
+#'
+#' @keywords internal
+#'
+#' @rdname calc_sign_prec
+#'
+calc_sign_prec <- function(truth, estim) {
+  eps <- 1e-06
+  checkmate::assert_integerish(x = truth, min.len = 1L,
+                               lower = - 1.0 - eps, upper = 1.0 + eps)
+  truth <- as.integer(round(truth))
+  checkmate::assert_integerish(x = estim, len = length(truth),
+                               lower = -1.0 - eps, upper = 1.0 + eps)
+  estim <- as.integer(round(estim))
+  if (all(is.na(estim) | estim == 0L)) {
+    NA
+  } else {
+    sum(estim != 0L & truth != 0L &
+          sign(estim) == sign(truth)) / sum(estim != 0L)
   }
 }

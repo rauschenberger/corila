@@ -536,6 +536,8 @@ nobs.cv.corila <- function(object, ...) {
 #'
 #' @keywords internal
 #'
+#' @rdname combine_slopes
+#'
 .combine_slopes <- function(alpha, beta) {
   checkmate::assert_number(x = alpha, null.ok = TRUE)
   checkmate::assert_numeric(x = beta, min.len = 2L, lower = 0.0)
@@ -585,6 +587,8 @@ nobs.cv.corila <- function(object, ...) {
 #' all(x_expanded[, !primary] == 0L)
 #'
 #' @keywords internal
+#'
+#' @rdname expand_auxiliary
 #'
 .expand_auxiliary <- function(x, primary) {
   checkmate::assert_matrix(x = x, mode = "numeric",
@@ -645,6 +649,8 @@ nobs.cv.corila <- function(object, ...) {
 #'
 #' @keywords internal
 #'
+#' @rdname residuals
+#'
 .residuals <- function(y, y_hat, family) {
   family <- .validate_family(family = family)
   eps <- 1e-06
@@ -691,6 +697,8 @@ nobs.cv.corila <- function(object, ...) {
 #' .type(alpha = 0.0)
 #'
 #' @keywords internal
+#'
+#' @rdname type
 #'
 .type <- function(alpha) {
   checkmate::assert_scalar(x = alpha, na.ok = TRUE)

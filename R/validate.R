@@ -157,6 +157,7 @@ NULL
     checkmate::assert_numeric(x = cor, lower = - 1.0 - eps, upper = 1.0 + eps)
     checkmate::assert_numeric(x = diag(cor), lower = 1.0 - eps,
                               upper = 1.0 + eps)
+    if (!isSymmetric(cor)) stop("Matrix 'cor' must be symmetric.")
     pmax(-1.0, pmin(cor, 1.0))
   } else {
     stop("Argument 'cor' must be either a single character or a matrix.")
