@@ -102,7 +102,7 @@ These functions validate the arguments
 of the function \code{\link[=cv.corila]{cv.corila()}}, its helper functions, and its S3 methods.
 They check whether the provided arguments satisfy expectations,
 and return them in standardised forms
-(e.g., as integers instead of integerish numerics).
+(e.g., as integers instead of integer-like numerics).
 }
 \details{
 These functions are called by \code{\link[=cv.corila]{cv.corila()}},
