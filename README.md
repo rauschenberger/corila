@@ -15,7 +15,7 @@
 
 ## Scope
 
-The R package `corila` implements sparse modelling with grouped and correlated features allowing for privileged information (_Rauschenberger_, 2026).
+Implements lasso regression (Gaussian, logistic, Poisson, and Cox) for features in heterogeneous groups (e.g., where some groups contain subgroups of correlated features), overlapping groups (i.e., where some features belong to two or more groups), and misspecified groups (i.e., where some group labels are incorrect or missing). Involves an initial ridge regression followed by a final adaptive lasso regression. Exchanges information between features according to their assumed adjacencies or their observed correlations to improve selection and predictive performance. Allows for features that can provide information on other features but must not themselves be selected (i.e., privileged information).
 
 ##  Installation
 
