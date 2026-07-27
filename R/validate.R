@@ -87,6 +87,9 @@ NULL
   checkmate::assert_count(x = n, positive = TRUE, null.ok = TRUE)
   checkmate::assert_character(x = names, len = n, null.ok = TRUE)
   if (length(y) > 1L) y <- drop(y)
+  if (identical(family, "cox") != inherits(y, "Surv")) {
+    stop("Expects survival response if and only if Cox model.")
+  }
   eps <- 1e-06
   if (!is.null(n) && family == "cox") n <- 2L * n
   checkmate::assert_numeric(
@@ -95,9 +98,6 @@ NULL
   )
   if (!is.null(names) && !is.null(names(y))) {
     checkmate::assert_names(x = names(y), identical.to = names)
-  }
-  if (identical(family, "cox") != inherits(y, "Surv")) {
-    stop("Expects survival response if and only if Cox model.")
   }
   if (identical(family, "binomial")) {
     checkmate::assert_integerish(x = y, lower = 0.0 - eps, upper = 1.0 + eps)
@@ -158,7 +158,9 @@ NULL
     checkmate::assert_numeric(x = diag(cor), lower = 1.0 - eps,
                               upper = 1.0 + eps)
     if (!isSymmetric(cor)) stop("Matrix 'cor' must be symmetric.")
-    pmax(-1.0, pmin(cor, 1.0))
+    cor[cor < -1.0] <- -1.0
+    cor[cor > 1.0] <- 1.0
+    cor
   } else {
     stop("Argument 'cor' must be either a single character or a matrix.")
   }
