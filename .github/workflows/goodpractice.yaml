@@ -16,6 +16,7 @@ jobs:
         with:
           extra-packages: |
             devtools
+            srr
             goodpractice
             ecpc=?ignore
             grpregOverlap=?ignore
