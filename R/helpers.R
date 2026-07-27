@@ -63,14 +63,11 @@
 #'
 .forescale <- function(x, y = NULL, family = NULL, pars = NULL) {
   # --- check arguments ---
-  #if (is.character(family)) family <- tolower(family)
   checkmate::assert_matrix(x = x, mode = "numeric", any.missing = FALSE,
                            min.rows = 1L, min.cols = 1L)
   if (is.null(family) == is.null(pars)) {
     stop('Expect either "family" or "pars".')
   }
-  #families <- c("gaussian", "binomial", "poisson", "cox")
-  #checkmate::assert_choice(x = family, choices = families, null.ok = TRUE)
   if (!is.null(pars)) {
     slots <- c("family", "mu.x", "sd.x", "mu.y", "sd.y")
     checkmate::assert_list(x = pars, len = 5L)
@@ -80,7 +77,6 @@
     checkmate::assert_number(x = pars$mu.y)
     checkmate::assert_number(x = pars$sd.y, lower = 0.0)
   }
-  #checkmate::assert_choice(x = c(family, pars$family), choices = families)
   family <- .validate_family(family = c(family, pars$family))
   # --- estimate parameters ---
   if (is.null(pars)) {
