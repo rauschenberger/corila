@@ -36,9 +36,9 @@ testthat::test_that("function .na_action returns argument if valid", {
 #----- .validate_y -------------------------------------------------------------
 
 testthat::test_that("function .validate_y handles survival times", {
-  n <- 10
-  time <- stats::rpois(n = n,lambda = 4)
-  event <- stats::rbinom(n = n, size = 1, prob = 0.5)
+  n <- 10L
+  time <- stats::rpois(n = n,lambda = 4L)
+  event <- stats::rbinom(n = n, size = 1L, prob = 0.5)
   y <- survival::Surv(time = time, event = event)
   testthat::expect_error(
     object = .validate_y(y = y, family = "gaussian", n = n, na_action = "error",
@@ -58,7 +58,7 @@ testthat::test_that("function .validate_cor returns valid character", {
   x <- c("pearson", "spearman", "kendall")
   for (i in seq_along(x)) {
     testthat::expect_identical(
-      object = .validate_cor(cor = x[i], p = 10, names = NULL),
+      object = .validate_cor(cor = x[i], p = 10L, names = NULL),
       expected = x[i]
     )
   }
@@ -66,13 +66,13 @@ testthat::test_that("function .validate_cor returns valid character", {
 
 testthat::test_that("function .validate_cor errors for invalid character", {
   testthat::expect_error(
-    object = .validate_cor(cor = "cramer", p = 10, names = NULL),
+    object = .validate_cor(cor = "cramer", p = 10L, names = NULL),
     regexp = "Must be element of set" 
   )
 })
 
-n <- 10
-p <- 5
+n <- 10L
+p <- 5L
 x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
 cor <- stats::cor(x)
 
@@ -80,6 +80,31 @@ testthat::test_that("function .validate_cor expects character or matrix", {
   testthat::expect_identical(
     object = .validate_cor(cor = cor, p = p, names = NULL),
     expected = cor
+  )
+})
+
+#----- function .validate_foldid -----------------------------------------------
+
+testthat::test_that("function .validate_foldid complains if needed", {
+  family <- "binomial"
+  foldid <- rep(x = c(1L, 2L, 3L), each = 2L)
+  y <- c(1L, 1L, 1L, 0L, 1L, 0L)
+  testthat::expect_error(
+    object = .validate_foldid(foldid = foldid, y = y, family = family),
+    regexp = "at least two observations from class 0"
+  )
+  y <- c(0L, 0L, 0L, 1L, 0L, 1L)
+  testthat::expect_error(
+    object = .validate_foldid(foldid = foldid, y = y, family = family),
+    regexp = "at least two observations from class 1"
+  )
+  family <- "cox"
+  time <- stats::rpois(n = 6L, lambda = 4L)
+  event <- c(0L, 0L, 0L, 1L, 0L, 1L)
+  y <- survival::Surv(time = time, event = event)
+  testthat::expect_error(
+    object = .validate_foldid(foldid = foldid, y = y, family = family),
+    regexp = "at least two uncensored observations"
   )
 })
 

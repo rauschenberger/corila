@@ -290,12 +290,6 @@ NULL
       stop("Each fold must leave at least ",
            "two uncensored observations for the other folds.")
     }
-  } else {
-    rest <- n - tabulate(foldid)
-    if (any(rest < 2L)) {
-      stop("Each fold must leave at least two observations ",
-           "for the other folds.")
-    }
   }
   foldid
 }
