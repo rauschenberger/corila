@@ -130,7 +130,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                           family = "gaussian", rho = 0.5,
                           prob_primary = 0.5, signal_strength = 1.0,
                           prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
-  # argument checks
+  # assertions
   checkmate::assert_int(x = n0, lower = 1L, upper = 1e04L)
   n0 <- as.integer(round(n0))
   checkmate::assert_int(x = n1, lower = 0L, upper = 1e05L)
@@ -139,9 +139,6 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   p <- as.integer(round(p))
   checkmate::assert_int(x = q, lower = 1L, upper = p)
   q <- as.integer(round(q))
-  #if (is.character(family)) family <- tolower(family)
-  #checkmate::assert_choice(x = family, choices = c("gaussian", "binomial",
-  #                                                 "poisson", "cox"))\
   family <- .validate_family(family = family)
   checkmate::assert_number(x = rho, lower = 0.0, upper = 1.0)
   rho <- round(rho, digits = 6L)
@@ -156,46 +153,58 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   checkmate::assert_int(x = seed)
   set.seed(as.integer(round(seed)))
   # simulation
-  n <- n0 + n1
   group <- sort(c(seq_len(q),
                   sample(x = seq_len(q), size = p - q, replace = TRUE)))
   primary <- as.logical(stats::rbinom(n = p, size = 1L, prob = prob_primary))
   holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
-  x <- .simulate_predictors(n = n, group = group, rho = rho, seed = seed)
-  beta <- .simulate_effects(group = group,
-                            signal_strength = signal_strength,
-                            prob_group = prob_group,
-                            prob_predictor = prob_predictor,
-                            seed = seed)
-  y <- .simulate_response(family = family, x = x, beta = beta, seed = seed)
-  # names of observations and predictors
-  rownames <- c(paste0("train_"[n0 > 0L], seq_len(n0)),
-                paste0("test_"[n1 > 0L], seq_len(n1)))
-  rownames(x) <- names(y) <- rownames
-  count <- vapply(
-    X = seq_len(p),
-    FUN = function(i) sum(group[seq_len(i)] == group[i]),
-    FUN.VALUE = numeric(1L)
+  x <- .simulate_predictors(n = n0 + n1, group = group, rho = rho, seed = seed)
+  beta <- .simulate_effects(
+    group = group, signal_strength = signal_strength, prob_group = prob_group,
+    prob_predictor = prob_predictor, seed = seed
   )
-  colnames <- paste0(group, ".", count)
-  colnames[primary] <- paste0("pri_", colnames[primary])
-  colnames[!primary] <- paste0("aux_", colnames[!primary])
-  colnames(x) <- names(primary) <- names(group) <- names(beta) <- colnames
-  # training/test split
+  y <- .simulate_response(family = family, x = x, beta = beta, seed = seed)
+  rownames(x) <- names(y) <- .rownames(holdout = holdout)
+  colnames(x) <- names(primary) <- names(group) <- names(beta) <-
+    .colnames(group = group, primary = primary)
+  # train/test split
   x_train <- x[!holdout, , drop = FALSE]
   y_train <- y[!holdout]
   x_test <- x[holdout, , drop = FALSE]
   y_test <- y[holdout]
   # privileged information
   x_test[, !primary] <- NA
-  # dataset
-  list(x_train = x_train,
-       y_train = y_train,
-       group = group,
-       primary = primary,
-       beta = beta,
-       x_test = x_test,
-       y_test = y_test)
+  list(x_train = x_train, y_train = y_train, group = group, primary = primary,
+       beta = beta, x_test = x_test, y_test = y_test)
+}
+
+#' create names for simulated observations (training vs testing)
+#' @noRD
+.rownames <- function(holdout) {
+  checkmate::assert_logical(x = holdout, any.missing = FALSE, min.len = 1L)
+  n0 <- sum(!holdout)
+  n1 <- sum(holdout)
+  rownames <- character(length = n0 + n1)
+  rownames[!holdout] <- paste0("train_", seq_len(n0))
+  rownames[holdout] <- paste0("test_", seq_len(n1))
+  rownames
+}
+
+#' create names for simulated predictors (primary vs auxiliary)
+#' @noRd
+.colnames <- function(group, primary) {
+  checkmate::assert_integer(x = group, any.missing = FALSE, lower = 1L,
+                            upper = length(group))
+  checkmate::assert_logical(x = primary, any.missing = FALSE,
+                            len = length(group))
+  count <- vapply(
+    X = seq_along(group),
+    FUN = function(i) sum(group[seq_len(i)] == group[i]),
+    FUN.VALUE = numeric(1L)
+  )
+  colnames <- paste0(group, ".", count)
+  colnames[primary] <- paste0("pri_", colnames[primary])
+  colnames[!primary] <- paste0("aux_", colnames[!primary])
+  colnames
 }
 
 #' @title
