@@ -70,6 +70,11 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   )
 }
 
+testthat::test_that(".backscale throws error if y and coef are missing", {
+  testthat::expect_error(.backscale(pars = pars),
+                         regexp = "Provide 'y' or 'coef'.")
+})
+
 ## function ".type" ------------------------------------------------------------
 
 expect <- list("ridge" = 0.0,
