@@ -227,9 +227,7 @@
   # --- check arguments ---
   slots <- c("family", "mu.x", "sd.x", "mu.y", "sd.y")
   families <- c("gaussian", "binomial", "poisson", "cox")
-  if (is.null(y) && is.null(coef)) {
-    stop("Provide 'y' or 'coef'.")
-  }
+  if (is.null(y) && is.null(coef)) stop("Provide 'y' or 'coef'.")
   checkmate::assert_list(x = pars, len = 5L)
   checkmate::assert_names(x = names(pars), identical.to = slots)
   checkmate::assert_choice(x = pars$family, choices = families)
@@ -244,15 +242,8 @@
     checkmate::assert_numeric(x = y, min.len = 1L, any.missing = FALSE,
                               null.ok = TRUE)
   }
-  #checkmate::assert(
-  #  checkmate::check_numeric(x = y, min.len = 1L, any.missing = FALSE),
-  #  checkmate::check_matrix(x = y, min.rows = 1L, min.cols = 1L,
-  #                           any.missing = FALSE),
-  #  combine = "or"
-  #)
   checkmate::assert_numeric(
-    x = coef,
-    len = length(pars$mu.x) + !identical(pars$family, "cox"),
+    x = coef, len = length(pars$mu.x) + !identical(pars$family, "cox"),
     null.ok = TRUE
   )
   # --- transform target ---
@@ -267,16 +258,13 @@
     if (identical(pars$family, "cox")) {
       alpha <- NULL
       beta <- coef * ifelse(test = pars$sd.x < .Machine$double.eps,
-                            yes = 0.0,
-                            no = pars$sd.y / pars$sd.x)
+                            yes = 0.0, no = pars$sd.y / pars$sd.x)
     } else {
       factor <- ifelse(test = pars$sd.x < .Machine$double.eps,
-                       yes = 0.0,
-                       no = pars$mu.x / pars$sd.x)
+                       yes = 0.0, no = pars$mu.x / pars$sd.x)
       alpha <- pars$mu.y + pars$sd.y * (coef[1L] - sum(coef[-1L] * factor))
       beta <- coef[-1L] * ifelse(test = pars$sd.x < .Machine$double.eps,
-                                 yes = 0.0,
-                                 no = pars$sd.y / pars$sd.x)
+                                 yes = 0.0, no = pars$sd.y / pars$sd.x)
     }
     list$coef <- c(alpha, beta)
   }
