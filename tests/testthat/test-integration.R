@@ -250,6 +250,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   message("family=\"", family, "\"")
+  set.seed(1L)
   n <- 100L
   p <- 50L
   sd <- abs(stats::rnorm(n = p))
@@ -278,7 +279,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
     set.seed(1L)
     object <- cv.corila(x = x[[i]],
                         y = y,
-                        group = rep(1L:5L, each = 10L),
+                        group = rep(seq_len(5L), each = 10L),
                         family = family)
     y_hat[[i]] <- predict(object = object, newx = x[[i]])
   }
@@ -323,7 +324,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   data <- simulate_data(family = family)
   foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
   object <- y_hat <- coef <- list()
-  for (i in 1L:2L) {
+  for (i in seq_len(2L)) {
     set.seed(i)
     x <- data$x_train + stats::rnorm(n = length(data$x_train),
                                      sd = .Machine$double.eps)
@@ -415,7 +416,7 @@ testthat::test_that("complete case analysis works with NAs in response", {
 #' @srrstats {G5.4} *correctness test with glmnet*
 #' @srrstats {G5.4a} *trivial comparison in setting without groups*
 
-for (i in 1L:3L) {
+for (i in seq_len(3L)) {
   set.seed(i)
   n <- 100L
   p <- 10L
@@ -423,9 +424,9 @@ for (i in 1L:3L) {
   alpha <- stats::rnorm(n = 1L)
   beta <- stats::rnorm(n = p)
   y <- as.numeric(x %*% beta)
-  foldid <- sample(1L:10L, size = n, replace = TRUE)
+  foldid <- sample(seq_len(10L), size = n, replace = TRUE)
   glmnet <- glmnet::cv.glmnet(x = x, y = y, foldid = foldid)
-  model0 <- cv.corila(x = x[1L:(n / 4L), ], y = y[1L:(n / 4L)],
+  model0 <- cv.corila(x = x[seq_len(n / 4L), ], y = y[seq_len(n / 4L)],
                       group = seq_len(p))
   model1 <- cv.corila(x = x, y = y, group = seq_len(p), foldid = foldid)
   diff0 <- abs(coef(model0)[-1L] - beta)
