@@ -358,12 +358,14 @@ testthat::test_that("complete case analysis works with NAs in predictors", {
   foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
   missing <- stats::rbinom(n = nrow(data$x_train), size = 1L, prob = 0.2) == 1L
   data$x_train[missing, 1L] <- NA
+  set.seed(1L)
   object0 <- cv.corila(x = data$x_train[!missing, ],
                        y = data$y_train[!missing],
                        group = data$group,
                        family = family,
                        foldid = foldid[!missing],
                        na_action = "error")
+  set.seed(1L)
   object1 <- cv.corila(x = data$x_train,
                        y = data$y_train,
                        group = data$group,
@@ -384,12 +386,14 @@ testthat::test_that("complete case analysis works with NAs in response", {
   foldid <- .folds(y = data$y_train, family = family, nfolds = 10L)
   missing <- stats::rbinom(n = nrow(data$x_train), size = 1L, prob = 0.2) == 1L
   data$y_train[missing] <- NA
+  set.seed(1L)
   object0 <- cv.corila(x = data$x_train[!missing, ],
                        y = data$y_train[!missing],
                        group = data$group,
                        family = family,
                        foldid = foldid[!missing],
                        na_action = "error")
+  set.seed(1L)
   object1 <- cv.corila(x = data$x_train,
                        y = data$y_train,
                        group = data$group,
@@ -426,8 +430,10 @@ for (i in seq_len(3L)) {
   y <- as.numeric(x %*% beta)
   foldid <- sample(seq_len(10L), size = n, replace = TRUE)
   glmnet <- glmnet::cv.glmnet(x = x, y = y, foldid = foldid)
+  set.seed(1L)
   model0 <- cv.corila(x = x[seq_len(n / 4L), ], y = y[seq_len(n / 4L)],
                       group = seq_len(p))
+  set.seed(1L)
   model1 <- cv.corila(x = x, y = y, group = seq_len(p), foldid = foldid)
   diff0 <- abs(coef(model0)[-1L] - beta)
   diff1 <- abs(coef(model1)[-1L] - beta)
