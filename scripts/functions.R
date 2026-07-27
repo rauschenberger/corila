@@ -126,7 +126,7 @@
     breaks <- c(seq(-max, -eps, length.out = 50L),
                 seq(eps, max, length.out = 50L))
     col <- grDevices::colorRampPalette(c("blue","white","red"))(99L)
-    col <- c(col[1L:49L], "white", col[51L:99L])
+    col <- c(col[seq_len(49L)], "white", col[51L:99L])
   }
   graphics::par(mar=c(0.0, 2.0, 2.0, 0.0))
   graphics::image(t(z[p:1L,]), breaks = breaks, col = col, axes = FALSE)
@@ -212,7 +212,7 @@
   lwd <- list(grid = 1.0, sep = 3.0, box = 1.0)
   cex <- list(axis = 1.1, cell = 1.2, lab = 0.9)
   col  <- grDevices::colorRampPalette(c("blue","white","red"))(99)
-  col <- c(col[1L:49L], "white", col[51L:99L], cols$na)
+  col <- c(col[seq_len(49L)], "white", col[51L:99L], cols$na)
   max <- 1.01 * max(abs(c(as.vector(x), as.vector(y))), na.rm=TRUE)
   eps <- 1e-06
   breaks <- c(seq(-max, -eps, length.out = 50L),

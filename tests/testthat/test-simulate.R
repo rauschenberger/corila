@@ -43,7 +43,7 @@ family <- c("gaussian", "binomial", "poisson", "cox")
 n <- 10L
 p <- 5L
 for (i in seq_along(family)) {
-  for (j in 1L:2L) {
+  for (j in seq_len(2L)) {
     if (j == 1L) {
       y <- .simulate_response(n = n, family = family[i])
     } else {

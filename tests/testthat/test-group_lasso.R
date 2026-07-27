@@ -81,8 +81,8 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
       regexp = "at least 3 rows"
     )
     testthat::expect_error(
-      object = cv.corila(x = data$x_train[1L:2L, ],
-                         y = data$y_train[1L:2L],
+      object = cv.corila(x = data$x_train[seq_len(2L), ],
+                         y = data$y_train[seq_len(2L)],
                          group = data$group,
                          family = family_data),
       regexp = "at least 3 rows"
@@ -156,7 +156,7 @@ testthat::test_that("initial coefficients are estimated", {
   n <- 20L
   p <- 10L
   x <- matrix(rnorm(n * p), nrow = n, ncol = p)
-  group <- rep(1L:4L, times = c(3L, 3L, 2L, 2L))
+  group <- rep(seq_len(4L), times = c(3L, 3L, 2L, 2L))
   beta <- rbinom(n = p, size = 1L, prob = 0.5) * rnorm(p)
   for (i in seq_along(family)) {
     for (j in seq_along(alpha)) {
@@ -170,7 +170,7 @@ testthat::test_that("initial coefficients are estimated", {
       }
       y <- .simulate_response(family = family[i], x = x, beta = beta)
       init <- list()
-      for (k in 1L:2L) {
+      for (k in seq_len(2L)) {
         if (k == 1L) {
           lambda <- NULL
           nfolds <- 10L

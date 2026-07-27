@@ -541,7 +541,7 @@ nobs.cv.corila <- function(object, ...) {
   checkmate::assert_number(x = alpha, null.ok = TRUE)
   checkmate::assert_numeric(x = beta, min.len = 2L, lower = 0.0)
   if (length(beta) %% 2 != 0) stop("Requires 'beta' with even length.")
-  beta_positive <- beta[1L:(length(beta) / 2L)]
+  beta_positive <- beta[seq_len(length(beta) / 2L)]
   beta_negative <- beta[(length(beta) / 2L + 1L):(length(beta))]
   eps <- 1e-06
   if (any(beta_positive > eps & beta_negative > eps)) {

@@ -280,7 +280,7 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
       )
     }
   )
-  foldid <- .folds(y = unique(y)[1L:2L], family = family, nfolds = 2L)
+  foldid <- .folds(y = unique(y)[seq_len(2L)], family = family, nfolds = 2L)
   testthat::test_that(
     desc = "function '.folds' works if y has two entries",
     code = {
@@ -327,7 +327,7 @@ testthat::test_that("outcomes are simulated", {
     testthat::expect_error(
       .simulate_response(family = family[i], x = x, beta = beta, n = n)
     )
-    for (j in 1L:2L){
+    for (j in seq_len(2L)) {
       if (j == 1L) {
         y <- .simulate_response(family = family[i], x = x, beta = beta)
       } else {
