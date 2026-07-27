@@ -108,6 +108,23 @@ testthat::test_that("function .validate_foldid complains if needed", {
   )
 })
 
+#----- function .validate_alpha ------------------------------------------------
+
+testthat::test_that("function .validate_data", {
+  testthat::expect_identical(
+    object = .validate_alpha(alpha = "ridge", init = FALSE),
+    expected = 0
+  )
+  testthat::expect_identical(
+    object = .validate_alpha(alpha = "lasso", init = FALSE),
+    expected = 1
+  )
+  testthat::expect_error(
+    object = .validate_alpha(alpha = TRUE, init = FALSE),
+    regexp = "either a single character or a single numeric"
+  )
+})
+
 ".validate_primary"
 ".validate_alpha"
 ".validate_cor"
