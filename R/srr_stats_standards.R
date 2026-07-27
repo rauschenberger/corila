@@ -1,6 +1,9 @@
 #' srr_stats
 #'
 #' @srrstatsVerbose TRUE
+#' 
+#' @seealso
+#' https://stats-devguide.ropensci.org/standards.html
 #'
 #' @srrstats {G1.2} *README.md contains a life cycle badge* 
 #' @srrstats {G1.3} *statistical terminology is defined (see files in folder R)* 
