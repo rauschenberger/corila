@@ -76,10 +76,25 @@ p <- 5L
 x <- matrix(data = stats::rnorm(n = n * p), nrow = n, ncol = p)
 cor <- stats::cor(x)
 
-testthat::test_that("function .validate_cor expects character or matrix", {
+testthat::test_that("function .validate_cor returns matrix input", {
   testthat::expect_identical(
     object = .validate_cor(cor = cor, p = p, names = NULL),
     expected = cor
+  )
+})
+
+cor[1L, 2L] <- - cor[2L, 1L]
+testthat::test_that("function .validate_cor expects symmetric matrix", {
+  testthat::expect_error(
+    object = .validate_cor(cor = cor, p = p, names = NULL),
+    regex = "must be symmetric"
+  )
+})
+
+testthat::test_that("function .validate_cor expects character or matrix", {
+  testthat::expect_error(
+    object = .validate_cor(cor = logical(length = p), p = p, names = NULL),
+    regex = "either a single character or a matrix"
   )
 })
 
