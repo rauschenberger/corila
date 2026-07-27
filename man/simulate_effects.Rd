@@ -47,7 +47,7 @@ Simulates effect vector.
 }
 \examples{
 \dontshow{.simulate_effects <- corila:::.simulate_effects}
-group <- rep(c(1L:5L), each = 3L)
+group <- rep(seq_len(5L), each = 3L)
 .simulate_effects(group = group)
 .simulate_effects(group = group, signal_strength = 1.5)
 
