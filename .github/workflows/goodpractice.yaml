@@ -15,6 +15,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
+            devtools
             goodpractice
             ecpc=?ignore
             grpregOverlap=?ignore
@@ -23,6 +24,7 @@ jobs:
 
       - name: goodpractice
         run: |
+          devtools::load_all()
           checks <- setdiff(goodpractice::all_checks(), c("covr", "cyclocomp"))
           checks <- checks[!grepl(pattern="rcmdcheck_", x = checks)]
           x <- goodpractice::gp(checks = checks)
