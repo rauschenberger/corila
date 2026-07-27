@@ -499,8 +499,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       temp <-  cor_trans * init$coef * adjacent
       weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
       weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
-      # ad-hoc solution for features that are in no group (unreachable?)
-      # weight$local[is.na(weight$local)] <- 0.0 # features in no group
+      weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * init$coef
       weight$global[j] <- sum(pmax(0.0, temp)) / p
       weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
@@ -684,9 +683,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   y <- .validate_y(y = y, family = family, n = n, na_action = "error",
                    names = rownames(x))
   alpha_init <- .validate_alpha(alpha = alpha_init, init = TRUE)
-  #if (!is.null(lambda) == (!is.null(foldid) || !is.null(nfolds))) {
-  #  stop("Either provide 'lambda' or provide 'foldid' or 'nfolds'.")
-  #}
   if (!is.null(foldid)) {
     foldid <- .validate_foldid(foldid = foldid, y = y, family = family)
   }

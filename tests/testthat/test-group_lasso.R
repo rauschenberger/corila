@@ -173,8 +173,10 @@ testthat::test_that("initial coefficients are estimated", {
       for (k in 1L:2L) {
         if (k == 1L) {
           lambda <- NULL
+          nfolds <- 10L
         } else {
           lambda <- init[[1L]]$lambda
+          nfolds <- NULL
         }
         init[[k]] <- .estim_initial_coefs(
           x = x,
@@ -183,7 +185,7 @@ testthat::test_that("initial coefficients are estimated", {
           alpha_init = alpha[[j]][1L],
           group = group,
           foldid = NULL,
-          nfolds = 10L,
+          nfolds = nfolds,
           lambda = lambda
         )
       }
@@ -209,7 +211,7 @@ testthat::test_that("initial coefficients are estimated", {
         alpha_init = alpha[[i]],
         group = group,
         foldid = NULL,
-        nfolds = 10L,
+        nfolds = NULL,
         lambda = lambda
       )
     )
