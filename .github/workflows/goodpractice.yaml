@@ -26,7 +26,9 @@ jobs:
       - name: goodpractice
         run: |
           devtools::load_all()
+          library(stt)
           checks <- setdiff(goodpractice::all_checks(), c("covr", "cyclocomp"))
+          # "roxygen2_unknown_tags"
           checks <- checks[!grepl(pattern="rcmdcheck_", x = checks)]
           x <- goodpractice::gp(checks = checks)
           print(x)
