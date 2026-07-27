@@ -194,60 +194,79 @@ NULL
 
 #' @rdname validate
 .validate_group <- function(group, p, names) {
-  eps <- 1e-06
   checkmate::assert_count(x = p, positive = TRUE)
   checkmate::assert_character(x = names, len = p, null.ok = TRUE)
   group <- drop(group)
   if (is.vector(group) && is.atomic(group)) {
-    if (is.numeric(group)) {
-      checkmate::assert_integerish(x = group, len = p,
-                                   lower = 1.0 - eps, upper = p + eps)
-      as.integer(round(group))
-    } else if (is.character(group)) {
-      checkmate::assert_character(x = group, any.missing = FALSE, len = p)
-    } else {
-      stop("If argument 'group' is a vector, ",
-           "it must be of class 'numeric' or 'character'.")
-    }
+    .validate_group_vector(group = group, p = p, names = names)
   } else if (is.list(group)) {
-    checkmate::assert_list(x = group, min.len = 1L, any.missing = FALSE)
-    values <- unlist(group)
-    if (all(is.numeric(values))) {
-      checkmate::assert_integerish(
-        x = values, lower = 1.0 - eps, upper = p + eps,
-        any.missing = FALSE, .var.name = "unlist(group)"
-      )
-      lapply(X = group, FUN = function(x) as.integer(round(x)))
-    } else if (all(is.character(values))) {
-      checkmate::assert_character(x = names, any.missing = FALSE, len = p,
-                                  unique = TRUE)
-      checkmate::assert_character(x = values, any.missing = FALSE,
-                                  min.len = 1L, .var.name = "unlist(group)")
-      checkmate::assert_subset(x = values, choices = names,
-                               .var.name = "unlist(group)")
-      group
-    } else {
-      stop("If argument 'group' is a list, ",
-           "it must be a list of ",
-           "either numeric vectors or character vectors.")
-    }
+    .validate_group_list(group = group, p = p, names = names)
   } else if (is.matrix(group)) {
-    checkmate::assert_matrix(x = group, mode = "integerish",
-                             nrows = p, ncols = p)
-    if (!is.null(names) && !is.null(rownames(group))) {
-      checkmate::assert_names(x = rownames(group), identical.to = names)
-    }
-    if (!is.null(names) && !is.null(colnames(group))) {
-      checkmate::assert_names(x = colnames(group), identical.to = names)
-    }
-    checkmate::assert_numeric(x = group, lower = 0.0 - eps, upper = 1.0 + eps)
-    group <- round(group)
-    class(group) <- "integer"
+    .validate_group_matrix(group = group, p = p, names = names)
+  } else {
+    stop("Argument 'group' must be a vector, a list, or a matrix.")
+  }
+}
+
+#' @noRd
+.validate_group_vector <- function(group, p, names) {
+  eps <- 1e-06
+  checkmate::assert_vector(x = group, len = p)
+  if (!is.null(names) && !is.null(names(group))) {
+    checkmate::assert_names(x = names(group), identical.to = names)
+  }
+  if (is.numeric(group)) {
+    checkmate::assert_integerish(x = group, len = p, any.missing = FALSE,
+                                 lower = 1.0 - eps, upper = p + eps)
+    as.integer(round(group))
+  } else if (is.character(group)) {
+    checkmate::assert_character(x = group, any.missing = FALSE, len = p)
+  } else {
+    stop("If argument 'group' is a vector, ",
+         "it must be of class 'numeric' or 'character'.")
+  }
+}
+
+#' @noRd
+.validate_group_list <- function(group, p, names) {
+  eps <- 1e-06
+  checkmate::assert_list(x = group, min.len = 1L, any.missing = FALSE)
+  values <- unlist(group)
+  if (all(is.numeric(values))) {
+    checkmate::assert_integerish(
+      x = values, lower = 1.0 - eps, upper = p + eps,
+      any.missing = FALSE, .var.name = "unlist(group)"
+    )
+    lapply(X = group, FUN = function(x) as.integer(round(x)))
+  } else if (all(is.character(values))) {
+    checkmate::assert_character(x = names, any.missing = FALSE, len = p,
+                                unique = TRUE)
+    checkmate::assert_character(x = values, any.missing = FALSE,
+                                min.len = 1L, .var.name = "unlist(group)")
+    checkmate::assert_subset(x = values, choices = names,
+                             .var.name = "unlist(group)")
     group
   } else {
-    stop("Argument 'group' must be a vector, ",
-         "a list, or a matrix.")
+    stop("If argument 'group' is a list, it must be a list of ",
+         "either numeric vectors or character vectors.")
   }
+}
+
+#' @noRd
+.validate_group_matrix <- function(group, p, names) {
+  eps <- 1e-06
+  checkmate::assert_matrix(x = group, mode = "integerish",
+                           nrows = p, ncols = p)
+  if (!is.null(names) && !is.null(rownames(group))) {
+    checkmate::assert_names(x = rownames(group), identical.to = names)
+  }
+  if (!is.null(names) && !is.null(colnames(group))) {
+    checkmate::assert_names(x = colnames(group), identical.to = names)
+  }
+  checkmate::assert_numeric(x = group, lower = 0.0 - eps, upper = 1.0 + eps)
+  group <- round(group)
+  class(group) <- "integer"
+  group
 }
 
 #' @rdname validate
