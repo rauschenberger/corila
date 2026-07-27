@@ -32,6 +32,7 @@
 #' @srrstats {G2.2} *rejects multivariate input if expecting univariate input*
 #' @srrstats {G2.15} *rejects missing values by default*
 #' @srrstats {G2.3a} *rejects unexpected values*
+#' @srrstats {G2.3b} *uses tolower*
 #' @srrstats {G2.4} *verifying data types:*
 #' @srrstats {G2.4a} *- integer*
 #' @srrstats {G2.4b} *- numeric*

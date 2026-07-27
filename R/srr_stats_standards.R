@@ -15,6 +15,8 @@ NULL
 
 #' NA_standards
 #'
+#' @srrstatsNA {G1.5} *performance claims are not yet made (manuscript in preparation)*
+#' @srrstatsNA {G1.6} *idem*
 #' @srrstatsNA {G2.4d} *method does not use factors*
 #' @srrstatsNA {G2.4e} *idem*
 #' @srrstatsNA {G2.5} *no function has a factor argument*
