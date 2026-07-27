@@ -178,7 +178,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 }
 
 #' create names for simulated observations (training vs testing)
-#' @noRD
+#' @noRd
 .rownames <- function(holdout) {
   checkmate::assert_logical(x = holdout, any.missing = FALSE, min.len = 1L)
   n0 <- sum(!holdout)
