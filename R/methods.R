@@ -123,7 +123,6 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
     stop("Excluded coefficients must equal zero.")
     # nocov end
   }
-  #coef[c(TRUE[object$scale$family != "cox"], object$args$primary)] # ?
   if (object$scale$family != "cox") names(coef)[1L] <- "(intercept)"
   coef
 }

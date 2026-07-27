@@ -318,11 +318,6 @@
 #'
 .folds <- function(y, family, nfolds) {
   # --- check arguments ---
-  #if (is.character(family)) family <- tolower(family)
-  #checkmate::assert_choice(
-  #  x = family,
-  #  choices = c("gaussian", "binomial", "poisson", "cox")
-  #)
   family <- .validate_family(family = family)
   y <- .validate_y(y = y, family = family, n = NULL, na_action = "error",
                    names = NULL)
@@ -383,9 +378,6 @@
 #'
 .mean_function <- function(x, family) {
   # --- check arguments ---
-  #if (is.character(family)) family <- tolower(family)
-  #support <- c("gaussian", "binomial", "poisson", "cox")
-  #checkmate::assert_choice(x = family, choices = support)
   checkmate::assert_numeric(x = x, min.len = 1L)
   family <- .validate_family(family = family)
   # --- transform target ---
@@ -442,18 +434,10 @@
 #'
 .deviance <- function(y, y_hat, family) {
   # --- check arguments ---
-  #if (is.character(family)) family <- tolower(family)
-  #checkmate::assert_choice(
-  #  x = family,
-  #  choice = c("gaussian", "binomial", "poisson", "cox")
-  #)
   family <- .validate_family(family = family)
   y <- .validate_y(y = y, family = family, n = NULL,
                    na_action = "complete_cases", names = NULL)
   y_hat <- .validate_y_hat(y_hat = y_hat, family = family, n = length(y))
-  #if (length(y) != length(y_hat)) {
-  #  stop("Arguments 'y' and 'y_hat' must have the same length.")
-  #}
   # --- calculate deviance ---
   eps <- 1e-06
   if (identical(family, "gaussian")) {

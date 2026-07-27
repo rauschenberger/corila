@@ -132,12 +132,6 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
   names_train <- names(data$y_train)
   names_test <- names(data$y_test)
   names_covs <- colnames(data$x_train)
-  #names_train <- paste0("train_", seq_len(data$info$n0))
-  #rownames(data$x_train) <- names(data$y_train) <- names_train
-  #names_test <- paste0("train_", seq_len(data$info$n1))
-  #rownames(data$x_test) <- names(data$y_test) <- names_test
-  #names_covs <- LETTERS[seq_len(ncol(data$x_train))]
-  #colnames(data$x_train) <- colnames(data$x_test) <- names_covs
   group <- list()
   group$vector <- data$group
   group$vector_char <- LETTERS[data$group]
@@ -302,7 +296,6 @@ for (family in c("gaussian", "binomial", "poisson", "cox")) {
 for (family in c("gaussian", "binomial", "poisson", "cox")) {
   # simulate data
   data <- simulate_data(family = family)
-  #primary <- as.logical(stats::rbinom(n = data$info$p, size = 1L, prob = 0.5))
   # fit model
   object <- cv.corila(x = data$x_train, y = data$y_train,
                       group = data$group, primary = data$primary,

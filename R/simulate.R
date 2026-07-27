@@ -264,7 +264,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   sigma <- rho * outer(X = group, Y = group, FUN = "==") +
     (1.0 - rho) * diag(rep(x = 1.0, times = p))
   x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
-  #x <- mvtnorm::rmvnorm(n = n, mean = mu, sigma = sigma)
+  # alternative: function mvtnorm::rmvnorm
+  # with arguments n = n, mean = mu, sigma = sigma
   if (n == 1L) x <- matrix(data = x, nrow = 1L)
   x
 }
@@ -314,14 +315,6 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   beta_group <-
     sign(stats::rnorm(n = q)) *
     stats::rbinom(n = q, size = 1L, prob = prob_group)
-  #beta <- rep(x = NA, times = p)
-  #for (i in seq_len(q)) {
-  #  beta[group == i] <-
-  #    beta_group[i] * signal_strength *
-  #    abs(stats::rnorm(n = sum(group == i))) *
-  #    stats::rbinom(n = sum(group == i), size = 1L, prob = prob_predictor)
-  #}
-  #beta
   beta <- numeric(p)
   beta[order] <- signal_strength * rep(x = beta_group, times = size) *
     abs(stats::rnorm(n = p)) *
@@ -376,9 +369,6 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #'
 .simulate_response <- function(family, x = NULL, beta = NULL, n = NULL,
                                seed = 1L) {
-  #if (is.character(family)) family <- tolower(family)
-  #checkmate::assert_choice(x = family, choices = c("gaussian", "binomial",
-  #                                                 "poisson", "cox"))
   family <- .validate_family(family = family)
   if (is.null(x) != is.null(beta)) {
     stop("Provide either none or both of 'x' and 'beta'.")

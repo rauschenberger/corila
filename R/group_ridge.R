@@ -275,8 +275,5 @@ coef.multiridge <- function(object, ...) {
   coef <- multiridge::betasout(object,
                                Xblocks = xblocks,
                                penalties = object$penalties)
-  #if (identical(object$family, "cox") & is.null(coef[[1L]])) {
-  #  coef[[1L]] <- NA # was 0
-  #}
   .backscale(pars = object$pars, coef = unlist(coef))$coef
 }
