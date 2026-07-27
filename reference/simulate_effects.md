@@ -57,7 +57,7 @@ This function is called by
 ## Examples
 
 ``` r
-group <- rep(c(1L:5L), each = 3L)
+group <- rep(seq_len(5L), each = 3L)
 .simulate_effects(group = group)
 #>  [1]  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000
 #>  [7]  0.0000000 -0.4115108 -0.2522234  0.0000000  0.0000000  0.0000000
