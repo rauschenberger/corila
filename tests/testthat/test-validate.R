@@ -18,7 +18,7 @@ testthat::test_that("function .validate_family standardises arguments", {
 
 testthat::test_that("function .validate_family errors if invalid argument", {
   testthat::expect_error(object = .validate_family(family = "gamma"),
-                       regexp = "Must be element of set") 
+                         regexp = "Must be element of set")
 })
 
 #----- .validate_na_action -----------------------------------------------------
@@ -37,7 +37,7 @@ testthat::test_that("function .na_action returns argument if valid", {
 
 testthat::test_that("function .validate_y handles survival times", {
   n <- 10L
-  time <- stats::rpois(n = n,lambda = 4L)
+  time <- stats::rpois(n = n, lambda = 4L)
   event <- stats::rbinom(n = n, size = 1L, prob = 0.5)
   y <- survival::Surv(time = time, event = event)
   testthat::expect_error(
@@ -67,7 +67,7 @@ testthat::test_that("function .validate_cor returns valid character", {
 testthat::test_that("function .validate_cor errors for invalid character", {
   testthat::expect_error(
     object = .validate_cor(cor = "cramer", p = 10L, names = NULL),
-    regexp = "Must be element of set" 
+    regexp = "Must be element of set"
   )
 })
 
@@ -113,24 +113,14 @@ testthat::test_that("function .validate_foldid complains if needed", {
 testthat::test_that("function .validate_data", {
   testthat::expect_identical(
     object = .validate_alpha(alpha = "ridge", init = FALSE),
-    expected = 0
+    expected = 0.0
   )
   testthat::expect_identical(
     object = .validate_alpha(alpha = "lasso", init = FALSE),
-    expected = 1
+    expected = 1.0
   )
   testthat::expect_error(
     object = .validate_alpha(alpha = TRUE, init = FALSE),
     regexp = "either a single character or a single numeric"
   )
 })
-
-".validate_primary"
-".validate_alpha"
-".validate_cor"
-".validate_foldid"
-".validate_group"
-".validate_hyper"
-".validate_x"
-".validate_y"
-".validate_y_hat"
