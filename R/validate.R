@@ -199,7 +199,7 @@ NULL
   checkmate::assert_count(x = p, positive = TRUE)
   checkmate::assert_character(x = names, len = p, null.ok = TRUE)
   group <- drop(group)
-  if (is.vector(group) && is.atomic(group)) {
+  if (is.atomic(group) && is.null(dim(group))) {
     .validate_group_vector(group = group, p = p, names = names)
   } else if (is.list(group)) {
     .validate_group_list(group = group, p = p, names = names)
@@ -215,7 +215,8 @@ NULL
   eps <- 1e-06
   checkmate::assert_vector(x = group, len = p)
   if (!is.null(names) && !is.null(names(group))) {
-    checkmate::assert_names(x = names(group), identical.to = names)
+    checkmate::assert_names(x = names(group),
+                            identical.to = as.character(names))
   }
   if (is.numeric(group)) {
     checkmate::assert_integerish(x = group, len = p, any.missing = FALSE,

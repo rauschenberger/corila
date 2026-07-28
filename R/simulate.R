@@ -5,6 +5,8 @@
 #' Data simulation
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' Simulates a predictor matrix, an effect vector and a response vector.
 #' The simulated datasets can be used for modelling a response based on
 #' grouped and correlated primary and auxiliary predictors.
