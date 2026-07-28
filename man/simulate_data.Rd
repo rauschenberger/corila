@@ -96,6 +96,8 @@ response vector for the test observations of length \eqn{n_1}
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Simulates a predictor matrix, an effect vector and a response vector.
 The simulated datasets can be used for modelling a response based on
 grouped and correlated primary and auxiliary predictors.
