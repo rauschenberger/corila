@@ -7,6 +7,8 @@ vignette: >
   %\VignetteIndexEntry{Vignette}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Introduction
@@ -156,6 +158,16 @@ y_hat$all <- predict(object = object, newx = x[holdout, ])
 y_hat$sub <- predict(object = object, newx = x[holdout, primary])
 all(y_hat$all == y_hat$sub)
 ```
+
+
+```{r signed-precision,echo=FALSE,eval=FALSE}
+lapply(
+  X = coef,
+  FUN = function(x) corila:::calc_sign_prec(truth = sign(beta),
+                                            estim = sign(as.numeric(x)[-1]))
+)
+```
+
 
 ## Reference
 
