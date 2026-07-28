@@ -195,7 +195,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
                       alpha_init = 0.0, cor = "spearman", alpha_final = 1.0,
                       nfolds = 10L, foldid = NULL, tune = "weight",
                       na_action = "error", silent = FALSE) {
-  # assertion
+  # --- validate arguments ---
   family <- .validate_family(family = family)
   na_action <- .validate_na_action(na_action = na_action)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
@@ -211,7 +211,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   alpha_final <- .validate_alpha(alpha = alpha_final, init = FALSE)
   hyper <- .set_candidates(tune = tune)
   complete <- .is_complete_case(x = x, y = y, na_action = na_action)
-  # split observations into folds
+  # --- split observations into folds ---
   checkmate::assert_count(x = nfolds, positive = TRUE)
   if (is.null(foldid)) {
     foldid <- .folds(y = y[complete], family = family, nfolds = nfolds)
@@ -220,42 +220,30 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
                                family = family)
     nfolds <- max(foldid)
   }
-  # fit model on all folds
-  object_ext <- corila(x = x[complete, , drop = FALSE],
-                       y = y[complete],
-                       group = group,
-                       primary = primary,
-                       family = family,
-                       alpha_init = alpha_init,
-                       alpha_final = alpha_final,
-                       cor = cor,
-                       foldid = foldid,
-                       nfolds = NULL,
-                       hyper = hyper,
-                       lambda_init = NULL,
-                       silent = silent)
+  # --- fit model on all folds ---
+  args <- list(group = group, primary = primary, family = family,
+               alpha_init = alpha_init, alpha_final = alpha_final,
+               cor = cor, silent = silent, nfolds = NULL, hyper = hyper)
+  object_ext <- do.call(
+    what = "corila",
+    args = c(args, list(x = x[complete, , drop = FALSE], y = y[complete],
+                        foldid = foldid, lambda_init = NULL))
+  )
   lambda <- lapply(X = object_ext$model, FUN = function(x) x$lambda)
-  # initialise matrices for predictions
+  # --- initialise matrices for predictions ---
   pred <- list()
   for (j in seq_len(nrow(hyper))) {
     pred[[j]] <- matrix(data = NA, nrow = n,
                         ncol = length(object_ext$model[[j]]$lambda))
   }
-  # repeatedly train without and test for held-out fold
+  # --- repeatedly train without and test for held-out fold ---
   for (i in seq_len(nfolds)) {
-    object_int <- corila(x = x[foldid != i & complete, ],
-                         y = y[foldid != i & complete],
-                         group = group,
-                         primary = primary,
-                         family = family,
-                         alpha_init = alpha_init,
-                         alpha_final = alpha_final,
-                         cor = cor,
-                         foldid = NULL,
-                         nfolds = NULL,
-                         hyper = hyper,
-                         lambda_init = object_ext$lambda_init,
-                         silent = silent)
+    object_int <- do.call(
+      what = "corila",
+      args = c(args, list(x = x[foldid != i & complete, , drop = FALSE],
+                          y = y[foldid != i & complete], foldid = NULL,
+                          lambda_init = object_ext$lambda_init))
+    )
     for (j in seq_len(nrow(hyper))) {
       pred[[j]][foldid == i & complete, ] <- predict.corila(
         object = object_int,
@@ -265,7 +253,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
       )
     }
   }
-  # select hyperparameters
+  # --- select hyperparameters ---
   cvm <- list()
   for (l in seq_len(nrow(hyper))) {
     cvm[[l]] <- apply(
@@ -274,39 +262,23 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
       FUN = function(x) .deviance(y_hat = x, y =  y[complete], family = family)
     )
   }
-  hyper$cvm <- cvm_min <- vapply(X = cvm,
-                                 FUN = base::min,
-                                 FUN.VALUE = numeric(1L))
-  id_hyper <- which.min(cvm_min)
+  hyper$cvm <- vapply(X = cvm, FUN = base::min, FUN.VALUE = numeric(1L))
+  id_hyper <- which.min(hyper$cvm)
   lambda.min <- object_ext$model[[id_hyper]]$lambda[which.min(cvm[[id_hyper]])]
-  # return fitted model
+  # --- return fitted model ---
   object <- object_ext
   object$hyper <- hyper
   object$id_hyper <- id_hyper
   object$lambda.min <- lambda.min
   class(object) <- "cv.corila"
   object$y <- y
-  complete_x <- stats::complete.cases(x = x)
   object$y_hat <- stats::setNames(object = rep(x = NA, times = n),
                                   nm = rownames(x))
+  complete_x <- stats::complete.cases(x = x)
   object$y_hat[complete_x] <- stats::predict(object = object,
                                              newx = x[complete_x, ])
   object
 }
-
-.is_complete_case <- function(x, y, na_action) {
-  if (identical(na_action, "complete_cases")) {
-    complete <- stats::complete.cases(x = x, y = y)
-    if (sum(complete) < 3L) {
-      stop("Requires at least three complete observations.")
-    }
-    warning("Ignoring ", sum(!complete), " observations with missing data.")
-    complete
-  } else {
-    rep(x = TRUE, times = nrow(x))
-  }
-}
-
 
 #--- model fitting without cross-validation -----
 
@@ -847,5 +819,20 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     }
   } else if (is.matrix(group)) {
     group[, j] == 1L
+  }
+}
+
+
+#' @noRd
+.is_complete_case <- function(x, y, na_action) {
+  if (identical(na_action, "complete_cases")) {
+    complete <- stats::complete.cases(x = x, y = y)
+    if (sum(complete) < 3L) {
+      stop("Requires at least three complete observations.")
+    }
+    warning("Ignoring ", sum(!complete), " observations with missing data.")
+    complete
+  } else {
+    rep(x = TRUE, times = nrow(x))
   }
 }
