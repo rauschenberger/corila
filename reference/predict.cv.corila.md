@@ -1,5 +1,7 @@
 # predict (S3 method)
 
+**\[stable\]**
+
 Makes predictions from an object of class `"cv.corila"`.
 
 ## Usage

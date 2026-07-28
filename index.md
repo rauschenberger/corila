@@ -66,8 +66,7 @@ https://git.lih.lu/arauschenberger/corila and
 https://gitlab.com/uniluxembourg/Personalfolders/armin.rauschenberger/corila)).
 
 Large-language models (mainly Claude Sonnet 4.6 and GPT-5.4) were used
-for reviewing R code and documentation and for adapting configuration
-files (`.yaml`).
+for reviewing R code and documentation.
 
 **Copyright** © 2025 Armin Rauschenberger; Luxembourg Institute of
 Health (LIH), Department of Medical Informatics (DMI), Bioinformatics

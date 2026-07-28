@@ -1,5 +1,7 @@
 # Fitted values
 
+**\[stable\]**
+
 Extracts fitted values.
 
 ## Usage

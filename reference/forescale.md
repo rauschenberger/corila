@@ -70,40 +70,24 @@ to bring coefficients and predictions back to original scale.
 
 ``` r
 # \donttest{
+
 # simulate data
 family <- "gaussian"
-n0 <- 100L; n1 <- 50L; p <- 3L
-n <- n0 + n1
-fold <- rep(c(0L, 1L), times = c(n0, n1))
-sd <- stats::rpois(n = p, lambda = 5.0)
-x <- data.frame(x = sapply(X = sd,
-                           FUN = function(x) stats::rnorm(n = n, sd = x)))
-beta <- stats::rnorm(n = p)
-eta <- as.matrix(x) %*% beta
-if (identical(family, "gaussian")) {
-  y <- stats::rnorm(n = n, mean = eta)
-} else if (identical(family, "binomial")) {
-  y <- stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
-} else if (identical(family, "poisson")) {
-  y <- stats::rpois(n = n, lambda = exp(eta))
-} else if (identical(family, "cox")) {
-  time <- stats::rexp(n = n, rate = exp(eta))
-  status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
-  y <- survival::Surv(time = time, event = status)
-}
+data <- simulate_data(family = family, prob_primary = 1.0)
 
 # regression without standardisation
 if (identical(family, "cox")) {
-  lm1 <- survival::coxph(y[fold == 0L]~., data=x[fold == 0L, ])
+  lm1 <- survival::coxph(data$y_train~., data = data.frame(data$x_train))
 } else {
-  lm1 <- stats::glm(y[fold == 0L]~., data=x[fold == 0L, ], family=family)
+  lm1 <- stats::glm(data$y_train~., data = data.frame(data$x_train),
+                    family = family)
 }
 coef1 <- stats::coef(lm1)
-yhat1 <- predict(lm1, newdata = x[fold == 1L, ])
+yhat1 <- predict(lm1, newdata = data.frame(data$x_test))
 
 # regression with standardisation
-scale <- .forescale(x = as.matrix(x)[fold == 0L, ],
-                    y = y[fold == 0L],
+scale <- .forescale(x = data$x_train,
+                    y = data$y_train,
                     family = family)
 if (identical(family, "cox")) {
   lm2 <- survival::coxph(scale$y~., data = data.frame(scale$x))
@@ -111,7 +95,7 @@ if (identical(family, "cox")) {
   lm2 <- stats::glm(scale$y~., data = data.frame(scale$x), family = family)
 }
 coef_temp <- stats::coef(lm2)
-newx_temp <- .forescale(x = as.matrix(x)[fold == 1L, ],
+newx_temp <- .forescale(x = data$x_test,
                         pars = scale$pars)$x
 yhat_temp <- predict(object = lm2, newdata = data.frame(newx_temp))
 result <- .backscale(pars = scale$pars,
@@ -121,9 +105,9 @@ coef2 <- result$coef
 yhat2 <- result$y
 
 # equality
-all.equal(coef1, coef2, check.attributes = FALSE)
+all.equal(coef1, coef2)
 #> [1] TRUE
-all.equal(yhat1, yhat2, check.attributes = FALSE)
+all.equal(yhat1, yhat2)
 #> [1] TRUE
 # }
 ```

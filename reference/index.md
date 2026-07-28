@@ -9,16 +9,16 @@
 ## Sparse group lasso regression
 
 - [`cv.corila()`](https://rauschenberger.github.io/corila/reference/cv.corila.md)
-  : Sparse group lasso regression
+  **\[experimental\]** : Sparse group lasso regression
 
 - [`coef(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/coef.cv.corila.md)
-  : Extract coefficients
+  **\[stable\]** : Extract coefficients
 
 - [`predict(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/predict.cv.corila.md)
-  : predict (S3 method)
+  **\[stable\]** : predict (S3 method)
 
 - [`fitted(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/fitted.cv.corila.md)
-  : Fitted values
+  **\[stable\]** : Fitted values
 
 - [`residuals(`*`<cv.corila>`*`)`](https://rauschenberger.github.io/corila/reference/residuals.cv.corila.md)
   : Residuals
@@ -40,23 +40,23 @@
 ## Multi-penalty ridge regression
 
 - [`multiridge()`](https://rauschenberger.github.io/corila/reference/multiridge.md)
-  : Multi-penalty ridge regression
+  **\[experimental\]** : Multi-penalty ridge regression
 - [`coef(`*`<multiridge>`*`)`](https://rauschenberger.github.io/corila/reference/coef.multiridge.md)
-  : Extract coefficients
+  **\[stable\]** : Extract coefficients
 - [`predict(`*`<multiridge>`*`)`](https://rauschenberger.github.io/corila/reference/predict.multiridge.md)
-  : Make predictions
+  **\[stable\]** : Make predictions
 
 ## Simulation
 
 - [`simulate_data()`](https://rauschenberger.github.io/corila/reference/simulate_data.md)
-  : Data simulation
+  **\[experimental\]** : Data simulation
 
 ## Internal functions
 
+- [`calc_sign_prec()`](https://rauschenberger.github.io/corila/reference/calc_sign_prec.md)
+  **\[experimental\]** : Precision for sign variable
 - [`.backscale()`](https://rauschenberger.github.io/corila/reference/backscale.md)
   : Inverse standardisation
-- [`calc_sign_prec()`](https://rauschenberger.github.io/corila/reference/calc_sign_prec.md)
-  : Precision for sign variable
 - [`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/combine_slopes.md)
   : Combine coefficients
 - [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md)

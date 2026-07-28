@@ -81,20 +81,20 @@
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">.residuals</span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, y_hat <span class="op">=</span> <span class="va">y_hat</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  2.72219304  2.08273331  4.06620885 -0.63673367  1.01550569  0.23718041</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  1.74721013 -0.01598406 -1.85191712 -0.72359451</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.78975751 -0.08759941  0.36352758 -1.92828113 -0.28245617 -1.08557846</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.87820576 -0.68048115  1.19346418  1.62444244</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>, size <span class="op">=</span> <span class="fl">1L</span>, prob <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">.residuals</span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, y_hat <span class="op">=</span> <span class="va">y_hat</span>, family <span class="op">=</span> <span class="st">"binomial"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -1.1311203  0.5995055 -0.5089340 -1.5009462 -1.1717845 -2.1564864</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -1.2659546 -0.5246211 -1.0801980 -0.6535468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -1.5501738 -0.1446479 -1.1840541 -1.6206567 -0.8945908 -1.8534159</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -2.0791134  0.5577054 -1.0988661 -1.1274718</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>, lambda <span class="op">=</span> <span class="fl">4.0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">rexp</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>, rate <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">.residuals</span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, y_hat <span class="op">=</span> <span class="va">y_hat</span>, family <span class="op">=</span> <span class="st">"poisson"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  3.0550014  0.1332344  3.9281638  0.8293250 -2.8022961  3.0161842</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.8142865  0.5589854 -2.1815729  0.9211323</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -1.331031  1.372616  1.757591  1.841133  2.893044 -1.484706 -2.201960</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] -1.998516  2.326685 -1.953178</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

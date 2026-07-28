@@ -1,5 +1,7 @@
 # Extract coefficients
 
+**\[stable\]**
+
 Extracts coefficients from an object of class `"cv.corila"`.
 
 ## Usage

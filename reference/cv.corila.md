@@ -1,5 +1,7 @@
 # Sparse group lasso regression
 
+**\[experimental\]**
+
 Optimises the parameters and the hyperparameters of the sparse group
 lasso.
 
