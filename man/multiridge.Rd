@@ -84,21 +84,21 @@ is indicated by \eqn{p_k},
 with \eqn{\sum_{k=1}^q p_k = p} for non-overlapping groups.
 }
 \examples{
-warning("Re-activate examples.")
-data <- simulate_data()
+\donttest{
+data <- simulate_data(prob_primary = 1.0)
+model <- multiridge(x = data$x_train, y = data$y_train, group = data$group)
+beta_hat <- coef(model)
+y_hat <- predict(object = model, newx = data$x_test)
+}
 
-## standard model fitting
-#model <- multiridge(x = data$x_train, y = data$y_train, group = data$group)
+# examples for automatic mutation testing (with the R package autotest)
+foldid <- sample(seq_len(10L), size = nrow(data$x_train), replace = TRUE)
+model <- multiridge(x = data$x_train, y = data$y_train, group = data$group,
+                    foldid = foldid)
 
-## fitting with given folds
-#foldid <- sample(seq_len(10L), size = nrow(data$x_train), replace = TRUE)
-#model <- multiridge(x = data$x_train, y = data$y_train, group = data$group,
-#                    foldid = foldid)
-
-## fitting with given penalties
-#penalties <- abs(rnorm(length(unique(data$group))))
-#model <- multiridge(x = data$x_train, y = data$y_train, group = data$group,
-#                    penalties = penalties)
+penalties <- abs(rnorm(length(unique(data$group))))
+model <- multiridge(x = data$x_train, y = data$y_train, group = data$group,
+                    penalties = penalties)
 
 }
 \references{
