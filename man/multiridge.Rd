@@ -63,6 +63,8 @@ and the scalars \code{mu.y} and \code{sd.y}
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Fits multi-penalty ridge regression
 (tuning regularisation hyperparameters
 and estimating regression coefficients).

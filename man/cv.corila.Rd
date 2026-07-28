@@ -145,6 +145,8 @@ output from \code{\link[=.forescale]{.forescale()}}
 }
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Optimises the parameters and the hyperparameters of the sparse group lasso.
 }
 \details{

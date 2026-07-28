@@ -21,6 +21,8 @@ Returns an \eqn{n_0}-dimensional vector of fitted values
 or an \eqn{n_1}-dimensional vector of predicted values.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 Makes predictions from a multi-penalty ridge regression model.
 }
 \examples{

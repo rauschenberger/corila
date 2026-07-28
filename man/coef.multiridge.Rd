@@ -18,6 +18,8 @@ if \code{family="gaussian"} and \code{family="binomial"}
 and a \eqn{p}-dimensional vector of estimated slopes if \code{family="cox"}.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 Extracts coefficients from a multi-penalty ridge regression model.
 }
 \examples{

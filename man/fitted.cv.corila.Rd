@@ -16,6 +16,8 @@ Returns a numeric vector of length \eqn{n_0}
 (one entry for each training observation).
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 Extracts fitted values.
 }
 \examples{

@@ -5,6 +5,8 @@
 #' Multi-penalty ridge regression
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' Fits multi-penalty ridge regression
 #' (tuning regularisation hyperparameters
 #' and estimating regression coefficients).
@@ -189,6 +191,8 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
 #' Make predictions
 #'
 #' @description
+#'`r lifecycle::badge("stable")`
+#'
 #' Makes predictions from a multi-penalty ridge regression model.
 #'
 #' @inheritParams predict.cv.corila
@@ -240,6 +244,8 @@ predict.multiridge <- function(object, newx, ...) {
 #' Extract coefficients
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
+#'
 #' Extracts coefficients from a multi-penalty ridge regression model.
 #'
 #' @inheritParams predict.multiridge object

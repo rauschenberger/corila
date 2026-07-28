@@ -19,6 +19,8 @@ The first entry is the estimated intercept,
 and the other \eqn{p} entries are the estimated slopes.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 Extracts coefficients from an object of class \code{"cv.corila"}.
 }
 \details{

@@ -24,6 +24,8 @@ Returns fitted or predicted values in an
 \eqn{n_1 \times m}-dimensional matrix, respectively.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
+
 Makes predictions from an object of class \code{"cv.corila"}.
 }
 \details{

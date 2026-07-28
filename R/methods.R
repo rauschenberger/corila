@@ -68,6 +68,8 @@ NULL
 #' Extract coefficients
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
+#'
 #' Extracts coefficients from an object of class `"cv.corila"`.
 #'
 #' @inheritParams predict.cv.corila object s
@@ -133,6 +135,8 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
 #' predict (S3 method)
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
+#'
 #' Makes predictions from an object of class `"cv.corila"`.
 #'
 #' @param object
@@ -199,6 +203,8 @@ predict.cv.corila <- function(object, newx, s = "lambda.min", ...) {
 #' Fitted values
 #'
 #' @description
+#' `r lifecycle::badge("stable")`
+#'
 #' Extracts fitted values.
 #'
 #' @inheritParams predict.cv.corila object

@@ -6,6 +6,8 @@
 #' Sparse group lasso regression
 #'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' Optimises the parameters and the hyperparameters of the sparse group lasso.
 #'
 #' @param x
