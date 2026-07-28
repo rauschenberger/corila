@@ -195,7 +195,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
                       alpha_init = 0.0, cor = "spearman", alpha_final = 1.0,
                       nfolds = 10L, foldid = NULL, tune = "weight",
                       na_action = "error", silent = FALSE) {
-  # validate arguments
+  # assertion
   family <- .validate_family(family = family)
   na_action <- .validate_na_action(na_action = na_action)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
@@ -210,16 +210,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   cor <- .validate_cor(cor = cor, p = p, names = colnames(x))
   alpha_final <- .validate_alpha(alpha = alpha_final, init = FALSE)
   hyper <- .set_candidates(tune = tune)
-  # handle missing values
-  if (identical(na_action, "complete_cases")) {
-    complete <- stats::complete.cases(x = x, y = y)
-    if (sum(complete) < 3L) {
-      stop("Requires at least three complete observations.")
-    }
-    warning("Ignoring ", sum(!complete), " observations with missing data.")
-  } else {
-    complete <- rep(x = TRUE, times = n)
-  }
+  complete <- .is_complete_case(x = x, y = y, na_action = na_action)
   # split observations into folds
   checkmate::assert_count(x = nfolds, positive = TRUE)
   if (is.null(foldid)) {
@@ -247,8 +238,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   # initialise matrices for predictions
   pred <- list()
   for (j in seq_len(nrow(hyper))) {
-    pred[[j]] <- matrix(data = NA,
-                        nrow = n,
+    pred[[j]] <- matrix(data = NA, nrow = n,
                         ncol = length(object_ext$model[[j]]$lambda))
   }
   # repeatedly train without and test for held-out fold
@@ -303,6 +293,20 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
                                              newx = x[complete_x, ])
   object
 }
+
+.is_complete_case <- function(x, y, na_action) {
+  if (identical(na_action, "complete_cases")) {
+    complete <- stats::complete.cases(x = x, y = y)
+    if (sum(complete) < 3L) {
+      stop("Requires at least three complete observations.")
+    }
+    warning("Ignoring ", sum(!complete), " observations with missing data.")
+    complete
+  } else {
+    rep(x = TRUE, times = nrow(x))
+  }
+}
+
 
 #--- model fitting without cross-validation -----
 
@@ -453,6 +457,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 corila <- function(x, y, group, primary, family, hyper, alpha_init,
                    alpha_final, cor, foldid,
                    nfolds, lambda_init, silent = FALSE, threshold = 0.0) {
+  # --- validate arguments ---
   family <- .validate_family(family = family)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
   x <- .validate_x(x = x, na_action = "error")
@@ -471,35 +476,50 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   args <- c(n = n, p = p, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
-  # --- initial coefficients ---
-  init <- .estim_initial_coefs(x = scale$x,
-                               y = scale$y,
-                               family = family,
-                               alpha_init = alpha_init,
-                               group = group,
-                               foldid = foldid,
-                               nfolds = nfolds,
-                               lambda = lambda_init)
-  #--- feature correlation ---
+  # --- estimate initial coefficients ---
+  init <- .estim_initial_coefs(
+    x = scale$x, y = scale$y, family = family, alpha_init = alpha_init,
+    group = group, foldid = foldid, nfolds = nfolds, lambda = lambda_init
+  )
+  # --- share information between predictors ---
   if (!is.matrix(cor)) {
     cor <- stats::cor(x = scale$x, method = cor, use = "pairwise.complete")
-    cor[abs(cor) <= threshold] <- 0.0
   }
-  cor[is.na(cor)] <- 0.0
-  #--- regression ---
+  cor[is.na(cor) | abs(cor) <= threshold] <- 0.0
+  pf <- .construct_penalty_factors(
+    coef = init$coef, group = group, cor = cor, names = colnames(scale$x),
+    primary = primary, hyper = hyper
+  )
+  # --- estimate final coefficients ---
   model <- list()
+  for (i in seq_len(nrow(hyper))) {
+    model[[i]] <- suppressMessages(
+      glmnet::glmnet(
+        x = cbind(scale$x, -scale$x), y = scale$y, family = family,
+        penalty.factor = pf[[i]], lower.limits = 0.0, alpha = alpha_final
+      ), classes = "message"[silent]
+    )
+  }
+  structure(list(model = model, lambda_init = init$lambda, scale = scale$pars,
+                 args = args), class = "corila")
+}
+
+#' @rdname corila
+.construct_penalty_factors <- function(coef, group, cor, names, primary,
+                                       hyper) {
+  p <- length(coef)
+  pf <- list()
   for (i in seq_len(nrow(hyper))) {
     weight <- list()
     weight$global <- weight$local <- rep(x = NA, times = p)
     for (j in seq_len(p)) {
-      adjacent <- .is_adjacent(group = group, j = j, p = p,
-                               names = colnames(scale$x))
+      adjacent <- .is_adjacent(group = group, j = j, p = p, names = names)
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
-      temp <-  cor_trans * init$coef * adjacent
+      temp <-  cor_trans * coef * adjacent
       weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
       weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
       weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
-      temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * init$coef
+      temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef
       weight$global[j] <- sum(pmax(0.0, temp)) / p
       weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
     }
@@ -507,30 +527,12 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       X = weight,
       FUN = function(x) p * ifelse(test = x == 0.0, yes = 0.0, no = x / sum(x))
     )
-    pf_ext <- 1.0 / (weight$local * hyper$wgt_local[i] +
-                       weight$global * hyper$wgt_global[i])
-    pf_ext[!c(primary, primary)] <- Inf # exclude auxiliary features
-    checkmate::assert_numeric(x = pf_ext, len = 2L * p, min = 0.0)
-    # pf_ext <- .construct_pf(group = group, j = j, p = p, hyper = hyper, i = i)
-    model[[i]] <- suppressMessages(
-      glmnet::glmnet(x = cbind(scale$x, -scale$x),
-                     y = scale$y,
-                     family = family,
-                     penalty.factor = pf_ext,
-                     lower.limits = 0.0,
-                     alpha = alpha_final),
-      classes = "message"[silent]
-    )
+    pf[[i]] <- 1.0 / (weight$local * hyper$wgt_local[i] +
+                        weight$global * hyper$wgt_global[i])
+    pf[[i]][!c(primary, primary)] <- Inf # exclude auxiliary features
+    checkmate::assert_numeric(x = pf[[i]], len = 2L * p, min = 0.0)
   }
-  structure(
-    list(
-      model = model,
-      lambda_init = init$lambda,
-      scale = scale$pars,
-      args = args
-    ),
-    class = "corila"
-  )
+  pf
 }
 
 #' @title

@@ -2,6 +2,7 @@
 % Please edit documentation in R/group_lasso.R
 \name{corila}
 \alias{corila}
+\alias{.construct_penalty_factors}
 \title{Sparse group lasso regression (without cross-validation)}
 \usage{
 corila(
@@ -20,6 +21,8 @@ corila(
   silent = FALSE,
   threshold = 0
 )
+
+.construct_penalty_factors(coef, group, cor, names, primary, hyper)
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix,
