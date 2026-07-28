@@ -130,9 +130,8 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                            min.rows = 1L, min.cols = 1L, any.missing = FALSE)
   y <- .validate_y(y = y, family = family, n = nrow(x), na_action = "error",
                    names = rownames(x))
-  checkmate::assert_integer(x = group,
-                            lower = 1L, upper = length(unique(group)),
-                            len = ncol(x))
+  checkmate::assert_integer(x = group, len = ncol(x),
+                            lower = 1L, upper = length(unique(group)))
   group <- as.integer(round(group))
   checkmate::assert_integer(x = foldid, len = nrow(x),
                             lower = 1L, upper = nrow(x), null.ok = TRUE)
@@ -149,9 +148,7 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                FUN = function(i) scale$x[, group == i, drop = FALSE])
   xxblocks <- multiridge::createXXblocks(datablocks = xx)
   invisible(utils::capture.output({
-    init <- multiridge::fastCV2(XXblocks = xxblocks,
-                                Y = scale$y,
-                                model = model)
+    init <- multiridge::fastCV2(XXblocks = xxblocks, Y = scale$y, model = model)
   }))
   # --- cross-validation ---
   if (is.null(penalties)) {
@@ -162,25 +159,21 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                         FUN = function(x) which(foldid == x))
     }
     invisible(utils::capture.output({
-      final <- multiridge::optLambdasWrap(penaltiesinit = init$lambdas,
-                                          XXblocks = xxblocks,
-                                          Y = scale$y,
-                                          folds = indices)
+      final <- multiridge::optLambdasWrap(
+        penaltiesinit = init$lambdas, XXblocks = xxblocks, Y = scale$y,
+        folds = indices
+      )
     }))
     penalties <- final$optpen
   } else {
     indices <- NULL
   }
   # --- refit ---
-  xxt <- multiridge::SigmaFromBlocks(XXblocks = xxblocks,
-                                     penalties = penalties)
+  xxt <- multiridge::SigmaFromBlocks(XXblocks = xxblocks, penalties = penalties)
   if (identical(family, "cox")) {
-    object <- multiridge::IWLSCoxridge(XXT = xxt,
-                                       Y = scale$y)
+    object <- multiridge::IWLSCoxridge(XXT = xxt, Y = scale$y)
   } else {
-    object <- multiridge::IWLSridge(XXT = xxt,
-                                    Y = scale$y,
-                                    model = model)
+    object <- multiridge::IWLSridge(XXT = xxt, Y = scale$y, model = model)
   }
   object$family <- family
   object$penalties <- penalties
