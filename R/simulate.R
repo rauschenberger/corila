@@ -450,6 +450,7 @@ calc_sign_prec <- function(truth, estim) {
     NA
   } else {
     sum(estim != 0L & truth != 0L &
-          sign(estim) == sign(truth)) / sum(estim != 0L)
+          sign(estim) == sign(truth), na.rm = TRUE) /
+      sum(estim != 0L & !is.na(truth), na.rm = TRUE)
   }
 }
