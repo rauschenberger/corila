@@ -60,10 +60,14 @@
 - [`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/combine_slopes.md)
   : Combine coefficients
 - [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md)
+  [`.construct_penalty_factors()`](https://rauschenberger.github.io/corila/reference/corila.md)
   : Sparse group lasso regression (without cross-validation)
 - [`.deviance()`](https://rauschenberger.github.io/corila/reference/deviance.md)
   : Deviance
 - [`.estim_initial_coefs()`](https://rauschenberger.github.io/corila/reference/estim_initial_coefs.md)
+  [`.estim_multiridge_coefs()`](https://rauschenberger.github.io/corila/reference/estim_initial_coefs.md)
+  [`.estim_cor_coefs()`](https://rauschenberger.github.io/corila/reference/estim_initial_coefs.md)
+  [`.estim_glmnet_coefs()`](https://rauschenberger.github.io/corila/reference/estim_initial_coefs.md)
   : Initial coefficients
 - [`.expand_auxiliary()`](https://rauschenberger.github.io/corila/reference/expand_auxiliary.md)
   : Expand auxiliary features

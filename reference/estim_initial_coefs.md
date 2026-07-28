@@ -16,6 +16,12 @@ Estimate initial coefficients.
   lambda = NULL,
   silent = FALSE
 )
+
+.estim_multiridge_coefs(x, y, group, family, foldid, nfolds, lambda)
+
+.estim_cor_coefs(x, y, method)
+
+.estim_glmnet_coefs(x, y, family, alpha, foldid, nfolds, lambda, silent)
 ```
 
 ## Arguments
@@ -82,8 +88,9 @@ Estimate initial coefficients.
 - silent:
 
   Should messages from
-  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) and
-  [`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  and
+  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
   be suppressed? (logical scalar, `FALSE` or `TRUE`)
 
 ## Value
@@ -100,9 +107,10 @@ Returns a list with two slots:
 This function is called by
 [`corila()`](https://rauschenberger.github.io/corila/reference/corila.md).
 It calls
-[`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
-or [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) for
-an initial lasso, ridge, or elastic net regression,
+[`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
+or
+[`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+for an initial lasso, ridge, or elastic net regression,
 [`multiridge()`](https://rauschenberger.github.io/corila/reference/multiridge.md)
 for an initial multi-penalty ridge regression, or
 [`stats::cor()`](https://rdrr.io/r/stats/cor.html) for initial
@@ -129,8 +137,17 @@ y <- drop(x %*% beta)
                      nfolds = 10L,
                      lambda = NULL)
 #> $coef
-#>  [1]  0.53478992 -0.50991597  0.31870348  0.19558223 -0.09483794 -0.02713085
-#>  [7] -0.18953181 -0.42223289 -0.03990396 -0.30554622
+#>              [,1]
+#>  [1,]  0.53478992
+#>  [2,] -0.50991597
+#>  [3,]  0.31870348
+#>  [4,]  0.19558223
+#>  [5,] -0.09483794
+#>  [6,] -0.02713085
+#>  [7,] -0.18953181
+#>  [8,] -0.42223289
+#>  [9,] -0.03990396
+#> [10,] -0.30554622
 #> 
 #> $lambda
 #> NULL

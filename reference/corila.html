@@ -70,7 +70,9 @@ of correlated variables.</p>
 <span>  <span class="va">lambda_init</span>,</span>
 <span>  silent <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  threshold <span class="op">=</span> <span class="fl">0</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">.construct_penalty_factors</span><span class="op">(</span><span class="va">coef</span>, <span class="va">group</span>, <span class="va">cor</span>, <span class="va">names</span>, <span class="va">primary</span>, <span class="va">hyper</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -174,7 +176,7 @@ or <code>NULL</code> (cross-validation)</p></dd>
 
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
-<dd><p>Should messages from <code><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
+<dd><p>Should messages from <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
 be suppressed? (logical scalar, <code>FALSE</code> or <code>TRUE</code>)</p></dd>
 
 
@@ -221,7 +223,7 @@ respectively,
 <code><a href="folds.html">.folds()</a></code> for splitting samples into folds,
 <code><a href="estim_initial_coefs.html">.estim_initial_coefs()</a></code> for obtaining initial coefficients,
 <code><a href="is_adjacent.html">.is_adjacent()</a></code> for identifying adjacent predictors,
-and <code><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code> and <code><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet::glmnet()</a></code>
+and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code>
 for adaptive lasso regression.</p></div>
     </div>
 
