@@ -43,5 +43,6 @@ reference:
   - simulate_data
 - title: "Internal functions"
   contents:
+  - calc_sign_prec
   - has_keyword("internal")
 
