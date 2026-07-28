@@ -2,6 +2,9 @@
 % Please edit documentation in R/group_lasso.R
 \name{.estim_initial_coefs}
 \alias{.estim_initial_coefs}
+\alias{.estim_multiridge_coefs}
+\alias{.estim_cor_coefs}
+\alias{.estim_glmnet_coefs}
 \title{Initial coefficients}
 \usage{
 .estim_initial_coefs(
@@ -15,6 +18,12 @@
   lambda = NULL,
   silent = FALSE
 )
+
+.estim_multiridge_coefs(x, y, group, family, foldid, nfolds, lambda)
+
+.estim_cor_coefs(x, y, method)
+
+.estim_glmnet_coefs(x, y, family, alpha, foldid, nfolds, lambda, silent)
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix,

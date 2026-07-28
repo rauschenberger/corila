@@ -246,7 +246,6 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   lambda <- lapply(X = object_ext$model, FUN = function(x) x$lambda)
   # initialise matrices for predictions
   pred <- list()
-  n <- nrow(x)
   for (j in seq_len(nrow(hyper))) {
     pred[[j]] <- matrix(data = NA,
                         nrow = n,
@@ -512,6 +511,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
                        weight$global * hyper$wgt_global[i])
     pf_ext[!c(primary, primary)] <- Inf # exclude auxiliary features
     checkmate::assert_numeric(x = pf_ext, len = 2L * p, min = 0.0)
+    # pf_ext <- .construct_pf(group = group, j = j, p = p, hyper = hyper, i = i)
     model[[i]] <- suppressMessages(
       glmnet::glmnet(x = cbind(scale$x, -scale$x),
                      y = scale$y,
@@ -696,52 +696,75 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   checkmate::assert_numeric(x = lambda, len = dim, lower = 0.0, null.ok = TRUE)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
   # --- estimate initial coefficients ---
-  is_slope <- rep(c(FALSE, TRUE), times = c(family != "cox", p))
   if (all(is.na(alpha_init))) {
-    coef <- rep(x = 1.0, times = p)
+    list(coef = rep(x = 1.0, times = p), lambda = NULL)
   } else if (is.character(alpha_init) && identical(alpha_init, "multiridge")) {
-    if (is.null(lambda)) {
-      model <- multiridge(x = x,
-                          y = y,
-                          group = group,
-                          family = family,
-                          foldid = foldid,
-                          nfolds = nfolds)
-      coef <- stats::coef(object = model)[is_slope]
-      lambda <- model$penalties
-    } else {
-      model <- multiridge(x = x,
-                          y = y,
-                          group = group,
-                          family = family,
-                          penalties = lambda)
-      coef <- stats::coef(object = model)[is_slope]
-    }
+    .estim_multiridge_coefs(x = x, y = y, group = group, family = family,
+                            foldid = foldid, nfolds = nfolds, lambda = lambda)
   } else if (is.character(alpha_init) && alpha_init %in% methods) {
-    coef <- stats::cor(x = x,
-                       y = y,
-                       method = alpha_init,
-                       use = "pairwise.complete")
-    coef[is.na(coef)] <- 0.0
+    .estim_cor_coefs(x = x, y = y, method = alpha_init)
   } else if (is.numeric(alpha_init) && alpha_init >= 0.0 && alpha_init <= 1.0) {
-    if (is.null(lambda)) {
-      model <- suppressMessages(glmnet::cv.glmnet(x = x,
-                                                  y = y,
-                                                  family = family,
-                                                  alpha = alpha_init,
-                                                  foldid = foldid,
-                                                  nfolds = nfolds),
-                                classes = "message"[silent])
-      coef <- stats::coef(object = model, s = "lambda.min")[is_slope]
-      lambda <- model$lambda.min
-    } else {
-      model <- suppressMessages(glmnet::glmnet(x = x,
-                                               y = y,
-                                               family = family,
-                                               alpha = alpha_init),
-                                classes = "message"[silent])
-      coef <- stats::coef(object = model, s = lambda)[is_slope]
-    }
+    .estim_glmnet_coefs(x = x, y = y, family = family, alpha = alpha_init,
+                        foldid = foldid, nfolds = nfolds, lambda = lambda,
+                        silent = silent)
+  }
+}
+
+#' @rdname estim_initial_coefs
+.estim_multiridge_coefs <- function(x, y, group, family, foldid, nfolds,
+                                    lambda) {
+  is_slope <- rep(c(FALSE, TRUE), times = c(family != "cox", ncol(x)))
+  if (is.null(lambda)) {
+    model <- multiridge(x = x,
+                        y = y,
+                        group = group,
+                        family = family,
+                        foldid = foldid,
+                        nfolds = nfolds)
+    coef <- stats::coef(object = model)[is_slope]
+    lambda <- model$penalties
+  } else {
+    model <- multiridge(x = x,
+                        y = y,
+                        group = group,
+                        family = family,
+                        penalties = lambda)
+    coef <- stats::coef(object = model)[is_slope]
+  }
+  list(coef = coef, lambda = lambda)
+}
+
+#' @rdname estim_initial_coefs
+.estim_cor_coefs <- function(x, y, method) {
+  coef <- stats::cor(x = x,
+                     y = y,
+                     method = method,
+                     use = "pairwise.complete")
+  coef[is.na(coef)] <- 0.0
+  list(coef = coef, lambda = NULL)
+}
+
+#' @rdname estim_initial_coefs
+.estim_glmnet_coefs <- function(x, y, family, alpha, foldid, nfolds, lambda,
+                                silent) {
+  is_slope <- rep(c(FALSE, TRUE), times = c(family != "cox", ncol(x)))
+  if (is.null(lambda)) {
+    model <- suppressMessages(glmnet::cv.glmnet(x = x,
+                                                y = y,
+                                                family = family,
+                                                alpha = alpha,
+                                                foldid = foldid,
+                                                nfolds = nfolds),
+                              classes = "message"[silent])
+    coef <- stats::coef(object = model, s = "lambda.min")[is_slope]
+    lambda <- model$lambda.min
+  } else {
+    model <- suppressMessages(glmnet::glmnet(x = x,
+                                             y = y,
+                                             family = family,
+                                             alpha = alpha),
+                              classes = "message"[silent])
+    coef <- stats::coef(object = model, s = lambda)[is_slope]
   }
   list(coef = drop(coef), lambda = lambda)
 }
