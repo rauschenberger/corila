@@ -138,7 +138,7 @@
 #' - `scale`:
 #' output from [.forescale()]
 #' - `y_hat`:
-#' \eqn{n}-dimensional vector of fitted values
+#' \eqn{n_0}-dimensional vector of fitted values
 #'
 #' @inherit corila-package references
 #'
@@ -823,7 +823,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     group[, j] == 1L
   }
 }
-
 
 #' @noRd
 .is_complete_case <- function(x, y, na_action) {

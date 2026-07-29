@@ -149,7 +149,7 @@ coef.cv.corila <- function(object, s = "lambda.min", ...) {
 #' to obtain predicted values
 #'
 #' @param s
-#' character `"lambda.min"` or numeric value
+#' character `"lambda.min"` or numeric non-negative scalar
 #'
 #' @param ...
 #' (for compatibility with [stats::predict])
@@ -622,10 +622,10 @@ nobs.cv.corila <- function(object, ...) {
 #' Calculates the deviance residuals.
 #'
 #' @param y
-#' \eqn{n}-dimensional vector of observed values
+#' \eqn{n_0}-dimensional vector of observed values
 #'
 #' @param y_hat
-#' \eqn{n}-dimensional vector of fitted values or probabilities
+#' \eqn{n_0}-dimensional vector of fitted values or probabilities
 #'
 #' @param family
 #' character `"gaussian"`, `"binomial"`, or `"poisson"`
@@ -634,7 +634,7 @@ nobs.cv.corila <- function(object, ...) {
 #' This function is called by [residuals.cv.corila()].
 #'
 #' @return
-#' Returns an \eqn{n}-dimensional vector.
+#' Returns an \eqn{n_0}-dimensional vector.
 #'
 #' @examples
 #' \dontshow{.residuals <- corila:::.residuals}
