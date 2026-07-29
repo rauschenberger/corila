@@ -16,10 +16,10 @@ multiridge(
 }
 \arguments{
 \item{x}{predictors:
-\eqn{n \times p} numeric matrix}
+\eqn{n_0 \times p} numeric matrix}
 
 \item{y}{response:
-\eqn{n}-dimensional vector}
+\eqn{n_0}-dimensional vector}
 
 \item{group}{\eqn{p}-dimensional integer vector with entries in \eqn{\{1, \ldots, q\}}}
 

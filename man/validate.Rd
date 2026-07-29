@@ -62,7 +62,7 @@ where \eqn{n_0} is the number of observations used for model training}
 of length \eqn{n} or \eqn{p}
 for names of observations or predictors}
 
-\item{y_hat}{\eqn{n}-dimensional vector of fitted values or probabilities}
+\item{y_hat}{\eqn{n_0}-dimensional vector of fitted values or probabilities}
 
 \item{primary}{\eqn{p}-dimensional logical vector
 indicating whether a predictor may be included in the final model

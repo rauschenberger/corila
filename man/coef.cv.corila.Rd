@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{object of class \code{"cv.corila"}}
 
-\item{s}{character \code{"lambda.min"} or numeric value}
+\item{s}{character \code{"lambda.min"} or numeric non-negative scalar}
 
 \item{...}{(for compatibility with \link[stats:coef]{stats::coef})}
 }

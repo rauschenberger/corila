@@ -7,14 +7,14 @@
 .residuals(y, y_hat, family)
 }
 \arguments{
-\item{y}{\eqn{n}-dimensional vector of observed values}
+\item{y}{\eqn{n_0}-dimensional vector of observed values}
 
-\item{y_hat}{\eqn{n}-dimensional vector of fitted values or probabilities}
+\item{y_hat}{\eqn{n_0}-dimensional vector of fitted values or probabilities}
 
 \item{family}{character \code{"gaussian"}, \code{"binomial"}, or \code{"poisson"}}
 }
 \value{
-Returns an \eqn{n}-dimensional vector.
+Returns an \eqn{n_0}-dimensional vector.
 }
 \description{
 Calculates the deviance residuals.

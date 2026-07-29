@@ -14,7 +14,7 @@ to obtain fitted values,
 \eqn{n_1 \times p} predictor matrix (testing data)
 to obtain predicted values}
 
-\item{s}{character \code{"lambda.min"} or numeric value}
+\item{s}{character \code{"lambda.min"} or numeric non-negative scalar}
 
 \item{...}{(for compatibility with \link[stats:predict]{stats::predict})}
 }
