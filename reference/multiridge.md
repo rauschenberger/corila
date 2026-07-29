@@ -25,11 +25,11 @@ multiridge(
 
 - x:
 
-  predictors: \\n \times p\\ numeric matrix
+  predictors: \\n_0 \times p\\ numeric matrix
 
 - y:
 
-  response: \\n\\-dimensional vector
+  response: \\n_0\\-dimensional vector
 
 - group:
 

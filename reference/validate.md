@@ -69,7 +69,7 @@ forms (e.g., as integers instead of integer-like numerics).
 
 - y_hat:
 
-  \\n\\-dimensional vector of fitted values or probabilities
+  \\n_0\\-dimensional vector of fitted values or probabilities
 
 - primary:
 

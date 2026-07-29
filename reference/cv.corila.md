@@ -171,7 +171,7 @@ slots:
 - `scale`: output from
   [`.forescale()`](https://rauschenberger.github.io/corila/reference/forescale.md)
 
-- `y_hat`: \\n\\-dimensional vector of fitted values
+- `y_hat`: \\n_0\\-dimensional vector of fitted values
 
 ## Details
 

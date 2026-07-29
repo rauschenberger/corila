@@ -25,7 +25,7 @@ predict(object, newx, s = "lambda.min", ...)
 
 - s:
 
-  character `"lambda.min"` or numeric value
+  character `"lambda.min"` or numeric non-negative scalar
 
 - ...:
 

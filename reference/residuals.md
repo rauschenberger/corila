@@ -12,11 +12,11 @@ Calculates the deviance residuals.
 
 - y:
 
-  \\n\\-dimensional vector of observed values
+  \\n_0\\-dimensional vector of observed values
 
 - y_hat:
 
-  \\n\\-dimensional vector of fitted values or probabilities
+  \\n_0\\-dimensional vector of fitted values or probabilities
 
 - family:
 
@@ -24,7 +24,7 @@ Calculates the deviance residuals.
 
 ## Value
 
-Returns an \\n\\-dimensional vector.
+Returns an \\n_0\\-dimensional vector.
 
 ## Details
 
