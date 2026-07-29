@@ -11,7 +11,7 @@
 [![CRAN status](https://img.shields.io/badge/CRAN-not%20yet%20published-lightgray)](https://github.com/rauschenberger/corila)
 <!-- badges: end -->
 
-# Sparse modelling with grouped and correlated features
+# Sparse modelling with grouped and correlated features allowing for privileged information
 
 ## Scope
 
