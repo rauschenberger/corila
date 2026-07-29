@@ -26,7 +26,6 @@
 #' @param xline
 #' non-negative scalar or `NULL`
 #' 
-#' @param yline
 #' non-negative scalar or `NULL`
 #'
 #' @examples
@@ -41,15 +40,15 @@
 #' 
 .plot_cor <- function(x, group, exp = 1.0, min = 5L, cex = 0.7,
                       xline = 0.5, yline = 0.5) {
-  .assert(x = x, type = "numeric", dim = c(Inf, Inf),
-          min = -1.0, max = 1.0)
+  #.assert(x = x, type = "numeric", dim = c(Inf, Inf),
+  #        min = -1.0, max = 1.0)
   p <- ncol(x)
-  .assert(x = group, type = "nominal", dim = p)
-  .assert(x = exp, type = "numeric", min = 0.0)
-  .assert(x = min, type = "integer", min = 1L)
-  .assert(x = cex, type = "numeric", min = 0.0)
-  .assert(x = xline, type = "numeric", min = 0.0)
-  .assert(x = yline, type = "numeric", min = 0.0)
+  #.assert(x = group, type = "nominal", dim = p)
+  #.assert(x = exp, type = "numeric", min = 0.0)
+  #.assert(x = min, type = "integer", min = 1L)
+  #.assert(x = cex, type = "numeric", min = 0.0)
+  #.assert(x = xline, type = "numeric", min = 0.0)
+  #.assert(x = yline, type = "numeric", min = 0.0)
   levels <- names(sort(table(group), decreasing = TRUE))
   index <- sapply(levels, function(x) which(group == x))
   size <- sapply(index, length)
@@ -103,8 +102,8 @@
   if(is.logical(z)){
     class(z) <- "numeric"
   }
-  .assert(x = z, type = "numeric", dim = c(Inf, Inf))
-  .assert(x = col, type = "nominal")
+  #.assert(x = z, type = "numeric", dim = c(Inf, Inf))
+  #.assert(x = col, type = "nominal")
   if(ncol(z) != nrow(z)) {
     stop("Requires p rows and p columns.")
   }
@@ -184,21 +183,21 @@
 #'    holdout = rep(c(FALSE, TRUE), times = c(5L, 5L)))
 #' 
 .heatmap_lupi <- function(x, y, holdout = NULL, group = NULL, primary = NULL) {
-  .assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
+  #.assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
   n <- nrow(x)
   p <- ncol(x)
-  .assert(x = y, type = "numeric", dim = n, na.rm = TRUE)
-  .assert(x = holdout, type = "logical", dim = n, na.rm = TRUE)
+  #.assert(x = y, type = "numeric", dim = n, na.rm = TRUE)
+  #.assert(x = holdout, type = "logical", dim = n, na.rm = TRUE)
   if(is.null(holdout)){
     holdout <- rep(x = FALSE, times = n)
   }
-  .assert(x = group, type = "numeric", dim = p)
+  #.assert(x = group, type = "numeric", dim = p)
   if(!is.null(group)) {
     if( any(group != sort(group)) ) {
       stop("Vector group should be sorted.")
     }
   }
-  .assert(x = primary, type = "logical", dim = p)
+  #.assert(x = primary, type = "logical", dim = p)
   if(is.null(group)) {
     group <- rep(x = 1L, times = p)
   }
@@ -354,13 +353,13 @@
 #'
 .simulate_lupi_data <- function(mode, n0 = 100L, n1 = 10000L, p = 200L, q = 4L,
                                 plot = FALSE) {
-  .assert(x = n0, type = "integer", min = 2L)
-  .assert(x = n1, type = "integer", min = 2L)
-  .assert(x = p, type = "integer", min = 5L)
-  .assert(x = q, type = "integer", min = 2L, max = p)
-  .assert(x = mode, type = "nominal",
-          support = c("upstream", "aggregated", "surrogate", "baseline", "uninformative"))
-  .assert(x = plot, type = "logical")
+  #.assert(x = n0, type = "integer", min = 2L)
+  #.assert(x = n1, type = "integer", min = 2L)
+  #.assert(x = p, type = "integer", min = 5L)
+  #.assert(x = q, type = "integer", min = 2L, max = p)
+  #.assert(x = mode, type = "nominal",
+  #        support = c("upstream", "aggregated", "surrogate", "baseline", "uninformative"))
+  #.assert(x = plot, type = "logical")
   fold <- rep(x = c(0L, 1L), times = c(n0, n1))
   n <- n0 + n1
   if (p %% q != 0L) {
@@ -561,14 +560,14 @@
                             mar = 0.3, xlim = c(1.0, 5.0),
                             ylim = c(11.0, 0.0),
                             cex = 0.9) {
-  .assert(x = mode, type = "nominal",
-          support = c("upstream", "aggregated", "surrogate", "baseline"))
-  .assert(x = lwd, type = "numeric", min = 0.0)
-  .assert(x = length_arrow, type = "numeric", min = 0.0)
-  .assert(x = mar, type = "numeric", min = 0.0)
-  .assert(x = xlim, type = "numeric", dim = 2L)
-  .assert(x = ylim, type = "numeric", dim = 2L)
-  .assert(x = cex, type = "numeric", min = 0.0)
+  #.assert(x = mode, type = "nominal",
+  #        support = c("upstream", "aggregated", "surrogate", "baseline"))
+  #.assert(x = lwd, type = "numeric", min = 0.0)
+  #.assert(x = length_arrow, type = "numeric", min = 0.0)
+  #.assert(x = mar, type = "numeric", min = 0.0)
+  #.assert(x = xlim, type = "numeric", dim = 2L)
+  #.assert(x = ylim, type = "numeric", dim = 2L)
+  #.assert(x = cex, type = "numeric", min = 0.0)
   graphics::plot.new()
   graphics::plot.window(xlim = xlim, ylim = ylim)
   if (identical(mode, "upstream")) {
@@ -884,12 +883,12 @@
                          lwd = 1.0, cex = 1.0, cex.axis = 1.0, cex.lab = 1.0){
   if(!is.list(x)){stop("Expect list.")}
   nslot <- length(x)
-  for (i in seq_len(nslot)) {
-    .assert(x = x[[i]], type = "numeric", dim = c(Inf, Inf))
-  }
-  .assert(x = main, type = "nominal", dim = nslot)
-  .assert(x = alternative, type = "nominal",
-          support = c("two.sided", "greater", "less"))
+  #for (i in seq_len(nslot)) {
+  #  .assert(x = x[[i]], type = "numeric", dim = c(Inf, Inf))
+  #}
+  #.assert(x = main, type = "nominal", dim = nslot)
+  #.assert(x = alternative, type = "nominal",
+  #        support = c("two.sided", "greater", "less"))
   ylim <- range(x)
   if(graphics::par()$mfrow[2L] != nslot){
     warning("Set graphics::par(mfrow=c(...,length(x)))." )
@@ -1245,28 +1244,28 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
                      prop_causal = 0.5, noise_factor = 1.0,
                      plot = FALSE, trial = FALSE) {
   # --- check arguments ---
-  .assert(x = family, type = "nominal",
-          support = c("gaussian", "binomial", "poisson", "cox"))
-  .assert(x = n0, type = "integer", min = 2L)
-  n0 <- as.integer(n0)
-  .assert(x = n1, type = "integer", min = 2L)
-  n1 <- as.integer(n1)
-  .assert(x = n_group, type = "integer", min = 2L)
-  n_group <- as.integer(n_group)
-  .assert(x = n_type, type = "integer", min = 2L)
-  n_type <- as.integer(n_type)
-  .assert(x = size_group, type = "integer", dim = n_type, min = 1L)
-  size_group <- as.integer(size_group)
-  .assert(x = effect_size, type = "numeric", dim = n_type, min = 0.0)
-  .assert(x = corfac_feature, type = "numeric", min = 0.0, max = 1.0)
-  .assert(x = corfac_type, type = "numeric", min = 0.0, max = 1.0)
-  .assert(x = corfac_group, type = "numeric", min = 0.0, max = 1.0)
-  .assert(x = n_group_causal, type = "integer", min = 0.0, max = n_group)
-  n_group_causal <- as.integer(n_group_causal)
-  .assert(x = prop_causal, type = "numeric", min = 0.0, max = 1.0)
-  .assert(x = noise_factor, type = "numeric", min = 0.0)
-  .assert(x = plot, type = "logical")
-  .assert(x = trial, type = "logical")
+  #.assert(x = family, type = "nominal",
+  #        support = c("gaussian", "binomial", "poisson", "cox"))
+  #.assert(x = n0, type = "integer", min = 2L)
+  #n0 <- as.integer(n0)
+  #.assert(x = n1, type = "integer", min = 2L)
+  #n1 <- as.integer(n1)
+  #.assert(x = n_group, type = "integer", min = 2L)
+  #n_group <- as.integer(n_group)
+  #.assert(x = n_type, type = "integer", min = 2L)
+  #n_type <- as.integer(n_type)
+  #.assert(x = size_group, type = "integer", dim = n_type, min = 1L)
+  #size_group <- as.integer(size_group)
+  #.assert(x = effect_size, type = "numeric", dim = n_type, min = 0.0)
+  #.assert(x = corfac_feature, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = corfac_type, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = corfac_group, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = n_group_causal, type = "integer", min = 0.0, max = n_group)
+  #n_group_causal <- as.integer(n_group_causal)
+  #.assert(x = prop_causal, type = "numeric", min = 0.0, max = 1.0)
+  #.assert(x = noise_factor, type = "numeric", min = 0.0)
+  #.assert(x = plot, type = "logical")
+  #.assert(x = trial, type = "logical")
   # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;
   # size_group = c(5, 3);effect_size = c(1, 1);corfac_feature = 0.5;
   # corfac_type = 0.5;corfac_group = 0.25;n_group_causal = 2;
