@@ -1,4 +1,4 @@
-# Sparse modelling with grouped and correlated features
+# Sparse modelling with grouped and correlated features allowing for privileged information
 
 ## Scope
 
