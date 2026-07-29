@@ -35,9 +35,12 @@ devtools::load_all()
 # Checks
 
 ```{r}
+# Add argument seed = 1L to cv.corila to avoid that repeated runs lead to different results (which possibly solves the issue in autotest with alpha_init and group as integer or numeric).
+
 #devtools::check()
 roxygen2::roxygenise()
 lintr::lint_package()
+devtools::run_examples()
 rcmdcheck::rcmdcheck()
 
 devtools::spell_check()
@@ -59,11 +62,17 @@ print(x, positions_limit = 20)
 
 urlchecker::url_check()
 
-x <- pkgcheck::pkgcheck(goodpractice=FALSE)
+x <- pkgcheck::pkgcheck(goodpractice = FALSE, use_cache = TRUE)
 
 # autotest all functions at once
 notes <- autotest::autotest_package(exclude = c(""),test=TRUE)
-extra <- autotest::autotest_package(functions= ".folds",test=TRUE)
+extra <- autotest::autotest_package(functions= "multiridge",test=TRUE)
+
+data.frame(notes)[which(notes$type == "error"),c("type", "test_name", "fn_name", "parameter", "parameter_type", "operation", "content")]
+data.frame(notes)[which(notes$fn_name=="simulate_data"),]
+notes[notes$content=="is case dependent",]
+
+data.frame(notes[notes$fn_name==".assert",])
 
 # autotest functions one-by-one
 list <- rcompendium::get_all_functions()
@@ -73,16 +82,6 @@ for(i in seq_along(functions)){
   cat("function ", functions[i], "\n")
   notes[[i]] <- autotest::autotest_package(functions = functions[i],test=TRUE)
 }
-
-
-
-data.frame(notes)[which(notes$type == "error"),c("type", "test_name", "fn_name", "parameter", "parameter_type", "operation", "content")]
-data.frame(notes)[which(notes$fn_name==".is_adjacent"),][1, ]
-notes[notes$content=="is case dependent",]
-
-data.frame(notes[notes$fn_name=="cv.corila",])
-
-note <- autotest::autotest_package(functions="cv.corila",test=TRUE)
 
 #srr::srr_stats_roxygen(category = c("ml", "regression"))
 
