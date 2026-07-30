@@ -658,8 +658,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   # --- check arguments ---
   if (is.character(family)) family <- tolower(family)
   methods <- c("pearson", "spearman", "kendall", "multiridge")
-  checkmate::assert_matrix(x = x, mode = "numeric", min.rows = 1, min.cols = 1,
-                           any.missing = FALSE)
+  checkmate::assert_matrix(x = x, mode = "numeric", min.rows = 1L,
+                           min.cols = 1L, any.missing = FALSE)
   n <- nrow(x)
   p <- ncol(x)
   family <- .validate_family(family = family)
