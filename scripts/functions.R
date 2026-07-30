@@ -2006,7 +2006,7 @@ holdout <- function(x_train, y_train, group, primary, family,
         y_hat$corila <- stats::predict(object = object,
                                        newx = x_test[, primary])
       }
-      coef$corila <- stats::coef(object = object)
+      coef$corila <- stats::coef(object = object)[c(TRUE, primary)]
     }
     end <- Sys.time()
     difftime[i] <- difftime(time1 = end, time2 = start, units = "secs")
@@ -2031,7 +2031,11 @@ holdout <- function(x_train, y_train, group, primary, family,
         if (all(is.na(original))) {
           next
         }
-        eta <- coef[[i]][1] + x_test[, primary] %*% coef[[i]][-1]
+        #if (method[i] == "corila") {
+        #  eta <- coef[[i]][1] + x_test %*% coef[[i]][-1]
+        #} else {
+          eta <- coef[[i]][1] + x_test[, primary] %*% coef[[i]][-1]
+        #}
         if (family %in% c("gaussian", "cox")) {
           manual <- eta
         } else if (family == "binomial") {
