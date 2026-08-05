@@ -117,6 +117,10 @@
 #' Should messages from [glmnet::glmnet()] and [glmnet::cv.glmnet()]
 #' be suppressed? (logical scalar, `FALSE` or `TRUE`)
 #'
+#' @param threshold
+#' threshold for absolute correlation coefficients:
+#' numeric in unit interval
+#'
 #' @inherit corila details
 #'
 #' @return
@@ -196,11 +200,12 @@
 cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
                       alpha_init = 0.0, cor = "spearman", alpha_final = 1.0,
                       nfolds = 10L, foldid = NULL, tune = "weight",
-                      na_action = "error", silent = FALSE) {
+                      na_action = "error", silent = FALSE, threshold = 0.0) {
   # --- validate arguments ---
   family <- .validate_family(family = family)
   na_action <- .validate_na_action(na_action = na_action)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
+  checkmate::assert_number(x = threshold, lower = 0.0, upper = 1.0)
   x <- .validate_x(x = x, na_action = na_action)
   n <- nrow(x)
   p <- ncol(x)
@@ -225,7 +230,8 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   # --- fit model on all folds ---
   args <- list(group = group, primary = primary, family = family,
                alpha_init = alpha_init, alpha_final = alpha_final,
-               cor = cor, silent = silent, nfolds = NULL, hyper = hyper)
+               cor = cor, silent = silent, nfolds = NULL, hyper = hyper,
+               threshold = threshold)
   object_ext <- do.call(
     what = "corila",
     args = c(args, list(x = x[complete, , drop = FALSE], y = y[complete],
@@ -356,10 +362,6 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' or a data frame with \eqn{m} rows
 #' containing candidate values
 #' for the regularisation and mixing hyperparameters
-#'
-#' @param threshold
-#' threshold for absolute correlation coefficients:
-#' numeric in unit interval
 #'
 #' @details
 #' The numbers of observations (samples) for training or testing
