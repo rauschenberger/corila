@@ -397,9 +397,11 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   } else if (identical(family, "binomial")) {
     stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
   } else if (identical(family, "cox")) {
-    time <- stats::rexp(n = n, rate = exp(eta))
-    status <- stats::rbinom(n = n, size = 1L, prob = 0.5)
-    survival::Surv(time = time, event = status)
+    time_event <- stats::rexp(n = n, rate = exp(eta))
+    time_censor <- stats::rexp(n = n, rate = 0.5 * median(exp(eta)))
+    time <- pmin(time_event, time_censor)
+    event <- time_event <= time_censor
+    survival::Surv(time = time, event = event)
   } else if (identical(family, "poisson")) {
     stats::rpois(n = n, lambda = exp(eta))
   }
