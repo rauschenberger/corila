@@ -159,12 +159,12 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                   sample(x = seq_len(q), size = p - q, replace = TRUE)))
   primary <- as.logical(stats::rbinom(n = p, size = 1L, prob = prob_primary))
   holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
-  x <- .simulate_predictors(n = n0 + n1, group = group, rho = rho, seed = seed)
+  x <- .simulate_predictors(n = n0 + n1, group = group, rho = rho, seed = NULL)
   beta <- .simulate_effects(
     group = group, signal_strength = signal_strength, prob_group = prob_group,
-    prob_predictor = prob_predictor, seed = seed
+    prob_predictor = prob_predictor, seed = NULL
   )
-  y <- .simulate_response(family = family, x = x, beta = beta, seed = seed)
+  y <- .simulate_response(family = family, x = x, beta = beta, seed = NULL)
   rownames(x) <- names(y) <- .rownames(holdout = holdout)
   colnames(x) <- names(primary) <- names(group) <- names(beta) <-
     .colnames(group = group, primary = primary)
@@ -259,8 +259,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   group <- as.integer(round(group))
   checkmate::assert_number(x = rho, lower = - eps, upper = 1.0 + eps)
   rho <- round(rho, digits = 6L)
-  checkmate::assert_int(x = seed)
-  set.seed(as.integer(round(seed)))
+  checkmate::assert_int(x = seed, null.ok = TRUE)
+  if (!is.null(seed)) set.seed(as.integer(round(seed)))
   p <- length(group)
   mu <- rep(x = 0.0, times = p)
   sigma <- rho * outer(X = group, Y = group, FUN = "==") +
@@ -308,8 +308,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   prob_predictor <- round(prob_predictor, digits = 6L)
   checkmate::assert_number(x = signal_strength, lower = 0.0, upper = 2.0)
   signal_strength <- round(signal_strength, digits = 6L)
-  checkmate::assert_int(x = seed)
-  set.seed(as.integer(round(seed)))
+  checkmate::assert_int(x = seed, null.ok = TRUE)
+  if (!is.null(seed)) set.seed(as.integer(round(seed)))
   p <- length(group)
   order <- order(group)
   size <- tabulate(group[order])
@@ -382,8 +382,8 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   checkmate::assert_numeric(x = beta, len = ncol(x), any.missing = FALSE,
                             null.ok = TRUE)
   checkmate::assert_int(x = n, lower = 1L, upper = 1e05L, null.ok = TRUE)
-  checkmate::assert_int(x = seed)
-  set.seed(as.integer(round(seed)))
+  checkmate::assert_int(x = seed, null.ok = TRUE)
+  if (!is.null(seed)) set.seed(as.integer(round(seed)))
   if (!is.null(x) && !is.null(beta) && is.null(n)) {
     eta <- as.numeric(x %*% as.vector(beta))
     n <- nrow(x)
