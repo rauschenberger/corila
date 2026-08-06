@@ -1506,6 +1506,8 @@ holdout <- function(x_train, y_train, group, primary, family,
   
   difftime <- numeric()
   
+  group_primary <- as.integer(as.factor(as.character(group[primary])))
+  
   for (i in method) {
     if (!is.null(seed)) {
       set.seed(seed)
@@ -1586,7 +1588,7 @@ holdout <- function(x_train, y_train, group, primary, family,
       object <- gglasso::cv.gglasso(x = x_train[, primary],
                                     y = temp_y_train,
                                     loss = temp_loss,
-                                    group = group[primary],
+                                    group = group_primary,
                                     foldid = foldid)
       if (!is.null(x_test)) {
         temp <- stats::predict(object = object,
@@ -1658,7 +1660,7 @@ holdout <- function(x_train, y_train, group, primary, family,
       #--- sparse group lasso (sparsegl) ---
       object <- sparsegl::cv.sparsegl(x = x_train[, primary],
                                       y = y_train,
-                                      group = group[primary],
+                                      group = group_primary,
                                       family = family,
                                       foldid = foldid)
       if (!is.null(x_test)) {
