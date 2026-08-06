@@ -1423,16 +1423,26 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
 #'
 #' @examples
 #' \donttest{
-#' data <- simulate()
-#' results <- holdout(x_train = data$x_train,
-#'                    y_train = data$y_train,
-#'                    group = data$group,
-#'                    primary = rep(c(TRUE, FALSE), each = 80),
-#'                    x_test = data$x_test,
-#'                    y_test = data$y_test,
-#'                    family = data$info$family,
-#'                    method = c("mean", "ridge", "lasso", "corila"))
-#' # Why does holdout require y_test? Try to remove this
+#' results <- list()
+#' for(i in seq_len(25L)){
+#' family <- "gaussian"
+#' data <- simulate_data(n0 = 100L, n1 = 10000L, p = 200L,
+#'                       q = 50L, prob_primary = 0.5, prob_group = 0.2,
+#'                       prob_predictor = 0.8, seed = i, signal_strength = 1.0)
+#' results[[i]] <- holdout(x_train = data$x_train,
+#'                         y_train = data$y_train,
+#'                         group = data$group,
+#'                         primary = data$primary,
+#'                         x_test = data$x_test,
+#'                         y_test = data$y_test,
+#'                         tune = "weight",
+#'                         family = family,
+#'                         method = c("mean", "ridge", "lasso", "corila"))
+#'}
+#' mse <- sapply(results,function(x) x$metric)
+#' colMeans(t(mse)/mse["mean",])
+#'
+#'# Why does holdout require y_test? Try to remove this
 #' }
 #'
 #' @keywords iteration
@@ -1442,7 +1452,7 @@ holdout <- function(x_train, y_train, group, primary, family,
                     alpha_init = 0, alpha_final = 1,
                     x_test = NULL, y_test = NULL,
                     nfolds = 10, foldid = NULL, method = NULL,
-                    seed = NULL, tune = "both") {
+                    seed = NULL, tune = "bivariate") {
   # nfolds <- 10; foldid <- NULL; seed <- NULL
   
   if (!is.null(primary) && any(primary == 0) && !is.numeric(group)) {
@@ -2081,7 +2091,18 @@ holdout <- function(x_train, y_train, group, primary, family,
   } else {
     warning("Implement checks for Cox regression.")
   }
-  list(y_hat = y_hat, coef = coef, difftime = difftime)
+  if(!is.null(y_test)) {
+    if(family %in% c("gaussian","poisson")){
+      metric <- sapply(X = y_hat, FUN = function(x) mean((y_test-x)^2.0, na.rm=TRUE))
+    } else if(family == "binomial"){
+      metric <- sapply(X = y_hat, FUN = function(x) pROC::auc(response = y_test, predictor = as.vector(x), levels=c(0L, 1L), direction="<"))
+    } else if(family == "cox"){
+      metric <- sapply(X = y_hat, FUN = function(x) ifelse(all(is.na(x)), NA_real_, survival::concordance(y_test ~ I(-x))$concordance))
+    }
+  } else {
+    metric <- NULL
+  }
+  list(y_hat = y_hat, coef = coef, metric = metric, difftime = difftime)
 }
 
 #' @title
@@ -2153,6 +2174,7 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
       nfolds <- max(foldid)
     }
     y_hat <- data.frame(row.names = seq_len(n))
+    values <- numeric()
     for (i in seq_len(nfolds)) {
       set.seed(i)
       cat("fold", i, "\n")
@@ -2174,6 +2196,7 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
       for (j in seq_along(results$y_hat)) {
         y_hat[[names(results$y_hat)[j]]][cond] <- results$y_hat[[j]]
       }
+      values <- rbind(values, results$metric)
     }
     if (family %in% c("gaussian", "poisson")) {
       list$metric[[k]] <- apply(
@@ -2225,6 +2248,8 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
   }
   list <- lapply(X = list, FUN = function(x) do.call(what = "rbind", args = x))
   list$family <- family
+  list$metric_mu <- colMeans(values)
+  list$metric_sd <- apply(values, 2, sd)
   list
 }
 
