@@ -460,6 +460,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   # --- share information between predictors ---
   if (!is.matrix(cor)) {
     cor <- stats::cor(x = scale$x, method = cor, use = "pairwise.complete")
+    # alternatively use function cor.shrink from package corpcor
   }
   cor[is.na(cor) | abs(cor) <= threshold] <- 0.0
   pf <- .construct_penalty_factors(
