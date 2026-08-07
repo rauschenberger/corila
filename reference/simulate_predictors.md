@@ -5,7 +5,14 @@ Simulates predictor matrix.
 ## Usage
 
 ``` r
-.simulate_predictors(n, p = NULL, group = NULL, rho = 0, seed = 1L)
+.simulate_predictors(
+  n,
+  p = NULL,
+  group = NULL,
+  rho_within = 0,
+  rho_between = 0,
+  seed = 1L
+)
 ```
 
 ## Arguments
@@ -27,12 +34,19 @@ Simulates predictor matrix.
   number of predictor groups (maximum length \\1\\000\\, minimum entry
   1, maximum entry \\1\\000\\)
 
-- rho:
+- rho_within:
 
   correlation coefficient for predictors within the same group: numeric
   scalar in the unit interval (minimum 0 leads to uncorrelated
   predictors within each group, maximum 1 leads to identical predictors
   within each group)
+
+- rho_between:
+
+  correlation coefficient for predictors in different groups: numeric
+  scalar in the unit interval (minimum 0 leads to uncorrelated
+  predictors between groups, maximum `rho_within` leads to same
+  correlation between and within groups)
 
 - seed:
 
@@ -64,11 +78,12 @@ This function is called by
 #> [3,] -0.8356286
 #> [4,]  1.5952808
 #> [5,]  0.3295078
-.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
-#>            [,1]       [,2]       [,3]       [,4]       [,5]       [,6]
-#> [1,]  0.6264538  0.6264538  0.6264538  0.8204684  0.8204684  0.8204684
-#> [2,] -0.1836433 -0.1836433 -0.1836433 -0.4874290 -0.4874291 -0.4874291
-#> [3,]  0.8356286  0.8356286  0.8356286 -0.7383247 -0.7383247 -0.7383247
-#> [4,] -1.5952808 -1.5952808 -1.5952808 -0.5757814 -0.5757813 -0.5757813
-#> [5,] -0.3295078 -0.3295078 -0.3295078  0.3053884  0.3053884  0.3053884
+.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L),
+                     rho_within = 0.5, rho_between = 0.2)
+#>            [,1]        [,2]        [,3]       [,4]        [,5]       [,6]
+#> [1,]  1.0662725  1.39458262 -0.03473632  0.2054373  0.36454078 -0.5218025
+#> [2,] -0.3669381 -0.02765002 -0.67443015  0.4352125  0.07786598 -0.1693932
+#> [3,] -0.7265088  0.88402641  0.42278252  0.8067964  0.54929905  1.3640730
+#> [4,] -2.0109892 -1.91334934 -0.06047507 -1.5443969 -1.27242568  0.5007818
+#> [5,]  0.3727967  0.33846546 -0.91943801 -0.3312861 -0.34621180 -0.4157776
 ```

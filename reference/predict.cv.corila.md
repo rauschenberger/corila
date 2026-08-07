@@ -83,5 +83,6 @@ model <- cv.corila(x = data$x_train,
                    group = as.double(data$group),
                    primary = data$primary,
                    alpha_init = 0.0,
+                   threshold = 0.0,
                    foldid = rep(1:10, length.out = nrow(data$x_train)))
 ```

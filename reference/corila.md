@@ -134,7 +134,7 @@ corila(
 - threshold:
 
   threshold for absolute correlation coefficients: numeric in unit
-  interval
+  interval (minimum 0, maximum 1)
 
 ## Value
 
@@ -208,6 +208,7 @@ object <- corila(x = x,
                  foldid = NULL,
                  nfolds = 10L,
                  hyper = hyper,
+                 threshold = 0.0,
                  lambda_init = NULL)
 
 y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)

@@ -61,11 +61,12 @@ grouped and correlated primary and auxiliary predictors.</p>
 <span>  p <span class="op">=</span> <span class="fl">30L</span>,</span>
 <span>  q <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"gaussian"</span>,</span>
-<span>  rho <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  rho_between <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  rho_within <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  prob_primary <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  signal_strength <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  prob_group <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  prob_predictor <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  signal_strength <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1L</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -106,7 +107,14 @@ maximum <code>p</code> assigns each predictor to its own group)</p></dd>
 <dd><p>character string <code>"gaussian"</code>, <code>"binomial"</code>, <code>"poisson"</code>, or <code>"cox"</code></p></dd>
 
 
-<dt id="arg-rho">rho<a class="anchor" aria-label="anchor" href="#arg-rho"></a></dt>
+<dt id="arg-rho-between">rho_between<a class="anchor" aria-label="anchor" href="#arg-rho-between"></a></dt>
+<dd><p>correlation coefficient for predictors in different groups:
+numeric scalar in the unit interval
+(minimum 0 leads to uncorrelated predictors between groups,
+maximum <code>rho_within</code> leads to same correlation between and within groups)</p></dd>
+
+
+<dt id="arg-rho-within">rho_within<a class="anchor" aria-label="anchor" href="#arg-rho-within"></a></dt>
 <dd><p>correlation coefficient for predictors within the same group:
 numeric scalar in the unit interval
 (minimum 0 leads to uncorrelated predictors within each group,
@@ -118,14 +126,6 @@ maximum 1 leads to identical predictors within each group)</p></dd>
 numeric scalar in the unit interval
 (minimum 0 leads to auxiliary predictors only,
 maximum 1 leads to primary predictors only)</p></dd>
-
-
-<dt id="arg-signal-strength">signal_strength<a class="anchor" aria-label="anchor" href="#arg-signal-strength"></a></dt>
-<dd><p>non-negative numeric scalar
-for multiplying the effect sizes
-(default: <code>signal_strength=1.0</code>,
-minimum 0 sets all effect sizes to 0,
-maximum 2 to avoid undefined values)</p></dd>
 
 
 <dt id="arg-prob-group">prob_group<a class="anchor" aria-label="anchor" href="#arg-prob-group"></a></dt>
@@ -140,6 +140,14 @@ maximum 1 makes all groups active)</p></dd>
 numeric scalar in the unit interval
 (minimum 0 makes all predictors inactive,
 maximum 1 makes all predictors in active groups active)</p></dd>
+
+
+<dt id="arg-signal-strength">signal_strength<a class="anchor" aria-label="anchor" href="#arg-signal-strength"></a></dt>
+<dd><p>non-negative numeric scalar
+for multiplying the effect sizes
+(default: <code>signal_strength=1.0</code>,
+minimum 0 sets all effect sizes to 0,
+maximum 2 to avoid undefined values)</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -195,16 +203,17 @@ predictor matrix, the effect vector, or the response vector, respectively.</p></
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">simulate_data</span><span class="op">(</span>n0 <span class="op">=</span> <span class="fl">50L</span>, n1 <span class="op">=</span> <span class="fl">20L</span>, p <span class="op">=</span> <span class="fl">30L</span>, q <span class="op">=</span> <span class="fl">10L</span>,</span></span>
-<span class="r-in"><span>                     family <span class="op">=</span> <span class="st">"gaussian"</span>, rho <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
-<span class="r-in"><span>                     prob_primary <span class="op">=</span> <span class="fl">0.5</span>, signal_strength <span class="op">=</span> <span class="fl">1.0</span>,</span></span>
-<span class="r-in"><span>                     prob_group <span class="op">=</span> <span class="fl">0.5</span>, prob_predictor <span class="op">=</span> <span class="fl">0.8</span>, seed <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                     family <span class="op">=</span> <span class="st">"gaussian"</span>, rho_between <span class="op">=</span> <span class="fl">0.0</span>,</span></span>
+<span class="r-in"><span>                     rho_within <span class="op">=</span> <span class="fl">0.5</span>, prob_primary <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
+<span class="r-in"><span>                     signal_strength <span class="op">=</span> <span class="fl">1.0</span>, prob_group <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
+<span class="r-in"><span>                     prob_predictor <span class="op">=</span> <span class="fl">0.8</span>, seed <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">data</span>, vec.len <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ x_train: num [1:50, 1:30] 0.266 -1.91 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ x_train: num [1:50, 1:30] 0.611 0.242 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dimnames")=List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : chr [1:50] "train_1" "train_2" ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : chr [1:30] "aux_1.1" "aux_1.2" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ y_train: Named num [1:50] -0.761 -1.743 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ y_train: Named num [1:50] 1.32 -3.92 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:50] "train_1" "train_2" ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ group  : Named int [1:30] 1 1 1 2 2 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:30] "aux_1.1" "aux_1.2" ...</span>
@@ -216,7 +225,7 @@ predictor matrix, the effect vector, or the response vector, respectively.</p></
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dimnames")=List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : chr [1:20] "test_1" "test_2" ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : chr [1:30] "aux_1.1" "aux_1.2" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ y_test : Named num [1:20] -4.52 -2.65 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ y_test : Named num [1:20] 1.823 -0.0562 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:20] "test_1" "test_2" ...</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

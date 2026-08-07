@@ -46,7 +46,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.simulate_predictors</span><span class="op">(</span><span class="va">n</span>, p <span class="op">=</span> <span class="cn">NULL</span>, group <span class="op">=</span> <span class="cn">NULL</span>, rho <span class="op">=</span> <span class="fl">0</span>, seed <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.simulate_predictors</span><span class="op">(</span></span>
+<span>  <span class="va">n</span>,</span>
+<span>  p <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rho_within <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  rho_between <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">1L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,11 +82,18 @@ and \(q\) is the number of predictor groups
 minimum entry 1, maximum entry \(1\,000\))</p></dd>
 
 
-<dt id="arg-rho">rho<a class="anchor" aria-label="anchor" href="#arg-rho"></a></dt>
+<dt id="arg-rho-within">rho_within<a class="anchor" aria-label="anchor" href="#arg-rho-within"></a></dt>
 <dd><p>correlation coefficient for predictors within the same group:
 numeric scalar in the unit interval
 (minimum 0 leads to uncorrelated predictors within each group,
 maximum 1 leads to identical predictors within each group)</p></dd>
+
+
+<dt id="arg-rho-between">rho_between<a class="anchor" aria-label="anchor" href="#arg-rho-between"></a></dt>
+<dd><p>correlation coefficient for predictors in different groups:
+numeric scalar in the unit interval
+(minimum 0 leads to uncorrelated predictors between groups,
+maximum <code>rho_within</code> leads to same correlation between and within groups)</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -112,13 +126,14 @@ and \(p\) columns (predictors).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.8356286</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  1.5952808</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  0.3295078</span>
-<span class="r-in"><span><span class="fu">.simulate_predictors</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5L</span>, group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">2L</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span>, rho <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]       [,4]       [,5]       [,6]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  0.6264538  0.6264538  0.6264538  0.8204684  0.8204684  0.8204684</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -0.1836433 -0.1836433 -0.1836433 -0.4874290 -0.4874291 -0.4874291</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  0.8356286  0.8356286  0.8356286 -0.7383247 -0.7383247 -0.7383247</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -1.5952808 -1.5952808 -1.5952808 -0.5757814 -0.5757813 -0.5757813</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] -0.3295078 -0.3295078 -0.3295078  0.3053884  0.3053884  0.3053884</span>
+<span class="r-in"><span><span class="fu">.simulate_predictors</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5L</span>, group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">2L</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                     rho_within <span class="op">=</span> <span class="fl">0.5</span>, rho_between <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]        [,2]        [,3]       [,4]        [,5]       [,6]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  1.0662725  1.39458262 -0.03473632  0.2054373  0.36454078 -0.5218025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -0.3669381 -0.02765002 -0.67443015  0.4352125  0.07786598 -0.1693932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.7265088  0.88402641  0.42278252  0.8067964  0.54929905  1.3640730</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -2.0109892 -1.91334934 -0.06047507 -1.5443969 -1.27242568  0.5007818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  0.3727967  0.33846546 -0.91943801 -0.3312861 -0.34621180 -0.4157776</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

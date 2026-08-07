@@ -15,11 +15,12 @@ simulate_data(
   p = 30L,
   q = 10L,
   family = "gaussian",
-  rho = 0.5,
+  rho_between = 0,
+  rho_within = 0.5,
   prob_primary = 0.5,
-  signal_strength = 1,
   prob_group = 0.5,
   prob_predictor = 0.8,
+  signal_strength = 1,
   seed = 1L
 )
 ```
@@ -51,7 +52,14 @@ simulate_data(
 
   character string `"gaussian"`, `"binomial"`, `"poisson"`, or `"cox"`
 
-- rho:
+- rho_between:
+
+  correlation coefficient for predictors in different groups: numeric
+  scalar in the unit interval (minimum 0 leads to uncorrelated
+  predictors between groups, maximum `rho_within` leads to same
+  correlation between and within groups)
+
+- rho_within:
 
   correlation coefficient for predictors within the same group: numeric
   scalar in the unit interval (minimum 0 leads to uncorrelated
@@ -64,12 +72,6 @@ simulate_data(
   numeric scalar in the unit interval (minimum 0 leads to auxiliary
   predictors only, maximum 1 leads to primary predictors only)
 
-- signal_strength:
-
-  non-negative numeric scalar for multiplying the effect sizes (default:
-  `signal_strength=1.0`, minimum 0 sets all effect sizes to 0, maximum 2
-  to avoid undefined values)
-
 - prob_group:
 
   probability for each predictor group to be active: numeric scalar in
@@ -81,6 +83,12 @@ simulate_data(
   probability for each predictor in an active group to be active:
   numeric scalar in the unit interval (minimum 0 makes all predictors
   inactive, maximum 1 makes all predictors in active groups active)
+
+- signal_strength:
+
+  non-negative numeric scalar for multiplying the effect sizes (default:
+  `signal_strength=1.0`, minimum 0 sets all effect sizes to 0, maximum 2
+  to avoid undefined values)
 
 - seed:
 
@@ -140,16 +148,17 @@ vector, respectively.
 
 ``` r
 data <- simulate_data(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
-                     family = "gaussian", rho = 0.5,
-                     prob_primary = 0.5, signal_strength = 1.0,
-                     prob_group = 0.5, prob_predictor = 0.8, seed = 1L)
+                     family = "gaussian", rho_between = 0.0,
+                     rho_within = 0.5, prob_primary = 0.5,
+                     signal_strength = 1.0, prob_group = 0.5,
+                     prob_predictor = 0.8, seed = 1L)
 utils::str(data, vec.len = 2L)
 #> List of 7
-#>  $ x_train: num [1:50, 1:30] 0.266 -1.91 ...
+#>  $ x_train: num [1:50, 1:30] 0.611 0.242 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : chr [1:50] "train_1" "train_2" ...
 #>   .. ..$ : chr [1:30] "aux_1.1" "aux_1.2" ...
-#>  $ y_train: Named num [1:50] -0.761 -1.743 ...
+#>  $ y_train: Named num [1:50] 1.32 -3.92 ...
 #>   ..- attr(*, "names")= chr [1:50] "train_1" "train_2" ...
 #>  $ group  : Named int [1:30] 1 1 1 2 2 ...
 #>   ..- attr(*, "names")= chr [1:30] "aux_1.1" "aux_1.2" ...
@@ -161,6 +170,6 @@ utils::str(data, vec.len = 2L)
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : chr [1:20] "test_1" "test_2" ...
 #>   .. ..$ : chr [1:30] "aux_1.1" "aux_1.2" ...
-#>  $ y_test : Named num [1:20] -4.52 -2.65 ...
+#>  $ y_test : Named num [1:20] 1.823 -0.0562 ...
 #>   ..- attr(*, "names")= chr [1:20] "test_1" "test_2" ...
 ```
