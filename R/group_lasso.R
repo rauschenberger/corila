@@ -119,7 +119,7 @@
 #'
 #' @param threshold
 #' threshold for absolute correlation coefficients:
-#' numeric in unit interval
+#' numeric in unit interval (minimum 0, maximum 1)
 #'
 #' @inherit corila details
 #'
@@ -173,6 +173,7 @@
 #'                    group = as.double(data$group),
 #'                    primary = data$primary,
 #'                    alpha_init = 0.0,
+#'                    threshold = 0.0,
 #'                    foldid = rep(1:10, length.out = nrow(data$x_train)))
 #'
 #' @keywords methods models regression classif
@@ -221,10 +222,12 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   # --- split observations into folds ---
   checkmate::assert_count(x = nfolds, positive = TRUE)
   if (is.null(foldid)) {
-    foldid <- .folds(y = y[complete], family = family, nfolds = nfolds)
+    foldid <- integer(length = n)
+    foldid[complete] <- .folds(y = y[complete], family = family,
+                               nfolds = nfolds)
   } else {
-    foldid <- .validate_foldid(foldid = foldid[complete], y = y[complete],
-                               family = family)
+    foldid[complete] <- .validate_foldid(foldid = foldid[complete],
+                                         y = y[complete], family = family)
     nfolds <- max(foldid)
   }
   # --- fit model on all folds ---
@@ -235,7 +238,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   object_ext <- do.call(
     what = "corila",
     args = c(args, list(x = x[complete, , drop = FALSE], y = y[complete],
-                        foldid = foldid, lambda_init = NULL))
+                        foldid = foldid[complete], lambda_init = NULL))
   )
   lambda <- lapply(X = object_ext$model, FUN = function(x) x$lambda)
   # --- initialise matrices for predictions ---
@@ -248,14 +251,14 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   for (i in seq_len(nfolds)) {
     object_int <- do.call(
       what = "corila",
-      args = c(args, list(x = x[foldid != i & complete, , drop = FALSE],
-                          y = y[foldid != i & complete], foldid = NULL,
+      args = c(args, list(x = x[complete & foldid != i, , drop = FALSE],
+                          y = y[complete & foldid != i], foldid = NULL,
                           lambda_init = object_ext$lambda_init))
     )
     for (j in seq_len(nrow(hyper))) {
-      pred[[j]][foldid == i & complete, ] <- predict.corila(
+      pred[[j]][complete & foldid == i, ] <- predict.corila(
         object = object_int,
-        newx = x[foldid == i & complete, , drop = FALSE],
+        newx = x[complete & foldid == i, , drop = FALSE],
         index = j,
         s = lambda[[j]]
       )
@@ -421,6 +424,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'                  foldid = NULL,
 #'                  nfolds = 10L,
 #'                  hyper = hyper,
+#'                  threshold = 0.0,
 #'                  lambda_init = NULL)
 #'
 #' y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)
@@ -449,6 +453,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   hyper <- .validate_hyper(hyper = hyper)
   checkmate::assert_number(x = lambda_init, lower = 0.0, null.ok = TRUE)
   checkmate::assert_number(x = threshold, lower = 0.0, upper = 1.0)
+  threshold <- pmax(0.0, pmin(threshold, 1.0))
   args <- c(n = n, p = p, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
