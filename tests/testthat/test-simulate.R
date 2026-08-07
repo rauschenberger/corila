@@ -14,7 +14,7 @@ testthat::test_that(".simulate_predictors requires either p or group", {
 )
 
 testthat::test_that(".simulate_predictors handles single sample", {
-  x <- .simulate_predictors(n = 1L, group = c(1L, 1L), rho = 1.0)
+  x <- .simulate_predictors(n = 1L, group = c(1L, 1L), rho_within = 1.0)
   testthat::expect_type(object = x, type = "double")
   testthat::expect_equal(object = x[1L], expected = x[2L])
   testthat::expect_shape(object = x, dim = c(1L, 2L))
@@ -22,7 +22,7 @@ testthat::test_that(".simulate_predictors handles single sample", {
 )
 
 testthat::test_that(".simulate_predictors handles multiple samples", {
-  x <- .simulate_predictors(n = 10L, group = c(1L, 1L, 2L), rho = 1.0)
+  x <- .simulate_predictors(n = 10L, group = c(1L, 1L, 2L), rho_within = 1.0)
   testthat::expect_type(object = x, type = "double")
   testthat::expect_equal(object = x[, 1L], expected = x[, 2L],
                          tolerance = 1e-06)
