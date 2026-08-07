@@ -153,7 +153,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   checkmate::assert_number(x = rho_within, lower = 0.0, upper = 1.0)
   rho_within <- round(rho_within, digits = 6L)
   checkmate::assert_number(x = rho_between, lower = 0.0, upper = rho_within)
-  rho_within <- round(rho_between, digits = 6L)
+  rho_between <- round(rho_between, digits = 6L)
   checkmate::assert_number(x = prob_primary, lower = 0.0, upper = 1.0)
   prob_primary <- round(prob_primary, digits = 6L)
   checkmate::assert_number(x = signal_strength, lower = 0.0, upper = 2.0)
