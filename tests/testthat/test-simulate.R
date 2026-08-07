@@ -37,6 +37,22 @@ testthat::test_that(".simulate_predictors works with p and group", {
 }
 )
 
+#----- function .simulate_effects ----------------------------------------------
+
+testthat::test_that("all or no predictors get selected", {
+  beta <- .simulate_effects(group = group,
+                            prob_group = 0.0, prob_predictor = 1.0)
+  testthat::expect_all_equal(object = beta, expected = 0.0)
+  beta <- .simulate_effects(group = group,
+                            prob_group = 1.0, prob_predictor = 0.0)
+  testthat::expect_all_equal(object = beta, expected = 0.0)
+  group <- rep(x = 1L, times = 5L)
+  beta <- .simulate_effects(group = group,
+                            prob_group = 1.0, prob_predictor = 1.0)
+  testthat::expect_all_equal(object = sign(beta), expected = sign(beta[1L]))
+  testthat::expect_disjoint(object = beta, expected = 0.0)
+})
+
 #----- function .simulate_response ---------------------------------------------
 
 family <- c("gaussian", "binomial", "poisson", "cox")
