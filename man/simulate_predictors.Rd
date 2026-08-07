@@ -4,7 +4,14 @@
 \alias{.simulate_predictors}
 \title{Simulate predictors}
 \usage{
-.simulate_predictors(n, p = NULL, group = NULL, rho = 0, seed = 1L)
+.simulate_predictors(
+  n,
+  p = NULL,
+  group = NULL,
+  rho_within = 0,
+  rho_between = 0,
+  seed = 1L
+)
 }
 \arguments{
 \item{n}{number of observations:
@@ -23,10 +30,15 @@ and \eqn{q} is the number of predictor groups
 (maximum length \eqn{1\,000},
 minimum entry 1, maximum entry \eqn{1\,000})}
 
-\item{rho}{correlation coefficient for predictors within the same group:
+\item{rho_within}{correlation coefficient for predictors within the same group:
 numeric scalar in the unit interval
 (minimum 0 leads to uncorrelated predictors within each group,
 maximum 1 leads to identical predictors within each group)}
+
+\item{rho_between}{correlation coefficient for predictors in different groups:
+numeric scalar in the unit interval
+(minimum 0 leads to uncorrelated predictors between groups,
+maximum \code{rho_within} leads to same correlation between and within groups)}
 
 \item{seed}{random seed for reproducibility:
 integer scalar (unrestricted)}
@@ -41,7 +53,8 @@ Simulates predictor matrix.
 \examples{
 \dontshow{.simulate_predictors <- corila:::.simulate_predictors}
 .simulate_predictors(n = 5L, p = 7L)
-.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
+.simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L),
+                     rho_within = 0.5, rho_between = 0.2)
 
 }
 \seealso{

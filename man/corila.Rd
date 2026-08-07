@@ -106,7 +106,7 @@ or \code{NULL} (cross-validation)}
 be suppressed? (logical scalar, \code{FALSE} or \code{TRUE})}
 
 \item{threshold}{threshold for absolute correlation coefficients:
-numeric in unit interval}
+numeric in unit interval (minimum 0, maximum 1)}
 }
 \value{
 Returns an object of class \code{"corila"}.
@@ -154,6 +154,7 @@ object <- corila(x = x,
                  foldid = NULL,
                  nfolds = 10L,
                  hyper = hyper,
+                 threshold = 0.0,
                  lambda_init = NULL)
 
 y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)

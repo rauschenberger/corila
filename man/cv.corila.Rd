@@ -123,7 +123,7 @@ with a missing predictor or a missing response from model fitting
 be suppressed? (logical scalar, \code{FALSE} or \code{TRUE})}
 
 \item{threshold}{threshold for absolute correlation coefficients:
-numeric in unit interval}
+numeric in unit interval (minimum 0, maximum 1)}
 }
 \value{
 Returns an object of class \code{"cv.corila"},
@@ -183,6 +183,7 @@ model <- cv.corila(x = data$x_train,
                    group = as.double(data$group),
                    primary = data$primary,
                    alpha_init = 0.0,
+                   threshold = 0.0,
                    foldid = rep(1:10, length.out = nrow(data$x_train)))
 
 }

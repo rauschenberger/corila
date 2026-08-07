@@ -10,11 +10,12 @@ simulate_data(
   p = 30L,
   q = 10L,
   family = "gaussian",
-  rho = 0.5,
+  rho_between = 0,
+  rho_within = 0.5,
   prob_primary = 0.5,
-  signal_strength = 1,
   prob_group = 0.5,
   prob_predictor = 0.8,
+  signal_strength = 1,
   seed = 1L
 )
 }
@@ -41,7 +42,12 @@ maximum \code{p} assigns each predictor to its own group)}
 
 \item{family}{character string \code{"gaussian"}, \code{"binomial"}, \code{"poisson"}, or \code{"cox"}}
 
-\item{rho}{correlation coefficient for predictors within the same group:
+\item{rho_between}{correlation coefficient for predictors in different groups:
+numeric scalar in the unit interval
+(minimum 0 leads to uncorrelated predictors between groups,
+maximum \code{rho_within} leads to same correlation between and within groups)}
+
+\item{rho_within}{correlation coefficient for predictors within the same group:
 numeric scalar in the unit interval
 (minimum 0 leads to uncorrelated predictors within each group,
 maximum 1 leads to identical predictors within each group)}
@@ -50,12 +56,6 @@ maximum 1 leads to identical predictors within each group)}
 numeric scalar in the unit interval
 (minimum 0 leads to auxiliary predictors only,
 maximum 1 leads to primary predictors only)}
-
-\item{signal_strength}{non-negative numeric scalar
-for multiplying the effect sizes
-(default: \code{signal_strength=1.0},
-minimum 0 sets all effect sizes to 0,
-maximum 2 to avoid undefined values)}
 
 \item{prob_group}{probability for each predictor group to be active:
 numeric scalar in the unit interval
@@ -66,6 +66,12 @@ maximum 1 makes all groups active)}
 numeric scalar in the unit interval
 (minimum 0 makes all predictors inactive,
 maximum 1 makes all predictors in active groups active)}
+
+\item{signal_strength}{non-negative numeric scalar
+for multiplying the effect sizes
+(default: \code{signal_strength=1.0},
+minimum 0 sets all effect sizes to 0,
+maximum 2 to avoid undefined values)}
 
 \item{seed}{random seed for reproducibility:
 integer scalar (unrestricted)}
@@ -121,9 +127,10 @@ and a number indexing the predictors within this group
 }
 \examples{
 data <- simulate_data(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
-                     family = "gaussian", rho = 0.5,
-                     prob_primary = 0.5, signal_strength = 1.0,
-                     prob_group = 0.5, prob_predictor = 0.8, seed = 1L)
+                     family = "gaussian", rho_between = 0.0,
+                     rho_within = 0.5, prob_primary = 0.5,
+                     signal_strength = 1.0, prob_group = 0.5,
+                     prob_predictor = 0.8, seed = 1L)
 utils::str(data, vec.len = 2L)
 
 }
