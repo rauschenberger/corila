@@ -31,12 +31,12 @@ and \eqn{q} is the number of predictor groups
 minimum entry 1, maximum entry \eqn{1\,000})}
 
 \item{rho_within}{correlation coefficient for predictors within the same group:
-numeric scalar in the unit interval
+positive numeric scalar in the unit interval
 (minimum 0 leads to uncorrelated predictors within each group,
 maximum 1 leads to identical predictors within each group)}
 
 \item{rho_between}{correlation coefficient for predictors in different groups:
-numeric scalar in the unit interval
+positive numeric scalar in the unit interval
 (minimum 0 leads to uncorrelated predictors between groups,
 maximum \code{rho_within} leads to same correlation between and within groups)}
 
