@@ -54,15 +54,15 @@ simulate_data(
 
 - rho_between:
 
-  correlation coefficient for predictors in different groups: numeric
-  scalar in the unit interval (minimum 0 leads to uncorrelated
+  correlation coefficient for predictors in different groups: positive
+  numeric scalar in the unit interval (minimum 0 leads to uncorrelated
   predictors between groups, maximum `rho_within` leads to same
   correlation between and within groups)
 
 - rho_within:
 
-  correlation coefficient for predictors within the same group: numeric
-  scalar in the unit interval (minimum 0 leads to uncorrelated
+  correlation coefficient for predictors within the same group: positive
+  numeric scalar in the unit interval (minimum 0 leads to uncorrelated
   predictors within each group, maximum 1 leads to identical predictors
   within each group)
 

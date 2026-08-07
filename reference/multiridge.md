@@ -140,7 +140,5 @@ model <- multiridge(x = data$x_train, y = data$y_train, group = data$group)
 beta_hat <- coef(model)
 y_hat <- predict(object = model, newx = data$x_test)
 
-#> Error in rep(1, n) : invalid 'times' argument
-#> Error in rep(1, n): invalid 'times' argument
 # }
 ```
