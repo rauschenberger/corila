@@ -37,11 +37,17 @@
 #' (minimum 1 assigns all predictors to the same group.
 #' maximum `p` assigns each predictor to its own group)
 #'
-#' @param rho
+#' @param rho_within
 #' correlation coefficient for predictors within the same group:
-#' numeric scalar in the unit interval
+#' positive numeric scalar in the unit interval
 #' (minimum 0 leads to uncorrelated predictors within each group,
 #' maximum 1 leads to identical predictors within each group)
+#'
+#' @param rho_between
+#' correlation coefficient for predictors in different groups:
+#' positive numeric scalar in the unit interval
+#' (minimum 0 leads to uncorrelated predictors between groups,
+#' maximum `rho_within` leads to same correlation between and within groups)
 #'
 #' @param prob_primary
 #' probability for each predictor to be primary (rather than auxiliary):
@@ -121,17 +127,19 @@
 #'
 #' @examples
 #' data <- simulate_data(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
-#'                      family = "gaussian", rho = 0.5,
-#'                      prob_primary = 0.5, signal_strength = 1.0,
-#'                      prob_group = 0.5, prob_predictor = 0.8, seed = 1L)
+#'                      family = "gaussian", rho_between = 0.0,
+#'                      rho_within = 0.5, prob_primary = 0.5,
+#'                      signal_strength = 1.0, prob_group = 0.5,
+#'                      prob_predictor = 0.8, seed = 1L)
 #' utils::str(data, vec.len = 2L)
 #'
 #' @srrstats {G5.1} *data set for tests and examples is exported*
 #'
 simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
-                          family = "gaussian", rho = 0.5,
-                          prob_primary = 0.5, signal_strength = 1.0,
-                          prob_group = 0.5, prob_predictor = 0.8, seed = 1L) {
+                          family = "gaussian", rho_between = 0.0,
+                          rho_within = 0.5, prob_primary = 0.5,
+                          prob_group = 0.5, prob_predictor = 0.8,
+                          signal_strength = 1.0, seed = 1L) {
   # assertions
   checkmate::assert_int(x = n0, lower = 1L, upper = 1e04L)
   n0 <- as.integer(round(n0))
@@ -142,8 +150,10 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
   checkmate::assert_int(x = q, lower = 1L, upper = p)
   q <- as.integer(round(q))
   family <- .validate_family(family = family)
-  checkmate::assert_number(x = rho, lower = 0.0, upper = 1.0)
-  rho <- round(rho, digits = 6L)
+  checkmate::assert_number(x = rho_within, lower = 0.0, upper = 1.0)
+  rho_within <- round(rho_within, digits = 6L)
+  checkmate::assert_number(x = rho_between, lower = 0.0, upper = rho_within)
+  rho_within <- round(rho_between, digits = 6L)
   checkmate::assert_number(x = prob_primary, lower = 0.0, upper = 1.0)
   prob_primary <- round(prob_primary, digits = 6L)
   checkmate::assert_number(x = signal_strength, lower = 0.0, upper = 2.0)
@@ -159,7 +169,9 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                   sample(x = seq_len(q), size = p - q, replace = TRUE)))
   primary <- as.logical(stats::rbinom(n = p, size = 1L, prob = prob_primary))
   holdout <- rep(x = c(FALSE, TRUE), times = c(n0, n1))
-  x <- .simulate_predictors(n = n0 + n1, group = group, rho = rho, seed = NULL)
+  x <- .simulate_predictors(n = n0 + n1, group = group,
+                            rho_within = rho_within,
+                            rho_between = rho_between, seed = NULL)
   beta <- .simulate_effects(
     group = group, signal_strength = signal_strength, prob_group = prob_group,
     prob_predictor = prob_predictor, seed = NULL
@@ -215,7 +227,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' @description
 #' Simulates predictor matrix.
 #'
-#' @inheritParams simulate_data p rho seed
+#' @inheritParams simulate_data p rho_between rho_within seed
 #'
 #' @param n
 #' number of observations:
@@ -244,10 +256,11 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
 #' @examples
 #' \dontshow{.simulate_predictors <- corila:::.simulate_predictors}
 #' .simulate_predictors(n = 5L, p = 7L)
-#' .simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L), rho = 1.0)
+#' .simulate_predictors(n = 5L, group = rep(c(1L, 2L), each = 3L),
+#'                      rho_within = 0.5, rho_between = 0.2)
 #'
-.simulate_predictors <- function(n, p = NULL, group = NULL, rho = 0.0,
-                                 seed = 1L) {
+.simulate_predictors <- function(n, p = NULL, group = NULL, rho_within = 0.0,
+                                 rho_between = 0.0, seed = 1L) {
   eps <- 1e-06
   if (is.null(p) == is.null(group)) stop("Provide either p or group.")
   checkmate::assert_int(x = n, lower = 1L, upper = 11e04L)
@@ -257,14 +270,18 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
                                lower = 1L, upper = length(group),
                                null.ok = TRUE)
   group <- as.integer(round(group))
-  checkmate::assert_number(x = rho, lower = - eps, upper = 1.0 + eps)
-  rho <- round(rho, digits = 6L)
+  checkmate::assert_number(x = rho_within, lower = - eps, upper = 1.0 + eps)
+  rho_within <- round(rho_within, digits = 6L)
+  checkmate::assert_number(x = rho_between, lower = - eps,
+                           upper = rho_within + eps)
+  rho_between <- round(rho_between, digits = 6L)
   checkmate::assert_int(x = seed, null.ok = TRUE)
   if (!is.null(seed)) set.seed(as.integer(round(seed)))
   p <- length(group)
   mu <- rep(x = 0.0, times = p)
-  sigma <- rho * outer(X = group, Y = group, FUN = "==") +
-    (1.0 - rho) * diag(rep(x = 1.0, times = p))
+  sigma <- rho_between +
+    (rho_within - rho_between) * outer(X = group, Y = group, FUN = "==") +
+    (1.0 - rho_within) * diag(rep(x = 1.0, times = p))
   x <- MASS::mvrnorm(n = n, mu = mu, Sigma = sigma)
   # alternative: function mvtnorm::rmvnorm
   # with arguments n = n, mean = mu, sigma = sigma
@@ -398,7 +415,7 @@ simulate_data <- function(n0 = 50L, n1 = 20L, p = 30L, q = 10L,
     stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
   } else if (identical(family, "cox")) {
     time_event <- stats::rexp(n = n, rate = exp(eta))
-    time_censor <- stats::rexp(n = n, rate = 0.5 * median(exp(eta)))
+    time_censor <- stats::rexp(n = n, rate = 0.5 * stats::median(exp(eta)))
     time <- pmin(time_event, time_censor)
     event <- time_event <= time_censor
     survival::Surv(time = time, event = event)
