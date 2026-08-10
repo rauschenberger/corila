@@ -204,8 +204,8 @@
   if(is.null(primary)) {
     primary <- rep(x = TRUE, times = p)
   }
-  y[holdout] <- NA
-  x[holdout, !primary] <- NA
+  y[holdout] <- NA_real_
+  x[holdout, !primary] <- NA_real_
   graphics::par(mar = c(0.0, 0.0, 0.0, 0.0), oma = c(2.0, 4.0, 4.0, 2.0))
   cols <- list(na = "lightgrey", grid = "grey",sep = "black", box = "grey")
   lwd <- list(grid = 1.0, sep = 3.0, box = 1.0)
@@ -264,7 +264,7 @@
                  cex.axis=cex$axis)
   #--- effect vector ---
   graphics::plot.new()
-  graphics::image(x = matrix(ifelse(primary, 1L, NA), ncol = 1L),
+  graphics::image(x = matrix(ifelse(primary, 1L, NA_integer_), ncol = 1L),
                   axes = FALSE, col = cols$na)
   graphics::abline(v = vlines, col = cols$grid, lwd = lwd$grid)
   graphics::mtext(side = 2L, text = "coefs", line = 2.0, font = 2L,
@@ -1537,7 +1537,7 @@ holdout <- function(x_train, y_train, group, primary, family,
                                       s = "lambda.min",
                                       type = "response")
       }
-      coef$ridge <- c(NA[family == "cox"],
+      coef$ridge <- c(NA_real_[family == "cox"],
                       as.numeric(stats::coef(object = object,
                                              s = "lambda.min")))
     } else if (i == "multiridge") {
@@ -1567,7 +1567,7 @@ holdout <- function(x_train, y_train, group, primary, family,
                                       s = "lambda.min",
                                       type = "response")
       }
-      coef$lasso <- c(NA[family == "cox"],
+      coef$lasso <- c(NA_real_[family == "cox"],
                       as.numeric(stats::coef(object = object,
                                              s = "lambda.min")))
     } else if (i == "gglasso") {
