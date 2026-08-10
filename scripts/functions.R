@@ -1411,7 +1411,7 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
 #' @keywords iteration
 #'
 #' @export
-holdout <- function(x_train, y_train, group, primary, family,
+holdout <- function(x_train, y_train, group, family, primary = NULL, 
                     x_test = NULL, y_test = NULL, beta = NULL,
                     nfolds = 10L, foldid = NULL, method = NULL,
                     seed = NULL, ...) {
@@ -2168,27 +2168,26 @@ holdout <- function(x_train, y_train, group, primary, family,
 #' @keywords iteration
 #'
 #' @export
-crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 5L,
-                     foldid = NULL, nfolds = 10L, method = NULL, ...) {
+crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 1L,
+                     nfolds = 5L, method = NULL, ...) {
+  checkmate::assert_int(x = iter, lower = 1L)
+  checkmate::assert_int(x = nfolds, lower = 2L)
   n <- nrow(x)
   p <- ncol(x)
   if (is.null(group)) {
     group <- seq_len(p)
   }
+  #--- cross-validation ---
   list <- list()
-  list$metric <- list$nzero <- list()
+  list$metric_mu <- list$metric_sd <- list$stability <- list$metric <-
+    list$nzero <- list()
   for (k in seq_len(iter)) {
     set.seed(k)
     cat("iter", k, "\n")
-    if (is.null(foldid)) {
-      foldid <- .folds(y = y,
-                       family = family,
-                       nfolds = nfolds) # balanced/stratified folds
-    } else {
-      nfolds <- max(foldid)
-    }
+    foldid <- .folds(y = y, family = family, nfolds = nfolds)
     y_hat <- data.frame(row.names = seq_len(n))
-    values <- numeric()
+    coef <- list()
+    metric <- numeric()
     for (i in seq_len(nfolds)) {
       set.seed(i)
       cat("fold", i, "\n")
@@ -2207,8 +2206,10 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 5L,
                          ...)
       for (j in seq_along(results$y_hat)) {
         y_hat[[names(results$y_hat)[j]]][cond] <- results$y_hat[[j]]
+        if (i == 1L) coef[[j]] <- numeric()
+        coef[[j]] <- cbind(coef[[j]], results$coef[[j]])
       }
-      values <- rbind(values, results$metric)
+      metric <- rbind(metric, results$metric)
     }
     if (family %in% c("gaussian", "poisson")) {
       list$metric[[k]] <- apply(
@@ -2235,6 +2236,10 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 5L,
         }
       )
     }
+    list$metric_mu[[k]] <- colMeans(metric)
+    list$metric_sd[[k]] <- apply(X = metric, MARGIN = 2L, FUN = sd)
+    list$stability[[k]] <- vapply(X = coef, FUN = function(slot) stabm::stabilityNovovicova(features = apply(X = slot[-1L,], MARGIN = 2L, FUN = function(col) which(col!=0), simplify = FALSE), p = nrow(slot) - 1L), FUN.VALUE = numeric(1L))
+    #--- refit on all folds ---
     set.seed(k)
     if (nfolds == 1L) {
       list$nzero[[k]] <- vapply(X = results$coef,
@@ -2258,8 +2263,6 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 5L,
   }
   list <- lapply(X = list, FUN = function(x) do.call(what = "rbind", args = x))
   list$family <- family
-  list$metric_mu <- colMeans(values)
-  list$metric_sd <- apply(X = values, MARGIN = 2L, FUN = sd)
   list
 }
 
