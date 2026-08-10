@@ -41,15 +41,17 @@
 #' 
 .plot_cor <- function(x, group, exp = 1.0, min = 5L, cex = 0.7,
                       xline = 0.5, yline = 0.5) {
-  #.assert(x = x, type = "numeric", dim = c(Inf, Inf),
-  #        min = -1.0, max = 1.0)
+  checkmate::assert_matrix(x = x, mode = "numeric", any.missing = FALSE,
+                           min.rows = 2L, min.cols = 2L)
+  checkmate::assert_numeric(x = x, lower = -1.0, upper = 1.0)
+  if (any(x != t(x))) stop("Expect a symmetric matrix.")
   p <- ncol(x)
-  #.assert(x = group, type = "nominal", dim = p)
-  #.assert(x = exp, type = "numeric", min = 0.0)
-  #.assert(x = min, type = "integer", min = 1L)
-  #.assert(x = cex, type = "numeric", min = 0.0)
-  #.assert(x = xline, type = "numeric", min = 0.0)
-  #.assert(x = yline, type = "numeric", min = 0.0)
+  checkmate::assert_character(x = group, any.missing = FALSE, len = p)
+  checkmate::assert_number(x = exp, lower = 0.0)
+  checkmate::assert_int(x = min, lower = 1L)
+  checkmate::assert_number(x = cex, lower = 0.0)
+  checkmate::assert_number(x = xline, lower = 0.0)
+  checkmate::assert_number(x = yline, lower = 0.0)
   levels <- names(sort(table(group), decreasing = TRUE))
   index <- lapply(X = levels, FUN = function(x) which(group == x))
   size <- vapply(X = index, FUN = length, FUN.VALUE = integer(1L))
@@ -103,8 +105,9 @@
   if(is.logical(z)){
     class(z) <- "numeric"
   }
-  #.assert(x = z, type = "numeric", dim = c(Inf, Inf))
-  #.assert(x = col, type = "nominal")
+  checkmate::assert_matrix(x = z, mode = "numeric",
+                           min.rows = 2L, min.cols = 2L)
+  checkmate::assert_character(x = col, len = 1L)
   if(ncol(z) != nrow(z)) {
     stop("Requires p rows and p columns.")
   }
@@ -117,11 +120,11 @@
   lines <- seq(from = -0.5 / (p - 1L),
                to = 1L + 0.5 / (p - 1L),
                length.out = p + 1L)
-  if(all(z %in% c(0, 1))) {
+  if(all(z %in% c(0L, 1L))) {
     breaks <- c(0.0, 0.5, 1.0)
     col <- c("white", col)
   } else {
-    max <- 1.1*max(abs(z))
+    max <- 1.1 * max(abs(z))
     eps <- 1e-06
     breaks <- c(seq(-max, -eps, length.out = 50L),
                 seq(eps, max, length.out = 50L))
@@ -166,7 +169,7 @@
 #' Renders a plot and returns `NULL` invisibly.
 #' 
 #' @examples
-#' set.seed(1)
+#' set.seed(1L)
 #' n <- 10L; p <- 20L; q <- 5L
 #' group <- rep(x = seq_len(q), each = p / q)
 #' sigma <- 0.9 * outer(group, group, "==") + 0.1 * diag(p)
@@ -185,24 +188,23 @@
 #'    holdout = rep(c(FALSE, TRUE), times = c(5L, 5L)))
 #' 
 .heatmap_lupi <- function(x, y, holdout = NULL, group = NULL, primary = NULL) {
-  #.assert(x = x, type = "numeric", dim = c(Inf, Inf), na.rm = TRUE)
+  checkmate::assert_matrix(x = x, mode = "numeric",
+                           min.rows = 2L, min.cols = 2L)
   n <- nrow(x)
   p <- ncol(x)
-  #.assert(x = y, type = "numeric", dim = n, na.rm = TRUE)
-  #.assert(x = holdout, type = "logical", dim = n, na.rm = TRUE)
+  checkmate::assert_numeric(x = y, len = n)
   if(is.null(holdout)){
     holdout <- rep(x = FALSE, times = n)
+  } else {
+    checkmate::assert_logical(x = holdout, len = n, any.missing = FALSE)
   }
-  #.assert(x = group, type = "numeric", dim = p)
-  if(!is.null(group)) {
-    if( any(group != sort(group)) ) {
-      stop("Vector group should be sorted.")
-    }
-  }
-  #.assert(x = primary, type = "logical", dim = p)
   if(is.null(group)) {
     group <- rep(x = 1L, times = p)
+  } else {
+    checkmate::assert_integerish(x = group, lower = 1L, len = p,
+                                 any.missing = FALSE, sorted = TRUE)
   }
+  checkmate::assert_logical(x = primary, len = p, any.missing = FALSE)
   if(is.null(primary)) {
     primary <- rep(x = TRUE, times = p)
   }
@@ -355,13 +357,14 @@
 #'
 .simulate_lupi_data <- function(mode, n0 = 100L, n1 = 10000L, p = 200L, q = 4L,
                                 plot = FALSE) {
-  #.assert(x = n0, type = "integer", min = 2L)
-  #.assert(x = n1, type = "integer", min = 2L)
-  #.assert(x = p, type = "integer", min = 5L)
-  #.assert(x = q, type = "integer", min = 2L, max = p)
-  #.assert(x = mode, type = "nominal",
-  #        support = c("upstream", "aggregated", "surrogate", "baseline", "uninformative"))
-  #.assert(x = plot, type = "logical")
+  checkmate::assert_int(x = n0, lower = 2L)
+  checkmate::assert_int(x = n1, lower = 2L)
+  checkmate::assert_int(x = p, lower = 5L)
+  checkmate::assert_int(x = q, lower = 2L, upper = p)
+  checkmate::assert_choice(x = mode,
+                           choices =  c("upstream", "aggregated", "surrogate",
+                                        "baseline", "uninformative"))
+  checkmate::assert_logical(x = plot, any.missing = FALSE, len = 1L)
   fold <- rep(x = c(0L, 1L), times = c(n0, n1))
   n <- n0 + n1
   if (p %% q != 0L) {
@@ -560,14 +563,15 @@
                             mar = 0.3, xlim = c(1.0, 5.0),
                             ylim = c(11.0, 0.0),
                             cex = 0.9) {
-  #.assert(x = mode, type = "nominal",
-  #        support = c("upstream", "aggregated", "surrogate", "baseline"))
-  #.assert(x = lwd, type = "numeric", min = 0.0)
-  #.assert(x = length_arrow, type = "numeric", min = 0.0)
-  #.assert(x = mar, type = "numeric", min = 0.0)
-  #.assert(x = xlim, type = "numeric", dim = 2L)
-  #.assert(x = ylim, type = "numeric", dim = 2L)
-  #.assert(x = cex, type = "numeric", min = 0.0)
+  checkmate::assert_choice(x = mode,
+                           choices = c("upstream", "aggregated", "surrogate",
+                                       "baseline"))
+  checkmate::assert_number(x = lwd, lower = 0.0)
+  checkmate::assert_number(x = length_arrow, lower = 0.0)
+  checkmate::assert_number(x = mar, lower = 0.0)
+  checkmate::assert_numeric(x = xlim, len = 2L)
+  checkmate::assert_numeric(x = ylim, len = 2L)
+  checkmate::assert_number(x = cex, lower = 0.0)
   graphics::plot.new()
   graphics::plot.window(xlim = xlim, ylim = ylim)
   if (identical(mode, "upstream")) {
@@ -866,14 +870,15 @@
 .plot_change <- function(x, ylab = "", main = names(x), 
                          alternative = "two.sided", lwd = 1.0, cex = 1.0,
                          cex.axis = 1.0, cex.lab = 1.0){
-  if(!is.list(x)){stop("Expect list.")}
+  checkmate::assert_list(x = x, min.len = 1L)
   nslot <- length(x)
-  #for (i in seq_len(nslot)) {
-  #  .assert(x = x[[i]], type = "numeric", dim = c(Inf, Inf))
-  #}
-  #.assert(x = main, type = "nominal", dim = nslot)
-  #.assert(x = alternative, type = "nominal",
-  #        support = c("two.sided", "greater", "less"))
+  for (i in seq_len(nslot)) {
+    checkmate::assert_matrix(x = x[[i]], mode = "numeric",
+                             min.rows = 2L, min.cols = 2L)
+  }
+  checkmate::assert_character(x = main, len = nslot)
+  checkmate::assert_choice(x = alternative,
+                           choices = c("two.sided", "greater", "less"))
   ylim <- range(x)
   if(graphics::par()$mfrow[2L] != nslot){
     warning("Set graphics::par(mfrow=c(...,length(x)))." )
@@ -1228,33 +1233,6 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
                      corfac_group = 0.25, n_group_causal = 2L,
                      prop_causal = 0.5, noise_factor = 1.0,
                      plot = FALSE, trial = FALSE) {
-  # --- check arguments ---
-  #.assert(x = family, type = "nominal",
-  #        support = c("gaussian", "binomial", "poisson", "cox"))
-  #.assert(x = n0, type = "integer", min = 2L)
-  #n0 <- as.integer(n0)
-  #.assert(x = n1, type = "integer", min = 2L)
-  #n1 <- as.integer(n1)
-  #.assert(x = n_group, type = "integer", min = 2L)
-  #n_group <- as.integer(n_group)
-  #.assert(x = n_type, type = "integer", min = 2L)
-  #n_type <- as.integer(n_type)
-  #.assert(x = size_group, type = "integer", dim = n_type, min = 1L)
-  #size_group <- as.integer(size_group)
-  #.assert(x = effect_size, type = "numeric", dim = n_type, min = 0.0)
-  #.assert(x = corfac_feature, type = "numeric", min = 0.0, max = 1.0)
-  #.assert(x = corfac_type, type = "numeric", min = 0.0, max = 1.0)
-  #.assert(x = corfac_group, type = "numeric", min = 0.0, max = 1.0)
-  #.assert(x = n_group_causal, type = "integer", min = 0.0, max = n_group)
-  #n_group_causal <- as.integer(n_group_causal)
-  #.assert(x = prop_causal, type = "numeric", min = 0.0, max = 1.0)
-  #.assert(x = noise_factor, type = "numeric", min = 0.0)
-  #.assert(x = plot, type = "logical")
-  #.assert(x = trial, type = "logical")
-  # family = "gaussian";n0 = 100;n1 = 10000;n_group = 20;n_type = 2;
-  # size_group = c(5, 3);effect_size = c(1, 1);corfac_feature = 0.5;
-  # corfac_type = 0.5;corfac_group = 0.25;n_group_causal = 2;
-  # prop_causal = 0.5; noise_factor = 1; plot = TRUE
   n <- n0 + n1
   #if (n_type != length(size_group)) {
   #  stop("Wrong length.")
@@ -2097,7 +2075,7 @@ holdout <- function(x_train, y_train, group, primary, family,
     sign_prec <- vapply(
       X = coef,
       FUN = function(x) calc_sign_prec(truth = sign(beta[primary]),
-                                       estim = sign(x)[-1]),
+                                       estim = sign(x)[-1L]),
       FUN.VALUE = double(1L)
     )
   }
@@ -2178,8 +2156,8 @@ holdout <- function(x_train, y_train, group, primary, family,
 #'
 #' @examples
 #' \donttest{
-#' n <- 100
-#' p <- 20
+#' n <- 100L
+#' p <- 20L
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- stats::rnorm(n)
 #' foldid <- rep(c(0L, 1L), times = c(50L, 50L))
@@ -2203,7 +2181,6 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 5L,
     set.seed(k)
     cat("iter", k, "\n")
     if (is.null(foldid)) {
-      #foldid <- sample(rep(x = seq_len(nfolds), length.out = n))
       foldid <- .folds(y = y,
                        family = family,
                        nfolds = nfolds) # balanced/stratified folds
@@ -2287,6 +2264,8 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 5L,
 }
 
 .wilcox_test <- function(x, y, ...) {
+  checkmate::assert_numeric(x = x)
+  checkmate::assert_numeric(x = y, len = length(x))
   if (all(is.na(x)) || all(is.na(y))) {
     NA
   } else {
@@ -2333,6 +2312,13 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 5L,
 #' @export
 .plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
                        ylim = NULL, cex.main = 1.2) {
+  checkmate::assert_data_frame(x = x)
+  checkmate::assert_character(x = base, len = 1L)
+  checkmate::assert_character(x = main, len = 1L)
+  checkmate::assert_logical(x = decrease, any.missing = FALSE, len = 1L)
+  checkmate::assert_numeric(x = ylim, any.missing = FALSE, len = 2L,
+                            null.ok = TRUE)
+  checkmate::assert_number(x = cex.main, lower = 0.0)
   #--- hypothesis testing ---
   pvalue <- list()
   for (i in c("less", "greater")){
