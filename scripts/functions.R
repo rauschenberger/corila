@@ -59,7 +59,7 @@
                   axes = FALSE, col = col, zlim = c(-1.0, 1.0))
   pos <- (c(0.0, cumsum(size)) - 0.5) / (ncol(x) - 1L)
   # add grid
-  #lwd <- ifelse(size >= min, 2, ifelse(size > 2, 1, 0.5))
+  #lwd <- ifelse(size >= min, 2.0, ifelse(size > 2L, 1.0, 0.5))
   graphics::abline(v = pos, col = "grey", lty = 1L, lwd = 0.5)
   graphics::abline(h = 1.0 - pos, col = "grey" ,lty = 1L, lwd = 0.5)
   # add ticks
@@ -93,7 +93,7 @@
 #' colour
 #'
 #' @examples
-#' size <- c(3, 3, 2, 1)
+#' size <- c(3L, 3L, 2L, 1L)
 #' group <- rep(x = seq_along(size), times = size)
 #' z <- outer(group, group, FUN = "==")
 #' .plot_groups(z, col = "black")
@@ -210,7 +210,7 @@
   cols <- list(na = "lightgrey", grid = "grey",sep = "black", box = "grey")
   lwd <- list(grid = 1.0, sep = 3.0, box = 1.0)
   cex <- list(axis = 1.1, cell = 1.2, lab = 0.9)
-  col  <- grDevices::colorRampPalette(c("blue","white","red"))(99)
+  col  <- grDevices::colorRampPalette(c("blue","white","red"))(99L)
   col <- c(col[seq_len(49L)], "white", col[51L:99L], cols$na)
   max <- 1.01 * max(abs(c(as.vector(x), as.vector(y))), na.rm=TRUE)
   eps <- 1e-06
@@ -220,7 +220,7 @@
   ypos <- seq(from = 1.0, to = 0.0, length.out = n)
   vlines <- seq(from = - 0.5 / (p - 1L),
                 to = 1.0 + 0.5 / (p - 1L),
-                length.out = p + 1)
+                length.out = p + 1L)
   hlines <- seq(from = - 0.5 / (n - 1L),
                 to = 1.0 + 0.5 / (n - 1L),
                 length.out = n + 1L)
@@ -374,7 +374,7 @@
                    times = p / q)
     causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5L, p / q - 5L))),
                   each = q)
-    x <- matrix(data = NA, nrow = n, ncol = p)
+    x <- matrix(data = NA_real_, nrow = n, ncol = p)
     for (j in seq_len(p / q)) {
       sel_pry <- group == j & primary
       sel_aux <- group == j & !primary
@@ -398,12 +398,10 @@
     causal <- rep(x = sample(rep(
       x = c(TRUE, FALSE), times = c(5L, p / q - 5L)
     )), each = q)
-    x <- matrix(data = NA,
-                nrow = n,
-                ncol = p)
+    x <- matrix(data = NA_real_, nrow = n, ncol = p)
     #w <- 0.5
     #w <- c(1/3,1/3,1/3)
-    #w <- stats::rgamma(n=3,shape=1,rate=1)
+    #w <- stats::rgamma(n=3L, shape=1.0, rate=1.0)
     #w <- w/sum(w)
     for (j in seq_len(p / q)) {
       sel_pry <- group == j & primary
@@ -424,7 +422,7 @@
       # original # TRIAL (was above)
       #w <- stats::runif(n=4)
       #
-      #w[4] <- 0
+      #w[4L] <- 0
       #w <- c(0.1,0.2,0.4,0.3)
       #w <- w/sum(w)
       x[, sel_pry] <- cbind(x[, sel_aux], stats::rnorm(n = n)) %*% sqrt(w)
@@ -441,9 +439,7 @@
     causal <- rep(x = sample(rep(
       x = c(TRUE, FALSE), times = c(5L, p / q - 5L)
     )), each = q)
-    x <- matrix(data = NA,
-                nrow = n,
-                ncol = p)
+    x <- matrix(data = NA_real_, nrow = n, ncol = p)
     for (j in seq_len(p / q)) {
       sel_pry <- group == j & primary
       sel_aux <- group == j & !primary
@@ -462,10 +458,10 @@
     y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
   } else if (mode == "baseline") {
     #--- baseline and follow-up predictors ---
-    w <- c(NA, rep(x = 0.9, times = q - 1L))
+    w <- c(NA_real_, rep(x = 0.9, times = q - 1L))
     #w <- c(NA,runif(3)) # TRIAl
     list <- list()
-    list[[1]] <- matrix(
+    list[[1L]] <- matrix(
       data = stats::rnorm(n = n * p / q),
       nrow = n,
       ncol = p / q
@@ -572,8 +568,8 @@
   graphics::plot.window(xlim = xlim, ylim = ylim)
   if (identical(mode, "upstream")) {
     graphics::mtext(
-      at = c(NA, 3.0),
-      adj = c(0.0, NA),
+      at = c(NA_real_, 3.0),
+      adj = c(0.0, NA_real_),
       text = c("upstream", "downstream"),
       col = c("blue", "red"),
       side = 3L,
@@ -598,14 +594,14 @@
       x0 = 2.0,
       y0 = rep(c(1.0, 5.0, 10.0), each = 3L),
       x1 = 3.0 - mar,
-      y1 = c(0:2, 4:6, 9:11),
+      y1 = c(0L:2L, 4L:6L, 9L:11L),
       length = length_arrow,
       col = "grey",
       lwd = lwd
     )
     graphics::text(
-      x = 3,
-      y = c(0:2, 4:6, 9:11),
+      x = 3.0,
+      y = c(0L:2L, 4L:6L, 9L:11L),
       label = expression(x["1,1"], x["1,2"], x["1,3"],
                          x["2,1"], x["2,2"], x["2,3"],
                          x["50,1"], x["50,2"], x["50,3"]),
@@ -614,9 +610,9 @@
     )
     knot <- c(2.5, 5.0, 8.0) # c(2,5,9)
     graphics::segments(
-      x0 = 3 + mar,
-      y0 = c(0:2, 4:6, 9:11),
-      x1 = 4,
+      x0 = 3.0 + mar,
+      y0 = c(0L:2L, 4L:6L, 9L:11L),
+      x1 = 4.0,
       y = rep(knot, each = 3L),
       lwd = lwd,
       col = "grey"
@@ -625,18 +621,14 @@
       x0 = 4.0,
       y0 = knot,
       x1 = 5.0 - mar,
-      y1 = 5.0 + seq(
-        from = -1,
-        to = +1,
-        length.out = 3L
-      ),
+      y1 = 5.0 + seq( from = - 1.0, to = + 1.0, length.out = 3L),
       length = length_arrow,
       col = "grey",
       lwd = lwd
     )
     graphics::text(
-      x = 5,
-      y = 5,
+      x = 5.0,
+      y = 5.0,
       label = "y",
       col = "blue",
       cex = cex
@@ -652,8 +644,8 @@
     )
   } else if (identical(mode, "aggregated")) {
     graphics::mtext(
-      at = c(NA, 3.0),
-      adj = c(0, NA),
+      at = c(NA_real_, 3.0),
+      adj = c(0.0, NA_real_),
       text = c("aggregated", "fine-grained"),
       col = c("blue", "red"),
       side = 3L,
@@ -662,78 +654,74 @@
     )
     graphics::text(
       x = 1.0,
-      y = c(1, 5, 10),
+      y = c(1.0, 5.0, 10.0),
       label = expression(x["1,0"], x["2,0"], x["50,0"]),
       col = "blue",
       cex = cex
     )
     graphics::segments(
       x0 = 3.0 - mar,
-      y0 = c(0:2, 4:6, 9:11),
+      y0 = c(0L:2L, 4L:6L, 9L:11L),
       x1 = 2.0,
-      y = rep(c(1, 5, 10), each = 3L),
+      y = rep(c(1.0, 5.0, 10.0), each = 3L),
       lwd = lwd,
       col = "grey"
     )
     graphics::arrows(
-      x0 = 2,
-      y0 = c(1, 5, 10),
-      x1 = 1 + mar,
+      x0 = 2.0,
+      y0 = c(1.0, 5.0, 10.0),
+      x1 = 1.0 + mar,
       length = length_arrow,
       col = "grey",
       lwd = lwd
     )
     graphics::text(
-      x = 3,
-      y = c(0:2, 4:6, 9:11),
+      x = 3.0,
+      y = c(0L:2L, 4L:6L, 9L:11L),
       label = expression(x["1,1"], x["1,2"], x["1,3"],
                          x["2,1"], x["2,2"], x["2,3"],
                          x["50,1"], x["50,2"], x["50,3"]),
       col = "red",
       cex = cex
     )
-    knot <- c(2.5, 5, 8) # c(2,5,9)
+    knot <- c(2.5, 5.0, 8.0) # c(2,5,9)
     graphics::segments(
-      x0 = 3 + mar,
-      y0 = c(0:2, 4:6, 9:11),
-      x1 = 4,
+      x0 = 3.0 + mar,
+      y0 = c(0L:2L, 4L:6L, 9L:11L),
+      x1 = 4.0,
       y = rep(knot, each = 3L),
       lwd = lwd,
       col = "grey"
     )
     graphics::arrows(
-      x0 = 4,
+      x0 = 4.0,
       y0 = knot,
-      x1 = 5 - mar,
-      y1 = 5 + seq(
-        from = -1,
-        to = +1,
-        length.out = 3L
-      ),
+      x1 = 5.0 - mar,
+      y1 = 5.0 + seq(from = - 1.0, to = + 1.0, length.out = 3L),
       length = length_arrow,
       col = "grey",
       lwd = lwd
     )
     graphics::text(
-      x = 5,
-      y = 5,
+      x = 5.0,
+      y = 5.0,
       label = "y",
       col = "blue",
       cex = cex
     )
     graphics::text(
-      x = c(1, 3),
+      x = c(1.0, 3.0),
       y = 7.5,
       label = "...",
-      srt = 90,
+      srt = 90.0,
       font = 2L,
       col = c("blue", "red"),
       cex = cex
     )
   } else if (identical(mode, "surrogate")) {
     graphics::mtext(
-      at = c(NA, 3),
-      adj = c(0, NA),
+      at = c(NA_real_, 3.0),
+      adj = c(0.0, NA_real_),
       text = c("surrogate", "canonical"),
       col = c("blue", "red"),
       side = 3L,
@@ -742,7 +730,7 @@
     )
     graphics::text(
       x = 1.0,
-      y = c(0:2, 4:6, 9:11),
+      y = c(0L:2L, 4L:6L, 9L:11L),
       label = expression(x["1,1"], x["1,2"], x["1,3"],
                          x["2,1"], x["2,2"], x["2,3"],
                          x["50,1"], x["50,2"], x["50,3"]),
@@ -751,60 +739,56 @@
     )
     graphics::segments(
       x0 = 3.0 - mar,
-      y0 = c(1, 5, 10),
+      y0 = c(1.0, 5.0, 10.0),
       x1 = 2.0,
       lwd = lwd,
       col = "grey"
     )
     graphics::arrows(
       x0 = 2.0,
-      y0 = rep(c(1, 5, 10), each = 3L),
-      x1 = 1 + mar,
-      y1 = c(0:2, 4:6, 9:11),
+      y0 = rep(c(1.0, 5.0, 10.0), each = 3L),
+      x1 = 1.0 + mar,
+      y1 = c(0L:2L, 4L:6L, 9L:11L),
       length = length_arrow,
       col = "grey",
       lwd = lwd
     )
     graphics::text(
-      x = 3,
-      y = c(1, 5, 10),
+      x = 3.0,
+      y = c(1.0, 5.0, 10.0),
       label = expression(x["1,0"], x["2,0"], x["50,0"]),
       col = "red",
       cex = cex
     )
     graphics::arrows(
-      x0 = 3 + mar,
-      y0 = c(1, 5, 10),
-      x1 = 5 - mar,
-      y1 = 5 + seq(
-        from = -1,
-        to = +1,
-        length.out = 3L
-      ),
+      x0 = 3.0 + mar,
+      y0 = c(1.0, 5.0, 10.0),
+      x1 = 5.0 - mar,
+      y1 = 5.0 + seq(from = - 1.0, to = + 1.0, length.out = 3L),
       length = length_arrow,
       col = "grey",
       lwd = lwd
     )
     graphics::text(
-      x = 5,
-      y = 5,
+      x = 5.0,
+      y = 5.0,
       label = "y",
       col = "blue",
       cex = cex
     )
     graphics::text(
-      x = c(1, 3),
+      x = c(1.0, 3.0),
       y = 7.5,
       label = "...",
-      srt = 90,
-      font = 2,
+      srt = 90.0,
+      font = 2L,
       col = c("blue", "red"),
       cex = cex
     )
   } else if (identical(mode, "baseline")) {
     graphics::mtext(
-      at = c(NA, 3),
-      adj = c(0, NA),
+      at = c(NA_real_, 3.0),
+      adj = c(0.0, NA_real_),
       text = c("baseline", "follow-up"),
       col = c("blue", "red"),
       side = 3L,
@@ -812,23 +796,23 @@
       cex = cex
     )
     graphics::text(
-      x = 1,
-      y = c(1, 5, 10),
+      x = 1.0,
+      y = c(1.0, 5.0, 10.0),
       labels = expression(x["1,0"], x["2,0"], x["50,0"]),
       col = "blue",
       cex = cex
     )
     graphics::arrows(
-      x0 = 1:3 + mar,
-      y0 = rep(c(1, 5, 10), each = 3),
-      x1 = 2:4 - mar,
+      x0 = seq_len(3L) + mar,
+      y0 = rep(c(1.0, 5.0, 10.0), each = 3L),
+      x1 = 2L:4L - mar,
       length = length_arrow,
       col = "grey",
       lwd = lwd
     )
     graphics::text(
-      x = rep(x = c(2, 3, 4), times = 3),
-      y = rep(c(1, 5, 10), each = 3),
+      x = rep(x = c(2.0, 3.0, 4.0), times = 3L),
+      y = rep(c(1.0, 5.0, 10.0), each = 3L),
       labels = expression(x["1,1"], x["1,2"], x["1,3"],
                           x["2,1"], x["2,2"], x["2,3"],
                           x["50,1"], x["50,2"], x["50,3"]),
@@ -836,27 +820,23 @@
       cex = cex
     )
     graphics::arrows(
-      x0 = 4 + mar,
-      y0 = c(1, 5, 10),
-      x1 = 5 - mar,
-      y1 = 5 + seq(
-        from = -1,
-        to = +1,
-        length.out = 3
-      ),
+      x0 = 4.0 + mar,
+      y0 = c(1.0, 5.0, 10.0),
+      x1 = 5.0 - mar,
+      y1 = 5.0 + seq(from = -1.0, to = +1.0, length.out = 3L),
       length = length_arrow,
       col = "grey",
       lwd = lwd
     )
     graphics::text(
-      x = 5,
-      y = 5,
+      x = 5.0,
+      y = 5.0,
       label = "y",
       col = "blue",
       cex = cex
     )
     graphics::text(
-      x = c(1, 2, 3, 4),
+      x = c(1.0, 2.0, 3.0, 4.0),
       y = 7.5,
       label = "...",
       srt = 90.0,
@@ -902,10 +882,10 @@
     graphics::plot.new()
     graphics::plot.window(xlim = c(0.5, ncol + 0.5), ylim = ylim)
     usr <- graphics::par("usr")
-    if (i == 1) {
+    if (i == 1L) {
       graphics::axis(side = 2L, cex.axis = cex.axis)
       graphics::segments(x0 = usr[1L], y0 = usr[3L], y1 = usr[4L])
-      graphics::segments(x0 = usr[1L], x1 = 99, y0 = usr[3L])
+      graphics::segments(x0 = usr[1L], x1 = 99.0, y0 = usr[3L])
       graphics::title(ylab = ylab , cex.lab = cex.lab)
     }
     graphics::title(main = main[i], line = 0.5, cex.main = cex.lab)
@@ -914,18 +894,18 @@
         col = "grey", lwd = lwd)
     }
     col <- matrix(data = "grey", nrow = nrow , ncol = ncol)
-    col[, 1] <- "blue"
+    col[, 1L] <- "blue"
     col[, ncol] <- "red"
     graphics::points(x = col(x[[i]]), y = x[[i]],
                      col = col, pch = 16L, cex = cex)
-    pvalue <- stats::t.test(x = x[[i]][, 1],
+    pvalue <- stats::t.test(x = x[[i]][, 1L],
                             y = x[[i]][, ncol],
                             paired = TRUE,
                             alternative = alternative)$p.value
     text <- paste0("p=", format(x = signif(pvalue, digits = 2L),
                                 scientific = TRUE))
-    #graphics::mtext(text = text, side = 1, cex = cex.axis, line = 0.2)
-    graphics::axis(side = 1L, at = ncol/2L + 0.5, labels = text,
+    #graphics::mtext(text = text, side = 1L, cex = cex.axis, line = 0.2)
+    graphics::axis(side = 1L, at = ncol / 2L + 0.5, labels = text,
                    cex.axis = cex.axis, tick = FALSE, line = - 0.5)
   }
   invisible(NULL)
@@ -942,36 +922,36 @@ simulate_overlap <- function() {
   n <- n0 + n1
   p <- 100L
   n_group <- 20L
-  size_group <- rep(x = 5, times = n_group)
-  # sample(x = 2:10, size = n_group, replace = TRUE)
+  size_group <- rep(x = 5L, times = n_group)
+  # sample(x = 2L:10L, size = n_group, replace = TRUE)
   group <- lapply(X = seq_len(n_group),
                   FUN = function(i) {
                     sort(sample(x = seq_len(p), size = size_group[i]))
                   })
   # Inside corila, put each feature that is in no group in a separate group?
-  mean <- rep(x = 0, times = p)
-  sigma <- matrix(data = NA, nrow = p, ncol = p)
+  mean <- rep(x = 0.0, times = p)
+  sigma <- matrix(data = NA_real_, nrow = p, ncol = p)
   #sigma <- 0.95^(abs(col(sigma)-row(sigma)))
   # alternative:
   for (i in seq_len(p)) {
     for (j in seq_len(p)) {
-      group_i <- vapply(group, function(x) i %in% x, logical(1))
-      group_j <- vapply(group, function(x) j %in% x, logical(1))
+      group_i <- vapply(group, function(x) i %in% x, logical(1L))
+      group_j <- vapply(group, function(x) j %in% x, logical(1L))
       sigma[i, j] <- 0.5^(i != j) * 0.25^(!any(group_i & group_j) & (i != j))
     }
   }
   sigma <- as.matrix(Matrix::nearPD(x = sigma)$mat)
   x <- mvtnorm::rmvnorm(n = n, mean = mean, sigma = sigma)
-  sel_group <- sample(x = seq_len(n_group), size = 3)
-  beta <- 1 * (seq_len(p) %in% unlist(group[sel_group]))
+  sel_group <- sample(x = seq_len(n_group), size = 3L)
+  beta <- 1.0 * (seq_len(p) %in% unlist(group[sel_group]))
   # NB: multiply by abs(stats::rnorm(p))?
   eta <- x %*% beta
   y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
-  fold <- rep(x = c(0, 1), times = c(n0, n1))
-  x_train <- x[fold == 0, ]
-  y_train <- y[fold == 0]
-  x_test <- x[fold == 1, ]
-  y_test <- y[fold == 1]
+  fold <- rep(x = c(0L, 1L), times = c(n0, n1))
+  x_train <- x[fold == 0L, ]
+  y_train <- y[fold == 0L]
+  x_test <- x[fold == 1L, ]
+  y_test <- y[fold == 1L]
   info <- data.frame(n0 = n0, n1 = n1, p = p, n_group = n_group)
   list(x_train = x_train,
        group = group,
@@ -1025,17 +1005,17 @@ simulate_overlap <- function() {
 #' p <- c(100, 50)
 #' z <- rep(x = seq_along(p), times = p)
 #' x <- sapply(X = z, FUN = function(x) stats::rnorm(n = n, sd = x))
-#' beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
-#'         stats::rbinom(n = sum(p), size = 1, prob = 0.2)
+#' beta <- stats::rnorm(n = sum(p), mean = 1.0, sd = 0.0) *
+#'         stats::rbinom(n = sum(p), size = 1L, prob = 0.2)
 #' eta <- x %*% beta
 #' family <- "gaussian"
 #' if (identical(family, "gaussian")) {
 #'   y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
 #' } else if (identical(family, "binomial")) {
-#'   y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+#'   y <- stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
 #' } else if (identical(family, "cox")) {
 #'   time <- stats::rexp(n = n, rate = exp(eta))
-#'   status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+#'   status <- stats::rbinom(n = n, prob = 0.5, size = 1L)
 #'   y <- survival::Surv(time = time, event = status)
 #' }
 #' cond <- rep(x = c(TRUE, FALSE), times = c(n0, n1))
@@ -1044,7 +1024,7 @@ simulate_overlap <- function() {
 #'
 #' # standard lasso regression
 #' object <- glmnet::cv.glmnet(x = x[cond, ], y = y[cond],
-#'                             family = family, alpha = 1)
+#'                             family = family, alpha = 1.0)
 #' coef$glmnet <- stats::coef(object = object, s = "lambda.min")
 #' y_hat$glmnet <- stats::predict(object = object, newx = x[!cond, ],
 #'                                type = "response", s = "lambda.min")
@@ -1055,15 +1035,15 @@ simulate_overlap <- function() {
 #' y_hat$corila <- stats::predict(object = object, newx = x[!cond, ])
 #'
 #' # selection performance
-#' sapply(coef, function(x) mean(sign(x[-1]) == sign(beta)))
+#' sapply(coef, function(x) mean(sign(x[-1L]) == sign(beta)))
 #' sapply(coef, function(x) {
-#'   sum(sign(x[-1]) != 0 & sign(x[-1]) == sign(beta)) / sum(x[-1] != 0.0)
+#'   sum(sign(x[-1L]) != 0 & sign(x[-1L]) == sign(beta)) / sum(x[-1L] != 0.0)
 #' })
 #'
 #' # predictive performance
 #' if (identical(family, "gaussian")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
-#'     mean((x-y[!cond])^2))
+#'     mean((x-y[!cond])^2.0))
 #' } else if (identical(family, "binomial")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
 #'     pROC::auc(response = y[!cond],
@@ -1085,24 +1065,24 @@ simulate_overlap <- function() {
 
 #' \donttest{
 #' # simulation
-#' set.seed(1)
-#' n0 <- 100
-#' n1 <- 10000
+#' set.seed(1L)
+#' n0 <- 100L
+#' n1 <- 10000L
 #' n <- n0 + n1
-#' p <- c(100, 50)
+#' p <- c(100L, 50L)
 #' group <- rep(x = seq_along(p), times = p)
 #' x <- sapply(X = group, FUN = function(x) stats::rnorm(n = n, sd = x))
-#' beta <- stats::rnorm(n = sum(p), mean = 1, sd = 0) *
-#'         stats::rbinom(n = sum(p), size = 1, prob = 0.2)
+#' beta <- stats::rnorm(n = sum(p), mean = 1.0, sd = 0.0) *
+#'         stats::rbinom(n = sum(p), size = 1L, prob = 0.2)
 #' eta <- x %*% beta
 #' family <- "gaussian"
 #' if (identical(family, "gaussian")) {
 #'   y <- eta + 0.5 * stats::rnorm(n = n, sd = stats::sd(eta))
 #' } else if (identical(family, "binomial")) {
-#'   y <- stats::rbinom(n = n, size = 1, prob = 1 / (1 + exp(-eta)))
+#'   y <- stats::rbinom(n = n, size = 1L, prob = 1.0 / (1.0 + exp(-eta)))
 #' } else if (identical(family, "cox")) {
 #'   time <- stats::rexp(n = n, rate = exp(eta))
-#'   status <- stats::rbinom(n = n, prob = 0.5, size = 1)
+#'   status <- stats::rbinom(n = n, prob = 0.5, size = 1L)
 #'   y <- survival::Surv(time = time, event = status)
 #' }
 #' cond <- rep(x = c(TRUE, FALSE), times = c(n0, n1))
@@ -1111,7 +1091,7 @@ simulate_overlap <- function() {
 #'
 #' # standard ridge regression
 #' object <- glmnet::cv.glmnet(x = x[cond, ], y = y[cond],
-#'                            family = family, alpha = 0)
+#'                            family = family, alpha = 0.0)
 #' coef$glmnet <- stats::coef(object = object, s = "lambda.min")
 #' y_hat$glmnet <- stats::predict(object = object, newx = x[!cond, ],
 #'                               type = "response", s = "lambda.min")
@@ -1123,18 +1103,18 @@ simulate_overlap <- function() {
 #' y_hat$multiridge <- stats::predict(object = object, newx = x[!cond, ])
 #'
 #' # estimation performance
-#' sapply(coef, function(x) stats::cor(beta, x[-1]))
-#' sapply(coef, function(x) mean((beta-x[-1])^2))
+#' sapply(coef, function(x) stats::cor(beta, x[-1L]))
+#' sapply(coef, function(x) mean((beta-x[-1L])^2.0))
 #'
 #' # predictive performance
 #' if (identical(family, "gaussian")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
-#'     mean((x-y[!cond])^2))
+#'     mean((x-y[!cond])^2.0))
 #' } else if (identical(family, "binomial")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
 #'     pROC::auc(response = y[!cond],
 #'               predictor = as.vector(x),
-#'               levels = c(0, 1),
+#'               levels = c(0L, 1L),
 #'               direction = "<"))
 #' } else if (identical(family, "cox")) {
 #'   metric <- sapply(X = y_hat, FUN = function(x)
@@ -1312,7 +1292,7 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
   }
   #- - - feature matrix - - -
   mean <- rep(x = 0.0, times = p)
-  sigma <- matrix(data = NA, nrow = p, ncol = p)
+  sigma <- matrix(data = NA_real_, nrow = p, ncol = p)
   for (i in seq_len(p)) {
     for (j in seq_len(p)) {
       if (!trial) {
@@ -1449,33 +1429,56 @@ simulate <- function(family = "gaussian", n0 = 100L, n1 = 10000L, n_group = 20L,
 #'
 #' @export
 holdout <- function(x_train, y_train, group, primary, family,
-                    alpha_init = 0, alpha_final = 1,
-                    x_test = NULL, y_test = NULL,
-                    nfolds = 10, foldid = NULL, method = NULL,
-                    seed = NULL, tune = "bivariate") {
-  # nfolds <- 10; foldid <- NULL; seed <- NULL
+                    x_test = NULL, y_test = NULL, beta = NULL,
+                    nfolds = 10L, foldid = NULL, method = NULL,
+                    seed = NULL, ...) {
+  .validate_family(family = family)
+  .validate_x(x = x_train, na_action = "error")
+  n0 <- nrow(x_train)
+  p <- ncol(x_train)
+  names <- names(x_train)
+  .validate_y(y = y_train, family = family, n = n0, na_action = "error",
+              names = names)
+  .validate_group(group = group, p = p, names = names)
+  checkmate::assertInt(x = seed, null.ok = TRUE)
   
-  if (!is.null(primary) && any(primary == 0) && !is.numeric(group)) {
+  if (!is.null(primary) && any(primary == 0L) && !is.numeric(group)) {
     stop(paste0("Function holdout is not fully implemented",
                 "for privileged learning with overlapping groups."))
   }
   
-  p <- ncol(x_train)
-  #n0 <- nrow(x_train)
-  n1 <- nrow(x_test)
-  
   if (is.null(primary)) {
     primary <- rep(x = TRUE, times = p)
+  } else {
+    .validate_primary(primary = primary, p = p, names = names)
   }
   
   if (is.null(x_test) != is.null(y_test)) {
     stop("Provide either both or none of x_test and y_test.")
   }
   
+  if(is.null(x_test)) {
+    n1 <- 0L
+    y_hat <- NULL
+  } else {
+    .validate_x(x = x_test[, primary, drop = FALSE], na_action = "error")
+    n1 <- nrow(x_test)
+    .validate_y(y = y_test, family = family, n = n1,
+                names = rownames(x_test), na_action = "error")
+    y_hat <- lapply(X = method,
+                    FUN = function(x) rep(x = NA_real_, times = n1))
+    names(y_hat) <- method
+  } 
+  
   if (is.null(foldid)) {
-    #foldid <- sample(rep(x = seq_len(nfolds), length.out = n0))
-    # balanced/stratified folds:
     foldid <- .folds(y = y_train, family = family, nfolds = nfolds)
+  } else {
+    .validate_foldid(foldid = foldid, y = y_train, family = family)
+  }
+
+  if (!is.null(beta)) {
+    checkmate::assert_numeric(x = beta, any.missing = FALSE, len = p,
+                              names = names)
   }
   
   if (is.null(method)) {
@@ -1494,15 +1497,9 @@ holdout <- function(x_train, y_train, group, primary, family,
     #method <- method[method != "pcLasso"] # bug in application (singletons?)
   }
   
-  if (!is.null(x_test)) {
-    y_hat <- lapply(X = method, FUN = function(x) rep(x = NA, times = n1))
-    names(y_hat) <- method
-  } else {
-    y_hat <- NULL
-  }
-  coef <- lapply(X = method, FUN = function(x) rep(x = NA, times = p + 1))
+  coef <- lapply(X = method,
+                 FUN = function(x) rep(x = NA_real_, times = p + 1L))
   names(coef) <- method
-  #y_hat <- coef <- list()
   
   difftime <- numeric()
   
@@ -1522,17 +1519,17 @@ holdout <- function(x_train, y_train, group, primary, family,
         warning("Implement intercept-only model for Cox regression.")
       }
       coef$mean <- c(ifelse(test = family == "binomial",
-                            yes = log(mean(y_train) / (1 - mean(y_train))),
+                            yes = log(mean(y_train) / (1.0 - mean(y_train))),
                             no = ifelse(test = family == "poisson",
                                         yes = log(mean(y_train)),
                                         no = mean(y_train))),
-                     rep(x = 0, times = sum(primary)))
+                     rep(x = 0.0, times = sum(primary)))
     } else if (i == "ridge") {
       #--- ridge ---
       object <- glmnet::cv.glmnet(x = x_train[, primary],
                                   y = y_train,
                                   family = family,
-                                  alpha = 0,
+                                  alpha = 0.0,
                                   foldid = foldid)
       if (!is.null(x_test)) {
         y_hat$ridge <- stats::predict(object = object,
@@ -1562,7 +1559,7 @@ holdout <- function(x_train, y_train, group, primary, family,
       object <- glmnet::cv.glmnet(x = x_train[, primary],
                                   y = y_train,
                                   family = family,
-                                  alpha = 1,
+                                  alpha = 1.0,
                                   foldid = foldid)
       if (!is.null(x_test)) {
         y_hat$lasso <- stats::predict(object = object,
@@ -1579,7 +1576,7 @@ holdout <- function(x_train, y_train, group, primary, family,
       }
       #--- group lasso (gglasso) ---
       if (family == "binomial") {
-        temp_y_train <- 2 * y_train - 1
+        temp_y_train <- 2L * y_train - 1L
         temp_loss <- "logit"
       } else {
         temp_y_train <- y_train
@@ -1596,7 +1593,7 @@ holdout <- function(x_train, y_train, group, primary, family,
                                s = "lambda.min",
                                type = "link")
         if (family == "binomial") {
-          y_hat$gglasso <- 1 / (1 + exp(-temp))
+          y_hat$gglasso <- 1.0 / (1.0 + exp(-temp))
           #} else if (family == "poisson") {
           #  y_hat$gglasso <- exp(temp)
         } else {
@@ -1625,7 +1622,7 @@ holdout <- function(x_train, y_train, group, primary, family,
                                        type = "response",
                                        lambda = object$lambda.min)
       }
-      coef$grpreg <- c(NA[family == "cox"],
+      coef$grpreg <- c(NA_real_[family == "cox"],
                        as.numeric(stats::coef(object = object,
                                               lambda = object$lambda.min)))
     } else if (i == "grplasso") {
@@ -1639,10 +1636,10 @@ holdout <- function(x_train, y_train, group, primary, family,
       # } else if (family == "poisson") {
       #   model <- grplasso::PoissReg()
       # }
-      # lambda <- grplasso::lambdamax(x = cbind(1, x_train[, primary]),
+      # lambda <- grplasso::lambdamax(x = cbind(1.0, x_train[, primary]),
       # y = y_train, index = c(NA, group[primary]),
-      # penscale = base::sqrt, model = model) * 0.9^(0:100)
-      # object <- grplasso::grplasso(x = cbind(1, x_train[, primary]),
+      # penscale = base::sqrt, model = model) * 0.9^(0L:100L)
+      # object <- grplasso::grplasso(x = cbind(1.0, x_train[, primary]),
       #                              y = y_train,
       #                              index = c(NA, group[primary]),
       #                              model = model,
@@ -1650,9 +1647,9 @@ holdout <- function(x_train, y_train, group, primary, family,
       # control = grplasso::grpl.control(update.hess = "lambda", trace = 0))
       # if (!is.null(x_test)) {
       #   y_hat$grplasso <- stats::predict(object = object,
-      # newdata = cbind(1, x_test[, primary]), type = "response")
+      # newdata = cbind(1.0, x_test[, primary]), type = "response")
       # }
-      # coef$grplasso <- object$coefficients[, 1]
+      # coef$grplasso <- object$coefficients[, 1L]
     } else if (i == "sparsegl") {
       if (family %in% c("poisson", "cox")) {
         next
@@ -1728,7 +1725,7 @@ holdout <- function(x_train, y_train, group, primary, family,
     } else if (i == "grpregOverlap") {
       #--- grpregOverlap (only on GitHub) ---
       func <- grpregOverlap::expandX
-      body(func)[[3]] <- quote(
+      body(func)[[3L]] <- quote(
         over_mat <- Matrix(incidence.mat %*% t(incidence.mat), sparse = TRUE)
       )
       utils::assignInNamespace(x = "expandX",
@@ -1758,7 +1755,7 @@ holdout <- function(x_train, y_train, group, primary, family,
                                               type = "response",
                                               lambda = object$lambda.min)
       }
-      coef$grpregOverlap <- c(if (family == "cox") NA,
+      coef$grpregOverlap <- c(if (family == "cox") NA_real_,
                               stats::coef(object = object,
                                           lambda = object$lambda.min))
     } else if (i == "multiview") {
@@ -1790,8 +1787,8 @@ holdout <- function(x_train, y_train, group, primary, family,
       if (!family %in% c("gaussian", "binomial")) {
         next
       }
-      if (all(table(group[primary]) == 1)) {
-        #group_temp <- rep(x = 1, times = length(group))
+      if (all(table(group[primary]) == 1L)) {
+        #group_temp <- rep(x = 1L, times = length(group))
         object <- scoop::coop.lasso(x = x_train[, primary],
                                     y = y_train,
                                     group = group,
@@ -1816,7 +1813,7 @@ holdout <- function(x_train, y_train, group, primary, family,
       }
       loss <- ifelse(family == "gaussian", "ls", "logit")
       if (loss == "logit") {
-        y_train_temp <- 2 * y_train - 1
+        y_train_temp <- 2L * y_train - 1L
       } else {
         y_train_temp <- y_train
       }
@@ -1834,7 +1831,7 @@ holdout <- function(x_train, y_train, group, primary, family,
         if (loss == "ls") {
           y_hat$MLGL <- temp
         } else {
-          y_hat$MLGL <- 1 / (1 + exp(-temp))
+          y_hat$MLGL <- 1.0 / (1.0 + exp(-temp))
         }
       }
       coef$MLGL <- stats::coef(object = object, s = cv$lambda.min)
@@ -1845,7 +1842,7 @@ holdout <- function(x_train, y_train, group, primary, family,
       if (family == "cox") {
         y_temp <- y_train
       } else {
-        y_temp <- matrix(y_train, ncol = 1)
+        y_temp <- matrix(y_train, ncol = 1L)
       }
       #--- ecpc ---
       model <- ifelse(test = family == "gaussian",
@@ -1959,8 +1956,8 @@ holdout <- function(x_train, y_train, group, primary, family,
                            FUN = function(x) which(x == group[primary]))
       # duplicating singletons:
       .duplicate_singletons <- function(x) {
-        if (length(x) == 1) {
-          rep(x, times = 2)
+        if (length(x) == 1L) {
+          rep(x, times = 2L)
         } else {
           x
         }
@@ -1969,14 +1966,14 @@ holdout <- function(x_train, y_train, group, primary, family,
       # combining remaining features
       indices <- seq_len(ncol(x_train[, primary]))
       extra <- indices[!indices %in% unlist(group_temp)]
-      if (length(extra) > 0) {
+      if (length(extra) > 0L) {
         group_temp <- c(group_temp, extra)
       }
       #group_temp <- c(group_temp[!cond], list(unlist(group_temp[cond])))
       if (!family %in% c("gaussian", "binomial")) {
         next
       }
-      ratio <- c(seq(from = 0.25, to = 0.75, by = 0.25), 0.9, 0.95, 1)
+      ratio <- c(seq(from = 0.25, to = 0.75, by = 0.25), 0.9, 0.95, 1.0)
       # NB: set is from paper
       object <- list()
       for (j in seq_along(ratio)) {
@@ -1990,7 +1987,7 @@ holdout <- function(x_train, y_train, group, primary, family,
       }
       id <- which.min(vapply(X = object,
                              FUN = function(x) min(x$cvm),
-                             FUN.VALUE = numeric(1)))
+                             FUN.VALUE = numeric(1L)))
       object <- object[[id]]
       if (!is.null(x_test)) {
         y_hat$pcLasso <- pcLasso::predict.cv.pcLasso(object = object,
@@ -2008,11 +2005,9 @@ holdout <- function(x_train, y_train, group, primary, family,
                           y = y_train,
                           group = group,
                           primary = primary,
-                          alpha_init = alpha_init,
-                          alpha_final = alpha_final,
                           family = family,
                           foldid = foldid,
-                          tune = tune)
+                          ...)
       print(object$hyper[object$id_hyper, ])
       if (!is.null(x_test)) {
         y_hat$corila <- stats::predict(object = object,
@@ -2028,10 +2023,10 @@ holdout <- function(x_train, y_train, group, primary, family,
     method <- names(y_hat)
     if (!is.null(x_test)) {
       if (family == "binomial") {
-        if (min(unlist(y_hat), na.rm = TRUE) < 0) {
+        if (min(unlist(y_hat), na.rm = TRUE) < 0.0) {
           stop("too small")
         }
-        if (max(unlist(y_hat), na.rm = TRUE) > 1) {
+        if (max(unlist(y_hat), na.rm = TRUE) > 1.0) {
           stop("too large")
         }
       }
@@ -2044,14 +2039,14 @@ holdout <- function(x_train, y_train, group, primary, family,
           next
         }
         #if (method[i] == "corila") {
-        #  eta <- coef[[i]][1] + x_test %*% coef[[i]][-1]
+        #  eta <- coef[[i]][1L] + x_test %*% coef[[i]][-1L]
         #} else {
-          eta <- coef[[i]][1] + x_test[, primary] %*% coef[[i]][-1]
+          eta <- coef[[i]][1L] + x_test[, primary] %*% coef[[i]][-1L]
         #}
         if (family %in% c("gaussian", "cox")) {
           manual <- eta
         } else if (family == "binomial") {
-          manual <- 1 / (1 + exp(-eta))
+          manual <- 1.0 / (1.0 + exp(-eta))
         } else if (family == "poisson") {
           manual <- exp(eta)
         }
@@ -2066,8 +2061,8 @@ holdout <- function(x_train, y_train, group, primary, family,
         if (any(abs(original - manual) > 0.001)) {
           warning(paste("unequal:", method[i]))
         }
-        if (stats::sd(original) != 0 &&
-            stats::sd(manual) != 0 &&
+        if (stats::sd(original) != 0.0 &&
+            stats::sd(manual) != 0.0 &&
             stats::cor(original, manual) < 0.999) {
           warning(paste("correlation:", method[i]))
         }
@@ -2076,18 +2071,18 @@ holdout <- function(x_train, y_train, group, primary, family,
     
     if (!is.null(x_test)) {
       range <- range(unlist(y_hat), na.rm = TRUE)
-      if (family == "binomial" && (range[1] < 0 || range[2] > 1)) {
+      if (family == "binomial" && (range[1L] < 0.0 || range[2L] > 1.0)) {
         stop("invalid y_hat range")
       }
       if (any(vapply(X = y_hat,
                      FUN = base::length,
-                     FUN.VALUE = numeric(1)) != n1)) {
+                     FUN.VALUE = numeric(1L)) != n1)) {
         stop("invalid y_hat length")
       }
     }
     if (any(vapply(X = coef,
                    FUN = base::length,
-                   FUN.VALUE = numeric(1)) != sum(primary) + 1)) {
+                   FUN.VALUE = numeric(1L)) != sum(primary) + 1L)) {
       stop("invalid coef length")
     }
   } else {
@@ -2146,7 +2141,7 @@ holdout <- function(x_train, y_train, group, primary, family,
 #' p <- 20
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- stats::rnorm(n)
-#' foldid <- rep(c(0, 1), times = c(50, 50))
+#' foldid <- rep(c(0L, 1L), times = c(50L, 50L))
 #' results <- crossval(x, y, family = "gaussian",
 #'                     method = c("mean", "corila"), foldid = foldid)
 #' }
@@ -2155,8 +2150,8 @@ holdout <- function(x_train, y_train, group, primary, family,
 #'
 #' @export
 crossval <- function(x, y, family, group = NULL, primary = NULL,
-                     alpha_init = 0, alpha_final = 1, iter = 5, foldid = NULL,
-                     nfolds = 10, method = NULL, tune = "both") {
+                     alpha_init = 0.0, alpha_final = 1.0, iter = 5L, foldid = NULL,
+                     nfolds = 10L, method = NULL, tune = "both") {
   n <- nrow(x)
   p <- ncol(x)
   if (is.null(group)) {
@@ -2190,7 +2185,7 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
                          alpha_init = alpha_init,
                          alpha_final = alpha_final,
                          family = family,
-                         nfolds = 10,
+                         nfolds = 10L,
                          foldid = NULL,
                          method = method,
                          seed = NULL,
@@ -2203,55 +2198,55 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
     if (family %in% c("gaussian", "poisson")) {
       list$metric[[k]] <- apply(
         X = y_hat,
-        MARGIN = 2,
-        FUN = function(x) mean((y[foldid != 0] - x[foldid != 0])^2)
+        MARGIN = 2L,
+        FUN = function(x) mean((y[foldid != 0L] - x[foldid != 0L])^2.0)
       )
     } else if (family == "binomial") {
       list$metric[[k]] <- apply(
         X = y_hat,
-        MARGIN = 2,
+        MARGIN = 2L,
         FUN = function(x) {
-          pROC::auc(response = y[foldid != 0],
-                    predictor = as.vector(x[foldid != 0]),
-                    levels = c(0, 1), direction = "<")
+          pROC::auc(response = y[foldid != 0L],
+                    predictor = as.vector(x[foldid != 0L]),
+                    levels = c(0L, 1L), direction = "<")
         }
       )
     } else if (family == "cox") {
       list$metric[[k]] <- apply(
         X = y_hat,
-        MARGIN = 2,
+        MARGIN = 2L,
         FUN = function(x) {
-          survival::concordance(y[foldid != 0] ~ I(-x[foldid != 0]))$concordance
+          survival::concordance(y[foldid != 0K] ~ I(-x[foldid != 0L]))$concordance
         }
       )
     }
     set.seed(k)
     if (nfolds == 1) {
       list$nzero[[k]] <- vapply(X = results$coef,
-                                FUN = function(x) sum(x[-1] != 0),
-                                FUN.VALUE = numeric(1))
+                                FUN = function(x) sum(x[-1L] != 0L),
+                                FUN.VALUE = numeric(1L))
     } else {
-      refit <- holdout(x_train = x[foldid != 0, ],
-                       y_train = y[foldid != 0],
+      refit <- holdout(x_train = x[foldid != 0L, ],
+                       y_train = y[foldid != 0L],
                        group = group,
                        primary = primary,
                        alpha_init = alpha_init,
                        alpha_final = alpha_final,
                        family = family,
-                       nfolds = 10,
+                       nfolds = 10L,
                        foldid = NULL,
                        method = method,
                        seed = NULL,
                        tune = tune)
       list$nzero[[k]] <- vapply(X = refit$coef,
-                                FUN = function(x) sum(x[-1] != 0),
+                                FUN = function(x) sum(x[-1L] != 0),
                                 FUN.VALUE = numeric(1))
     }
   }
   list <- lapply(X = list, FUN = function(x) do.call(what = "rbind", args = x))
   list$family <- family
   list$metric_mu <- colMeans(values)
-  list$metric_sd <- apply(values, 2, sd)
+  list$metric_sd <- apply(X = values, MARGIN = 2L, FUN = sd)
   list
 }
 
@@ -2294,7 +2289,7 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
 #' Returns \code{NULL} (and plots a figure).
 #'
 #' @examples
-#' x <- data.frame(mean = 0, corila = rnorm(100) - 1, other = rnorm(100))
+#' x <- data.frame(mean = 0.0, corila = rnorm(100L) - 1.0, other = rnorm(100L))
 #' .plot_boxes(x)
 #'
 #' @keywords graphs
@@ -2327,7 +2322,7 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
   #--- boxplot ---
   graphics::boxplot(x = x,
                     main = main,
-                    las = 2,
+                    las = 2L,
                     col = col,
                     frame.plot = FALSE,
                     xaxt = "n",
@@ -2338,10 +2333,10 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
   col <- list(grey = which(pvalue$worse <= 0.05 | is.na(pvalue$worse)),
               black = which(pvalue$worse > 0.05))
   for (i in seq_along(col)) {
-    graphics::axis(side = 1,
+    graphics::axis(side = 1L,
                    at = seq_len(ncol(x))[col[[i]]],
                    labels = colnames(x)[col[[i]]],
-                   las = 2,
+                   las = 2L,
                    col.axis = names(col)[i],
                    tick = FALSE,
                    line = -0.5)
@@ -2351,25 +2346,25 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
   }
   #--- vertical axis ---
   usr <- graphics::par("usr")
-  mar_big <- 0.05 * (usr[4] - usr[3])
-  mar_small <- 0.05 * (usr[4] - usr[3])
+  mar_big <- 0.05 * (usr[4L] - usr[3L])
+  mar_small <- 0.05 * (usr[4L] - usr[3L])
   graphics::axis(side = 2, col = "grey", col.axis = "grey")
-  graphics::arrows(x0 = usr[1],
-                   y0 = usr[3] + mar_big,
-                   x1 = usr[1],
-                   y1 = usr[4] - mar_big,
+  graphics::arrows(x0 = usr[1L],
+                   y0 = usr[3L] + mar_big,
+                   x1 = usr[1L],
+                   y1 = usr[4L] - mar_big,
                    length = 0.1,
                    xpd = TRUE,
-                   code = ifelse(decrease, 1, 2),
-                   lwd = 2)
+                   code = ifelse(decrease, 1L, 2L),
+                   lwd = 2.0)
   graphics::text(
-    x = usr[1],
-    y = c(usr[4] + mar_small, usr[3] - mar_small)[1 + c(!decrease, decrease)],
+    x = usr[1L],
+    y = c(usr[4L] + mar_small, usr[3L] - mar_small)[1L + c(!decrease, decrease)],
     labels = c("-", "+"),
     col = c("red", "blue"),
     xpd = TRUE,
     cex = 1.5,
-    font = 2
+    font = 2L
   )
   invisible(NULL)
 }
@@ -2428,11 +2423,11 @@ crossval <- function(x, y, family, group = NULL, primary = NULL,
 #@inheritParams corila
 #
 #@examples
-#n <- 5
-#p <- 6
+#n <- 5L
+#p <- 6L
 #x <- matrix(data = rnorm(n * p), nrow = n, ncol = p)
-#group <- rep(1:2, each = p / 2)
-#type <- rep(x = 1, times = p)
+#group <- rep(seq_len(2L), each = p / 2L)
+#type <- rep(x = 1L, times = p)
 #x <- construct_matrices(x = x, group = group, type = type)
 #
 #@seealso
