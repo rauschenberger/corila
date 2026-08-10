@@ -81,7 +81,7 @@ for (family in c("gaussian", "binomial", "cox")) {
     )
   })
   testthat::test_that("refit with given folds is identical", {
-    foldid <- rep(x = NA, times = sum(cond))
+    foldid <- rep(x = NA_integer_, times = sum(cond))
     for (i in seq_along(object$indices)) {
       foldid[object$indices[[i]]] <- i
     }

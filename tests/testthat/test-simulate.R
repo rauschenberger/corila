@@ -47,7 +47,6 @@ testthat::test_that("all or no predictors get selected", {
   beta <- .simulate_effects(group = group,
                             prob_group = 1.0, prob_predictor = 0.0)
   testthat::expect_all_equal(object = beta, expected = 0.0)
-  
   beta <- .simulate_effects(group = group,
                             prob_group = 1.0, prob_predictor = 1.0)
   testthat::expect_all_equal(object = sign(beta), expected = sign(beta[1L]))

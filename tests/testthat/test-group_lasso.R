@@ -139,7 +139,7 @@ for (family_data in c("gaussian", "binomial", "poisson", "cox")) {
     testthat::expect_error(
       object = cv.corila(x = data$x_train,
                          y = data$y_train,
-                         group = array(data = NA, dim = c(2L, 2L, 2L)),
+                         group = array(data = NA_integer_, dim = c(2L, 2L, 2L)),
                          family = family_data),
       regexp = "a vector, a list, or a matrix"
     )
@@ -260,8 +260,8 @@ testthat::test_that("adjacency is detected", {
     regexp = "but has length 0"
   )
   testthat::expect_error(
-    object = .is_adjacent(group = array(NA, dim = c(2, 2, 2)), j = 1L, p = p,
-                          names = NULL),
+    object = .is_adjacent(group = array(data = NA_integer_, dim = c(2, 2, 2)),
+                          j = 1L, p = p, names = NULL),
     regexp = "a vector, a list, or a matrix"
   )
 })

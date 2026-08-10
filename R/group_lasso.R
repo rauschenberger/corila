@@ -244,7 +244,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   # --- initialise matrices for predictions ---
   pred <- list()
   for (j in seq_len(nrow(hyper))) {
-    pred[[j]] <- matrix(data = NA, nrow = n,
+    pred[[j]] <- matrix(data = NA_real_, nrow = n,
                         ncol = length(object_ext$model[[j]]$lambda))
   }
   # --- repeatedly train without and test for held-out fold ---
@@ -283,7 +283,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   object$lambda.min <- lambda.min
   class(object) <- "cv.corila"
   object$y <- y
-  object$y_hat <- stats::setNames(object = rep(x = NA, times = n),
+  object$y_hat <- stats::setNames(object = rep(x = NA_real_, times = n),
                                   nm = rownames(x))
   complete_x <- stats::complete.cases(x = x)
   object$y_hat[complete_x] <- stats::predict(object = object,
@@ -493,7 +493,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   pf <- list()
   for (i in seq_len(nrow(hyper))) {
     weight <- list()
-    weight$global <- weight$local <- rep(x = NA, times = p)
+    weight$global <- weight$local <- rep(x = NA_real_, times = p)
     for (j in seq_len(p)) {
       adjacent <- .is_adjacent(group = group, j = j, p = p, names = names)
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
@@ -559,8 +559,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
                         wgt_global = 0.0, exp_global = Inf)
   } else if (identical(tune, "bivariate")) {
     wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
-    hyper <- data.frame(wgt_local = wgt_cand, exp_local = NA,
-                        wgt_global = 1.0 - wgt_cand, exp_global = NA)
+    hyper <- data.frame(wgt_local = wgt_cand, exp_local = NA_real_,
+                        wgt_global = 1.0 - wgt_cand, exp_global = NA_real_)
     exp_cand <- c(0.1, 0.5, 0.8, 1.0, 1.25, 2.0, 10.0)
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
     hyper$exp_local <- hyper$exp_global <- exp_cand
@@ -568,13 +568,13 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.25)
     exp_cand <- c(0.1, 0.5, 1.0, 2.0, 10.0)
     hyper <- expand.grid(wgt_local = wgt_cand, exp_local = exp_cand,
-                         wgt_global = NA, exp_global = exp_cand)
+                         wgt_global = NA_real_, exp_global = exp_cand)
     hyper$wgt_global <- 1.0 - hyper$wgt_local
   } else if (identical(tune, "trial")) {
     wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
     exp_cand <- c(0.1, 0.5, 0.8, 1.0, 1.25, 2.0, 10.0)
     hyper <- data.frame(wgt_local = wgt_cand, exp_local = 0,
-                        wgt_global = 1.0 - wgt_cand, exp_global = NA)
+                        wgt_global = 1.0 - wgt_cand, exp_global = NA_real_)
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
     hyper$exp_global <- exp_cand
   } else {

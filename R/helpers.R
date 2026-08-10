@@ -363,7 +363,7 @@ calc_sign_prec <- function(truth, estim) {
     if (identical(family, "cox")) {
       y <- y[, "status"]
     }
-    foldid <- rep(x = NA, times = length(y))
+    foldid <- rep(x = NA_integer_, times = length(y))
     if (sum(y == 0L) == 1L) {
       foldid[y == 0L] <- 1L
     } else {
