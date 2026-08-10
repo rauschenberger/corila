@@ -2082,6 +2082,7 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
   if(is.null(y_test)) {
     metric <- NULL
   } else {
+    # Replace the code below by a function e.g., .metric(fit, obs, family)
     if(family %in% c("gaussian","poisson")){
       metric <- vapply(X = y_hat,
                        FUN = function(x) mean((y_test-x)^2.0, na.rm=TRUE),
@@ -2211,6 +2212,7 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 1L,
       }
       metric <- rbind(metric, results$metric)
     }
+    # Replace the code below by a function e.g., .metric(fit, obs, family)
     if (family %in% c("gaussian", "poisson")) {
       list$metric[[k]] <- apply(
         X = y_hat,
