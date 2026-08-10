@@ -573,7 +573,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   } else if (identical(tune, "trial")) {
     wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
     exp_cand <- c(0.1, 0.5, 0.8, 1.0, 1.25, 2.0, 10.0)
-    hyper <- data.frame(wgt_local = wgt_cand, exp_local = 0,
+    hyper <- data.frame(wgt_local = wgt_cand, exp_local = 0.0,
                         wgt_global = 1.0 - wgt_cand, exp_global = NA_real_)
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
     hyper$exp_global <- exp_cand
