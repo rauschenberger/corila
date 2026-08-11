@@ -876,7 +876,7 @@
     checkmate::assert_matrix(x = x[[i]], mode = "numeric",
                              min.rows = 2L, min.cols = 2L)
   }
-  checkmate::assert_character(x = main, len = nslot)
+  checkmate::assert_character(x = main, len = nslot, null.ok = TRUE)
   checkmate::assert_choice(x = alternative,
                            choices = c("two.sided", "greater", "less"))
   ylim <- range(x)
@@ -2169,7 +2169,7 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
 #' @keywords iteration
 #'
 #' @export
-crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 1L,
+crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 5L,
                      nfolds = 5L, method = NULL, ...) {
   checkmate::assert_int(x = iter, lower = 1L)
   checkmate::assert_int(x = nfolds, lower = 2L)
@@ -2208,7 +2208,7 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 1L,
       for (j in seq_along(results$y_hat)) {
         y_hat[[names(results$y_hat)[j]]][cond] <- results$y_hat[[j]]
         if (i == 1L) coef[[j]] <- numeric()
-        coef[[j]] <- cbind(coef[[j]], results$coef[[j]])
+        coef[[j]] <- cbind(coef[[j]], as.numeric(results$coef[[j]]))
       }
       metric <- rbind(metric, results$metric)
     }
@@ -2286,7 +2286,7 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 1L,
 #' using Wilcoxon's signed-rank test to compare a group with the other groups.
 #'
 #' @param x
-#' data frame with names slots
+#' matrix with column names or data frame with named slots
 #'
 #' @param base
 #' character string naming the slot of interest
@@ -2317,7 +2317,10 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 1L,
 #' @export
 .plot_boxes <- function(x, base = "corila", main = "", decrease = TRUE,
                        ylim = NULL, cex.main = 1.2) {
-  checkmate::assert_data_frame(x = x)
+  checkmate::assert(
+    checkmate::check_matrix(x = x, mode = "numeric", min.rows = 1),
+    checkmate::check_data_frame(x = x, types = "numeric", min.rows = 1)
+  )
   checkmate::assert_character(x = base, len = 1L)
   checkmate::assert_character(x = main, len = 1L)
   checkmate::assert_logical(x = decrease, any.missing = FALSE, len = 1L)
