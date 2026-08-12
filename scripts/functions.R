@@ -1426,7 +1426,8 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
   .validate_group(group = group, p = p, names = names)
   checkmate::assertInt(x = seed, null.ok = TRUE)
   
-  if (!is.null(primary) && any(primary == 0L) && !is.numeric(group)) {
+  if (!is.null(primary) && any(!primary) && 
+      (!is.atomic(group) || !is.null(dim(group)))) {
     stop(paste0("Function holdout is not fully implemented",
                 "for privileged learning with overlapping groups."))
   }
