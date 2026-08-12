@@ -242,12 +242,12 @@ NULL
     )
     lapply(X = group, FUN = function(x) as.integer(round(x)))
   } else if (all(is.character(values))) {
-    checkmate::assert_character(x = names, any.missing = FALSE, len = p,
-                                unique = TRUE)
-    checkmate::assert_character(x = values, any.missing = FALSE,
-                                min.len = 1L, .var.name = "unlist(group)")
-    checkmate::assert_subset(x = values, choices = names,
-                             .var.name = "unlist(group)")
+    #checkmate::assert_character(x = names, any.missing = FALSE, len = p,
+    #                            unique = TRUE)
+    #checkmate::assert_character(x = values, any.missing = FALSE,
+    #                            min.len = 1L, .var.name = "unlist(group)")
+    #checkmate::assert_subset(x = values, choices = names,
+    #                         .var.name = "unlist(group)")
     group
   } else {
     stop("If argument 'group' is a list, it must be a list of ",
