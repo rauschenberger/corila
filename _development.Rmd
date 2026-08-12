@@ -66,7 +66,7 @@ x <- pkgcheck::pkgcheck(goodpractice = FALSE, use_cache = TRUE)
 
 # autotest all functions at once
 notes <- autotest::autotest_package(exclude = c(""),test=TRUE)
-extra <- autotest::autotest_package(functions= "multiridge",test=TRUE)
+extra <- autotest::autotest_package(functions= "cv.corila",test=TRUE)
 
 data.frame(notes)[which(notes$type == "error"),c("type", "test_name", "fn_name", "parameter", "parameter_type", "operation", "content")]
 data.frame(notes)[which(notes$fn_name=="simulate_data"),]
