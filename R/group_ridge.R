@@ -140,8 +140,12 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   checkmate::assert_integer(x = foldid, len = nrow(x),
                             lower = 1L, upper = nrow(x), null.ok = TRUE)
   if (!is.null(foldid)) foldid <- as.integer(round(foldid))
-  checkmate::assert_int(x = nfolds, lower = 2L, upper = nrow(x))
-  nfolds <- as.integer(round(nfolds))
+  checkmate::assert_int(x = nfolds, lower = 2L, upper = nrow(x), null.ok = TRUE)
+  if (is.null(nfolds)) {
+    nfolds <- max(foldid)
+  } else {
+    nfolds <- as.integer(round(nfolds))
+  }
   checkmate::assert_numeric(x = penalties, lower = 0.0,
                             len = length(unique(group)), null.ok = TRUE)
   # --- initial regression ---
