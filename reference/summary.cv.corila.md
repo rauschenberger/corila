@@ -65,7 +65,7 @@ summary(object)
 #> 20 features (9 primary and 11 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 0.9959 
+#> optimised regularisation parameter: lambda.min = 0.6305 
 #> selected weights: local = 0.1, global = 0.9
 #> selected exponents: local = 0, global = 1
 #> 2 non-zero coefficients (including intercept)
