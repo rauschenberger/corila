@@ -1446,10 +1446,10 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
     n1 <- 0L
     y_hat <- NULL
   } else {
-    .validate_x(x = x_test[, primary, drop = FALSE], na_action = "error")
+    #.validate_x(x = x_test[, primary, drop = FALSE], na_action = "error")
     n1 <- nrow(x_test)
-    .validate_y(y = y_test, family = family, n = n1,
-                names = rownames(x_test), na_action = "error")
+    #.validate_y(y = y_test, family = family, n = n1,
+    #            names = rownames(x_test), na_action = "error")
     y_hat <- lapply(X = method,
                     FUN = function(x) rep(x = NA_real_, times = n1))
     names(y_hat) <- method
