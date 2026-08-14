@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r,eval=FALSE}
 rm(list=ls(all.names=TRUE))
 setwd("C:/Users/arauschenberger/Desktop/corila/package")
+setwd("/Users/armin.rauschenberger/Desktop/corila/package")
 devtools::load_all()
 #install.packages(c("roxygen2","pkgdown","rcmdcheck","usethis","remotes","testthat","devtools","goodpractice","checkglobals","roxylint", "cyclocomp"))
 #remotes::install_github(c("ropensci-review-tools/pkgcheck","ropensci-review-tools/autotest","ropensci-review-tools/srr"))

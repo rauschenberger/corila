@@ -498,12 +498,18 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       adjacent <- .is_adjacent(group = group, j = j, p = p, names = names)
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
       temp <-  cor_trans * coef * adjacent
-      weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
-      weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
+      denom <- abs(cor[, j])^hyper$exp_local[i] * adjacent
+      #weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
+      #weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
+      weight$local[j] <- ifelse(sum(denom) == 0, 0, sum(pmax(0.0, temp)[adjacent]) / sum(denom))
+      weight$local[p + j] <- ifelse(sum(denom) == 0, 0, sum(pmax(0.0, -temp)[adjacent]) / sum(denom))
       weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef
-      weight$global[j] <- sum(pmax(0.0, temp)) / p
-      weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
+      denom <- abs(cor[, j])^hyper$exp_global[i]
+      #weight$global[j] <- sum(pmax(0.0, temp)) / p
+      #weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
+      weight$global[j] <- ifelse(sum(denom) == 0, 0, sum(pmax(0.0, temp)) / sum(denom))
+      weight$global[p + j] <- ifelse(sum(denom) == 0, 0, sum(pmax(0.0, -temp)) / sum(denom))
     }
     weight <- lapply(
       X = weight,

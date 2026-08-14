@@ -17,5 +17,7 @@ export(calc_sign_prec)
 export(cv.corila)
 export(multiridge)
 export(simulate_data)
-importFrom(stats,nobs)
-importFrom(stats,residuals)
+importFrom(stats,
+  nobs,
+  residuals
+)
