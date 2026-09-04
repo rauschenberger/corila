@@ -210,7 +210,9 @@ object <- corila(x = x,
                  hyper = hyper,
                  threshold = 0.0,
                  lambda_init = NULL)
+#> Error in .validate_hyper(hyper = hyper): Assertion on 'hyper' failed: Must have exactly 5 cols, but has 4 cols.
 
 y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)
+#> Error: object 'object' not found
 # }
 ```
