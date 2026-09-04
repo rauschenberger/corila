@@ -275,10 +275,10 @@ NULL
 #' @rdname validate
 .validate_hyper <- function(hyper) {
   eps <- 1e-06
-  slots <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
+  slots <- c("wgt_local", "exp_local", "wgt_global", "exp_global", "threshold")
   checkmate::assert_data_frame(x = hyper, types = "numeric",
                                any.missing = FALSE,
-                               min.rows = 1L, ncols = 4L)
+                               min.rows = 1L, ncols = length(slots))
   checkmate::assert_names(x = names(hyper), identical.to = slots)
   checkmate::assert_numeric(x = unlist(hyper), lower = 0.0 - eps)
   hyper[hyper < 0.0] <- 0.0

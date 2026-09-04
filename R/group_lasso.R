@@ -494,15 +494,17 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   for (i in seq_len(nrow(hyper))) {
     weight <- list()
     weight$global <- weight$local <- rep(x = NA_real_, times = p)
+    cor_cut <- cor # corpcor::cor.shrink(x = cor, lambda = NULL)
+    cor_cut[abs(cor_cut) <= hyper$threshold[i]] <- 0.0
     for (j in seq_len(p)) {
       adjacent <- .is_adjacent(group = group, j = j, p = p, names = names)
-      cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
+      cor_trans <- sign(cor_cut[, j]) * abs(cor_cut[, j])^hyper$exp_local[i]
       temp <-  cor_trans * coef * adjacent
       # Local weights were originally calculated without ifelse
       # and with sum(adjacent) instead of denom_local:
       # weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
       # weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
-      denom_local <- sum(abs(cor[, j])^hyper$exp_local[i] * adjacent)
+      denom_local <- sum(abs(cor_cut[, j])^hyper$exp_local[i] * adjacent)
       weight$local[j] <- ifelse(
         test = denom_local == 0.0,
         yes = 0.0,
@@ -514,12 +516,12 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
         no = sum(pmax(0.0, -temp)[adjacent]) / denom_local
       )
       weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
-      temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef
+      temp <- sign(cor_cut[, j]) * abs(cor_cut[, j])^hyper$exp_global[i] * coef
       # Global weights were originally calculated without ifelse
       # and with p instead of denom_global:
       # weight$global[j] <- sum(pmax(0.0, temp)) / p
       # weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
-      denom_global <- sum(abs(cor[, j])^hyper$exp_global[i])
+      denom_global <- sum(abs(cor_cut[, j])^hyper$exp_global[i])
       weight$global[j] <- ifelse(
         test = denom_global == 0.0,
         yes = 0.0,
@@ -596,16 +598,26 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     hyper <- expand.grid(wgt_local = wgt_cand, exp_local = exp_cand,
                          wgt_global = NA_real_, exp_global = exp_cand)
     hyper$wgt_global <- 1.0 - hyper$wgt_local
-  } else if (identical(tune, "trial")) {
+  } else if (identical(tune, "within")) {
+    # only share information within groups
     wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
     exp_cand <- c(0.1, 0.5, 0.8, 1.0, 1.25, 2.0, 10.0)
     hyper <- data.frame(wgt_local = wgt_cand, exp_local = 0.0,
                         wgt_global = 1.0 - wgt_cand, exp_global = NA_real_)
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
     hyper$exp_global <- exp_cand
+  } else if (identical(tune, "threshold")) {
+    # share btw local features <-> share btw features with cor above treshold
+    wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.2)
+    threshold_cand <- seq(from = 0.2, to = 0.8, by = 0.2)
+    hyper <- expand.grid(wgt_local = wgt_cand, exp_local = 0.0,
+                         wgt_global = NA_real_, exp_global = 1e-09,
+                         threshold = threshold_cand)
+    hyper$wgt_global <- 1 - wgt_cand
   } else {
     stop("Invalid value for argument 'tune'.")
   }
+  if(is.null(hyper$threshold)) hyper$threshold <- 0.0
   hyper$exp_local[hyper$wgt_local < .Machine$double.eps] <- Inf
   hyper$exp_global[hyper$wgt_global < .Machine$double.eps] <- Inf
   hyper <- unique(hyper)
