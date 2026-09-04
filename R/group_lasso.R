@@ -498,18 +498,38 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       adjacent <- .is_adjacent(group = group, j = j, p = p, names = names)
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
       temp <-  cor_trans * coef * adjacent
-      denom <- abs(cor[, j])^hyper$exp_local[i] * adjacent
-      #weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
-      #weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
-      weight$local[j] <- ifelse(sum(denom) == 0, 0, sum(pmax(0.0, temp)[adjacent]) / sum(denom))
-      weight$local[p + j] <- ifelse(sum(denom) == 0, 0, sum(pmax(0.0, -temp)[adjacent]) / sum(denom))
+      # Local weights were originally calculated without ifelse
+      # and with sum(adjacent) instead of denom_local:
+      # weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
+      # weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
+      denom_local <- sum(abs(cor[, j])^hyper$exp_local[i] * adjacent)
+      weight$local[j] <- ifelse(
+        test = denom_local == 0.0,
+        yes = 0.0,
+        no = sum(pmax(0.0, temp)[adjacent]) / denom_local
+      )
+      weight$local[p + j] <- ifelse(
+        test = denom_local == 0.0,
+        yes = 0.0,
+        no = sum(pmax(0.0, -temp)[adjacent]) / denom_local
+      )
       weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef
-      denom <- abs(cor[, j])^hyper$exp_global[i]
-      #weight$global[j] <- sum(pmax(0.0, temp)) / p
-      #weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
-      weight$global[j] <- ifelse(sum(denom) == 0, 0, sum(pmax(0.0, temp)) / sum(denom))
-      weight$global[p + j] <- ifelse(sum(denom) == 0, 0, sum(pmax(0.0, -temp)) / sum(denom))
+      # Global weights were originally calculated without ifelse
+      # and with p instead of denom_global:
+      # weight$global[j] <- sum(pmax(0.0, temp)) / p
+      # weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
+      denom_global <- sum(abs(cor[, j])^hyper$exp_global[i])
+      weight$global[j] <- ifelse(
+        test = denom_global == 0.0,
+        yes = 0.0,
+        no = sum(pmax(0.0, temp)) / denom_global
+      )
+      weight$global[p + j] <- ifelse(
+        test = denom_global == 0.0,
+        yes = 0.0,
+        no = sum(pmax(0.0, -temp)) / denom_global
+      )
     }
     weight <- lapply(
       X = weight,
