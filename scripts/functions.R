@@ -2170,8 +2170,8 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
 #' @keywords iteration
 #'
 #' @export
-crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 5L,
-                     nfolds = 5L, method = NULL, ...) {
+crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 10L,
+                     nfolds = 10L, method = NULL, ...) {
   checkmate::assert_int(x = iter, lower = 1L)
   checkmate::assert_int(x = nfolds, lower = 2L)
   n <- nrow(x)
