@@ -68,8 +68,7 @@ of correlated variables.</p>
 <span>  <span class="va">foldid</span>,</span>
 <span>  <span class="va">nfolds</span>,</span>
 <span>  <span class="va">lambda_init</span>,</span>
-<span>  silent <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  threshold <span class="op">=</span> <span class="fl">0</span></span>
+<span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">.construct_penalty_factors</span><span class="op">(</span><span class="va">coef</span>, <span class="va">group</span>, <span class="va">cor</span>, <span class="va">names</span>, <span class="va">primary</span>, <span class="va">hyper</span><span class="op">)</span></span></code></pre></div>
@@ -124,7 +123,8 @@ or must be excluded from the final model
 <dd><p>list of \(m\)-dimensional vectors
 or a data frame with \(m\) rows
 containing candidate values
-for the regularisation and mixing hyperparameters</p></dd>
+for the regularisation and mixing hyperparameters,
+as well as for the correlation hard-thresholding hyperparameter</p></dd>
 
 
 <dt id="arg-alpha-init">alpha_init<a class="anchor" aria-label="anchor" href="#arg-alpha-init"></a></dt>
@@ -178,11 +178,6 @@ or <code>NULL</code> (cross-validation)</p></dd>
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
 <dd><p>Should messages from <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
 be suppressed? (logical scalar, <code>FALSE</code> or <code>TRUE</code>)</p></dd>
-
-
-<dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
-<dd><p>threshold for absolute correlation coefficients:
-numeric in unit interval (minimum 0, maximum 1)</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -252,7 +247,6 @@ for adaptive lasso regression.</p></div>
 <span class="r-in"><span>                 foldid <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
 <span class="r-in"><span>                 nfolds <span class="op">=</span> <span class="fl">10L</span>,</span></span>
 <span class="r-in"><span>                 hyper <span class="op">=</span> <span class="va">hyper</span>,</span></span>
-<span class="r-in"><span>                 threshold <span class="op">=</span> <span class="fl">0.0</span>,</span></span>
 <span class="r-in"><span>                 lambda_init <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .validate_hyper(hyper = hyper):</span> Assertion on 'hyper' failed: Must have exactly 5 cols, but has 4 cols.</span>
 <span class="r-in"><span></span></span>

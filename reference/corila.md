@@ -20,8 +20,7 @@ corila(
   foldid,
   nfolds,
   lambda_init,
-  silent = FALSE,
-  threshold = 0
+  silent = FALSE
 )
 
 .construct_penalty_factors(coef, group, cor, names, primary, hyper)
@@ -74,7 +73,8 @@ corila(
 
   list of \\m\\-dimensional vectors or a data frame with \\m\\ rows
   containing candidate values for the regularisation and mixing
-  hyperparameters
+  hyperparameters, as well as for the correlation hard-thresholding
+  hyperparameter
 
 - alpha_init:
 
@@ -130,11 +130,6 @@ corila(
   and
   [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
   be suppressed? (logical scalar, `FALSE` or `TRUE`)
-
-- threshold:
-
-  threshold for absolute correlation coefficients: numeric in unit
-  interval (minimum 0, maximum 1)
 
 ## Value
 
@@ -208,7 +203,6 @@ object <- corila(x = x,
                  foldid = NULL,
                  nfolds = 10L,
                  hyper = hyper,
-                 threshold = 0.0,
                  lambda_init = NULL)
 #> Error in .validate_hyper(hyper = hyper): Assertion on 'hyper' failed: Must have exactly 5 cols, but has 4 cols.
 

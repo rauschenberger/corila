@@ -79,7 +79,6 @@ object <- corila(x = x,
                  foldid = NULL,
                  nfolds = 10L,
                  hyper = hyper,
-                 threshold = 0.0,
                  lambda_init = NULL)
 #> Error in .validate_hyper(hyper = hyper): Assertion on 'hyper' failed: Must have exactly 5 cols, but has 4 cols.
 

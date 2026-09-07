@@ -21,8 +21,7 @@ cv.corila(
   foldid = NULL,
   tune = "weight",
   na_action = "error",
-  silent = FALSE,
-  threshold = 0
+  silent = FALSE
 )
 ```
 
@@ -151,11 +150,6 @@ cv.corila(
   [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
   be suppressed? (logical scalar, `FALSE` or `TRUE`)
 
-- threshold:
-
-  threshold for absolute correlation coefficients: numeric in unit
-  interval (minimum 0, maximum 1)
-
 ## Value
 
 Returns an object of class `"cv.corila"`, a list with the following
@@ -231,6 +225,5 @@ model <- cv.corila(x = data$x_train,
                    group = as.double(data$group),
                    primary = data$primary,
                    alpha_init = 0.0,
-                   threshold = 0.0,
                    foldid = rep(1:10, length.out = nrow(data$x_train)))
 ```
