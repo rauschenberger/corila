@@ -17,8 +17,7 @@ cv.corila(
   foldid = NULL,
   tune = "weight",
   na_action = "error",
-  silent = FALSE,
-  threshold = 0
+  silent = FALSE
 )
 }
 \arguments{
@@ -121,9 +120,6 @@ with a missing predictor or a missing response from model fitting
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
 be suppressed? (logical scalar, \code{FALSE} or \code{TRUE})}
-
-\item{threshold}{threshold for absolute correlation coefficients:
-numeric in unit interval (minimum 0, maximum 1)}
 }
 \value{
 Returns an object of class \code{"cv.corila"},
@@ -183,7 +179,6 @@ model <- cv.corila(x = data$x_train,
                    group = as.double(data$group),
                    primary = data$primary,
                    alpha_init = 0.0,
-                   threshold = 0.0,
                    foldid = rep(1:10, length.out = nrow(data$x_train)))
 
 }

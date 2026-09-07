@@ -18,8 +18,7 @@ corila(
   foldid,
   nfolds,
   lambda_init,
-  silent = FALSE,
-  threshold = 0
+  silent = FALSE
 )
 
 .construct_penalty_factors(coef, group, cor, names, primary, hyper)
@@ -61,7 +60,8 @@ or must be excluded from the final model
 \item{hyper}{list of \eqn{m}-dimensional vectors
 or a data frame with \eqn{m} rows
 containing candidate values
-for the regularisation and mixing hyperparameters}
+for the regularisation and mixing hyperparameters,
+as well as for the correlation hard-thresholding hyperparameter}
 
 \item{alpha_init}{A scalar specifying the method used for obtaining initial coefficients:
 \itemize{
@@ -104,9 +104,6 @@ or \code{NULL} (cross-validation)}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
 be suppressed? (logical scalar, \code{FALSE} or \code{TRUE})}
-
-\item{threshold}{threshold for absolute correlation coefficients:
-numeric in unit interval (minimum 0, maximum 1)}
 }
 \value{
 Returns an object of class \code{"corila"}.
@@ -154,7 +151,6 @@ object <- corila(x = x,
                  foldid = NULL,
                  nfolds = 10L,
                  hyper = hyper,
-                 threshold = 0.0,
                  lambda_init = NULL)
 
 y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)

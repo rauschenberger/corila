@@ -282,6 +282,8 @@ NULL
   checkmate::assert_names(x = names(hyper), identical.to = slots)
   checkmate::assert_numeric(x = unlist(hyper), lower = 0.0 - eps)
   hyper[hyper < 0.0] <- 0.0
+  checkmate::assert_numeric(x = hyper$threshold, lower = 0.0, upper = 1.0)
+  hyper$threshold[hyper$threshold > 1.0] <- 1.0
   hyper
 }
 

@@ -117,10 +117,6 @@
 #' Should messages from [glmnet::glmnet()] and [glmnet::cv.glmnet()]
 #' be suppressed? (logical scalar, `FALSE` or `TRUE`)
 #'
-#' @param threshold
-#' threshold for absolute correlation coefficients:
-#' numeric in unit interval (minimum 0, maximum 1)
-#'
 #' @inherit corila details
 #'
 #' @return
@@ -173,7 +169,6 @@
 #'                    group = as.double(data$group),
 #'                    primary = data$primary,
 #'                    alpha_init = 0.0,
-#'                    threshold = 0.0,
 #'                    foldid = rep(1:10, length.out = nrow(data$x_train)))
 #'
 #' @keywords methods models regression classif
@@ -201,12 +196,11 @@
 cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
                       alpha_init = 0.0, cor = "spearman", alpha_final = 1.0,
                       nfolds = 10L, foldid = NULL, tune = "weight",
-                      na_action = "error", silent = FALSE, threshold = 0.0) {
+                      na_action = "error", silent = FALSE) {
   # --- validate arguments ---
   family <- .validate_family(family = family)
   na_action <- .validate_na_action(na_action = na_action)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
-  checkmate::assert_number(x = threshold, lower = 0.0, upper = 1.0)
   x <- .validate_x(x = x, na_action = na_action)
   n <- nrow(x)
   p <- ncol(x)
@@ -233,8 +227,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   # --- fit model on all folds ---
   args <- list(group = group, primary = primary, family = family,
                alpha_init = alpha_init, alpha_final = alpha_final,
-               cor = cor, silent = silent, nfolds = NULL, hyper = hyper,
-               threshold = threshold)
+               cor = cor, silent = silent, nfolds = NULL, hyper = hyper)
   object_ext <- do.call(
     what = "corila",
     args = c(args, list(x = x[complete, , drop = FALSE], y = y[complete],
@@ -364,7 +357,8 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' list of \eqn{m}-dimensional vectors
 #' or a data frame with \eqn{m} rows
 #' containing candidate values
-#' for the regularisation and mixing hyperparameters
+#' for the regularisation and mixing hyperparameters,
+#' as well as for the correlation hard-thresholding hyperparameter
 #'
 #' @details
 #' The numbers of observations (samples) for training or testing
@@ -424,7 +418,6 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'                  foldid = NULL,
 #'                  nfolds = 10L,
 #'                  hyper = hyper,
-#'                  threshold = 0.0,
 #'                  lambda_init = NULL)
 #'
 #' y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)
@@ -436,7 +429,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 corila <- function(x, y, group, primary, family, hyper, alpha_init,
                    alpha_final, cor, foldid,
-                   nfolds, lambda_init, silent = FALSE, threshold = 0.0) {
+                   nfolds, lambda_init, silent = FALSE) {
   # --- validate arguments ---
   family <- .validate_family(family = family)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
@@ -452,8 +445,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   alpha_final <- .validate_alpha(alpha = alpha_final, init = FALSE)
   hyper <- .validate_hyper(hyper = hyper)
   checkmate::assert_number(x = lambda_init, lower = 0.0, null.ok = TRUE)
-  checkmate::assert_number(x = threshold, lower = 0.0, upper = 1.0)
-  threshold <- pmax(0.0, pmin(threshold, 1.0))
   args <- c(n = n, p = p, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
   rm(x, y)
@@ -467,7 +458,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     cor <- stats::cor(x = scale$x, method = cor, use = "pairwise.complete")
     # alternatively use function cor.shrink from package corpcor
   }
-  cor[is.na(cor) | abs(cor) <= threshold] <- 0.0
+  cor[is.na(cor)] <- 0.0
   pf <- .construct_penalty_factors(
     coef = init$coef, group = group, cor = cor, names = colnames(scale$x),
     primary = primary, hyper = hyper
@@ -617,7 +608,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   } else {
     stop("Invalid value for argument 'tune'.")
   }
-  if(is.null(hyper$threshold)) hyper$threshold <- 0.0
+  if (is.null(hyper$threshold)) hyper$threshold <- 0.0
   hyper$exp_local[hyper$wgt_local < .Machine$double.eps] <- Inf
   hyper$exp_global[hyper$wgt_global < .Machine$double.eps] <- Inf
   hyper <- unique(hyper)

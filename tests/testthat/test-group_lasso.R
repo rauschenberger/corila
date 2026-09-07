@@ -333,10 +333,12 @@ testthat::test_that("expanded features are in a finite n x p matrix", {
 for (tune in c("none", "weight", "exponent", "bivariate", "factorial")) {
   hyper <- .set_candidates(tune = tune)
   testthat::test_that("candidate values", {
-    labels <- c("wgt_local", "exp_local", "wgt_global", "exp_global")
+    labels <- c("wgt_local", "exp_local", "wgt_global", "exp_global",
+                "threshold")
     testthat::expect_type(object = hyper, type = "list")
     testthat::expect_named(object = hyper, expected = labels)
     testthat::expect_gte(object = min(hyper), expected = 0.0)
+    testthat::expect_lte(object = max(hyper$threshold), expected = 1.0)
     testthat::expect_identical(object = hyper, expected = unique(hyper))
     testthat::expect_identical(object = rownames(hyper),
                                expected = as.character(seq_len(nrow(hyper))))
