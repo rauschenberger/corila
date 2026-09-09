@@ -27,7 +27,7 @@ Returns a scalar.
 ## Details
 
 Returns the deviance calculated by
-[`glmnet::deviance.glmnet()`](https://glmnet.stanford.edu/reference/deviance.glmnet.html)
+[`glmnet::deviance.glmnet()`](https://rdrr.io/pkg/glmnet/man/deviance.glmnet.html)
 for the model with the optimised mixing and regularisation
 hyperparameters.
 

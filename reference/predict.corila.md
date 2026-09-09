@@ -67,7 +67,8 @@ y <- rnorm(n = n)
 
 # model fitting
 hyper <- data.frame(wgt_local = 0.5, exp_local = 1.0,
-                    wgt_global = 0.5, exp_global = 1.0)
+                    wgt_global = 0.5, exp_global = 1.0,
+                    threshold = 0.0)
 object <- corila(x = x,
                  y = y,
                  group = group,
@@ -80,9 +81,7 @@ object <- corila(x = x,
                  nfolds = 10L,
                  hyper = hyper,
                  lambda_init = NULL)
-#> Error in .validate_hyper(hyper = hyper): Assertion on 'hyper' failed: Must have exactly 5 cols, but has 4 cols.
 
 y_hat <- stats::predict(object, newx = x, index = 1L, s = 0.0)
-#> Error: object 'object' not found
 # }
 ```
