@@ -169,7 +169,8 @@
 #'                    group = as.double(data$group),
 #'                    primary = data$primary,
 #'                    alpha_init = 0.0,
-#'                    foldid = rep(1:10, length.out = nrow(data$x_train)))
+#'                    foldid = rep(x = seq_len(10L),
+#'                                 length.out = nrow(data$x_train)))
 #'
 #' @keywords methods models regression classif
 #'
@@ -486,16 +487,12 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   for (i in seq_len(nrow(hyper))) {
     weight <- list()
     weight$global <- weight$local <- rep(x = NA_real_, times = p)
-    cor_cut <- cor # corpcor::cor.shrink(x = cor, lambda = NULL)
+    cor_cut <- cor # alternative: function cor.shrink from package corpcor
     cor_cut[abs(cor_cut) <= hyper$threshold[i]] <- 0.0
     for (j in seq_len(p)) {
       adjacent <- .is_adjacent(group = group, j = j, p = p, names = names)
       cor_trans <- sign(cor_cut[, j]) * abs(cor_cut[, j])^hyper$exp_local[i]
       temp <-  cor_trans * coef * adjacent
-      # Local weights were originally calculated without ifelse
-      # and with sum(adjacent) instead of denom_local:
-      # weight$local[j] <- sum(pmax(0.0, temp)[adjacent]) / sum(adjacent)
-      # weight$local[p + j] <- sum(pmax(0.0, -temp)[adjacent]) / sum(adjacent)
       denom_local <- sum(abs(cor_cut[, j])^hyper$exp_local[i] * adjacent)
       weight$local[j] <- ifelse(
         test = denom_local == 0.0,
@@ -509,10 +506,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       )
       weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
       temp <- sign(cor_cut[, j]) * abs(cor_cut[, j])^hyper$exp_global[i] * coef
-      # Global weights were originally calculated without ifelse
-      # and with p instead of denom_global:
-      # weight$global[j] <- sum(pmax(0.0, temp)) / p
-      # weight$global[p + j] <- sum(pmax(0.0, -temp)) / p
       denom_global <- sum(abs(cor_cut[, j])^hyper$exp_global[i])
       weight$global[j] <- ifelse(
         test = denom_global == 0.0,
