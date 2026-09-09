@@ -41,7 +41,8 @@ y <- rnorm(n = n)
 
 # model fitting
 hyper <- data.frame(wgt_local = 0.5, exp_local = 1.0,
-                    wgt_global = 0.5, exp_global = 1.0)
+                    wgt_global = 0.5, exp_global = 1.0,
+                    threshold = 0.0)
 object <- corila(x = x,
                  y = y,
                  group = group,
