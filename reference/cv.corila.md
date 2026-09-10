@@ -117,22 +117,29 @@ cv.corila(
   hyperparameters:
 
   - `"none"`: fixed weights and exponents (`wgt_local`=1, `exp_local`=1,
-    `wgt_global`=0), no tuning
+    `wgt_global`=0), no tuning (share information within groups, ignore
+    correlations)
 
-  - `"weight"`: fixed exponents (`exp_local`=0, `exp_global`=1), tuning
-    `wgt_local`=1-`wgt_global`
+  - `"weight"` (default): fixed exponents (`exp_local`=0,
+    `exp_global`=1), tuning `wgt_local`=1-`wgt_global` (find a
+    compromise between sharing information within groups and between
+    correlated predictors)
 
   - `"exponent"`: fixed weights (`wgt_local`=1, `wgt_global`=0), tuning
-    `exp_local`
+    `exp_local` (share information between correlated predictors in the
+    same group, determine level of trust in correlation coefficients)
 
   - `"bivariate"`: tuning `wgt_local`=1-`wgt_global` and
-    `exp_local`=`exp_global`
+    `exp_local`=`exp_global` (find a compromise between sharing
+    information between predictors in the same group and between all
+    predictors, determine level of trust in correlation coefficients)
 
   - `"factorial"`: tuning `wgt_local`, `exp_local`, `wgt_global`,
-    `exp_global`
+    `exp_global` (unrestricted information sharing with weights possibly
+    not summing to one and possibly different exponents)
 
-  (to implement: data frame with columns `wgt_local`, `exp_local`,
-  `wgt_global`, and `exp_global`)
+  (NB: It is currently not possible to provide a data frame with columns
+  `wgt_local`, `exp_local`, `wgt_global`, and `exp_global`.)
 
 - na_action:
 
@@ -225,5 +232,6 @@ model <- cv.corila(x = data$x_train,
                    group = as.double(data$group),
                    primary = data$primary,
                    alpha_init = 0.0,
-                   foldid = rep(1:10, length.out = nrow(data$x_train)))
+                   foldid = rep(x = seq_len(10L),
+                                length.out = nrow(data$x_train)))
 ```
