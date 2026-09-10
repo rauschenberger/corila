@@ -97,20 +97,31 @@ for the hyperparameters:
 fixed weights and exponents
 (\code{wgt_local}=1, \code{exp_local}=1, \code{wgt_global}=0),
 no tuning
-\item \code{"weight"}:
+(share information within groups, ignore correlations)
+\item \code{"weight"} (default):
 fixed exponents (\code{exp_local}=0, \code{exp_global}=1),
 tuning \code{wgt_local}=1-\code{wgt_global}
+(find a compromise between sharing information within groups
+and between correlated predictors)
 \item \code{"exponent"}:
 fixed weights (\code{wgt_local}=1, \code{wgt_global}=0),
 tuning \code{exp_local}
+(share information between correlated predictors in the same group,
+determine level of trust in correlation coefficients)
 \item \code{"bivariate"}:
 tuning \code{wgt_local}=1-\code{wgt_global} and \code{exp_local}=\code{exp_global}
+(find a compromise between sharing information
+between predictors in the same group and between all predictors,
+determine level of trust in correlation coefficients)
 \item \code{"factorial"}:
 tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
+(unrestricted information sharing
+with weights possibly not summing to one
+and possibly different exponents)
 }
 
-(to implement: data frame with columns
-\code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global})}
+(NB: It is currently not possible to provide a data frame with columns
+\code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global}.)}
 
 \item{na_action}{character \code{"error"} to trigger an error
 if any observation has a missing predictor or a missing response
@@ -179,7 +190,8 @@ model <- cv.corila(x = data$x_train,
                    group = as.double(data$group),
                    primary = data$primary,
                    alpha_init = 0.0,
-                   foldid = rep(1:10, length.out = nrow(data$x_train)))
+                   foldid = rep(x = seq_len(10L),
+                                length.out = nrow(data$x_train)))
 
 }
 \references{

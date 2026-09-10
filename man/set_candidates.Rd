@@ -14,20 +14,31 @@ for the hyperparameters:
 fixed weights and exponents
 (\code{wgt_local}=1, \code{exp_local}=1, \code{wgt_global}=0),
 no tuning
-\item \code{"weight"}:
+(share information within groups, ignore correlations)
+\item \code{"weight"} (default):
 fixed exponents (\code{exp_local}=0, \code{exp_global}=1),
 tuning \code{wgt_local}=1-\code{wgt_global}
+(find a compromise between sharing information within groups
+and between correlated predictors)
 \item \code{"exponent"}:
 fixed weights (\code{wgt_local}=1, \code{wgt_global}=0),
 tuning \code{exp_local}
+(share information between correlated predictors in the same group,
+determine level of trust in correlation coefficients)
 \item \code{"bivariate"}:
 tuning \code{wgt_local}=1-\code{wgt_global} and \code{exp_local}=\code{exp_global}
+(find a compromise between sharing information
+between predictors in the same group and between all predictors,
+determine level of trust in correlation coefficients)
 \item \code{"factorial"}:
 tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
+(unrestricted information sharing
+with weights possibly not summing to one
+and possibly different exponents)
 }
 
-(to implement: data frame with columns
-\code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global})}
+(NB: It is currently not possible to provide a data frame with columns
+\code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global}.)}
 }
 \value{
 Returns a data frame with

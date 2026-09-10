@@ -92,19 +92,30 @@
 #' fixed weights and exponents
 #' (`wgt_local`=1, `exp_local`=1, `wgt_global`=0),
 #' no tuning
-#' - `"weight"`:
+#' (share information within groups, ignore correlations)
+#' - `"weight"` (default):
 #' fixed exponents (`exp_local`=0, `exp_global`=1),
 #' tuning `wgt_local`=1-`wgt_global`
+#' (find a compromise between sharing information within groups
+#' and between correlated predictors)
 #' - `"exponent"`:
 #' fixed weights (`wgt_local`=1, `wgt_global`=0),
 #' tuning `exp_local`
+#' (share information between correlated predictors in the same group,
+#' determine level of trust in correlation coefficients)
 #' - `"bivariate"`:
 #' tuning `wgt_local`=1-`wgt_global` and `exp_local`=`exp_global`
+#' (find a compromise between sharing information
+#' between predictors in the same group and between all predictors,
+#' determine level of trust in correlation coefficients)
 #' - `"factorial"`:
 #' tuning `wgt_local`, `exp_local`, `wgt_global`, `exp_global`
+#' (unrestricted information sharing
+#' with weights possibly not summing to one
+#' and possibly different exponents)
 #'
-#' (to implement: data frame with columns
-#' `wgt_local`, `exp_local`, `wgt_global`, and `exp_global`)
+#' (NB: It is currently not possible to provide a data frame with columns
+#' `wgt_local`, `exp_local`, `wgt_global`, and `exp_global`.)
 #'
 #' @param na_action
 #' character `"error"` to trigger an error
