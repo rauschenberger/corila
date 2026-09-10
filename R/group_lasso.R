@@ -114,7 +114,8 @@
 #' with weights possibly not summing to one
 #' and possibly different exponents)
 #'
-#' (NB: It is currently not possible to provide a data frame with columns
+#' (The internal function [.set_candidates()] uses this argument
+#' to create a grid of candidates values for
 #' `wgt_local`, `exp_local`, `wgt_global`, and `exp_global`.)
 #'
 #' @param na_action
@@ -555,6 +556,17 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' for the local prior information
 #' and the slots `"wgt_global"` and `"exp_global"`
 #' for the global prior information.
+#' 
+#' @details
+#' - If the local weight equals 0, the local exponent has no influence.
+#' And if the global weight equals 0, the global exponent has no influence.
+#' Therefore, if a weight is close to zero, its exponent is set to infinity.
+#' This avoids redundant combinations of hyperparameters
+#' (i.e., a local weight of zero with multiple local exponents,
+#' or a global weight of zero with multiple global exponents)
+#' 
+#' - The experimental hyperparameter `"threshold"` is currently always set to 0
+#' (no thresholding of correlation coefficients).
 #'
 #' @seealso
 #' This function is called by [cv.corila()].
@@ -594,22 +606,6 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     hyper <- expand.grid(wgt_local = wgt_cand, exp_local = exp_cand,
                          wgt_global = NA_real_, exp_global = exp_cand)
     hyper$wgt_global <- 1.0 - hyper$wgt_local
-  } else if (identical(tune, "within")) {
-    # only share information within groups
-    wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
-    exp_cand <- c(0.1, 0.5, 0.8, 1.0, 1.25, 2.0, 10.0)
-    hyper <- data.frame(wgt_local = wgt_cand, exp_local = 0.0,
-                        wgt_global = 1.0 - wgt_cand, exp_global = NA_real_)
-    hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
-    hyper$exp_global <- exp_cand
-  } else if (identical(tune, "threshold")) {
-    # share btw local features <-> share btw features with cor above treshold
-    wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.2)
-    threshold_cand <- seq(from = 0.2, to = 0.8, by = 0.2)
-    hyper <- expand.grid(wgt_local = wgt_cand, exp_local = 0.0,
-                         wgt_global = NA_real_, exp_global = 1e-09,
-                         threshold = threshold_cand)
-    hyper$wgt_global <- 1 - wgt_cand
   } else {
     stop("Invalid value for argument 'tune'.")
   }

@@ -37,7 +37,8 @@ with weights possibly not summing to one
 and possibly different exponents)
 }
 
-(NB: It is currently not possible to provide a data frame with columns
+(The internal function \code{\link[=.set_candidates]{.set_candidates()}} uses this argument
+to create a grid of candidates values for
 \code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global}.)}
 }
 \value{
@@ -49,6 +50,18 @@ for the global prior information.
 }
 \description{
 Sets candidate values for hyperparameters.
+}
+\details{
+\itemize{
+\item If the local weight equals 0, the local exponent has no influence.
+And if the global weight equals 0, the global exponent has no influence.
+Therefore, if a weight is close to zero, its exponent is set to infinity.
+This avoids redundant combinations of hyperparameters
+(i.e., a local weight of zero with multiple local exponents,
+or a global weight of zero with multiple global exponents)
+\item The experimental hyperparameter \code{"threshold"} is currently always set to 0
+(no thresholding of correlation coefficients).
+}
 }
 \examples{
 \dontshow{.set_candidates <- corila:::.set_candidates}

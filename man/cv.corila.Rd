@@ -120,7 +120,8 @@ with weights possibly not summing to one
 and possibly different exponents)
 }
 
-(NB: It is currently not possible to provide a data frame with columns
+(The internal function \code{\link[=.set_candidates]{.set_candidates()}} uses this argument
+to create a grid of candidates values for
 \code{wgt_local}, \code{exp_local}, \code{wgt_global}, and \code{exp_global}.)}
 
 \item{na_action}{character \code{"error"} to trigger an error
