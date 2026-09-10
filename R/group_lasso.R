@@ -556,7 +556,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' for the local prior information
 #' and the slots `"wgt_global"` and `"exp_global"`
 #' for the global prior information.
-#' 
+#'
 #' @details
 #' - If the local weight equals 0, the local exponent has no influence.
 #' And if the global weight equals 0, the global exponent has no influence.
@@ -564,7 +564,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' This avoids redundant combinations of hyperparameters
 #' (i.e., a local weight of zero with multiple local exponents,
 #' or a global weight of zero with multiple global exponents)
-#' 
+#'
 #' - The experimental hyperparameter `"threshold"` is currently always set to 0
 #' (no thresholding of correlation coefficients).
 #'
