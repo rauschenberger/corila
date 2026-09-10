@@ -13,7 +13,9 @@
 #' The R package `corila` implements
 #' "Sparse modelling with grouped and correlated features
 #' allowing for privileged information" (*Rauschenberger, 2026*).
-#' This is the first implementation of a novel algorithm.
+#' This is the first implementation of a novel algorithm,
+#' sharing information based on assumed adjacencies and observed correlations,
+#' and allowing not only for primary but also for auxiliary predictors.
 #' It builds upon adaptive lasso regression with the
 #' [glmnet-package][glmnet::glmnet-package].
 #'
