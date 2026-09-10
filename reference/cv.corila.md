@@ -138,7 +138,9 @@ cv.corila(
     `exp_global` (unrestricted information sharing with weights possibly
     not summing to one and possibly different exponents)
 
-  (NB: It is currently not possible to provide a data frame with columns
+  (The internal function
+  [`.set_candidates()`](https://rauschenberger.github.io/corila/reference/set_candidates.md)
+  uses this argument to create a grid of candidates values for
   `wgt_local`, `exp_local`, `wgt_global`, and `exp_global`.)
 
 - na_action:

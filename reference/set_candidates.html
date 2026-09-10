@@ -80,7 +80,8 @@ tuning <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, 
 (unrestricted information sharing
 with weights possibly not summing to one
 and possibly different exponents)</p></li>
-</ul><p>(NB: It is currently not possible to provide a data frame with columns
+</ul><p>(The internal function <code>.set_candidates()</code> uses this argument
+to create a grid of candidates values for
 <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, and <code>exp_global</code>.)</p></dd>
 
 </dl></div>
@@ -92,6 +93,18 @@ for the local prior information
 and the slots <code>"wgt_global"</code> and <code>"exp_global"</code>
 for the global prior information.</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+
+<ul><li><p>If the local weight equals 0, the local exponent has no influence.
+And if the global weight equals 0, the global exponent has no influence.
+Therefore, if a weight is close to zero, its exponent is set to infinity.
+This avoids redundant combinations of hyperparameters
+(i.e., a local weight of zero with multiple local exponents,
+or a global weight of zero with multiple global exponents)</p></li>
+<li><p>The experimental hyperparameter <code>"threshold"</code> is currently always set to 0
+(no thresholding of correlation coefficients).</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>This function is called by <code><a href="cv.corila.html">cv.corila()</a></code>.</p></div>

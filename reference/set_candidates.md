@@ -37,14 +37,27 @@ Sets candidate values for hyperparameters.
     `exp_global` (unrestricted information sharing with weights possibly
     not summing to one and possibly different exponents)
 
-  (NB: It is currently not possible to provide a data frame with columns
-  `wgt_local`, `exp_local`, `wgt_global`, and `exp_global`.)
+  (The internal function `.set_candidates()` uses this argument to
+  create a grid of candidates values for `wgt_local`, `exp_local`,
+  `wgt_global`, and `exp_global`.)
 
 ## Value
 
 Returns a data frame with the slots `"wgt_local"` and `"exp_local"` for
 the local prior information and the slots `"wgt_global"` and
 `"exp_global"` for the global prior information.
+
+## Details
+
+- If the local weight equals 0, the local exponent has no influence. And
+  if the global weight equals 0, the global exponent has no influence.
+  Therefore, if a weight is close to zero, its exponent is set to
+  infinity. This avoids redundant combinations of hyperparameters (i.e.,
+  a local weight of zero with multiple local exponents, or a global
+  weight of zero with multiple global exponents)
+
+- The experimental hyperparameter `"threshold"` is currently always set
+  to 0 (no thresholding of correlation coefficients).
 
 ## See also
 
