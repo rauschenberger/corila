@@ -2162,9 +2162,9 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
 #' p <- 20L
 #' x <- matrix(rnorm(n * p), nrow = n, ncol = p)
 #' y <- stats::rnorm(n)
-#' foldid <- rep(c(0L, 1L), times = c(50L, 50L))
-#' results <- crossval(x, y, family = "gaussian",
-#'                     method = c("mean", "corila"), foldid = foldid)
+#' #foldid <- rep(c(0L, 1L), times = c(50L, 50L))
+#' results <- crossval(x, y, family = "gaussian", iter = 2L, nfolds = 3L,
+#'                     method = c("mean", "corila"))
 #' }
 #'
 #' @keywords iteration
@@ -2181,15 +2181,15 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 10L,
   }
   #--- cross-validation ---
   list <- list()
-  list$metric_mu <- list$metric_sd <- list$stability <- list$metric <-
-    list$nzero <- list()
+  #list$metric_mu <- list$metric_sd <- list$stability <- list$metric <-
+  #  list$nzero_mu <- list$nzero_sd <- list()
   for (k in seq_len(iter)) {
     set.seed(k)
     cat("iter", k, "\n")
     foldid <- .folds(y = y, family = family, nfolds = nfolds)
     y_hat <- data.frame(row.names = seq_len(n))
     coef <- list()
-    metric <- numeric()
+    metric <- nzero <- numeric()
     for (i in seq_len(nfolds)) {
       set.seed(i)
       cat("fold", i, "\n")
@@ -2212,16 +2212,21 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 10L,
         coef[[j]] <- cbind(coef[[j]], as.numeric(results$coef[[j]]))
       }
       metric <- rbind(metric, results$metric)
+      nzero <- rbind(nzero, results$nzero)
     }
+    list$metric_mu[[k]] <- colMeans(metric)
+    list$metric_sd[[k]] <- apply(X = metric, MARGIN = 2L, FUN = stats::sd)
+    list$nzero_mu[[k]] <- colMeans(nzero)
+    list$nzero_sd[[k]] <- apply(X = nzero, MARGIN = 2L, FUN = stats::sd)
     # Replace the code below by a function e.g., .metric(fit, obs, family)
     if (family %in% c("gaussian", "poisson")) {
-      list$metric[[k]] <- apply(
+      list$metric_pool[[k]] <- apply(
         X = y_hat,
         MARGIN = 2L,
         FUN = function(x) mean((y[foldid != 0L] - x[foldid != 0L])^2.0)
       )
     } else if (family == "binomial") {
-      list$metric[[k]] <- apply(
+      list$metric_pool[[k]] <- apply(
         X = y_hat,
         MARGIN = 2L,
         FUN = function(x) {
@@ -2231,7 +2236,7 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 10L,
         }
       )
     } else if (family == "cox") {
-      list$metric[[k]] <- apply(
+      list$metric_pool[[k]] <- apply(
         X = y_hat,
         MARGIN = 2L,
         FUN = function(x) {
@@ -2239,30 +2244,28 @@ crossval <- function(x, y, family, group = NULL, primary = NULL, iter = 10L,
         }
       )
     }
-    list$metric_mu[[k]] <- colMeans(metric)
-    list$metric_sd[[k]] <- apply(X = metric, MARGIN = 2L, FUN = sd)
-    list$stability[[k]] <- vapply(X = coef, FUN = function(slot) stabm::stabilityNovovicova(features = apply(X = slot[-1L,], MARGIN = 2L, FUN = function(col) which(col!=0), simplify = FALSE), p = nrow(slot) - 1L), FUN.VALUE = numeric(1L))
+    #list$stability[[k]] <- vapply(X = coef, FUN = function(slot) stabm::stabilityNovovicova(features = apply(X = slot[-1L,], MARGIN = 2L, FUN = function(col) which(col!=0), simplify = FALSE), p = nrow(slot) - 1L), FUN.VALUE = numeric(1L))
     #--- refit on all folds ---
-    set.seed(k)
-    if (nfolds == 1L) {
-      list$nzero[[k]] <- vapply(X = results$coef,
-                                FUN = function(x) sum(x[-1L] != 0L),
-                                FUN.VALUE = numeric(1L))
-    } else {
-      refit <- holdout(x_train = x[foldid != 0L, ],
-                       y_train = y[foldid != 0L],
-                       group = group,
-                       primary = primary,
-                       family = family,
-                       nfolds = 10L,
-                       foldid = NULL,
-                       method = method,
-                       seed = NULL,
-                       ...)
-      list$nzero[[k]] <- vapply(X = refit$coef,
-                                FUN = function(x) sum(x[-1L] != 0L),
-                                FUN.VALUE = numeric(1L))
-    }
+  #   set.seed(k)
+  #   if (nfolds == 1L) {
+  #     list$nzero[[k]] <- vapply(X = results$coef,
+  #                               FUN = function(x) sum(x[-1L] != 0L),
+  #                               FUN.VALUE = numeric(1L))
+  #   } else {
+  #     refit <- holdout(x_train = x[foldid != 0L, ],
+  #                      y_train = y[foldid != 0L],
+  #                      group = group,
+  #                      primary = primary,
+  #                      family = family,
+  #                      nfolds = 10L,
+  #                      foldid = NULL,
+  #                      method = method,
+  #                      seed = NULL,
+  #                      ...)
+  #     list$nzero[[k]] <- vapply(X = refit$coef,
+  #                               FUN = function(x) sum(x[-1L] != 0L),
+  #                               FUN.VALUE = numeric(1L))
+  #   }
   }
   list <- lapply(X = list, FUN = function(x) do.call(what = "rbind", args = x))
   list$family <- family
