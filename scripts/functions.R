@@ -908,14 +908,28 @@
     col[, ncol] <- "red"
     graphics::points(x = col(x[[i]]), y = x[[i]],
                      col = col, pch = 16L, cex = cex)
-    pvalue <- stats::t.test(x = x[[i]][, 1L],
-                            y = x[[i]][, ncol],
-                            paired = TRUE,
-                            alternative = alternative)$p.value
-    text <- paste0("p=", format(x = signif(pvalue, digits = 2L),
-                                scientific = TRUE))
+    #pvalue <- stats::t.test(x = x[[i]][, 1L],
+    #                        y = x[[i]][, ncol],
+    #                        paired = TRUE,
+    #                        alternative = alternative)$p.value
+    #text <- paste0("p=", format(x = signif(pvalue, digits = 2L),
+    #                            scientific = TRUE))
     #graphics::mtext(text = text, side = 1L, cex = cex.axis, line = 0.2)
-    graphics::axis(side = 1L, at = ncol / 2L + 0.5, labels = text,
+    #graphics::axis(side = 1L, at = ncol / 2L + 0.5, labels = text,
+    #               cex.axis = cex.axis, tick = FALSE, line = -0.5)
+    count <- c(sum(x[[i]][, 1L] < x[[i]][, ncol]),
+               sum(x[[i]][, 1L] > x[[i]][, ncol]))
+    if (alternative == "less") {
+      count <- rev(count)
+    }
+    #count <- format(count, width = 2L)
+    graphics::axis(side = 1L, at = ncol/2L + 0.1, labels = count[1],
+                   cex.axis = cex.axis, tick = FALSE, line = -0.5,
+                   col.axis = "blue")
+    graphics::axis(side = 1L, at = ncol/2L + 0.9, labels = count[2],
+                   cex.axis = cex.axis, tick = FALSE, line = -0.5,
+                   col.axis = "red")
+    graphics::axis(side = 1L, at = ncol/2L + 0.5, labels = "vs",
                    cex.axis = cex.axis, tick = FALSE, line = -0.5)
   }
   invisible(NULL)
