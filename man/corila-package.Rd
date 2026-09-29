@@ -9,7 +9,9 @@ allowing for privileged information}
 The R package \code{corila} implements
 "Sparse modelling with grouped and correlated features
 allowing for privileged information" (\emph{Rauschenberger, 2026}).
-This is the first implementation of a novel algorithm.
+This is the first implementation of a novel algorithm,
+sharing information based on assumed adjacencies and observed correlations,
+and allowing not only for primary but also for auxiliary predictors.
 It builds upon adaptive lasso regression with the
 \link[glmnet:glmnet-package]{glmnet-package}.
 }

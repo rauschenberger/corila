@@ -88,6 +88,8 @@ where the entry in the \eqn{j^{\text{th}}} row
 and the \eqn{k^{\text{th}}} column
 indicates whether information should be transferred
 from the \eqn{j^{\text{th}}} to the \eqn{k^{\text{th}}} variable
+(usually with a unit diagonal so that predictors retain the information
+from their initial coefficient)
 }}
 
 \item{foldid}{\eqn{n_0}-dimensional vector containing the fold identifiers
