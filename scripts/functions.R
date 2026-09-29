@@ -2132,7 +2132,13 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
     )
     recall <- vapply(
       X = coef,
-      FUN = function(x) calc_recall(truth = sign(beta[primary]),
+      FUN = function(x) sign_recall(truth = sign(beta[primary]),
+                                    estim = sign(x)[-1L]),
+      FUN.VALUE = double(1L)
+    )
+    fscore <- vapply(
+      X = coef,
+      FUN = function(x) sign_fscore(truth = sign(beta[primary]),
                                     estim = sign(x)[-1L]),
       FUN.VALUE = double(1L)
     )
@@ -2170,6 +2176,7 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
        nzero = nzero,
        precision = precision,
        recall = recall,
+       fscore = fscore,
        difftime = difftime)
 }
 
