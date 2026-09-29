@@ -3,6 +3,43 @@
 #' @srrstats {G1.6} *code for comparing with other methods*
 
 #' @title
+#' F-score for sign variable
+#'
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' Calculates the F-score for ternary variables
+#' with support \eqn{\{-1, 0, 1\}}.
+#'
+#' @param truth
+#' integer vector with values in \eqn{\{-1, 0, 1\}}
+#'
+#' @param estim
+#' integer vector of same length with values in \eqn{\{-1, 0, 1\}}
+#'
+#' @return
+#' Returns a scalar between 0 (minimum) and 1 (maximum), or `NA`.
+#'
+#' @examples
+#' \dontshow{sign_fscore <- corila:::sign_fscore}
+#' truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+#' estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+#' sign_fscore(truth = truth, estim = estim) # observed value
+#' sign_fscore(truth = truth, estim = truth) # upper limit 1
+#' sign_fscore(truth = 0L * truth, estim = estim) # not defined
+#' sign_fscore(truth = truth, estim = 0L *estim) # not defined
+#'
+#' @rdname sign_fscore
+#'
+#' @export
+#'
+sign_fscore <- function(truth, estim) {
+  precision <- sign_precision(truth = truth, estim = estim)
+  recall <- sign_recall(truth = truth, estim = estim)
+  2 * precision * recall / (precision + recall)
+}
+
+#' @title
 #' Correlation Plot
 #' 
 #' @description
@@ -401,8 +438,7 @@
     group <- rep(x = seq_len(p / q), each = q)
     primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1L, q - 1L)),
                    times = p / q)
-    causal <- rep(x = sample(rep(
-      x = c(TRUE, FALSE), times = c(5L, p / q - 5L)
+    causal <- rep(x = sample(rep(x = c(TRUE, FALSE), times = c(5L, p / q - 5L)
     )), each = q)
     x <- matrix(data = NA_real_, nrow = n, ncol = p)
     #w <- 0.5
@@ -1010,7 +1046,7 @@ simulate_overlap <- function() {
 #' # selection performance (precision: higher = better)
 #' vapply(X = coef,
 #'        FUN = function(x) {
-#'          calc_sign_prec(truth = sign(data$beta), estim = sign(x[-1L]))
+#'          sign_precision(truth = sign(data$beta), estim = sign(x[-1L]))
 #'        },
 #'        FUN.VALUE = numeric(1L))
 #'
@@ -2085,12 +2121,19 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
                   FUN = function(x) sum(x[-(family != "cox")] != 0.0),
                   FUN.VALUE = integer(1L))
   if(is.null(beta)) {
-    sign_prec <- NULL
+    precision <- NULL
+    recall <- NULL
   } else {
-    sign_prec <- vapply(
+    precision <- vapply(
       X = coef,
-      FUN = function(x) calc_sign_prec(truth = sign(beta[primary]),
+      FUN = function(x) sign_precision(truth = sign(beta[primary]),
                                        estim = sign(x)[-1L]),
+      FUN.VALUE = double(1L)
+    )
+    recall <- vapply(
+      X = coef,
+      FUN = function(x) calc_recall(truth = sign(beta[primary]),
+                                    estim = sign(x)[-1L]),
       FUN.VALUE = double(1L)
     )
   }
@@ -2125,7 +2168,8 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
        coef = coef,
        metric = metric,
        nzero = nzero,
-       sign_prec = sign_prec,
+       precision = precision,
+       recall = recall,
        difftime = difftime)
 }
 
