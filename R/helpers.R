@@ -22,19 +22,19 @@
 #' or `NA` if all estimated signs equal 0.
 #'
 #' @examples
-#' \dontshow{calc_sign_prec <- corila:::calc_sign_prec}
+#' \dontshow{sign_precision <- corila:::sign_precision}
 #' truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
 #' estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
-#' calc_sign_prec(truth = truth, estim = estim) # observed value
-#' calc_sign_prec(truth = truth, estim = -truth) # lower limit 0
-#' calc_sign_prec(truth = truth, estim = truth) # upper limit 1
-#' calc_sign_prec(truth = truth, estim = 0L * estim) # not defined
+#' sign_precision(truth = truth, estim = estim) # observed value
+#' sign_precision(truth = truth, estim = -truth) # lower limit 0
+#' sign_precision(truth = truth, estim = truth) # upper limit 1
+#' sign_precision(truth = truth, estim = 0L * estim) # not defined
 #'
-#' @rdname calc_sign_prec
+#' @rdname sign_precision
 #'
 #' @export
 #'
-calc_sign_prec <- function(truth, estim) {
+sign_precision <- function(truth, estim) {
   eps <- 1e-06
   checkmate::assert_integerish(x = truth, min.len = 1L,
                                lower = - 1.0 - eps, upper = 1.0 + eps)
@@ -45,9 +45,56 @@ calc_sign_prec <- function(truth, estim) {
   if (all(is.na(estim) | estim == 0L)) {
     NA
   } else {
-    sum(estim != 0L & truth != 0L &
-          sign(estim) == sign(truth), na.rm = TRUE) /
+    sum(estim != 0L & truth != 0L & sign(estim) == sign(truth), na.rm = TRUE) /
       sum(estim != 0L & !is.na(truth), na.rm = TRUE)
+  }
+}
+
+#' @title
+#' Recall for sign variable
+#'
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' Calculates recall for ternary variables with support \eqn{\{-1, 0, 1\}},
+#' i.e., the proportion of correctly identified positive and negative signs.
+#'
+#' @param truth
+#' integer vector with values in \eqn{\{-1, 0, 1\}}
+#'
+#' @param estim
+#' integer vector of same length with values in \eqn{\{-1, 0, 1\}}
+#'
+#' @return
+#' Returns a scalar between 0 (minimum recall) and 1 (maximum recall),
+#' or `NA` if all true signs equal 0.
+#'
+#' @examples
+#' \dontshow{sign_recall <- corila:::sign_recall}
+#' truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+#' estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+#' sign_recall(truth = truth, estim = estim) # observed value
+#' sign_recall(truth = truth, estim = 0L * estim) # lower limit 0
+#' sign_recall(truth = truth, estim = truth) # upper limit 1
+#' sign_recall(truth = 0L * truth, estim = estim) # not defined
+#'
+#' @rdname sign_recall
+#'
+#' @export
+#'
+sign_recall <- function(truth, estim) {
+  eps <- 1e-06
+  checkmate::assert_integerish(x = truth, min.len = 1L,
+                               lower = - 1.0 - eps, upper = 1.0 + eps)
+  truth <- as.integer(round(truth))
+  checkmate::assert_integerish(x = estim, len = length(truth),
+                               lower = -1.0 - eps, upper = 1.0 + eps)
+  estim <- as.integer(round(estim))
+  if (all(is.na(truth) | truth == 0L)) {
+    NA
+  } else {
+    sum(estim != 0L & truth != 0L & sign(estim) == sign(truth), na.rm = TRUE) /
+      sum(truth != 0L & !is.na(estim), na.rm = TRUE)
   }
 }
 
