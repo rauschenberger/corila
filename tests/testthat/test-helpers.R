@@ -189,7 +189,7 @@ testthat::test_that("mean function works", {
   }
 })
 
-## function "calc_sign_prec" ---------------------------------------------------
+## function "sign_precision" ---------------------------------------------------
 
 set.seed(1L)
 n <- 10L
@@ -197,43 +197,86 @@ truth <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
 estim <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
 
 testthat::test_that("precision is finite scalar", {
-  precision <- calc_sign_prec(truth = truth, estim = estim)
+  precision <- sign_precision(truth = truth, estim = estim)
   testthat::expect_type(object = precision, type = "double")
   testthat::expect_length(object = precision, n = 1L)
   testthat::expect_true(all(is.finite(precision)))
 })
 
 testthat::test_that("precision equals zero if all signs are inverted", {
-  prec <- calc_sign_prec(truth = truth, estim = -truth)
+  prec <- sign_precision(truth = truth, estim = -truth)
   testthat::expect_identical(object = prec, expected = 0.0)
 })
 
 testthat::test_that("precision equals one if all signs are true", {
-  prec <- calc_sign_prec(truth = truth, estim = truth)
+  prec <- sign_precision(truth = truth, estim = truth)
   testthat::expect_identical(object = prec, expected = 1.0)
 })
 
-testthat::test_that("precision is not defined if all signs equal zero", {
-  prec <- calc_sign_prec(truth = truth, estim = 0L * estim)
+testthat::test_that("precision is not defined if all est signs equal zero", {
+  prec <- sign_precision(truth = truth, estim = 0L * estim)
   testthat::expect_identical(object = prec, expected = NA)
 })
 
 testthat::test_that("precision is not influenced by estimated zeros", {
-  prec1 <- calc_sign_prec(truth = truth, estim = estim)
-  prec2 <- calc_sign_prec(truth = truth[estim != 0L],
+  prec1 <- sign_precision(truth = truth, estim = estim)
+  prec2 <- sign_precision(truth = truth[estim != 0L],
                           estim = estim[estim != 0L])
   testthat::expect_identical(object = prec1, expected = prec2)
 })
 
 testthat::test_that("precision equals zero if all true signs are zero", {
-  prec <- calc_sign_prec(truth = rep(x = 0L, times = n), estim = estim)
+  prec <- sign_precision(truth = rep(x = 0L, times = n), estim = estim)
   testthat::expect_identical(object = prec, expected = 0.0)
 })
 
 testthat::test_that("error if different lengths", {
   truth <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
   estim <- sample(x = c(-1L, 0L, 1L), size = n - 1L, replace = TRUE)
-  testthat::expect_error(calc_sign_prec(truth = truth, estim = estim))
+  testthat::expect_error(sign_precision(truth = truth, estim = estim))
+})
+
+## function "sign_recall" ------------------------------------------------------
+
+
+testthat::test_that("recall is finite scalar", {
+  precision <- sign_recall(truth = truth, estim = estim)
+  testthat::expect_type(object = precision, type = "double")
+  testthat::expect_length(object = precision, n = 1L)
+  testthat::expect_true(all(is.finite(precision)))
+})
+
+testthat::test_that("recall equals zero if all signs are inverted", {
+  prec <- sign_recall(truth = truth, estim = -truth)
+  testthat::expect_identical(object = prec, expected = 0.0)
+})
+
+testthat::test_that("recall equals one if all signs are true", {
+  prec <- sign_recall(truth = truth, estim = truth)
+  testthat::expect_identical(object = prec, expected = 1.0)
+})
+
+testthat::test_that("recall is not defined if all true signs equal zero", {
+  prec <- sign_recall(truth = 0L * truth, estim = estim)
+  testthat::expect_identical(object = prec, expected = NA)
+})
+
+testthat::test_that("recall is not influenced by true zeros", {
+  rec1 <- sign_recall(truth = truth, estim = estim)
+  rec2 <- sign_recall(truth = truth[truth != 0L],
+                      estim = estim[truth != 0L])
+  testthat::expect_identical(object = rec1, expected = rec2)
+})
+
+testthat::test_that("recall equals zero if all estimated signs are zero", {
+  rec <- sign_recall(truth = truth, estim = rep(x = 0L, times = n))
+  testthat::expect_identical(object = rec, expected = 0.0)
+})
+
+testthat::test_that("error if different lengths", {
+  truth <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
+  estim <- sample(x = c(-1L, 0L, 1L), size = n - 1L, replace = TRUE)
+  testthat::expect_error(sign_recall(truth = truth, estim = estim))
 })
 
 ## function ".folds" -----------------------------------------------------------
