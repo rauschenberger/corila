@@ -2128,8 +2128,7 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
                   FUN = function(x) sum(x[-(family != "cox")] != 0.0),
                   FUN.VALUE = integer(1L))
   if(is.null(beta)) {
-    precision <- NULL
-    recall <- NULL
+    precision <- recall <- fscore <- NULL
   } else {
     precision <- vapply(
       X = coef,
