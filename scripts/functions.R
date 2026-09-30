@@ -25,6 +25,7 @@
 #' truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
 #' estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
 #' sign_fscore(truth = truth, estim = estim) # observed value
+#' sign_fscore(truth = truth, estim = -truth) # lower limit 0
 #' sign_fscore(truth = truth, estim = truth) # upper limit 1
 #' sign_fscore(truth = 0L * truth, estim = estim) # not defined
 #' sign_fscore(truth = truth, estim = 0L *estim) # not defined
@@ -36,7 +37,13 @@
 sign_fscore <- function(truth, estim) {
   precision <- sign_precision(truth = truth, estim = estim)
   recall <- sign_recall(truth = truth, estim = estim)
-  2 * precision * recall / (precision + recall)
+  if(is.na(precision) || is.na(recall)) {
+    NA
+  } else if(precision == 0 && recall == 0) {
+    0
+  } else {
+    2 * precision * recall / (precision + recall)
+  }
 }
 
 #' @title
