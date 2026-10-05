@@ -459,8 +459,10 @@ sign_fscore <- function(truth, estim) {
       sel_aux <- group == j & !primary
       x[, sel_aux] <- stats::rnorm(n = n * sum(sel_aux))
       #w <- stats::runif(n = q)
-      w <- stats::rexp(n = q)
-      w <- w / sum(w)
+      #w <- stats::rexp(n = q)
+      #w <- w / sum(w)
+      w <- stats::rexp(n = q - 1L)
+      w <- c(w / sum(w), 0.0)
       x[, sel_pry] <- cbind(x[, sel_aux], stats::rnorm(n = n)) %*% sqrt(w)
     }
     beta <- (!primary) * causal * abs(stats::rnorm(n = p))
