@@ -407,8 +407,8 @@ sign_fscore <- function(truth, estim) {
   checkmate::assert_int(x = q, lower = 2L, upper = p)
   checkmate::assert_int(x = p / q, lower = 5L)
   checkmate::assert_choice(x = mode,
-                           choices =  c("upstream", "aggregated", "surrogate",
-                                        "baseline", "uninformative"))
+                           choices =  c("baseline", "surrogate", "aggregated", 
+                                        "upstream", "uninformative"))
   checkmate::assert_logical(x = plot, any.missing = FALSE, len = 1L)
   fold <- rep(x = c(0L, 1L), times = c(n0, n1))
   n <- n0 + n1
@@ -420,37 +420,18 @@ sign_fscore <- function(truth, estim) {
   active <- sample(rep(x = c(1L, 0L), times = c(5L, p / q - 5L)))
   sign <- sample(c(-1L, 1L), size = p / q, replace = TRUE)
   causal <- rep(x =  active * sign, each = q)
-  if (mode == "upstream") {
-    #--- upstream and downstream predictors ---
-    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1L, q - 1L)),
-                   times = p / q)
+  if (mode == "baseline") {
+    #--- baseline and follow-up predictors ---
+    w <- 0.9
+    time <- rep(seq_len(q), times = p / q)
     x <- matrix(data = NA_real_, nrow = n, ncol = p)
-    for (j in seq_len(p / q)) {
-      sel_pry <- group == j & primary
-      sel_aux <- group == j & !primary
-      x[, sel_pry] <- stats::rnorm(n = n)
-      w <- stats::runif(q - 1L)
-      x[, sel_aux] <- x[, sel_pry] %*% t(sqrt(w)) + t(t(matrix(
-        stats::rnorm(n * sum(sel_aux)),
-        nrow = n,
-        ncol = sum(sel_aux)
-      )) * sqrt(1.0 - w))
+    x[, time == 1] <- stats::rnorm(n = n * p / q)
+    for (j in seq(from = 2L, to = q)) {
+      x[, time == j] <- sqrt(w) * x[, time == j - 1L] +
+        sqrt(1 - w) * stats::rnorm(n = n * p / q)
     }
-    beta <- (!primary) * causal * abs(stats::rnorm(n = p))
-  } else if (mode == "aggregated") {
-    #--- fine-grained and aggregated predictors ---
-    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1L, q - 1L)),
-                   times = p / q)
-    x <- matrix(data = NA_real_, nrow = n, ncol = p)
-    for (j in seq_len(p / q)) {
-      sel_pry <- group == j & primary
-      sel_aux <- group == j & !primary
-      x[, sel_aux] <- stats::rnorm(n = n * sum(sel_aux))
-      w <- stats::runif(n = q)
-      w <- w / sum(w)
-      x[, sel_pry] <- cbind(x[, sel_aux], stats::rnorm(n = n)) %*% sqrt(w)
-    }
-    beta <- (!primary) * causal * abs(stats::rnorm(n = p))
+    primary <- time == min(time)
+    beta <- (time == max(time)) * causal * abs(stats::rnorm(n = p))
   } else if (mode == "surrogate") {
     #--- canonical and surrogate predictors ---
     primary <- rep(x = rep(x = c(FALSE, TRUE), times = c(1L, q - 1L)),
@@ -468,18 +449,38 @@ sign_fscore <- function(truth, estim) {
       )) * sqrt(1 - w))
     }
     beta <- (!primary) * causal * abs(stats::rnorm(n = p))
-  } else if (mode == "baseline") {
-    #--- baseline and follow-up predictors ---
-    w <- 0.9
-    time <- rep(seq_len(q), times = p / q)
+  } else if (mode == "aggregated") {
+    #--- fine-grained and aggregated predictors ---
+    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1L, q - 1L)),
+                   times = p / q)
     x <- matrix(data = NA_real_, nrow = n, ncol = p)
-    x[, time == 1] <- stats::rnorm(n = n * p / q)
-    for (j in seq(from = 2L, to = q)) {
-      x[, time == j] <- sqrt(w) * x[, time == j - 1L] +
-        sqrt(1 - w) * stats::rnorm(n = n * p / q)
+    for (j in seq_len(p / q)) {
+      sel_pry <- group == j & primary
+      sel_aux <- group == j & !primary
+      x[, sel_aux] <- stats::rnorm(n = n * sum(sel_aux))
+      #w <- stats::runif(n = q)
+      w <- stats::rexp(n = q)
+      w <- w / sum(w)
+      x[, sel_pry] <- cbind(x[, sel_aux], stats::rnorm(n = n)) %*% sqrt(w)
     }
-    primary <- time == min(time)
-    beta <- (time == max(time)) * causal * abs(stats::rnorm(n = p))
+    beta <- (!primary) * causal * abs(stats::rnorm(n = p))
+  } else if (mode == "upstream") {
+    #--- upstream and downstream predictors ---
+    primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1L, q - 1L)),
+                   times = p / q)
+    x <- matrix(data = NA_real_, nrow = n, ncol = p)
+    for (j in seq_len(p / q)) {
+      sel_pry <- group == j & primary
+      sel_aux <- group == j & !primary
+      x[, sel_pry] <- stats::rnorm(n = n)
+      w <- stats::runif(q - 1L)
+      x[, sel_aux] <- x[, sel_pry] %*% t(sqrt(w)) + t(t(matrix(
+        stats::rnorm(n * sum(sel_aux)),
+        nrow = n,
+        ncol = sum(sel_aux)
+      )) * sqrt(1.0 - w))
+    }
+    beta <- (!primary) * causal * abs(stats::rnorm(n = p))
   } else if (mode == "uninformative") {
     primary <- rep(x = rep(x = c(TRUE, FALSE), times = c(1L, q - 1L)),
                    times = p / q)
@@ -491,7 +492,7 @@ sign_fscore <- function(truth, estim) {
     warning("no unit variance")
   }
   eta <- x %*% beta
-  y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
+  y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta)) # sqrt in manuscript?
   if (plot) {
     graphics::par(mfrow = c(1L, 2L))
     graphics::plot(beta, col = group)
@@ -506,7 +507,6 @@ sign_fscore <- function(truth, estim) {
        causal = causal,
        beta = beta)
 }
-
 
 #' @title
 #' Visualise Simulation Settings
