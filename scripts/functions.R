@@ -1459,6 +1459,7 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
   names(coef) <- method
   
   difftime <- numeric()
+  hyper <- NULL
   
   group_primary <- as.integer(as.factor(as.character(group[primary])))
   
@@ -1959,7 +1960,8 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
                           family = family,
                           foldid = foldid,
                           ...)
-      print(object$hyper[object$id_hyper, ])
+      hyper <- object$hyper[object$id_hyper, ]
+      print(hyper)
       if (!is.null(x_test)) {
         y_hat$corila <- stats::predict(object = object,
                                        newx = x_test[, primary])
@@ -2098,7 +2100,8 @@ holdout <- function(x_train, y_train, group, family, primary = NULL,
        precision = precision,
        recall = recall,
        fscore = fscore,
-       difftime = difftime)
+       difftime = difftime,
+       hyper = hyper)
 }
 
 .duplicate_singletons <- function(x) {
