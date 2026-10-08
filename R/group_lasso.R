@@ -517,20 +517,20 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       #adjacent[abs(cor[j, ]) < hyper$threshold[i]] <- FALSE # avoid dilution
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
       temp <-  cor_trans * coef * adjacent
-      denom_local <- sum(abs(cor[, j])^hyper$exp_local[i] * adjacent)
-      #denom_local <- sum(adjacent) # consider: 1 or sum(adjacent)
-      #weight$local[j] <- ifelse(
-      #  test = denom_local == 0.0,
-      #  yes = 0.0,
-      #  no = sum(pmax(0.0, temp)[adjacent]) / denom_local
-      #)
-      #weight$local[p + j] <- ifelse(
-      #  test = denom_local == 0.0,
-      #  yes = 0.0,
-      #  no = sum(pmax(0.0, -temp)[adjacent]) / denom_local
-      #)
-      weight$local[j] <- weight$local[p + j] <- 
-        sum(abs(temp[adjacent])) / denom_local # sign-agnostic alternative
+      #denom_local <- sum(abs(cor[, j])^hyper$exp_local[i] * adjacent)
+      denom_local <- 1 # consider: 1 or sum(adjacent)
+      weight$local[j] <- ifelse(
+        test = denom_local == 0.0,
+        yes = 0.0,
+        no = sum(pmax(0.0, temp)[adjacent]) / denom_local
+      )
+      weight$local[p + j] <- ifelse(
+        test = denom_local == 0.0,
+        yes = 0.0,
+        no = sum(pmax(0.0, -temp)[adjacent]) / denom_local
+      )
+      #weight$local[j] <- weight$local[p + j] <- 
+      #  sum(abs(temp[adjacent])) / denom_local # sign-agnostic alternative
       weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef
       #denom_global <- sum(abs(cor[, j])^hyper$exp_global[i])
@@ -605,7 +605,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
                         wgt_global = 0.0, exp_global = Inf)
   } else if (identical(tune, "weight")) {
     wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
-    hyper <- data.frame(wgt_local = wgt_cand, exp_local = 0.0,
+    hyper <- data.frame(wgt_local = wgt_cand, exp_local = 2.0,
                         wgt_global = 1.0 - wgt_cand, exp_global = 2.0)
   } else if (identical(tune, "exponent")) {
     exp_cand <- c(0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0, Inf)
