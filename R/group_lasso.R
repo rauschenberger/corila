@@ -283,6 +283,7 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   }
   hyper$cvm <- vapply(X = cvm, FUN = base::min, FUN.VALUE = numeric(1L))
   id_hyper <- which.min(hyper$cvm)
+  print(hyper[id_hyper, ])
   lambda.min <- object_ext$model[[id_hyper]]$lambda[which.min(cvm[[id_hyper]])]
   # --- return fitted model ---
   object <- object_ext
@@ -474,6 +475,12 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     cor <- stats::cor(x = scale$x, method = cor, use = "pairwise.complete")
     # alternatively use function cor.shrink from package corpcor
   }
+  # soft/hard thresholding (Pearson/Spearman, not Kendall)
+  #t_critical <- stats::qt(p = 1 - 0.05 / 2, df = n - 2L) # soft-thresholding
+  #cutoff <- t_critical / sqrt(n - 2.0 + t_critical^2.0) # soft-thresholding
+  #cor <- sign(cor) * pmax(abs(cor) - cutoff, 0.0) / (1.0 - cutoff) # soft-thresholding
+  #diag(cor) <- 1.0 # soft-thresholding
+  #cor[abs(cor) < cutoff] <- 0.0 # hard-thresholding
   cor[is.na(cor)] <- 0.0
   pf <- .construct_penalty_factors(
     coef = init$coef, group = group, cor = cor, names = colnames(scale$x),
@@ -500,27 +507,34 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   pf <- list()
   for (i in seq_len(nrow(hyper))) {
     weight <- list()
-    weight$global <- weight$local <- rep(x = NA_real_, times = p)
-    cor_cut <- cor # alternative: function cor.shrink from package corpcor
-    cor_cut[abs(cor_cut) <= hyper$threshold[i]] <- 0.0
+    weight$global <- weight$local <- rep(x = NA_real_, times = 2L * p)
+    #cor[abs(cor) <= hyper$threshold[i]] <- 0.0 # hard-thresholding
+    #cor <- sign(cor) * pmax(abs(cor) - hyper$threshold[i], 0.0) /
+    #  (1.0 - hyper$threshold[i]) # soft-thresholding
     for (j in seq_len(p)) {
       adjacent <- .is_adjacent(group = group, j = j, p = p, names = names)
-      cor_trans <- sign(cor_cut[, j]) * abs(cor_cut[, j])^hyper$exp_local[i]
+      #adjacent <- adjacent & (cor[, j] != 0) # not correlated -> not adjacent
+      #adjacent[abs(cor[j, ]) < hyper$threshold[i]] <- FALSE # avoid dilution
+      cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
       temp <-  cor_trans * coef * adjacent
-      denom_local <- sum(abs(cor_cut[, j])^hyper$exp_local[i] * adjacent)
-      weight$local[j] <- ifelse(
-        test = denom_local == 0.0,
-        yes = 0.0,
-        no = sum(pmax(0.0, temp)[adjacent]) / denom_local
-      )
-      weight$local[p + j] <- ifelse(
-        test = denom_local == 0.0,
-        yes = 0.0,
-        no = sum(pmax(0.0, -temp)[adjacent]) / denom_local
-      )
+      denom_local <- sum(abs(cor[, j])^hyper$exp_local[i] * adjacent)
+      #denom_local <- sum(adjacent) # consider: 1 or sum(adjacent)
+      #weight$local[j] <- ifelse(
+      #  test = denom_local == 0.0,
+      #  yes = 0.0,
+      #  no = sum(pmax(0.0, temp)[adjacent]) / denom_local
+      #)
+      #weight$local[p + j] <- ifelse(
+      #  test = denom_local == 0.0,
+      #  yes = 0.0,
+      #  no = sum(pmax(0.0, -temp)[adjacent]) / denom_local
+      #)
+      weight$local[j] <- weight$local[p + j] <- 
+        sum(abs(temp[adjacent])) / denom_local # sign-agnostic alternative
       weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
-      temp <- sign(cor_cut[, j]) * abs(cor_cut[, j])^hyper$exp_global[i] * coef
-      denom_global <- sum(abs(cor_cut[, j])^hyper$exp_global[i])
+      temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef
+      #denom_global <- sum(abs(cor[, j])^hyper$exp_global[i])
+      denom_global <- 1
       weight$global[j] <- ifelse(
         test = denom_global == 0.0,
         yes = 0.0,
@@ -538,6 +552,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     )
     pf[[i]] <- 1.0 / (weight$local * hyper$wgt_local[i] +
                         weight$global * hyper$wgt_global[i])
+    #pf[[i]] <- pmin(pf[[i]], 1000) # upper bound
     pf[[i]][!c(primary, primary)] <- Inf # exclude auxiliary features
     checkmate::assert_numeric(x = pf[[i]], len = 2L * p, min = 0.0)
   }
@@ -584,29 +599,36 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 .set_candidates <- function(tune) {
   checkmate::assert_character(x = tune)
   tune <- tolower(tune)
+  # exp=1 => proportion of correlation, exp=2 => proportion of variance
   if (identical(tune, "none")) {
     hyper <- data.frame(wgt_local = 1.0, exp_local = 1.0,
                         wgt_global = 0.0, exp_global = Inf)
   } else if (identical(tune, "weight")) {
     wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
     hyper <- data.frame(wgt_local = wgt_cand, exp_local = 0.0,
-                        wgt_global = 1.0 - wgt_cand, exp_global = 1.0)
+                        wgt_global = 1.0 - wgt_cand, exp_global = 2.0)
   } else if (identical(tune, "exponent")) {
-    exp_cand <- c(0.0, 0.1, 0.25, 1.0 / 3.0, 0.5, 1.0, 2.0, 3.0, 4.0, 10.0, Inf)
+    exp_cand <- c(0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0, Inf)
     hyper <- data.frame(wgt_local = 1.0, exp_local = exp_cand,
                         wgt_global = 0.0, exp_global = Inf)
   } else if (identical(tune, "bivariate")) {
-    wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
+    wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.25)
     hyper <- data.frame(wgt_local = wgt_cand, exp_local = NA_real_,
                         wgt_global = 1.0 - wgt_cand, exp_global = NA_real_)
-    exp_cand <- c(0.1, 0.5, 0.8, 1.0, 1.25, 2.0, 10.0)
+    exp_cand <- c(2.0, 3.0, 5.0)
     hyper <- hyper[rep(seq_len(nrow(hyper)), each = length(exp_cand)), ]
     hyper$exp_local <- hyper$exp_global <- exp_cand
   } else if (identical(tune, "factorial")) {
-    wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.25)
-    exp_cand <- c(0.1, 0.5, 1.0, 2.0, 10.0)
-    hyper <- expand.grid(wgt_local = wgt_cand, exp_local = exp_cand,
-                         wgt_global = NA_real_, exp_global = exp_cand)
+    #wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.25)
+    #exp_cand <- c(0.1, 0.5, 1.0, 2.0, 10.0)
+    #hyper <- expand.grid(wgt_local = wgt_cand, exp_local = exp_cand,
+    #                     wgt_global = NA_real_, exp_global = exp_cand)
+    #hyper$wgt_global <- 1.0 - hyper$wgt_local
+    hyper <- expand.grid(wgt_local = seq(from = 0, to = 1, by = 0.25),
+                         #exp_local = c(0, 1, 2),
+                         exp_local = 0.0,
+                         wgt_global = NA_real_,
+                         exp_global = c(2.0, 3.0, 5.0))
     hyper$wgt_global <- 1.0 - hyper$wgt_local
   } else {
     stop("Invalid value for argument 'tune'.")
