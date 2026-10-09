@@ -12,11 +12,11 @@ for the hyperparameters:
 \itemize{
 \item \code{"none"}:
 fixed weights and exponents
-(\code{wgt_local}=1, \code{exp_local}=1, \code{wgt_global}=0),
+(\code{wgt_local}=1, \code{exp_local}=0, \code{wgt_global}=0),
 no tuning
 (share information within groups, ignore correlations)
 \item \code{"weight"} (default):
-fixed exponents (\code{exp_local}=0, \code{exp_global}=1),
+fixed exponents (\code{exp_local}=0, \code{exp_global}=2),
 tuning \code{wgt_local}=1-\code{wgt_global}
 (find a compromise between sharing information within groups
 and between correlated predictors)
@@ -31,10 +31,10 @@ tuning \code{wgt_local}=1-\code{wgt_global} and \code{exp_local}=\code{exp_globa
 between predictors in the same group and between all predictors,
 determine level of trust in correlation coefficients)
 \item \code{"factorial"}:
-tuning \code{wgt_local}, \code{exp_local}, \code{wgt_global}, \code{exp_global}
-(unrestricted information sharing
-with weights possibly not summing to one
-and possibly different exponents)
+tuning \code{wgt_local}=1-\code{wgt_global}, \code{exp_local}, and \code{exp_global}
+(find a compromise between sharing information within groups
+and between correlated predictors,
+with possibly different exponents)
 }
 
 (The internal function \code{\link[=.set_candidates]{.set_candidates()}} uses this argument
