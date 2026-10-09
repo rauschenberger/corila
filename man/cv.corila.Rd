@@ -11,7 +11,7 @@ cv.corila(
   primary = NULL,
   family = "gaussian",
   alpha_init = 0,
-  cor = "spearman",
+  cor = "pearson",
   alpha_final = 1,
   nfolds = 10L,
   foldid = NULL,
@@ -72,8 +72,8 @@ with one penalty for each group
 \item \code{NA} to set all initial coefficients equal to 1
 }}
 
-\item{cor}{character string \code{"pearson"},
-\code{"spearman"} (default),
+\item{cor}{character string \code{"pearson"} (default),
+\code{"spearman"},
 or \code{"kendall"};
 or a correlation matrix
 (\eqn{p} rows, \eqn{p} columns,

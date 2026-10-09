@@ -70,8 +70,8 @@ indicating whether a predictor may be included in the final model
 or must be excluded from the final model
 (\code{FALSE} for "auxiliary predictors")}
 
-\item{cor}{character string \code{"pearson"},
-\code{"spearman"} (default),
+\item{cor}{character string \code{"pearson"} (default),
+\code{"spearman"},
 or \code{"kendall"};
 or a correlation matrix
 (\eqn{p} rows, \eqn{p} columns,

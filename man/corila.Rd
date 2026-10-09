@@ -86,8 +86,8 @@ numeric between 0 for ridge penalisation
 and 1 for lasso penalisation
 (default: lasso penalisation with \code{alpha_final}=1)}
 
-\item{cor}{character string \code{"pearson"},
-\code{"spearman"} (default),
+\item{cor}{character string \code{"pearson"} (default),
+\code{"spearman"},
 or \code{"kendall"};
 or a correlation matrix
 (\eqn{p} rows, \eqn{p} columns,
@@ -150,7 +150,7 @@ object <- corila(x = x,
                  family = "gaussian",
                  alpha_init = 0.0,
                  alpha_final = 1.0,
-                 cor = "spearman",
+                 cor = "pearson",
                  foldid = NULL,
                  nfolds = 10L,
                  hyper = hyper,

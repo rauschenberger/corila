@@ -105,7 +105,7 @@ y <- drop(x \%*\% beta)
 .estim_initial_coefs(x = x,
                      y = y,
                      family = "gaussian",
-                     alpha_init = "spearman",
+                     alpha_init = "pearson",
                      group = NULL,
                      foldid = NULL,
                      nfolds = 10L,
