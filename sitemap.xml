@@ -8,7 +8,6 @@
 <url><loc>https://rauschenberger.github.io/corila/index.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/news/index.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/backscale.html</loc></url>
-<url><loc>https://rauschenberger.github.io/corila/reference/calc_sign_prec.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/coef.cv.corila.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/coef.multiridge.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/combine_slopes.html</loc></url>
@@ -36,6 +35,8 @@
 <url><loc>https://rauschenberger.github.io/corila/reference/residuals.cv.corila.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/residuals.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/set_candidates.html</loc></url>
+<url><loc>https://rauschenberger.github.io/corila/reference/sign_precision.html</loc></url>
+<url><loc>https://rauschenberger.github.io/corila/reference/sign_recall.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/simulate_data.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/simulate_effects.html</loc></url>
 <url><loc>https://rauschenberger.github.io/corila/reference/simulate_predictors.html</loc></url>

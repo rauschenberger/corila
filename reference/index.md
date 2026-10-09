@@ -53,8 +53,6 @@
 
 ## Internal functions
 
-- [`calc_sign_prec()`](https://rauschenberger.github.io/corila/reference/calc_sign_prec.md)
-  **\[experimental\]** : Precision for sign variable
 - [`.backscale()`](https://rauschenberger.github.io/corila/reference/backscale.md)
   : Inverse standardisation
 - [`.combine_slopes()`](https://rauschenberger.github.io/corila/reference/combine_slopes.md)
@@ -87,6 +85,10 @@
   : Deviance Residuals
 - [`.set_candidates()`](https://rauschenberger.github.io/corila/reference/set_candidates.md)
   : Candidate values
+- [`sign_precision()`](https://rauschenberger.github.io/corila/reference/sign_precision.md)
+  **\[experimental\]** : Precision for sign variable
+- [`sign_recall()`](https://rauschenberger.github.io/corila/reference/sign_recall.md)
+  **\[experimental\]** : Recall for sign variable
 - [`.simulate_effects()`](https://rauschenberger.github.io/corila/reference/simulate_effects.md)
   : Simulate effects
 - [`.simulate_predictors()`](https://rauschenberger.github.io/corila/reference/simulate_predictors.md)

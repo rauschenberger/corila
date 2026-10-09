@@ -71,7 +71,15 @@ of correlated variables.</p>
 <span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">.construct_penalty_factors</span><span class="op">(</span><span class="va">coef</span>, <span class="va">group</span>, <span class="va">cor</span>, <span class="va">names</span>, <span class="va">primary</span>, <span class="va">hyper</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">.construct_penalty_factors</span><span class="op">(</span></span>
+<span>  <span class="va">coef</span>,</span>
+<span>  <span class="va">group</span>,</span>
+<span>  <span class="va">cor</span>,</span>
+<span>  <span class="va">names</span>,</span>
+<span>  <span class="va">primary</span>,</span>
+<span>  <span class="va">hyper</span>,</span>
+<span>  sign_local <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -103,7 +111,9 @@ where \(n_0\) is the number of observations used for model training</p></dd>
 where the entry in the \(j^{\text{th}}\) row
 and the \(k^{\text{th}}\) column
 indicates whether information should be transferred
-from the \(j^{\text{th}}\) to the \(k^{\text{th}}\) variable</p></li>
+from the \(j^{\text{th}}\) to the \(k^{\text{th}}\) variable
+(usually with a unit diagonal so that predictors retain the information
+from their initial coefficient)</p></li>
 </ul></dd>
 
 
@@ -151,8 +161,8 @@ and 1 for lasso penalisation
 
 
 <dt id="arg-cor">cor<a class="anchor" aria-label="anchor" href="#arg-cor"></a></dt>
-<dd><p>character string <code>"pearson"</code>,
-<code>"spearman"</code> (default),
+<dd><p>character string <code>"pearson"</code> (default),
+<code>"spearman"</code>,
 or <code>"kendall"</code>;
 or a correlation matrix
 (\(p\) rows, \(p\) columns,
@@ -244,7 +254,7 @@ for adaptive lasso regression.</p></div>
 <span class="r-in"><span>                 family <span class="op">=</span> <span class="st">"gaussian"</span>,</span></span>
 <span class="r-in"><span>                 alpha_init <span class="op">=</span> <span class="fl">0.0</span>,</span></span>
 <span class="r-in"><span>                 alpha_final <span class="op">=</span> <span class="fl">1.0</span>,</span></span>
-<span class="r-in"><span>                 cor <span class="op">=</span> <span class="st">"spearman"</span>,</span></span>
+<span class="r-in"><span>                 cor <span class="op">=</span> <span class="st">"pearson"</span>,</span></span>
 <span class="r-in"><span>                 foldid <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
 <span class="r-in"><span>                 nfolds <span class="op">=</span> <span class="fl">10L</span>,</span></span>
 <span class="r-in"><span>                 hyper <span class="op">=</span> <span class="va">hyper</span>,</span></span>

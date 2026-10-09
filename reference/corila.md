@@ -23,7 +23,15 @@ corila(
   silent = FALSE
 )
 
-.construct_penalty_factors(coef, group, cor, names, primary, hyper)
+.construct_penalty_factors(
+  coef,
+  group,
+  cor,
+  names,
+  primary,
+  hyper,
+  sign_local = FALSE
+)
 ```
 
 ## Arguments
@@ -57,7 +65,8 @@ corila(
   - \\p \times p\\ matrix, where the entry in the \\j^{\text{th}}\\ row
     and the \\k^{\text{th}}\\ column indicates whether information
     should be transferred from the \\j^{\text{th}}\\ to the
-    \\k^{\text{th}}\\ variable
+    \\k^{\text{th}}\\ variable (usually with a unit diagonal so that
+    predictors retain the information from their initial coefficient)
 
 - primary:
 
@@ -103,7 +112,7 @@ corila(
 
 - cor:
 
-  character string `"pearson"`, `"spearman"` (default), or `"kendall"`;
+  character string `"pearson"` (default), `"spearman"`, or `"kendall"`;
   or a correlation matrix (\\p\\ rows, \\p\\ columns, entries between
   \\-1\\ and \\+1\\)
 
@@ -200,7 +209,7 @@ object <- corila(x = x,
                  family = "gaussian",
                  alpha_init = 0.0,
                  alpha_final = 1.0,
-                 cor = "spearman",
+                 cor = "pearson",
                  foldid = NULL,
                  nfolds = 10L,
                  hyper = hyper,

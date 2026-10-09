@@ -15,7 +15,7 @@ cv.corila(
   primary = NULL,
   family = "gaussian",
   alpha_init = 0,
-  cor = "spearman",
+  cor = "pearson",
   alpha_final = 1,
   nfolds = 10L,
   foldid = NULL,
@@ -56,7 +56,8 @@ cv.corila(
   - \\p \times p\\ matrix, where the entry in the \\j^{\text{th}}\\ row
     and the \\k^{\text{th}}\\ column indicates whether information
     should be transferred from the \\j^{\text{th}}\\ to the
-    \\k^{\text{th}}\\ variable
+    \\k^{\text{th}}\\ variable (usually with a unit diagonal so that
+    predictors retain the information from their initial coefficient)
 
 - primary:
 
@@ -89,7 +90,7 @@ cv.corila(
 
 - cor:
 
-  character string `"pearson"`, `"spearman"` (default), or `"kendall"`;
+  character string `"pearson"` (default), `"spearman"`, or `"kendall"`;
   or a correlation matrix (\\p\\ rows, \\p\\ columns, entries between
   \\-1\\ and \\+1\\)
 
@@ -223,6 +224,8 @@ model <- cv.corila(x = data$x_train,
                    y = data$y_train,
                    group = data$group,
                    primary = data$primary)
+#>   wgt_local exp_local wgt_global exp_global threshold      cvm
+#> 1         0       Inf          1          2         0 10.47225
 beta_hat <- coef(object = model)
 y_hat <- predict(object = model, newx = data$x_test)
 # }
@@ -236,4 +239,6 @@ model <- cv.corila(x = data$x_train,
                    alpha_init = 0.0,
                    foldid = rep(x = seq_len(10L),
                                 length.out = nrow(data$x_train)))
+#>   wgt_local exp_local wgt_global exp_global threshold      cvm
+#> 2       0.1         0        0.9          2         0 10.39423
 ```

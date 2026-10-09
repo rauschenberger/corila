@@ -23,7 +23,8 @@ Identifies adjacent predictors.
   - \\p \times p\\ matrix, where the entry in the \\j^{\text{th}}\\ row
     and the \\k^{\text{th}}\\ column indicates whether information
     should be transferred from the \\j^{\text{th}}\\ to the
-    \\k^{\text{th}}\\ variable
+    \\k^{\text{th}}\\ variable (usually with a unit diagonal so that
+    predictors retain the information from their initial coefficient)
 
 - j:
 
