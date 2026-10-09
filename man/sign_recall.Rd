@@ -31,3 +31,4 @@ sign_recall(truth = truth, estim = truth) # upper limit 1
 sign_recall(truth = 0L * truth, estim = estim) # not defined
 
 }
+\keyword{internal}

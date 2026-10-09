@@ -32,3 +32,4 @@ sign_precision(truth = truth, estim = truth) # upper limit 1
 sign_precision(truth = truth, estim = 0L * estim) # not defined
 
 }
+\keyword{internal}

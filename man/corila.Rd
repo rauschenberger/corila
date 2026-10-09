@@ -21,7 +21,15 @@ corila(
   silent = FALSE
 )
 
-.construct_penalty_factors(coef, group, cor, names, primary, hyper)
+.construct_penalty_factors(
+  coef,
+  group,
+  cor,
+  names,
+  primary,
+  hyper,
+  sign_local = FALSE
+)
 }
 \arguments{
 \item{x}{\eqn{n_0 \times p} predictor matrix,
