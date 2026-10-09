@@ -53,7 +53,7 @@ primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
 #>   wgt_local exp_local wgt_global exp_global threshold      cvm
-#> 1         0       Inf          1          2         0 3.835027
+#> 1         0       Inf          1          2         0 3.834771
 
 # using S3 methods
 coef(object)
@@ -86,7 +86,7 @@ summary(object)
 #> 20 features (10 primary and 10 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 43.78 
+#> optimised regularisation parameter: lambda.min = 44.02 
 #> selected weights: local = 0, global = 1
 #> selected exponents: local = Inf, global = 2
 #> 4 non-zero coefficients (including intercept)

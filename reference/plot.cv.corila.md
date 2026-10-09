@@ -47,8 +47,8 @@ group <- rep(seq_len(q), length.out = p)
 primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
-#>   wgt_local exp_local wgt_global exp_global threshold      cvm
-#> 4       0.3         0        0.7          2         0 0.458711
+#>   wgt_local exp_local wgt_global exp_global threshold       cvm
+#> 4       0.3         0        0.7          2         0 0.4574178
 print(object)
 #> object of class ‘cv.corila’ 
 #> (contains multiple objects of class ‘cv.glmnet’)
@@ -59,7 +59,7 @@ summary(object)
 #> 20 features (12 primary and 8 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 1.731 
+#> optimised regularisation parameter: lambda.min = 1.966 
 #> selected weights: local = 0.3, global = 0.7
 #> selected exponents: local = 0, global = 2
 #> 1 non-zero coefficients (including intercept)

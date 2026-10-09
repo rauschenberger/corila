@@ -87,8 +87,8 @@ or a histogram of fitted relative risks for the Cox model</p></li>
 <span class="r-in"><span><span class="va">primary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">p</span>, size <span class="op">=</span> <span class="fl">1L</span>, prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.corila.html">cv.corila</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, group <span class="op">=</span> <span class="va">group</span>, primary <span class="op">=</span> <span class="va">primary</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   wgt_local exp_local wgt_global exp_global threshold      cvm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       0.3         0        0.7          2         0 0.458711</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   wgt_local exp_local wgt_global exp_global threshold       cvm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       0.3         0        0.7          2         0 0.4574178</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> object of class ‘cv.corila’ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (contains multiple objects of class ‘cv.glmnet’)</span>
@@ -99,7 +99,7 @@ or a histogram of fitted relative risks for the Cox model</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 20 features (12 primary and 8 auxiliary features)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> initial coefficients: ridge regression </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> final coefficients: adaptive lasso regression </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> optimised regularisation parameter: lambda.min = 1.731 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> optimised regularisation parameter: lambda.min = 1.966 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> selected weights: local = 0.3, global = 0.7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> selected exponents: local = 0, global = 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 non-zero coefficients (including intercept)</span>
