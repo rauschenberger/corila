@@ -80,8 +80,8 @@
 #' NB: If `foldid` is provided, `nfolds` is overwritten by `max(foldid)`.
 #'
 #' @param cor
-#' character string `"pearson"`,
-#' `"spearman"` (default),
+#' character string `"pearson"` (default),
+#' `"spearman"`,
 #' or `"kendall"`;
 #' or a correlation matrix
 #' (\eqn{p} rows, \eqn{p} columns,
@@ -209,7 +209,7 @@
 #' @srrstats {RE4.8} *returns response variable in slot "y"*
 #'
 cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
-                      alpha_init = 0.0, cor = "spearman", alpha_final = 1.0,
+                      alpha_init = 0.0, cor = "pearson", alpha_final = 1.0,
                       nfolds = 10L, foldid = NULL, tune = "weight",
                       na_action = "error", silent = FALSE) {
   # --- validate arguments ---
@@ -431,7 +431,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'                  family = "gaussian",
 #'                  alpha_init = 0.0,
 #'                  alpha_final = 1.0,
-#'                  cor = "spearman",
+#'                  cor = "pearson",
 #'                  foldid = NULL,
 #'                  nfolds = 10L,
 #'                  hyper = hyper,
@@ -476,11 +476,11 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     # alternatively use function cor.shrink from package corpcor
   }
   # soft/hard thresholding (Pearson/Spearman, not Kendall)
-  #t_critical <- stats::qt(p = 1 - 0.05 / 2, df = n - 2L) # soft-thresholding
-  #cutoff <- t_critical / sqrt(n - 2.0 + t_critical^2.0) # soft-thresholding
-  #cor <- sign(cor) * pmax(abs(cor) - cutoff, 0.0) / (1.0 - cutoff) # soft-thresholding
-  #diag(cor) <- 1.0 # soft-thresholding
-  #cor[abs(cor) < cutoff] <- 0.0 # hard-thresholding
+  #t_critical <- stats::qt(p = 1 - 0.05 / 2, df = n - 2L) # soft
+  #cutoff <- t_critical / sqrt(n - 2.0 + t_critical^2.0) # soft
+  #cor <- sign(cor) * pmax(abs(cor) - cutoff, 0.0) / (1.0 - cutoff) # soft
+  #diag(cor) <- 1.0 # soft
+  #cor[abs(cor) < cutoff] <- 0.0 # hard
   cor[is.na(cor)] <- 0.0
   pf <- .construct_penalty_factors(
     coef = init$coef, group = group, cor = cor, names = colnames(scale$x),
@@ -518,19 +518,19 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
       cor_trans <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_local[i]
       temp <-  cor_trans * coef * adjacent
       #denom_local <- sum(abs(cor[, j])^hyper$exp_local[i] * adjacent)
-      denom_local <- 1 # consider: 1 or sum(adjacent)
-      weight$local[j] <- ifelse(
-        test = denom_local == 0.0,
-        yes = 0.0,
-        no = sum(pmax(0.0, temp)[adjacent]) / denom_local
-      )
-      weight$local[p + j] <- ifelse(
-        test = denom_local == 0.0,
-        yes = 0.0,
-        no = sum(pmax(0.0, -temp)[adjacent]) / denom_local
-      )
-      #weight$local[j] <- weight$local[p + j] <- 
-      #  sum(abs(temp[adjacent])) / denom_local # sign-agnostic alternative
+      #denom_local <- 1 # consider: 1 or sum(adjacent)
+      #weight$local[j] <- ifelse(
+      #  test = denom_local == 0.0,
+      #  yes = 0.0,
+      #  no = sum(pmax(0.0, temp)[adjacent]) / denom_local
+      #)
+      #weight$local[p + j] <- ifelse(
+      #  test = denom_local == 0.0,
+      #  yes = 0.0,
+      #  no = sum(pmax(0.0, -temp)[adjacent]) / denom_local
+      #)
+      weight$local[j] <- weight$local[p + j] <-
+        sum(abs(temp[adjacent])) / sum(adjacent) # sign-agnostic alternative
       weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
       temp <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef
       #denom_global <- sum(abs(cor[, j])^hyper$exp_global[i])
@@ -605,7 +605,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
                         wgt_global = 0.0, exp_global = Inf)
   } else if (identical(tune, "weight")) {
     wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.1)
-    hyper <- data.frame(wgt_local = wgt_cand, exp_local = 2.0,
+    hyper <- data.frame(wgt_local = wgt_cand, exp_local = 0.0,
                         wgt_global = 1.0 - wgt_cand, exp_global = 2.0)
   } else if (identical(tune, "exponent")) {
     exp_cand <- c(0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0, Inf)
@@ -682,7 +682,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
 #' .estim_initial_coefs(x = x,
 #'                      y = y,
 #'                      family = "gaussian",
-#'                      alpha_init = "spearman",
+#'                      alpha_init = "pearson",
 #'                      group = NULL,
 #'                      foldid = NULL,
 #'                      nfolds = 10L,
