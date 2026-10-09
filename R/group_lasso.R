@@ -517,19 +517,20 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
         weight$local[j] <- weight$local[p + j] <-
           sum(abs(c_local[adjacent])) / sum(adjacent)
       }
-      weight$local[is.na(weight$local)] <- 0.0 # features in no group (ad-hoc)
+      weight$local[is.na(weight$local)] <- 0.0
       # global weights
       c_global <- sign(cor[, j]) * abs(cor[, j])^hyper$exp_global[i] * coef
       weight$global[j] <- sum(pmax(0.0, c_global))
       weight$global[p + j] <- sum(pmax(0.0, -c_global))
     }
+    weight$local[!c(primary, primary)] <- 0.0 # exclude auxiliary features
+    weight$global[!c(primary, primary)] <- 0.0 # exclude auxiliary features
     weight <- lapply(
       X = weight,
       FUN = function(x) p * ifelse(test = x == 0.0, yes = 0.0, no = x / sum(x))
     )
     pf[[i]] <- 1.0 / (weight$local * hyper$wgt_local[i] +
                         weight$global * hyper$wgt_global[i])
-    pf[[i]][!c(primary, primary)] <- Inf # exclude auxiliary features
     checkmate::assert_numeric(x = pf[[i]], len = 2L * p, min = 0.0)
   }
   pf
