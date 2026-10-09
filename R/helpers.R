@@ -30,6 +30,8 @@
 #' sign_precision(truth = truth, estim = truth) # upper limit 1
 #' sign_precision(truth = truth, estim = 0L * estim) # not defined
 #'
+#' @keywords internal
+#'
 #' @rdname sign_precision
 #'
 #' @export
@@ -77,6 +79,8 @@ sign_precision <- function(truth, estim) {
 #' sign_recall(truth = truth, estim = 0L * estim) # lower limit 0
 #' sign_recall(truth = truth, estim = truth) # upper limit 1
 #' sign_recall(truth = 0L * truth, estim = estim) # not defined
+#'
+#' @keywords internal
 #'
 #' @rdname sign_recall
 #'
