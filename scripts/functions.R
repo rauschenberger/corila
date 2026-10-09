@@ -494,7 +494,7 @@ sign_fscore <- function(truth, estim) {
     warning("no unit variance")
   }
   eta <- x %*% beta
-  y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta)) # sqrt in manuscript?
+  y <- eta + stats::rnorm(n = n, sd = 0.5 * stats::sd(eta))
   if (plot) {
     graphics::par(mfrow = c(1L, 2L))
     graphics::plot(beta, col = group)
