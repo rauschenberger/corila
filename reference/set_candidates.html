@@ -57,11 +57,11 @@
 <dd><p>character string for determining the candidate values
 for the hyperparameters:</p><ul><li><p><code>"none"</code>:
 fixed weights and exponents
-(<code>wgt_local</code>=1, <code>exp_local</code>=1, <code>wgt_global</code>=0),
+(<code>wgt_local</code>=1, <code>exp_local</code>=0, <code>wgt_global</code>=0),
 no tuning
 (share information within groups, ignore correlations)</p></li>
 <li><p><code>"weight"</code> (default):
-fixed exponents (<code>exp_local</code>=0, <code>exp_global</code>=1),
+fixed exponents (<code>exp_local</code>=0, <code>exp_global</code>=2),
 tuning <code>wgt_local</code>=1-<code>wgt_global</code>
 (find a compromise between sharing information within groups
 and between correlated predictors)</p></li>
@@ -76,10 +76,10 @@ tuning <code>wgt_local</code>=1-<code>wgt_global</code> and <code>exp_local</cod
 between predictors in the same group and between all predictors,
 determine level of trust in correlation coefficients)</p></li>
 <li><p><code>"factorial"</code>:
-tuning <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, <code>exp_global</code>
-(unrestricted information sharing
-with weights possibly not summing to one
-and possibly different exponents)</p></li>
+tuning <code>wgt_local</code>=1-<code>wgt_global</code>, <code>exp_local</code>, and <code>exp_global</code>
+(find a compromise between sharing information within groups
+and between correlated predictors,
+with possibly different exponents)</p></li>
 </ul><p>(The internal function <code>.set_candidates()</code> uses this argument
 to create a grid of candidates values for
 <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, and <code>exp_global</code>.)</p></dd>

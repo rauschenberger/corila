@@ -117,12 +117,12 @@ cv.corila(
   character string for determining the candidate values for the
   hyperparameters:
 
-  - `"none"`: fixed weights and exponents (`wgt_local`=1, `exp_local`=1,
+  - `"none"`: fixed weights and exponents (`wgt_local`=1, `exp_local`=0,
     `wgt_global`=0), no tuning (share information within groups, ignore
     correlations)
 
   - `"weight"` (default): fixed exponents (`exp_local`=0,
-    `exp_global`=1), tuning `wgt_local`=1-`wgt_global` (find a
+    `exp_global`=2), tuning `wgt_local`=1-`wgt_global` (find a
     compromise between sharing information within groups and between
     correlated predictors)
 
@@ -135,9 +135,10 @@ cv.corila(
     information between predictors in the same group and between all
     predictors, determine level of trust in correlation coefficients)
 
-  - `"factorial"`: tuning `wgt_local`, `exp_local`, `wgt_global`,
-    `exp_global` (unrestricted information sharing with weights possibly
-    not summing to one and possibly different exponents)
+  - `"factorial"`: tuning `wgt_local`=1-`wgt_global`, `exp_local`, and
+    `exp_global` (find a compromise between sharing information within
+    groups and between correlated predictors, with possibly different
+    exponents)
 
   (The internal function
   [`.set_candidates()`](https://rauschenberger.github.io/corila/reference/set_candidates.md)
@@ -225,7 +226,7 @@ model <- cv.corila(x = data$x_train,
                    group = data$group,
                    primary = data$primary)
 #>   wgt_local exp_local wgt_global exp_global threshold      cvm
-#> 1         0       Inf          1          2         0 10.48576
+#> 2       0.1         0        0.9          2         0 10.40527
 beta_hat <- coef(object = model)
 y_hat <- predict(object = model, newx = data$x_test)
 # }
@@ -239,6 +240,6 @@ model <- cv.corila(x = data$x_train,
                    alpha_init = 0.0,
                    foldid = rep(x = seq_len(10L),
                                 length.out = nrow(data$x_train)))
-#>   wgt_local exp_local wgt_global exp_global threshold     cvm
-#> 2       0.1         0        0.9          2         0 10.3919
+#>    wgt_local exp_local wgt_global exp_global threshold      cvm
+#> 11         1         0          0        Inf         0 10.19317
 ```

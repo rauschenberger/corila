@@ -160,11 +160,11 @@ and 1 for lasso penalisation
 <dd><p>character string for determining the candidate values
 for the hyperparameters:</p><ul><li><p><code>"none"</code>:
 fixed weights and exponents
-(<code>wgt_local</code>=1, <code>exp_local</code>=1, <code>wgt_global</code>=0),
+(<code>wgt_local</code>=1, <code>exp_local</code>=0, <code>wgt_global</code>=0),
 no tuning
 (share information within groups, ignore correlations)</p></li>
 <li><p><code>"weight"</code> (default):
-fixed exponents (<code>exp_local</code>=0, <code>exp_global</code>=1),
+fixed exponents (<code>exp_local</code>=0, <code>exp_global</code>=2),
 tuning <code>wgt_local</code>=1-<code>wgt_global</code>
 (find a compromise between sharing information within groups
 and between correlated predictors)</p></li>
@@ -179,10 +179,10 @@ tuning <code>wgt_local</code>=1-<code>wgt_global</code> and <code>exp_local</cod
 between predictors in the same group and between all predictors,
 determine level of trust in correlation coefficients)</p></li>
 <li><p><code>"factorial"</code>:
-tuning <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, <code>exp_global</code>
-(unrestricted information sharing
-with weights possibly not summing to one
-and possibly different exponents)</p></li>
+tuning <code>wgt_local</code>=1-<code>wgt_global</code>, <code>exp_local</code>, and <code>exp_global</code>
+(find a compromise between sharing information within groups
+and between correlated predictors,
+with possibly different exponents)</p></li>
 </ul><p>(The internal function <code><a href="set_candidates.html">.set_candidates()</a></code> uses this argument
 to create a grid of candidates values for
 <code>wgt_local</code>, <code>exp_local</code>, <code>wgt_global</code>, and <code>exp_global</code>.)</p></dd>
@@ -262,7 +262,7 @@ with the helper functions listed <a href="validate.html">here</a>.</p></div>
 <span class="r-in"><span>                   group <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">group</span>,</span></span>
 <span class="r-in"><span>                   primary <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">primary</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   wgt_local exp_local wgt_global exp_global threshold      cvm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1         0       Inf          1          2         0 10.48576</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       0.1         0        0.9          2         0 10.40527</span>
 <span class="r-in"><span><span class="va">beta_hat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">model</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y_hat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">model</span>, newx <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">x_test</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
@@ -276,8 +276,8 @@ with the helper functions listed <a href="validate.html">here</a>.</p></div>
 <span class="r-in"><span>                   alpha_init <span class="op">=</span> <span class="fl">0.0</span>,</span></span>
 <span class="r-in"><span>                   foldid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">10L</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                                length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">x_train</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   wgt_local exp_local wgt_global exp_global threshold     cvm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       0.1         0        0.9          2         0 10.3919</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    wgt_local exp_local wgt_global exp_global threshold      cvm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11         1         0          0        Inf         0 10.19317</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
