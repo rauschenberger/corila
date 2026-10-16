@@ -6,7 +6,7 @@ correlated features allowing for privileged information"
 algorithm, sharing information based on assumed adjacencies and observed
 correlations, and allowing not only for primary but also for auxiliary
 predictors. It builds upon adaptive lasso regression with the
-[glmnet-package](https://glmnet.stanford.edu/reference/glmnet-package.html).
+[glmnet-package](https://rdrr.io/pkg/glmnet/man/glmnet-package.html).
 
 ## Details
 
