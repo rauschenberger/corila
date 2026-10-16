@@ -248,7 +248,8 @@ sign_fscore <- function(truth, estim) {
     checkmate::assert_integerish(x = group, lower = 1L, len = p,
                                  any.missing = FALSE, sorted = TRUE)
   }
-  checkmate::assert_logical(x = primary, len = p, any.missing = FALSE)
+  checkmate::assert_logical(x = primary, len = p, any.missing = FALSE,
+                            null.ok = TRUE)
   if(is.null(primary)) {
     primary <- rep(x = TRUE, times = p)
   }
