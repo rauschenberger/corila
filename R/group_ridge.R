@@ -137,6 +137,9 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   checkmate::assert_integer(x = group, len = ncol(x),
                             lower = 1L, upper = length(unique(group)))
   group <- as.integer(round(group))
+  if (is.unsorted(group)) {
+    stop("Argument 'group' must be sorted.")
+  }
   if (is.null(foldid)) {
     checkmate::assert_int(x = nfolds, lower = 2L, upper = nrow(x),
                           null.ok = TRUE)
