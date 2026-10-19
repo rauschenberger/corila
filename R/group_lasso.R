@@ -604,9 +604,10 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     stop("Invalid value for argument 'tune'.")
   }
   if (is.null(hyper$threshold)) hyper$threshold <- 0.0
-  # The replacement of irrelevant exponents is only relevant for some sets of hyperparameters (i.e., bivariate and factorial).
+  # The replacement of irrelevant exponents is only relevant for
+  # some sets of hyperparameters (i.e., bivariate and factorial).
   hyper$exp_local[hyper$wgt_local < .Machine$double.eps] <- Inf
-  hyper$exp_global[hyper$wgt_global < .Machine$double.eps] <- Inf 
+  hyper$exp_global[hyper$wgt_global < .Machine$double.eps] <- Inf
   hyper <- unique(hyper)
   rownames(hyper) <- seq_len(nrow(hyper))
   hyper
