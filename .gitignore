@@ -11,3 +11,5 @@
 *.png
 doc/
 docs/
+.Rproj.user
+.positai

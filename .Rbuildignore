@@ -16,3 +16,7 @@ _development.Rmd
 CITATION.cff
 ^scripts$
 ^data-raw$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.positai$
+^\.claude$
