@@ -475,7 +475,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   checkmate::assert_number(x = lambda_init, lower = 0.0, null.ok = TRUE)
   args <- c(n = n, p = p, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
-  checkmate::expect_logical(x = sign_local, any.missing = FALSE, len = 1L)
+  checkmate::assert_logical(x = sign_local, any.missing = FALSE, len = 1L)
   rm(x, y)
   # --- estimate initial coefficients ---
   init <- .estim_initial_coefs(
