@@ -92,4 +92,12 @@ for (family in c("gaussian", "binomial", "cox")) {
                         foldid = foldid)
     testthat::expect_identical(object = refit, expected = object)
   })
+  testthat::test_that("multiridge rejects unordered groups", {
+    testthat::expect_error(
+      multiridge(x = x[cond, ],
+                 y = y[cond],
+                 group = rev(group),
+                 family = family)
+    )
+  })
 }
