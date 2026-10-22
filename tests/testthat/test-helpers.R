@@ -413,7 +413,7 @@ testthat::test_that("residuals match those from stats::residuals", {
 
 ## function .construct_penalty_factors -----------------------------------------
 
-testthat::test_that("penalty factors are constructed," {
+testthat::test_that("penalty factors are constructed", {
   p <- 50L
   coef <- stats::rnorm(p)
   group <- rep(x = seq_len(10L), length.out = p)
@@ -424,12 +424,16 @@ testthat::test_that("penalty factors are constructed," {
   hyper <- data.frame(exp_local = 0.0, wgt_local = 0.5,
                       exp_global = 2.0, wgt_global = 0.5)
   sign_local <- FALSE
+  # general tests
   pf <- .construct_penalty_factors(
     coef = coef, group = group, cor = cor, names = names, primary = primary,
     hyper = hyper, sign_local = sign_local
   )[[1L]]
   testthat::expect_type(object = pf, type = "double")
   testthat::expect_all_equal(object = pf[!primary], expected = Inf)
+  # for each feature, sign-agnostic (sign_local = FALSE)
+  # and sign-aware (sign_local = TRUE) approach
+  # lead to the same total weight (positive and negative part together)
   hyper <- data.frame(exp_local = 0.0, wgt_local = 1.0,
                       exp_global = 2.0, wgt_global = 0.0)
   pf0 <- .construct_penalty_factors(
@@ -442,6 +446,8 @@ testthat::test_that("penalty factors are constructed," {
     coef = coef, group = group, cor = cor, names = names, primary = primary,
     hyper = hyper, sign_local = TRUE
   )[[1L]]
-  testthat::expect_equal(object = 1.0 / (1.0 / pf1[1L:50L] + 1 / pf1[51L:100L]),
-                         expected = 0.5 * pf0[1L:50L])
+  testthat::expect_equal(
+    object = (1.0 / pf1[1L:50L] + 1 / pf1[51L:100L]),
+    expected = (1.0 / pf0[1L:50L] + 1 / pf0[51L:100L])
+  )
 })
