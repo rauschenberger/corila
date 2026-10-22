@@ -91,44 +91,44 @@ and calls the internal function <code><a href="residuals.html">.residuals()</a><
 <span class="r-in"><span><span class="co"># fitting the model</span></span></span>
 <span class="r-in"><span><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.corila.html">cv.corila</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, group <span class="op">=</span> <span class="va">group</span>, primary <span class="op">=</span> <span class="va">primary</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    wgt_local exp_local wgt_global exp_global threshold      cvm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11         1         0          0        Inf         0 1.792635</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   wgt_local exp_local wgt_global exp_global threshold      cvm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       0.4         0        0.6          2         0 2.885987</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># using S3 methods</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (intercept)        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.1910942  -0.4528897   0.0000000   0.0000000   0.0000000   0.0000000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.0000000   0.0000000   0.0000000  -0.2268216   0.0000000   0.0000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.1314233   0.0000000   0.0000000  -0.3703490   0.0000000   0.0000000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -0.2308594   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.0000000   0.0000000   0.0000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.0000000   0.0000000  -0.6398561 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newx <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.186875744  0.816536087  0.461487360 -0.302035846  0.296781032</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6]  0.418972095  0.009587133 -0.740386858  0.045254514  0.648661414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.02159641  0.81992936 -0.26708138 -0.75205031  0.23008413  0.72817440</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -1.43826926  0.35489118  1.26389884 -0.25248387</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.186875744  0.816536087  0.461487360 -0.302035846  0.296781032</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6]  0.418972095  0.009587133 -0.740386858  0.045254514  0.648661414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.02159641  0.81992936 -0.26708138 -0.75205031  0.23008413  0.72817440</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -1.43826926  0.35489118  1.26389884 -0.25248387</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.53418090  0.19316925  0.35717618 -0.18173426 -0.28458351  1.49568597</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.35078531 -0.60900795 -0.03311259 -0.75419750</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.08393967  1.22013830 -0.05932453 -0.83556861  0.14858285  1.31602999</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.42177644 -0.53272310 -0.85713063  0.10571184</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="residuals.cv.corila-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> object of class ‘cv.corila’ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (contains multiple objects of class ‘cv.glmnet’)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selected 2 from 20 predictors</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected 3 from 20 predictors</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- object of class “cv.corila” --- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> generalised linear model with gaussian family </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 20 features (10 primary and 10 auxiliary features)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> initial coefficients: ridge regression </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> final coefficients: adaptive lasso regression </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> optimised regularisation parameter: lambda.min = 0.3004 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selected weights: local = 1, global = 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selected exponents: local = 0, global = Inf</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 non-zero coefficients (including intercept)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> optimised regularisation parameter: lambda.min = 0.3568 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected weights: local = 0.4, global = 0.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> selected exponents: local = 0, global = 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 non-zero coefficients (including intercept)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
