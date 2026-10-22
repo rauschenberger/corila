@@ -18,7 +18,8 @@ corila(
   foldid,
   nfolds,
   lambda_init,
-  silent = FALSE
+  silent = FALSE,
+  sign_local = FALSE
 )
 
 .construct_penalty_factors(
@@ -114,6 +115,10 @@ or \code{NULL} (cross-validation)}
 
 \item{silent}{Should messages from \code{\link[glmnet:glmnet]{glmnet::glmnet()}} and \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet()}}
 be suppressed? (logical scalar, \code{FALSE} or \code{TRUE})}
+
+\item{sign_local}{experimental argument:
+logical scalar indicating whether local weights should be sign-aware
+(default \code{FALSE})}
 }
 \value{
 Returns an object of class \code{"corila"}.

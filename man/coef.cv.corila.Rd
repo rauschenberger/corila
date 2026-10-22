@@ -47,7 +47,8 @@ model <- cv.corila(x = data$x_train,
                    primary = data$primary,
                    alpha_init = 0.0,
                    foldid = rep(x = seq_len(10L),
-                                length.out = nrow(data$x_train)))
+                                length.out = nrow(data$x_train)),
+                   seed = 1L)
 
 }
 \references{
