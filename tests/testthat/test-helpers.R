@@ -410,3 +410,38 @@ testthat::test_that("residuals match those from stats::residuals", {
     testthat::expect_equal(object = resid, expected = stats::residuals(glm)) # !
   }
 })
+
+## function .construct_penalty_factors -----------------------------------------
+
+testthat::test_that("penalty factors are constructed," {
+  p <- 50L
+  coef <- stats::rnorm(p)
+  group <- rep(x = seq_len(10L), length.out = p)
+  cor <- matrix(data = NA, nrow = p, ncol = p)
+  cor <- 0.9^abs(row(cor) - col(cor))
+  names <- NULL
+  primary <- sample(x = c(TRUE, FALSE), replace = TRUE, size = p)
+  hyper <- data.frame(exp_local = 0.0, wgt_local = 0.5,
+                      exp_global = 2.0, wgt_global = 0.5)
+  sign_local <- FALSE
+  pf <- .construct_penalty_factors(
+    coef = coef, group = group, cor = cor, names = names, primary = primary,
+    hyper = hyper, sign_local = sign_local
+  )[[1L]]
+  testthat::expect_type(object = pf, type = "double")
+  testthat::expect_all_equal(object = pf[!primary], expected = Inf)
+  hyper <- data.frame(exp_local = 0.0, wgt_local = 1.0,
+                      exp_global = 2.0, wgt_global = 0.0)
+  pf0 <- .construct_penalty_factors(
+    coef = coef, group = group, cor = cor, names = names, primary = primary,
+    hyper = hyper, sign_local = FALSE
+  )[[1L]]
+  testthat::expect_equal(object = pf0[1L:50L],
+                         expected = pf0[51:100L])
+  pf1 <- .construct_penalty_factors(
+    coef = coef, group = group, cor = cor, names = names, primary = primary,
+    hyper = hyper, sign_local = TRUE
+  )[[1L]]
+  testthat::expect_equal(object = 1.0 / (1.0 / pf1[1L:50L] + 1 / pf1[51L:100L]),
+                         expected = 0.5 * pf0[1L:50L])
+})
