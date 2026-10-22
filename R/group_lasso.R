@@ -130,7 +130,7 @@
 #' @param silent
 #' Should messages from [glmnet::glmnet()] and [glmnet::cv.glmnet()]
 #' be suppressed? (logical scalar, `FALSE` or `TRUE`)
-#' 
+#'
 #' @param seed
 #' random seed (integer scalar) for reproducibility, or \code{NULL} (default)
 #'
@@ -381,11 +381,11 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' containing candidate values
 #' for the regularisation and mixing hyperparameters,
 #' as well as for the correlation hard-thresholding hyperparameter
-#' 
+#'
 #' @param sign_local
 #' experimental argument:
 #' logical scalar indicating whether local weights should be sign-aware
-#' (default `FALSE`)  
+#' (default `FALSE`)
 #'
 #' @details
 #' The numbers of observations (samples) for training or testing
