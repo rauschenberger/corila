@@ -159,7 +159,7 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                FUN = function(i) scale$x[, group == i, drop = FALSE])
   xxblocks <- multiridge::createXXblocks(datablocks = xx)
   invisible(utils::capture.output({
-    init <- multiridge::fastCV2(XXblocks = xxblocks, Y = scale$y, 
+    init <- multiridge::fastCV2(XXblocks = xxblocks, Y = scale$y,
                                 kfold = nfolds, model = model)
   }))
   # --- cross-validation ---
