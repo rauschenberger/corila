@@ -120,6 +120,8 @@
 multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                        nfolds = 10L, penalties = NULL) {
   # --- validate arguments ---
+  checkmate::assert_matrix(x = x, mode = "numeric",
+                           min.rows = 1L, min.cols = 1L, any.missing = FALSE)
   family <- .validate_family(family = family, poisson = FALSE)
   checkmate::assert_integer(x = group, len = ncol(x),
                             lower = 1L, upper = length(unique(group)))
@@ -127,17 +129,11 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   if (is.unsorted(group)) {
     stop("Argument 'group' must be sorted.")
   }
-  if (is.matrix(x) && ncol(x) != length(group)) {
-    stop("For each variable, 'x' should have one column, ",
-         "and 'group' should have one entry.")
-  }
   cond <- !is.null(penalties) && !is.null(group) &&
     length(unique(group)) != length(penalties)
   if (cond) {
     stop("Argument 'penalties' must have one entry for each group.")
   }
-  checkmate::assert_matrix(x = x, mode = "numeric",
-                           min.rows = 1L, min.cols = 1L, any.missing = FALSE)
   y <- .validate_y(y = y, family = family, n = nrow(x), na_action = "error",
                    names = rownames(x))
   if (is.null(foldid)) {
