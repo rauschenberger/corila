@@ -156,9 +156,8 @@ cv.corila(
 - silent:
 
   Should messages from
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
-  and
-  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) and
+  [`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
   be suppressed? (logical scalar, `FALSE` or `TRUE`)
 
 ## Value
@@ -226,7 +225,7 @@ model <- cv.corila(x = data$x_train,
                    group = data$group,
                    primary = data$primary)
 #>   wgt_local exp_local wgt_global exp_global threshold      cvm
-#> 1         0       Inf          1          2         0 10.48576
+#> 2       0.1         0        0.9          2         0 10.40527
 beta_hat <- coef(object = model)
 y_hat <- predict(object = model, newx = data$x_test)
 # }
@@ -240,6 +239,6 @@ model <- cv.corila(x = data$x_train,
                    alpha_init = 0.0,
                    foldid = rep(x = seq_len(10L),
                                 length.out = nrow(data$x_train)))
-#>   wgt_local exp_local wgt_global exp_global threshold     cvm
-#> 2       0.1         0        0.9          2         0 10.3919
+#>    wgt_local exp_local wgt_global exp_global threshold      cvm
+#> 11         1         0          0        Inf         0 10.19317
 ```
