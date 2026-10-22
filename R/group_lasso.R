@@ -130,6 +130,9 @@
 #' @param silent
 #' Should messages from [glmnet::glmnet()] and [glmnet::cv.glmnet()]
 #' be suppressed? (logical scalar, `FALSE` or `TRUE`)
+#' 
+#' @param seed
+#' random seed (integer scalar) for reproducibility, or \code{NULL} (default)
 #'
 #' @inherit corila details
 #'
@@ -184,7 +187,8 @@
 #'                    primary = data$primary,
 #'                    alpha_init = 0.0,
 #'                    foldid = rep(x = seq_len(10L),
-#'                                 length.out = nrow(data$x_train)))
+#'                                 length.out = nrow(data$x_train)),
+#'                    seed = 1L)
 #'
 #' @keywords methods models regression classif
 #'
@@ -211,8 +215,10 @@
 cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
                       alpha_init = 0.0, cor = "pearson", alpha_final = 1.0,
                       nfolds = 10L, foldid = NULL, tune = "weight",
-                      na_action = "error", silent = FALSE) {
+                      na_action = "error", silent = FALSE, seed = NULL) {
   # --- validate arguments ---
+  checkmate::assertInt(x = seed, null.ok = TRUE)
+  if (!is.null(seed)) set.seed(seed)
   family <- .validate_family(family = family)
   na_action <- .validate_na_action(na_action = na_action)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
@@ -375,6 +381,11 @@ predict.corila <- function(object, newx, index, s, ...) {
 #' containing candidate values
 #' for the regularisation and mixing hyperparameters,
 #' as well as for the correlation hard-thresholding hyperparameter
+#' 
+#' @param sign_local
+#' experimental argument:
+#' logical scalar indicating whether local weights should be sign-aware
+#' (default `FALSE`)  
 #'
 #' @details
 #' The numbers of observations (samples) for training or testing
@@ -446,7 +457,7 @@ predict.corila <- function(object, newx, index, s, ...) {
 #'
 corila <- function(x, y, group, primary, family, hyper, alpha_init,
                    alpha_final, cor, foldid,
-                   nfolds, lambda_init, silent = FALSE) {
+                   nfolds, lambda_init, silent = FALSE, sign_local = FALSE) {
   # --- validate arguments ---
   family <- .validate_family(family = family)
   checkmate::assert_logical(x = silent, any.missing = FALSE, len = 1L)
@@ -464,6 +475,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   checkmate::assert_number(x = lambda_init, lower = 0.0, null.ok = TRUE)
   args <- c(n = n, p = p, mget(setdiff(names(formals(corila)), c("x", "y"))))
   scale <- .forescale(x = x, y = y, family = family)
+  checkmate::expect_logical(x = sign_local, any.missing = FALSE, len = 1L)
   rm(x, y)
   # --- estimate initial coefficients ---
   init <- .estim_initial_coefs(
@@ -480,7 +492,7 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
   cor[is.na(cor)] <- 0.0
   pf <- .construct_penalty_factors(
     coef = init$coef, group = group, cor = cor, names = colnames(scale$x),
-    primary = primary, hyper = hyper
+    primary = primary, hyper = hyper, sign_local = sign_local
   )
   # --- estimate final coefficients ---
   model <- list()
