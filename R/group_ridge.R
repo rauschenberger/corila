@@ -141,8 +141,7 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
     stop("Argument 'group' must be sorted.")
   }
   if (is.null(foldid)) {
-    checkmate::assert_int(x = nfolds, lower = 2L, upper = nrow(x),
-                          null.ok = TRUE)
+    checkmate::assert_int(x = nfolds, lower = 2L, upper = nrow(x))
     nfolds <- as.integer(round(nfolds))
   } else {
     checkmate::assert_integer(x = foldid, len = nrow(x),
@@ -160,7 +159,8 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                FUN = function(i) scale$x[, group == i, drop = FALSE])
   xxblocks <- multiridge::createXXblocks(datablocks = xx)
   invisible(utils::capture.output({
-    init <- multiridge::fastCV2(XXblocks = xxblocks, Y = scale$y, model = model)
+    init <- multiridge::fastCV2(XXblocks = xxblocks, Y = scale$y, 
+                                kfold = nfolds, model = model)
   }))
   # --- cross-validation ---
   if (is.null(penalties)) {
@@ -227,16 +227,16 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
 #' @export
 predict.multiridge <- function(object, newx, ...) {
   # --- check arguments ---
-  if (length(object$group) != ncol(newx)) {
-    stop("Argument 'newx' must have one column",
-         "for each variable used in model fitting.")
-  }
   checkmate::assert_matrix(x = newx, mode = "numeric", min.rows = 1L,
                            ncols = length(object$group))
+  if (length(object$group) != ncol(newx)) {
+    stop("Argument 'newx' must have one column ",
+         "for each variable used in model fitting.")
+  }
   # --- make predictions ---
   scale <- .forescale(x = newx, pars = object$pars)
   newxx <- lapply(X = unique(object$group),
-                  FUN = function(x) scale$x[, object$group == x])
+                  FUN = function(x) scale$x[, object$group == x, drop = FALSE])
   xxblocks <- multiridge::createXXblocks(datablocks = object$datablocks,
                                          datablocksnew = newxx)
   sigmanew <- multiridge::SigmaFromBlocks(XXblocks = xxblocks,
