@@ -2,7 +2,7 @@
 
 ## Scope
 
-Implements lasso regression (Gaussian, logistic, Poisson, and Cox) for
+Implements lasso regression (Gaussian, binomial, Poisson, and Cox) for
 features in heterogeneous groups (e.g., where some groups contain
 subgroups of correlated features), overlapping groups (i.e., where some
 features belong to two or more groups), and misspecified groups (i.e.,
@@ -65,7 +65,7 @@ private pull mirrors on two institutional GitLab instances (see
 https://git.lih.lu/arauschenberger/corila and
 https://gitlab.com/uniluxembourg/Personalfolders/armin.rauschenberger/corila)).
 
-Large-language models (mainly Claude Sonnet 4.6 and GPT-5.4) were used
+Large language models (mainly Claude Sonnet 4.6 and GPT-5.4) were used
 for reviewing R code and documentation.
 
 **Copyright** © 2025 Armin Rauschenberger; Luxembourg Institute of
