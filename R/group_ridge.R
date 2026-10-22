@@ -121,6 +121,12 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                        nfolds = 10L, penalties = NULL) {
   # --- validate arguments ---
   family <- .validate_family(family = family, poisson = FALSE)
+  checkmate::assert_integer(x = group, len = ncol(x),
+                            lower = 1L, upper = length(unique(group)))
+  group <- as.integer(round(group))
+  if (is.unsorted(group)) {
+    stop("Argument 'group' must be sorted.")
+  }
   if (is.matrix(x) && ncol(x) != length(group)) {
     stop("For each variable, 'x' should have one column, ",
          "and 'group' should have one entry.")
@@ -134,12 +140,6 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
                            min.rows = 1L, min.cols = 1L, any.missing = FALSE)
   y <- .validate_y(y = y, family = family, n = nrow(x), na_action = "error",
                    names = rownames(x))
-  checkmate::assert_integer(x = group, len = ncol(x),
-                            lower = 1L, upper = length(unique(group)))
-  group <- as.integer(round(group))
-  if (is.unsorted(group)) {
-    stop("Argument 'group' must be sorted.")
-  }
   if (is.null(foldid)) {
     checkmate::assert_int(x = nfolds, lower = 2L, upper = nrow(x))
     nfolds <- as.integer(round(nfolds))
@@ -158,10 +158,6 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
   xx <- lapply(X = unique(group),
                FUN = function(i) scale$x[, group == i, drop = FALSE])
   xxblocks <- multiridge::createXXblocks(datablocks = xx)
-  invisible(utils::capture.output({
-    init <- multiridge::fastCV2(XXblocks = xxblocks, Y = scale$y,
-                                kfold = nfolds, model = model)
-  }))
   # --- cross-validation ---
   if (is.null(penalties)) {
     if (is.null(foldid)) {
@@ -170,6 +166,10 @@ multiridge <- function(x, y, group, family = "gaussian", foldid = NULL,
       indices <- lapply(X = seq_len(nfolds),
                         FUN = function(x) which(foldid == x))
     }
+    invisible(utils::capture.output({
+      init <- multiridge::fastCV2(XXblocks = xxblocks, Y = scale$y,
+                                  kfold = nfolds, model = model)
+    }))
     invisible(utils::capture.output({
       final <- multiridge::optLambdasWrap(
         penaltiesinit = init$lambdas, XXblocks = xxblocks, Y = scale$y,
