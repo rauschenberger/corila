@@ -62,7 +62,8 @@ Optimises the parameters and the hyperparameters of the sparse group lasso."></h
 <span>  foldid <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tune <span class="op">=</span> <span class="st">"weight"</span>,</span>
 <span>  na_action <span class="op">=</span> <span class="st">"error"</span>,</span>
-<span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  silent <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -197,8 +198,12 @@ with a missing predictor or a missing response from model fitting
 
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
-<dd><p>Should messages from <code><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
+<dd><p>Should messages from <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code> and <code><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">glmnet::cv.glmnet()</a></code>
 be suppressed? (logical scalar, <code>FALSE</code> or <code>TRUE</code>)</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>random seed (integer scalar) for reproducibility, or <code>NULL</code> (default)</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -275,7 +280,8 @@ with the helper functions listed <a href="validate.html">here</a>.</p></div>
 <span class="r-in"><span>                   primary <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">primary</span>,</span></span>
 <span class="r-in"><span>                   alpha_init <span class="op">=</span> <span class="fl">0.0</span>,</span></span>
 <span class="r-in"><span>                   foldid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">10L</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">x_train</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                                length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">x_train</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                   seed <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    wgt_local exp_local wgt_global exp_global threshold      cvm</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11         1         0          0        Inf         0 10.19317</span>
 <span class="r-in"><span></span></span>

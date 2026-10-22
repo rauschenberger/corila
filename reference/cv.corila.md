@@ -21,7 +21,8 @@ cv.corila(
   foldid = NULL,
   tune = "weight",
   na_action = "error",
-  silent = FALSE
+  silent = FALSE,
+  seed = NULL
 )
 ```
 
@@ -156,9 +157,14 @@ cv.corila(
 - silent:
 
   Should messages from
-  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) and
-  [`glmnet::cv.glmnet()`](https://rdrr.io/pkg/glmnet/man/cv.glmnet.html)
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  and
+  [`glmnet::cv.glmnet()`](https://glmnet.stanford.edu/reference/cv.glmnet.html)
   be suppressed? (logical scalar, `FALSE` or `TRUE`)
+
+- seed:
+
+  random seed (integer scalar) for reproducibility, or `NULL` (default)
 
 ## Value
 
@@ -238,7 +244,8 @@ model <- cv.corila(x = data$x_train,
                    primary = data$primary,
                    alpha_init = 0.0,
                    foldid = rep(x = seq_len(10L),
-                                length.out = nrow(data$x_train)))
+                                length.out = nrow(data$x_train)),
+                   seed = 1L)
 #>    wgt_local exp_local wgt_global exp_global threshold      cvm
 #> 11         1         0          0        Inf         0 10.19317
 ```

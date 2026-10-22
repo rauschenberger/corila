@@ -27,7 +27,7 @@ Returns a scalar.
 ## Details
 
 Returns the deviance calculated by
-[`glmnet::deviance.glmnet()`](https://rdrr.io/pkg/glmnet/man/deviance.glmnet.html)
+[`glmnet::deviance.glmnet()`](https://glmnet.stanford.edu/reference/deviance.glmnet.html)
 for the model with the optimised mixing and regularisation
 hyperparameters.
 
@@ -57,27 +57,27 @@ primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
 #>   wgt_local exp_local wgt_global exp_global threshold      cvm
-#> 3       0.2         0        0.8          2         0 1.861687
+#> 2       0.1         0        0.9          2         0 2.215141
 
 # using S3 methods
 coef(object)
 #> (intercept)        <NA>        <NA>        <NA>        <NA>        <NA> 
-#>  -0.4934846   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000 
+#> -0.08951567  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000 
 #>        <NA>        <NA>        <NA>        <NA>        <NA>        <NA> 
-#>   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000 
+#>  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000 
 #>        <NA>        <NA>        <NA>        <NA>        <NA>        <NA> 
-#>   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000 
+#>  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000 
 #>        <NA>        <NA>        <NA> 
-#>   0.0000000   0.0000000   0.0000000 
+#>  0.00000000  0.00000000  0.00000000 
 predict(object, newx = x)
-#>  [1] -0.4934846 -0.4934846 -0.4934846 -0.4934846 -0.4934846 -0.4934846
-#>  [7] -0.4934846 -0.4934846 -0.4934846 -0.4934846
+#>  [1] -0.08951567 -0.08951567 -0.08951567 -0.08951567 -0.08951567 -0.08951567
+#>  [7] -0.08951567 -0.08951567 -0.08951567 -0.08951567
 fitted(object)
-#>  [1] -0.4934846 -0.4934846 -0.4934846 -0.4934846 -0.4934846 -0.4934846
-#>  [7] -0.4934846 -0.4934846 -0.4934846 -0.4934846
+#>  [1] -0.08951567 -0.08951567 -0.08951567 -0.08951567 -0.08951567 -0.08951567
+#>  [7] -0.08951567 -0.08951567 -0.08951567 -0.08951567
 residuals(object)
-#>  [1] -0.18455606  0.02012657  1.52090170 -0.10390295  1.65333399 -0.83974226
-#>  [7] -0.43227104 -0.58101051 -0.95763188 -0.09524755
+#>  [1]  0.31299608 -0.78919195  1.25248022 -1.91064928 -0.45527507 -0.16615504
+#>  [7] -0.07660537  1.10997958  0.22573756  0.49668327
 plot(object)
 
 print(object)
@@ -90,8 +90,8 @@ summary(object)
 #> 20 features (12 primary and 8 auxiliary features)
 #> initial coefficients: ridge regression 
 #> final coefficients: adaptive lasso regression 
-#> optimised regularisation parameter: lambda.min = 1.218 
-#> selected weights: local = 0.2, global = 0.8
+#> optimised regularisation parameter: lambda.min = 3.185 
+#> selected weights: local = 0.1, global = 0.9
 #> selected exponents: local = 0, global = 2
 #> 1 non-zero coefficients (including intercept)
 ```
