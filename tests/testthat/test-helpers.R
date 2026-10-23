@@ -238,7 +238,6 @@ testthat::test_that("error if different lengths", {
 
 ## function "sign_recall" ------------------------------------------------------
 
-
 testthat::test_that("recall is finite scalar", {
   precision <- sign_recall(truth = truth, estim = estim)
   testthat::expect_type(object = precision, type = "double")
@@ -277,6 +276,36 @@ testthat::test_that("error if different lengths", {
   truth <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
   estim <- sample(x = c(-1L, 0L, 1L), size = n - 1L, replace = TRUE)
   testthat::expect_error(sign_recall(truth = truth, estim = estim))
+})
+
+## function "sign_fscore" ------------------------------------------------------
+
+testthat::test_that("fscore is finite scalar", {
+  precision <- sign_fscore(truth = truth, estim = estim)
+  testthat::expect_type(object = precision, type = "double")
+  testthat::expect_length(object = precision, n = 1L)
+  testthat::expect_true(all(is.finite(precision)))
+})
+
+testthat::test_that("fscore equals zero if all signs are inverted", {
+  prec <- sign_fscore(truth = truth, estim = -truth)
+  testthat::expect_identical(object = prec, expected = 0.0)
+})
+
+testthat::test_that("fscore equals one if all signs are true", {
+  prec <- sign_fscore(truth = truth, estim = truth)
+  testthat::expect_identical(object = prec, expected = 1.0)
+})
+
+testthat::test_that("fscore is not defined if all true signs equal zero", {
+  prec <- sign_fscore(truth = 0L * truth, estim = estim)
+  testthat::expect_identical(object = prec, expected = NA)
+})
+
+testthat::test_that("error if different lengths", {
+  truth <- sample(x = c(-1L, 0L, 1L), size = n, replace = TRUE)
+  estim <- sample(x = c(-1L, 0L, 1L), size = n - 1L, replace = TRUE)
+  testthat::expect_error(sign_fscore(truth = truth, estim = estim))
 })
 
 ## function ".folds" -----------------------------------------------------------

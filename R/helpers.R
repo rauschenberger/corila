@@ -103,6 +103,54 @@ sign_recall <- function(truth, estim) {
 }
 
 #' @title
+#' F-score for sign variable
+#'
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
+#' Calculates the F-score for ternary variables
+#' with support \eqn{\{-1, 0, 1\}}.
+#'
+#' @param truth
+#' integer vector with values in \eqn{\{-1, 0, 1\}}
+#'
+#' @param estim
+#' integer vector of same length with values in \eqn{\{-1, 0, 1\}}
+#'
+#' @return
+#' Returns a scalar between 0 (minimum) and 1 (maximum), or `NA`.
+#' (Returns `NA` if precision or recall equals `NA`,
+#' and returns 0 if precision and recall equal 0.)
+#'
+#' @examples
+#' \dontshow{sign_fscore <- corila:::sign_fscore}
+#' truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+#' estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
+#' sign_fscore(truth = truth, estim = estim) # observed value
+#' sign_fscore(truth = truth, estim = -truth) # lower limit 0
+#' sign_fscore(truth = truth, estim = truth) # upper limit 1
+#' sign_fscore(truth = 0L * truth, estim = estim) # not defined
+#' sign_fscore(truth = truth, estim = 0L *estim) # not defined
+#'
+#' @keywords internal
+#'
+#' @rdname sign_fscore
+#'
+#' @export
+#'
+sign_fscore <- function(truth, estim) {
+  precision <- corila::sign_precision(truth = truth, estim = estim)
+  recall <- corila::sign_recall(truth = truth, estim = estim)
+  if (is.na(precision) || is.na(recall)) {
+    NA
+  } else if (precision == 0 && recall == 0) {
+    0
+  } else {
+    2 * precision * recall / (precision + recall)
+  }
+}
+
+#' @title
 #' Standardisation
 #'
 #' @description
