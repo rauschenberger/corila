@@ -66,8 +66,6 @@ primary <- as.logical(rbinom(n = p, size = 1L, prob = 0.5))
 # fitting the model
 object <- cv.corila(x = x, y = y, group = group, primary = primary)
 #> Warning: Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold
-#>    wgt_local exp_local wgt_global exp_global threshold      cvm
-#> 11         1         0          0        Inf         0 5.038443
 
 # using S3 methods
 coef(object)
