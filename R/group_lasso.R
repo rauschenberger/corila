@@ -1,4 +1,3 @@
-# This file contains the functions of the R package "corila".
 
 #----- model fitting with cross-validation -----
 
@@ -289,7 +288,6 @@ cv.corila <- function(x, y, group, primary = NULL, family = "gaussian",
   }
   hyper$cvm <- vapply(X = cvm, FUN = base::min, FUN.VALUE = numeric(1L))
   id_hyper <- which.min(hyper$cvm)
-  print(hyper[id_hyper, ])
   lambda.min <- object_ext$model[[id_hyper]]$lambda[which.min(cvm[[id_hyper]])]
   # --- return fitted model ---
   object <- object_ext
