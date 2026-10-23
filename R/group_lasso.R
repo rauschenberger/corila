@@ -609,7 +609,8 @@ corila <- function(x, y, group, primary, family, hyper, alpha_init,
     wgt_cand <- seq(from = 0.0, to = 1.0, by = 0.25)
     exp_cand <- c(0.0, 1.0, 2.0, 3.0, 5.0)
     hyper <- expand.grid(wgt_local = wgt_cand, exp_local = exp_cand,
-                         wgt_global = 1.0 - wgt_cand, exp_global = exp_cand)
+                         wgt_global = NA, exp_global = exp_cand)
+    hyper$wgt_global <- 1.0 - hyper$wgt_local
   } else {
     stop("Invalid value for argument 'tune'.")
   }
