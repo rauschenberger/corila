@@ -85,6 +85,8 @@
   : Deviance Residuals
 - [`.set_candidates()`](https://rauschenberger.github.io/corila/reference/set_candidates.md)
   : Candidate values
+- [`sign_fscore()`](https://rauschenberger.github.io/corila/reference/sign_fscore.md)
+  **\[experimental\]** : F-score for sign variable
 - [`sign_precision()`](https://rauschenberger.github.io/corila/reference/sign_precision.md)
   **\[experimental\]** : Precision for sign variable
 - [`sign_recall()`](https://rauschenberger.github.io/corila/reference/sign_recall.md)

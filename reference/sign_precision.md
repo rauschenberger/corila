@@ -33,7 +33,7 @@ precision), or `NA` if all estimated signs equal 0.
 truth <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
 estim <- sample(x = c(-1L, 0L, 1L), size = 10L, replace = TRUE)
 sign_precision(truth = truth, estim = estim) # observed value
-#> [1] 0.4285714
+#> [1] 0.2
 sign_precision(truth = truth, estim = -truth) # lower limit 0
 #> [1] 0
 sign_precision(truth = truth, estim = truth) # upper limit 1
